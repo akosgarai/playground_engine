@@ -1,6 +1,6 @@
 # Shader
 
-This structure helps us to create shader applications. It stores an `id`, that was generated with the gl.CreateProgram command, and the wrapper, that is ued to call gl. functions.
+This structure helps us to create shader applications. It stores an `id`, that was generated with the gl.CreateProgram command, and the wrapper, that is used to call gl. functions.
 
 
 ## Functions
@@ -17,7 +17,7 @@ It compiles the given shader program string as the given type of shader. In case
 
 ### NewShader
 
-NewShader returns a Shader. It's inputs are the filenames of the shaders, and the glwrapper instance. It reads the files and compiles them. The shaders are attached to the shader program.
+NewShader returns a Shader. Its inputs are the filenames of the shaders, and the glwrapper instance. It reads the files and compiles them. The shaders are attached to the shader program.
 
 ### Use
 
