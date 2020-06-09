@@ -15,7 +15,7 @@ func TestNew(t *testing.T) {
 
 	// normal
 	if triangle.Normal != expectedNormal {
-		t.Error("Invalid normal vector")
+		t.Errorf("Invalid normal vector. Instead of '%v', we have '%v'.\n", expectedNormal, triangle.Normal)
 	}
 	// bounding object
 	boParams := triangle.BO.Params()
@@ -58,10 +58,7 @@ func TestSortAngles(t *testing.T) {
 	for _, tt := range testData {
 		ordered := sortAngles(tt.Orig[0], tt.Orig[1], tt.Orig[2])
 		if ordered != tt.Ordered {
-			t.Error("Invalid order")
-			t.Log(ordered)
-			t.Log(tt.Ordered)
-			t.Log(tt.Orig)
+			t.Errorf("Invalid order. Original: '%v', expected: '%v', result: '%v'.\n", tt.Orig, tt.Ordered, ordered)
 		}
 	}
 }
@@ -70,8 +67,9 @@ func TestColoredMeshInput(t *testing.T) {
 	triangle := New(60, 60, 60)
 	vert, ind, _ := triangle.ColoredMeshInput([]mgl32.Vec3{mgl32.Vec3{1, 1, 1}})
 	if ind[0] != 0 || ind[1] != 1 || ind[2] != 2 {
-		t.Error("Invalid indices")
-		t.Log(vert)
-		t.Log(ind)
+		t.Errorf("Invalid indices. Instead of '[0, 1, 2]', we have '%v'", ind)
+	}
+	if len(vert) != 3 {
+		t.Errorf("Invalid number of vertices. Insead of '3', we have '%d': '%v'.\n", len(vert), vert)
 	}
 }
