@@ -9,9 +9,37 @@ import (
 func TestNew(t *testing.T) {
 	triangle := New(60, 60, 60)
 	expectedNormal := mgl32.Vec3{0, -1, 0}
+	expectedWidth := float32(1.0)
+	expectedHeight := float32(0.0)
+	expectedLength := float32(0.86602545) // sqrt(1^2 - 0.5^2)
 
+	// normal
 	if triangle.Normal != expectedNormal {
 		t.Error("Invalid normal vector")
+	}
+	// bounding object
+	boParams := triangle.BO.Params()
+	if boParams["height"] != expectedHeight {
+		t.Errorf("Invalid BO height. Instead of '%f', we have '%f'.\n", expectedHeight, boParams["height"])
+	}
+	if boParams["length"] != expectedLength {
+		t.Errorf("Invalid BO length. Instead of '%f', we have '%f'.\n", expectedLength, boParams["length"])
+	}
+	if boParams["width"] != expectedWidth {
+		t.Errorf("Invalid BO width. Instead of '%f', we have '%f'.\n", expectedWidth, boParams["width"])
+	}
+	// position
+	leftPoint := mgl32.Vec3{-0.5, 0.0, 0.0}
+	rightPoint := mgl32.Vec3{0.5, 0.0, 0.0}
+	topPoint := mgl32.Vec3{0.0, 0.0, expectedLength}
+	if !leftPoint.ApproxEqual(triangle.Points[0]) {
+		t.Errorf("Invalid left point. Insead of '%v', we have '%v'.\n", leftPoint, triangle.Points[0])
+	}
+	if !topPoint.ApproxEqualThreshold(triangle.Points[1], 0.001) {
+		t.Errorf("Invalid top point. Insead of '%v', we have '%v'.\n", topPoint, triangle.Points[1])
+	}
+	if !rightPoint.ApproxEqual(triangle.Points[2]) {
+		t.Errorf("Invalid top right. Insead of '%v', we have '%v'.\n", rightPoint, triangle.Points[2])
 	}
 }
 func TestSortAngles(t *testing.T) {

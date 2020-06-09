@@ -12,7 +12,7 @@ import (
 type Triangle struct {
 	Points [3]mgl32.Vec3
 	Normal mgl32.Vec3
-	BB     *boundingobject.BoundingObject
+	BO     *boundingobject.BoundingObject
 }
 
 // New returns a Triangle. The inputs are the angles of the triangle.
@@ -74,5 +74,5 @@ func (t *Triangle) ColoredMeshInput(col []mgl32.Vec3) (vertex.Vertices, []uint32
 			Color:    col[i%len(col)],
 		})
 	}
-	return vertices, indices, t.BB
+	return vertices, indices, t.BO
 }
