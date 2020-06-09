@@ -54,14 +54,14 @@ It is a little bit complicated than the ambient, because we need more calculatio
 norm = normalize(vNormal) // just to make sure, that it's normalized.
 lightDirection = normalize(lightPosition - vPosition) // it's a direction vector, it has to be normalized. 
 diffMult = max(dot(norm, lightDirection), 0.0) // it is the dot product of the lightDirection and norm vectors, but it can't be negative number.
-diffuseColorComponent = lightColor * (diffMult * material.diffuse) // calulate the diffuse color component
+diffuseColorComponent = lightColor * (diffMult * material.diffuse) // calculate the diffuse color component
 ```
 
 It's also a 3D vector.
 
 - The specular component
 
-Calculating this is also fun. We need to know some further stuff for the calculation. We have to know the view position (`viewPosition`, the position of the camera) the view direction (`viewDirection`, we can calulate it from the lightPosition and the viewPosition), and the direction of the reflection (`reflectionDirection`, we can calculate it based on the light direction and the normal vector of the object)
+Calculating this is also fun. We need to know some further stuff for the calculation. We have to know the view position (`viewPosition`, the position of the camera) the view direction (`viewDirection`, we can calculate it from the lightPosition and the viewPosition), and the direction of the reflection (`reflectionDirection`, we can calculate it based on the light direction and the normal vector of the object)
 
 ```
 viewDirection = normalize(viewPosition - lightPosition) // The light is coming from the lamp to the camera (eye)
