@@ -1,7 +1,7 @@
 # Sphere
 
 This package represents a unit sphere, that is described with the points of its surface. The points, and the indices are calculated based in the precision value.
-The math behind the calculation is based on [this](http://www.songho.ca/opengl/gl_sphere.html) very good explanation. 
+The math behind the calculation is based on [this](http://www.songho.ca/opengl/gl_sphere.html) very good explanation. The bounding object of the `Sphere` is obviously a `Sphere`.
 
 ## New
 
