@@ -43,6 +43,10 @@ func setup() {
 }
 
 func TestGenVertexArrays(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -55,6 +59,9 @@ func TestGenVertexArrays(t *testing.T) {
 	}()
 }
 func TestGenBuffers(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -67,6 +74,9 @@ func TestGenBuffers(t *testing.T) {
 	}()
 }
 func TestBindVertexArray(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -80,6 +90,9 @@ func TestBindVertexArray(t *testing.T) {
 	}()
 }
 func TestBindBuffer(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -93,6 +106,9 @@ func TestBindBuffer(t *testing.T) {
 	}()
 }
 func TestArrayBufferData(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -108,6 +124,9 @@ func TestArrayBufferData(t *testing.T) {
 	}()
 }
 func TestElementBufferData(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -123,6 +142,9 @@ func TestElementBufferData(t *testing.T) {
 	}()
 }
 func TestVertexAttribPointer(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -139,6 +161,9 @@ func TestVertexAttribPointer(t *testing.T) {
 	}()
 }
 func TestActiveTexture(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -153,6 +178,9 @@ func TestActiveTexture(t *testing.T) {
 	}()
 }
 func TestBindTexture(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -168,6 +196,9 @@ func TestBindTexture(t *testing.T) {
 	}()
 }
 func TestDrawTriangleElements(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -207,6 +238,9 @@ func TestDrawTriangleElements(t *testing.T) {
 	}()
 }
 func TestUseProgram(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -234,6 +268,9 @@ func TestUseProgram(t *testing.T) {
 	}()
 }
 func TestGetUniformLocation(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -264,6 +301,9 @@ func TestGetUniformLocation(t *testing.T) {
 	}()
 }
 func TestUniform1i(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -292,6 +332,9 @@ func TestUniform1i(t *testing.T) {
 	}()
 }
 func TestCreateProgram(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -305,6 +348,9 @@ func TestCreateProgram(t *testing.T) {
 	}()
 }
 func TestAttachShader(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -324,6 +370,9 @@ func TestAttachShader(t *testing.T) {
 	}()
 }
 func TestLinkProgram(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -350,6 +399,9 @@ func TestLinkProgram(t *testing.T) {
 	}()
 }
 func TestUniformMatrix4fv(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -379,6 +431,9 @@ func TestUniformMatrix4fv(t *testing.T) {
 	}()
 }
 func TestCreateShader(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -392,6 +447,9 @@ func TestCreateShader(t *testing.T) {
 	}()
 }
 func TestStrs(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -407,6 +465,9 @@ func TestStrs(t *testing.T) {
 	}()
 }
 func TestShaderSource(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -424,6 +485,9 @@ func TestShaderSource(t *testing.T) {
 	}()
 }
 func TestCompileShader(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -442,6 +506,9 @@ func TestCompileShader(t *testing.T) {
 	}()
 }
 func TestGetShaderiv(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -465,6 +532,9 @@ func TestGetShaderiv(t *testing.T) {
 	}()
 }
 func TestGetShaderInfoLog(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -491,6 +561,9 @@ func TestGetShaderInfoLog(t *testing.T) {
 	}()
 }
 func TestStr(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -517,6 +590,9 @@ func TestStr(t *testing.T) {
 	}()
 }
 func TestInitOpenGL(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -527,6 +603,9 @@ func TestInitOpenGL(t *testing.T) {
 	}()
 }
 func TestTexImage2D(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -548,6 +627,9 @@ func TestTexImage2D(t *testing.T) {
 	}()
 }
 func TestPtr(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -569,6 +651,9 @@ func TestPtr(t *testing.T) {
 	}()
 }
 func TestGenerateMipmap(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -583,6 +668,9 @@ func TestGenerateMipmap(t *testing.T) {
 	}()
 }
 func TestGenTextures(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -596,6 +684,9 @@ func TestGenTextures(t *testing.T) {
 	}()
 }
 func TestUniformMatrix3fv(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -625,6 +716,9 @@ func TestUniformMatrix3fv(t *testing.T) {
 	}()
 }
 func TestUniform3f(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -653,6 +747,9 @@ func TestUniform3f(t *testing.T) {
 	}()
 }
 func TestUniform1f(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -681,6 +778,9 @@ func TestUniform1f(t *testing.T) {
 	}()
 }
 func TestPtrOffset(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -692,6 +792,9 @@ func TestPtrOffset(t *testing.T) {
 	}()
 }
 func TestDisableVertexAttribArray(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -709,6 +812,9 @@ func TestDisableVertexAttribArray(t *testing.T) {
 	}()
 }
 func TestDrawArrays(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -744,6 +850,9 @@ func TestDrawArrays(t *testing.T) {
 	}()
 }
 func TestTexParameteri(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -768,6 +877,9 @@ func TestTexParameterfv(t *testing.T) {
 	t.Skip("Needs to be implemented.")
 }
 func TestClearColor(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -781,6 +893,9 @@ func TestClearColor(t *testing.T) {
 	}()
 }
 func TestClear(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -794,6 +909,9 @@ func TestClear(t *testing.T) {
 	}()
 }
 func TestEnable(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -807,6 +925,9 @@ func TestEnable(t *testing.T) {
 	}()
 }
 func TestDepthFunc(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -821,6 +942,9 @@ func TestDepthFunc(t *testing.T) {
 	}()
 }
 func TestViewport(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
