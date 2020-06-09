@@ -1,6 +1,6 @@
 # Vertex
 
-A 'Vertex' is the container of the possible values that we could use as vertex buffer data. Now it has support for the following options:
+A `Vertex` is the container of the possible values that we could use as vertex buffer data. Now it has support for the following options:
 
 - **Position**: It stores the position coordinate. (Where is the vertex)
 - **Normal**: The normal vector of the surface in the given position.
