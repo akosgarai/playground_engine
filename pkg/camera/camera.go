@@ -6,7 +6,7 @@ import (
 	"github.com/akosgarai/coldet"
 	"github.com/go-gl/mathgl/mgl32"
 
-	"github.com/akosgarai/playground_engine/pkg/primitives/transformations"
+	"github.com/akosgarai/playground_engine/pkg/transformations"
 )
 
 const (
