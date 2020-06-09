@@ -36,12 +36,12 @@ This light source is given with it's position, and the light is going to a speci
 
 ## NewPointLight
 
-NewPointLight returns a Light with point light settings. The vectorComponent [4]mgl32.Vec3 input has to contain the 'position', 'ambient', 'diffuse', 'specular' component vectors in this order. The terms [3]float32 input has to contain the 'constant', 'linear', 'quadratic' term components in this order.
+NewPointLight returns a Light with point light settings. The vectorComponent [4]mgl32.Vec3 input has to contain the `position`, `ambient`, `diffuse`, `specular` component vectors in this order. The terms [3]float32 input has to contain the `constant`, `linear`, `quadratic` term components in this order.
 
 ## NewDirectionalLight
 
-NewDirectionalLight returns a Light with directional light settings. The vectorComponent [4]mgl32.Vec3 input has to contain the 'direction', 'ambient', 'diffuse', 'specular' components in this order.
+NewDirectionalLight returns a Light with directional light settings. The vectorComponent [4]mgl32.Vec3 input has to contain the `direction`, `ambient`, `diffuse`, `specular` components in this order.
 
 ## NewSpotLight
 
-NewSpotLight returns a Light with spot light settings. The vectorComponent [5]mgl32.Vec3 input has to contain the 'position', 'direction', 'ambient', 'diffuse', 'specular' components in this order. The terms[5]float32 input has to contain the 'constant', 'linear', 'quadratic' terms, 'cutoff' and the 'outerCutoff' components in this order.
+NewSpotLight returns a Light with spot light settings. The vectorComponent [5]mgl32.Vec3 input has to contain the `position`, `direction`, `ambient`, `diffuse`, `specular` components in this order. The terms[5]float32 input has to contain the `constant`, `linear`, `quadratic` terms, `cutoff` and the `outerCutoff` components in this order.
