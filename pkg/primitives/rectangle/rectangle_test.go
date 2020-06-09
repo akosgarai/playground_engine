@@ -18,16 +18,16 @@ func TestNewSquare(t *testing.T) {
 	}
 	ExpectedNormal := mgl32.Vec3{0, -1, 0}
 	if square.Points != ExpectedPoints {
-		t.Error("Unexpected points.")
+		t.Errorf("Invalid points. Instead of '%v', we have '%v'.\n", ExpectedPoints, square.Points)
 	}
 	if square.Normal != ExpectedNormal {
-		t.Error("Invalid normal vector")
+		t.Errorf("Invalid normal vector. Instead of '%v', we have '%v'.\n", ExpectedNormal, square.Normal)
 	}
 	v1 := square.Points[1].Sub(square.Points[0])
 	v2 := square.Points[3].Sub(square.Points[0])
 	calculatedNormal := v1.Cross(v2).Normalize()
 	if calculatedNormal != square.Normal {
-		t.Error("Invalid normal vs calculated normal")
+		t.Errorf("Invalid normal vs calculated normal. Instead of '%v', we have '%v'.\n", calculatedNormal, square.Normal)
 	}
 }
 func TestNewOneAsScale(t *testing.T) {
@@ -43,16 +43,16 @@ func TestNewOneAsScale(t *testing.T) {
 	}
 	ExpectedNormal := mgl32.Vec3{0, -1, 0}
 	if square.Points != ExpectedPoints {
-		t.Error("Unexpected points.")
+		t.Errorf("Invalid points. Instead of '%v', we have '%v'.\n", ExpectedPoints, square.Points)
 	}
 	if square.Normal != ExpectedNormal {
-		t.Error("Invalid normal vector")
+		t.Errorf("Invalid normal vector. Instead of '%v', we have '%v'.\n", ExpectedNormal, square.Normal)
 	}
 	v1 := square.Points[1].Sub(square.Points[0])
 	v2 := square.Points[3].Sub(square.Points[0])
 	calculatedNormal := v1.Cross(v2).Normalize()
 	if calculatedNormal != square.Normal {
-		t.Error("Invalid normal vs calculated normal")
+		t.Errorf("Invalid normal vs calculated normal. Instead of '%v', we have '%v'.\n", calculatedNormal, square.Normal)
 	}
 }
 func TestNewLowScale(t *testing.T) {
@@ -68,16 +68,16 @@ func TestNewLowScale(t *testing.T) {
 	}
 	ExpectedNormal := mgl32.Vec3{0, -1, 0}
 	if square.Points != ExpectedPoints {
-		t.Error("Unexpected points.")
+		t.Errorf("Invalid points. Instead of '%v', we have '%v'.\n", ExpectedPoints, square.Points)
 	}
 	if square.Normal != ExpectedNormal {
-		t.Error("Invalid normal vector")
+		t.Errorf("Invalid normal vector. Instead of '%v', we have '%v'.\n", ExpectedNormal, square.Normal)
 	}
 	v1 := square.Points[1].Sub(square.Points[0])
 	v2 := square.Points[3].Sub(square.Points[0])
 	calculatedNormal := v1.Cross(v2).Normalize()
 	if calculatedNormal != square.Normal {
-		t.Error("Invalid normal vs calculated normal")
+		t.Errorf("Invalid normal vs calculated normal. Instead of '%v', we have '%v'.\n", calculatedNormal, square.Normal)
 	}
 }
 func TestNewHighScale(t *testing.T) {
@@ -93,16 +93,16 @@ func TestNewHighScale(t *testing.T) {
 	}
 	ExpectedNormal := mgl32.Vec3{0, -1, 0}
 	if square.Points != ExpectedPoints {
-		t.Error("Unexpected points.")
+		t.Errorf("Invalid points. Instead of '%v', we have '%v'.\n", ExpectedPoints, square.Points)
 	}
 	if square.Normal != ExpectedNormal {
-		t.Error("Invalid normal vector")
+		t.Errorf("Invalid normal vector. Instead of '%v', we have '%v'.\n", ExpectedNormal, square.Normal)
 	}
 	v1 := square.Points[1].Sub(square.Points[0])
 	v2 := square.Points[3].Sub(square.Points[0])
 	calculatedNormal := v1.Cross(v2).Normalize()
 	if calculatedNormal != square.Normal {
-		t.Error("Invalid normal vs calculated normal")
+		t.Errorf("Invalid normal vs calculated normal. Instead of '%v', we have '%v'.\n", calculatedNormal, square.Normal)
 	}
 }
 func TestMeshInput(t *testing.T) {
@@ -110,9 +110,10 @@ func TestMeshInput(t *testing.T) {
 	vertices, indices, _ := square.MeshInput()
 	expectedIndices := []uint32{0, 1, 2, 0, 2, 3}
 	if !reflect.DeepEqual(expectedIndices, indices) {
-		t.Error("Invalid indices")
-		t.Log(vertices)
-		t.Log(indices)
+		t.Errorf("Invalid indices. Instead of '%v', we have '%v'.\n", expectedIndices, indices)
+	}
+	if len(vertices) != 4 {
+		t.Errorf("Invalud number of vertices. Instead of '4', we have '%d' as '%v'.\n", len(vertices), vertices)
 	}
 }
 func TestColoredMeshInput(t *testing.T) {
@@ -121,9 +122,10 @@ func TestColoredMeshInput(t *testing.T) {
 	vertices, indices, _ := square.ColoredMeshInput(color)
 	expectedIndices := []uint32{0, 1, 2, 0, 2, 3}
 	if !reflect.DeepEqual(expectedIndices, indices) {
-		t.Error("Invalid indices")
-		t.Log(vertices)
-		t.Log(indices)
+		t.Errorf("Invalid indices. Instead of '%v', we have '%v'.\n", expectedIndices, indices)
+	}
+	if len(vertices) != 4 {
+		t.Errorf("Invalud number of vertices. Instead of '4', we have '%d' as '%v'.\n", len(vertices), vertices)
 	}
 }
 func TestColoredTexturesMeshInput(t *testing.T) {
@@ -132,8 +134,9 @@ func TestColoredTexturesMeshInput(t *testing.T) {
 	vertices, indices, _ := square.TexturedColoredMeshInput(color)
 	expectedIndices := []uint32{0, 1, 2, 0, 2, 3}
 	if !reflect.DeepEqual(expectedIndices, indices) {
-		t.Error("Invalid indices")
-		t.Log(vertices)
-		t.Log(indices)
+		t.Errorf("Invalid indices. Instead of '%v', we have '%v'.\n", expectedIndices, indices)
+	}
+	if len(vertices) != 4 {
+		t.Errorf("Invalud number of vertices. Instead of '4', we have '%d' as '%v'.\n", len(vertices), vertices)
 	}
 }
