@@ -131,7 +131,7 @@ func TestCircleWithRadius(t *testing.T) {
 		if len(points) != len(tt.expectedOutput) {
 			t.Error("Invalid number of generated points.")
 		}
-		for index, _ := range points {
+		for index := range points {
 			if !testhelper.Float32ApproxEqual(points[index], tt.expectedOutput[index], 0.001) {
 				t.Errorf("The given points are different. Instead of '%f', we have '%f'.\n", tt.expectedOutput[index], points[index])
 			}
