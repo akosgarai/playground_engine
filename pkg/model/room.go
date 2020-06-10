@@ -2,6 +2,8 @@ package model
 
 import (
 	"math"
+	"path"
+	"runtime"
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
@@ -100,11 +102,13 @@ func NewMaterialRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room 
 }
 func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	var concreteTexture texture.Textures
-	concreteTexture.AddTexture("pkg/model/assets/concrete-wall.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
-	concreteTexture.AddTexture("pkg/model/assets/concrete-wall.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
+	_, filename, _, _ := runtime.Caller(1)
+	fileDir := path.Dir(filename)
+	concreteTexture.AddTexture(fileDir+"/assets/concrete-wall.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
+	concreteTexture.AddTexture(fileDir+"/assets/concrete-wall.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
 	var doorTexture texture.Textures
-	doorTexture.AddTexture("pkg/model/assets/door.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
-	doorTexture.AddTexture("pkg/model/assets/door.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
+	doorTexture.AddTexture(fileDir+"/assets/door.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
+	doorTexture.AddTexture(fileDir+"/assets/door.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
 
 	floorCuboid := cuboid.New(1.0, 1.0, 0.005)
 	floorV, floorI, bo := floorCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_DEFAULT)

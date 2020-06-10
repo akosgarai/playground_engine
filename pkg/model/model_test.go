@@ -255,3 +255,126 @@ func TestBug(t *testing.T) {
 		bug.Update(10)
 	}()
 }
+func TestMaterialStreetLamp(t *testing.T) {
+	position := mgl32.Vec3{0.0, 0.0, 0.0}
+	bulbPosition := mgl32.Vec3{0.9349, 3.0, 2.98}
+	polePosition := mgl32.Vec3{0.0, 3.0, 0.0}
+	topPosition := mgl32.Vec3{1.1, 3.0, 6.4}
+	scale := float32(6.0)
+
+	lamp := NewMaterialStreetLamp(position, scale, wrapperMock)
+
+	if lamp.GetPolePosition() != polePosition {
+		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.GetPolePosition())
+	}
+	if !lamp.GetTopPosition().ApproxEqualThreshold(topPosition, 0.0001) {
+		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.GetTopPosition())
+	}
+	if !lamp.GetBulbPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
+		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.GetBulbPosition())
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("Update shouldn't have panic.")
+			}
+		}()
+		lamp.Update(10)
+	}()
+}
+func TestTexturedStreetLamp(t *testing.T) {
+	position := mgl32.Vec3{0.0, 0.0, 0.0}
+	bulbPosition := mgl32.Vec3{0.9, 3.035, 3.0}
+	polePosition := mgl32.Vec3{0.0, 3.0, 0.0}
+	topPosition := mgl32.Vec3{3.55, 3.55, 3.0}
+	scale := float32(6.0)
+
+	lamp := NewTexturedStreetLamp(position, scale, wrapperMock)
+
+	if lamp.GetPolePosition() != polePosition {
+		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.GetPolePosition())
+	}
+	if !lamp.GetTopPosition().ApproxEqualThreshold(topPosition, 0.0001) {
+		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.GetTopPosition())
+	}
+	if !lamp.GetBulbPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
+		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.GetBulbPosition())
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("Update shouldn't have panic.")
+			}
+		}()
+		lamp.Update(10)
+	}()
+}
+func CheckDefaultRoomOptions(room *Room, t *testing.T) {
+	doorPosition := mgl32.Vec3{-0.4975, 0.7, 0.6975}
+	if room.GetDoor().GetPosition() != doorPosition {
+		t.Errorf("Invalid door position. Instead of '%v', we have '%v'.", doorPosition, room.GetDoor().GetPosition())
+	}
+	if room.doorState != _DOOR_OPENED {
+		t.Errorf("Invalid initial door state. Instead of '%d', we have '%d'.", _DOOR_OPENED, room.doorState)
+	}
+	room.PushDoorState()
+	if room.doorState != _DOOR_CLOSING {
+		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_CLOSING, room.doorState)
+	}
+	room.PushDoorState()
+	if room.doorState != _DOOR_CLOSING {
+		t.Errorf("Invalid door state. Instead of '%d', we have '%d'.", _DOOR_CLOSING, room.doorState)
+	}
+
+	room.doorState = _DOOR_CLOSED
+	room.PushDoorState()
+	if room.doorState != _DOOR_OPENING {
+		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_OPENING, room.doorState)
+	}
+	room.PushDoorState()
+	if room.doorState != _DOOR_OPENING {
+		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_OPENING, room.doorState)
+	}
+	if room.currentAnimationTime != 0.0 {
+		t.Errorf("Invalid initial animation time. Instead of '0.0', it is '%f'.", room.currentAnimationTime)
+	}
+	room.animateDoor(100)
+	if room.currentAnimationTime != 100.0 {
+		t.Errorf("Invalid animation time. Instead of '100.0', it is '%f'.", room.currentAnimationTime)
+	}
+	room.animateDoor(950)
+	if room.doorState != _DOOR_OPENED {
+		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_OPENED, room.doorState)
+	}
+	room.PushDoorState()
+	room.animateDoor(100)
+	if room.currentAnimationTime != 100.0 {
+		t.Errorf("Invalid animation time. Instead of '100.0', it is '%f'.", room.currentAnimationTime)
+	}
+	room.animateDoor(950)
+	if room.doorState != _DOOR_CLOSED {
+		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_CLOSED, room.doorState)
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("Update shouldn't have panic.")
+			}
+		}()
+		room.Update(100)
+	}()
+}
+func TestMaterialRoom(t *testing.T) {
+	position := mgl32.Vec3{0.0, 0.0, 0.0}
+
+	room := NewMaterialRoom(position, wrapperMock)
+
+	CheckDefaultRoomOptions(room, t)
+}
+func TestTexturedRoom(t *testing.T) {
+	position := mgl32.Vec3{0.0, 0.0, 0.0}
+
+	room := NewTextureRoom(position, wrapperMock)
+
+	CheckDefaultRoomOptions(room, t)
+}

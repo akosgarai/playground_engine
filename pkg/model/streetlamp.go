@@ -1,6 +1,9 @@
 package model
 
 import (
+	"path"
+	"runtime"
+
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
@@ -61,9 +64,9 @@ func NewMaterialStreetLamp(position mgl32.Vec3, scale float32, glWrapper interfa
 	bulb.SetBoundingObject(bo)
 
 	m := newModel()
-	m.AddMesh(bulb)
-	m.AddMesh(top)
 	m.AddMesh(pole)
+	m.AddMesh(top)
+	m.AddMesh(bulb)
 
 	return &StreetLamp{Model: *m}
 }
@@ -78,14 +81,16 @@ func NewTexturedStreetLamp(position mgl32.Vec3, scale float32, glWrapper interfa
 	width := height * widthHeightRatio
 	length := height * lengthHeightRatio
 	bulbRadius := height * bulbRadiusHeightRatio
+	_, filename, _, _ := runtime.Caller(1)
+	fileDir := path.Dir(filename)
 
 	var metalTexture texture.Textures
-	metalTexture.AddTexture("pkg/model/assets/metal.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
-	metalTexture.AddTexture("pkg/model/assets/metal.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
+	metalTexture.AddTexture(fileDir+"/assets/metal.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
+	metalTexture.AddTexture(fileDir+"/assets/metal.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
 
 	var bulbTexture texture.Textures
-	bulbTexture.AddTexture("pkg/model/assets/crystal-ball.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
-	bulbTexture.AddTexture("pkg/model/assets/crystal-ball.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
+	bulbTexture.AddTexture(fileDir+"/assets/crystal-ball.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
+	bulbTexture.AddTexture(fileDir+"/assets/crystal-ball.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
 
 	// pole
 	poleCylinder := cylinder.New(width/2, 20, height)
