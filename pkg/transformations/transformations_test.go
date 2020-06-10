@@ -93,3 +93,22 @@ func TestIntegerToString(t *testing.T) {
 		}
 	}
 }
+func TestFloat32Abs(t *testing.T) {
+	testData := []struct {
+		input float32
+		abs   float32
+	}{
+		{0.0, 0.0},
+		{1.0, 1.0},
+		{5.0, 5.0},
+		{0.1, 0.1},
+		{-0.1, 0.1},
+		{-1.0, 1.0},
+	}
+	for _, tt := range testData {
+		abs := Float32Abs(tt.input)
+		if abs != tt.abs {
+			t.Errorf("Invalid f32 abs. Instead of '%f', got '%f'", tt.abs, abs)
+		}
+	}
+}

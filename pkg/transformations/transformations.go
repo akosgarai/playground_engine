@@ -37,3 +37,13 @@ func Float32ToString(num float32) string {
 func IntegerToString(num int) string {
 	return strconv.Itoa(num)
 }
+
+// This function returns the abs. value of a float32 number.
+// If the number is less than 0, it returns -1*number, otherwise
+// it returns the number itself.
+func Float32Abs(a float32) float32 {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
