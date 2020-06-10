@@ -21,3 +21,7 @@ This function transforms a float32 type number `float32` to it's string represen
 ## IntegerToString
 
 This function transforms an integer type number `int` to it's string representation. Useful for logs.
+
+## Float32Abs
+
+This function returns the abs. value of a float32 number. If the number is less than 0, it returns `-1*number`, otherwise it returns the number itself.
