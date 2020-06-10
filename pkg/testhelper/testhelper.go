@@ -5,6 +5,7 @@ import (
 	"unsafe"
 
 	"github.com/go-gl/glfw/v3.3/glfw"
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 const (
@@ -111,3 +112,12 @@ func (g GLWrapperMock) Clear(mask uint32)                                       
 func (g GLWrapperMock) Enable(cap uint32)                                                  {}
 func (g GLWrapperMock) DepthFunc(xfunc uint32)                                             {}
 func (g GLWrapperMock) Viewport(x int32, y int32, width int32, height int32)               {}
+
+type ShaderMock struct{}
+
+func (s ShaderMock) SetUniformMat4(name string, mat mgl32.Mat4)   {}
+func (s ShaderMock) SetUniform3f(name string, f1, f2, f3 float32) {}
+func (s ShaderMock) SetUniform1f(name string, f1 float32)         {}
+func (s ShaderMock) SetUniform1i(name string, i int32)            {}
+func (s ShaderMock) GetId() uint32                                { return uint32(1) }
+func (s ShaderMock) Use()                                         {}
