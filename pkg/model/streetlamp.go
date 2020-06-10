@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
+	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/primitives/cuboid"
@@ -31,7 +32,7 @@ type StreetLamp struct {
 // The 'position' input is the bottom center point of the 'pole' of the lamp. The top of the pole
 // points to the +Z axis. The 'top' is the head of the lamp. Its position is relative to the pole.
 // The 'bulb' is positioned relative to the 'top'.
-func NewMaterialStreetLamp(position mgl32.Vec3, scale float32) *StreetLamp {
+func NewMaterialStreetLamp(position mgl32.Vec3, scale float32, glWrapper interfaces.GLWrapper) *StreetLamp {
 	height := defaultPoleHeight * scale
 	width := height * widthHeightRatio
 	length := height * lengthHeightRatio
@@ -71,7 +72,7 @@ func NewMaterialStreetLamp(position mgl32.Vec3, scale float32) *StreetLamp {
 // The 'position' input is the bottom center point of the 'pole' of the lamp. The top of the pole
 // points to the +Z axis. The 'top' is the head of the lamp. Its position is relative to the pole.
 // The 'bulb' is positioned relative to the 'top'.
-func NewTexturedStreetLamp(position mgl32.Vec3, scale float32) *StreetLamp {
+func NewTexturedStreetLamp(position mgl32.Vec3, scale float32, glWrapper interfaces.GLWrapper) *StreetLamp {
 	// Setup the variables based on the given scale.
 	height := defaultPoleHeight * scale
 	width := height * widthHeightRatio

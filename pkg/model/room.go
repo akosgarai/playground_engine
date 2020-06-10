@@ -32,7 +32,7 @@ type Room struct {
 // The initial orientation of the floor is the xy plane.
 // The floor, the roof, the back wall, left wall, right wall are 1 * 1 * 0.05 cuboids.
 // The front wall holds a door that is different colored.
-func NewMaterialRoom(position mgl32.Vec3) *Room {
+func NewMaterialRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	floorCuboid := cuboid.New(1.0, 1.0, 0.005)
 	floorV, floorI, bo := floorCuboid.MaterialMeshInput()
 
@@ -98,7 +98,7 @@ func NewMaterialRoom(position mgl32.Vec3) *Room {
 	m.AddMesh(door)
 	return &Room{Model: *m, doorState: _DOOR_OPENED, currentAnimationTime: 0}
 }
-func NewTextureRoom(position mgl32.Vec3) *Room {
+func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	var concreteTexture texture.Textures
 	concreteTexture.AddTexture("pkg/model/assets/concrete-wall.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
 	concreteTexture.AddTexture("pkg/model/assets/concrete-wall.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
