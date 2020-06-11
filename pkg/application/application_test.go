@@ -326,7 +326,7 @@ func TestAddDirectionalLightSource(t *testing.T) {
 		}()
 		app := New()
 		if len(app.directionalLightSources) != 0 {
-			t.Errorf("Invalid number if dir. lenght. Instead of '0', it is '%d'.", len(app.directionalLightSources))
+			t.Errorf("Invalid number if dir. length. Instead of '0', it is '%d'.", len(app.directionalLightSources))
 		}
 		ds := light.NewDirectionalLight([4]mgl32.Vec3{
 			mgl32.Vec3{0, 0, 0},
@@ -337,11 +337,11 @@ func TestAddDirectionalLightSource(t *testing.T) {
 		uniforms := [4]string{"u1", "u2", "u3", "u4"}
 		app.AddDirectionalLightSource(ds, uniforms)
 		if len(app.directionalLightSources) != 1 {
-			t.Errorf("Invalid number if dir. lenght. Instead of '1', it is '%d'.", len(app.directionalLightSources))
+			t.Errorf("Invalid number if dir. length. Instead of '1', it is '%d'.", len(app.directionalLightSources))
 		}
 		app.AddDirectionalLightSource(ds, uniforms)
 		if len(app.directionalLightSources) != 2 {
-			t.Errorf("Invalid number if dir. lenght. Instead of '2', it is '%d'.", len(app.directionalLightSources))
+			t.Errorf("Invalid number if dir. length. Instead of '2', it is '%d'.", len(app.directionalLightSources))
 		}
 	}()
 }
@@ -356,7 +356,7 @@ func TestAddPointLightSource(t *testing.T) {
 		}()
 		app := New()
 		if len(app.pointLightSources) != 0 {
-			t.Errorf("Invalid number if point. lenght. Instead of '0', it is '%d'.", len(app.pointLightSources))
+			t.Errorf("Invalid number if point. length. Instead of '0', it is '%d'.", len(app.pointLightSources))
 		}
 		ps := light.NewPointLight([4]mgl32.Vec3{
 			mgl32.Vec3{0, 0, 0},
@@ -369,11 +369,11 @@ func TestAddPointLightSource(t *testing.T) {
 		uniforms := [7]string{"u1", "u2", "u3", "u4", "u5", "u6", "u7"}
 		app.AddPointLightSource(ps, uniforms)
 		if len(app.pointLightSources) != 1 {
-			t.Errorf("Invalid number if point. lenght. Instead of '1', it is '%d'.", len(app.pointLightSources))
+			t.Errorf("Invalid number if point. length. Instead of '1', it is '%d'.", len(app.pointLightSources))
 		}
 		app.AddPointLightSource(ps, uniforms)
 		if len(app.pointLightSources) != 2 {
-			t.Errorf("Invalid number if point. lenght. Instead of '2', it is '%d'.", len(app.pointLightSources))
+			t.Errorf("Invalid number if point. length. Instead of '2', it is '%d'.", len(app.pointLightSources))
 		}
 	}()
 }
@@ -388,7 +388,7 @@ func TestAddSpotLightSource(t *testing.T) {
 		}()
 		app := New()
 		if len(app.spotLightSources) != 0 {
-			t.Errorf("Invalid number if spot. lenght. Instead of '0', it is '%d'.", len(app.spotLightSources))
+			t.Errorf("Invalid number if spot. length. Instead of '0', it is '%d'.", len(app.spotLightSources))
 		}
 		ss := light.NewSpotLight([5]mgl32.Vec3{
 			mgl32.Vec3{0, 0, 0},
@@ -402,11 +402,11 @@ func TestAddSpotLightSource(t *testing.T) {
 		uniforms := [10]string{"u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9", "u10"}
 		app.AddSpotLightSource(ss, uniforms)
 		if len(app.spotLightSources) != 1 {
-			t.Errorf("Invalid number if spot. lenght. Instead of '1', it is '%d'.", len(app.spotLightSources))
+			t.Errorf("Invalid number if spot. length. Instead of '1', it is '%d'.", len(app.spotLightSources))
 		}
 		app.AddSpotLightSource(ss, uniforms)
 		if len(app.spotLightSources) != 2 {
-			t.Errorf("Invalid number if spot. lenght. Instead of '2', it is '%d'.", len(app.spotLightSources))
+			t.Errorf("Invalid number if spot. length. Instead of '2', it is '%d'.", len(app.spotLightSources))
 		}
 	}()
 }
@@ -429,7 +429,7 @@ func TestSetupDirectionalLightForShader(t *testing.T) {
 		uniforms := [4]string{"u1", "u2", "u3", "u4"}
 		app.AddDirectionalLightSource(ds, uniforms)
 		if len(app.directionalLightSources) != 1 {
-			t.Errorf("Invalid number if dir. lenght. Instead of '1', it is '%d'.", len(app.directionalLightSources))
+			t.Errorf("Invalid number if dir. length. Instead of '1', it is '%d'.", len(app.directionalLightSources))
 		}
 		app.setupDirectionalLightForShader(sm)
 	}()
