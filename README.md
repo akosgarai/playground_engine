@@ -1,6 +1,6 @@
 # Playgorund Engine
 
-This engine is written for playing around with the opengle v4.x features. It contains basic primitves, supports camera, light sources, materials, textures, (wavefront) model import / export solutions.
+This engine is written for playing around with the opengle v4.x features. It contains basic primitives, supports camera, light sources, materials, textures, (wavefront) model import / export solutions.
 
 ![Sample gif from outer space](https://github.com/akosgarai/go_opengl_playground/blob/master/examples/07-textured-spheres/sample/sample.gif)
 
