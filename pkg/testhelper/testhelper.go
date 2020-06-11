@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/akosgarai/coldet"
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -12,6 +13,10 @@ const (
 	WindowWidth  = 800
 	WindowHeight = 800
 	WindowTitle  = "Test title"
+)
+
+var (
+	bbSphere = coldet.NewBoundingSphere([3]float32{0, 0, 0}, 1.0)
 )
 
 // This function returns true, if the given a, b is almost equal,
@@ -121,3 +126,30 @@ func (s ShaderMock) SetUniform1f(name string, f1 float32)         {}
 func (s ShaderMock) SetUniform1i(name string, i int32)            {}
 func (s ShaderMock) GetId() uint32                                { return uint32(1) }
 func (s ShaderMock) Use()                                         {}
+
+type WindowMock struct{}
+
+func (wm WindowMock) GetCursorPos() (float64, float64)                    { return 0.0, 0.0 }
+func (wm WindowMock) SetKeyCallback(cb glfw.KeyCallback) glfw.KeyCallback { return cb }
+func (wm WindowMock) SetMouseButtonCallback(cb glfw.MouseButtonCallback) glfw.MouseButtonCallback {
+	return cb
+}
+func (wm WindowMock) ShouldClose() bool   { return false }
+func (wm WindowMock) SwapBuffers()        {}
+func (wm WindowMock) GetSize() (int, int) { return 800, 800 }
+
+type CameraMock struct{}
+
+func (cm CameraMock) Log() string                                      { return "" }
+func (cm CameraMock) GetViewMatrix() mgl32.Mat4                        { return mgl32.Ident4() }
+func (cm CameraMock) GetProjectionMatrix() mgl32.Mat4                  { return mgl32.Ident4() }
+func (cm CameraMock) Walk(float32)                                     {}
+func (cm CameraMock) Strafe(float32)                                   {}
+func (cm CameraMock) Lift(float32)                                     {}
+func (cm CameraMock) UpdateDirection(float32, float32)                 {}
+func (cm CameraMock) GetPosition() mgl32.Vec3                          { return mgl32.Vec3{0, 0, 0} }
+func (cm CameraMock) GetVelocity() float32                             { return float32(0.0) }
+func (cm CameraMock) GetRotationStep() float32                         { return float32(0.0) }
+func (cm CameraMock) BoundingObjectAfterWalk(float32) *coldet.Sphere   { return bbSphere }
+func (cm CameraMock) BoundingObjectAfterStrafe(float32) *coldet.Sphere { return bbSphere }
+func (cm CameraMock) BoundingObjectAfterLift(float32) *coldet.Sphere   { return bbSphere }
