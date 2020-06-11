@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/akosgarai/coldet"
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -12,6 +13,10 @@ const (
 	WindowWidth  = 800
 	WindowHeight = 800
 	WindowTitle  = "Test title"
+)
+
+var (
+	bbSphere = coldet.NewBoundingSphere([3]float32{0, 0, 0}, 1.0)
 )
 
 // This function returns true, if the given a, b is almost equal,
@@ -121,3 +126,22 @@ func (s ShaderMock) SetUniform1f(name string, f1 float32)         {}
 func (s ShaderMock) SetUniform1i(name string, i int32)            {}
 func (s ShaderMock) GetId() uint32                                { return uint32(1) }
 func (s ShaderMock) Use()                                         {}
+
+type WindowMock struct {
+	CursorX, CursorY float64
+}
+
+func (wm *WindowMock) SetCursorPos(x float64, y float64) {
+	wm.CursorX = x
+	wm.CursorY = y
+}
+func (wm WindowMock) GetCursorPos() (float64, float64) {
+	return wm.CursorX, wm.CursorY
+}
+func (wm WindowMock) SetKeyCallback(cb glfw.KeyCallback) glfw.KeyCallback { return cb }
+func (wm WindowMock) SetMouseButtonCallback(cb glfw.MouseButtonCallback) glfw.MouseButtonCallback {
+	return cb
+}
+func (wm WindowMock) ShouldClose() bool   { return false }
+func (wm WindowMock) SwapBuffers()        {}
+func (wm WindowMock) GetSize() (int, int) { return 800, 800 }
