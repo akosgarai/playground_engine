@@ -3,7 +3,6 @@ package modelimport
 import (
 	"testing"
 
-	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/testhelper"
 )
@@ -14,8 +13,7 @@ const (
 )
 
 var (
-	wrapperMock   testhelper.GLWrapperMock
-	realGlWrapper glwrapper.Wrapper
+	wrapperMock testhelper.GLWrapperMock
 )
 
 func TestNew(t *testing.T) {
@@ -47,9 +45,6 @@ func TestImport(t *testing.T) {
 				t.Log(r)
 			}
 		}()
-		testhelper.GlfwInit()
-		defer testhelper.GlfwTerminate()
-		realGlWrapper.InitOpenGL()
 		importer := New(Directory, ObjectFileName, wrapperMock)
 		importer.Import()
 		meshes := importer.GetMeshes()
