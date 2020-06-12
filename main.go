@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 )
 
@@ -32,15 +34,51 @@ func createTarget(targetPath string) {
 		os.MkdirAll(targetPath, os.ModePerm)
 	}
 }
+func fileExists(filepath string) bool {
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
 func downloadShaders() {
 	fmt.Println("Downloading shaders ...")
+}
+func downloadFile(from, target string) error {
+	// create the file
+	to, err := os.Create(target)
+	if err != nil {
+		return err
+	}
+	defer to.Close()
+	// get the data from the given url
+	resp, err := http.Get(from)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// write  the downloaded data to the file
+	_, err = io.Copy(to, resp.Body)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 func downloadModels() {
 	createTarget(modelTargetDirectory)
 	fmt.Println("Downloading models ...")
 	for _, img := range modelImages {
+		target := modelTargetDirectory + "/" + img
+		if fileExists(target) {
+			continue
+		}
 		url := fmt.Sprintf("%s%s%s", downLoadBaseUrl, modelBaseDirectory, img)
 		fmt.Printf("Downloading '%s'\n", url)
+		err := downloadFile(url, target)
+		if err != nil {
+			fmt.Printf("Something happened during download: '%s'.\n", err.Error())
+			fmt.Println("Please try to install again.")
+		}
 	}
 }
 
