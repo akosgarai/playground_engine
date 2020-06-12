@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	downLoadBaseUrl      = "https://raw.githubusercontent.com/akosgarai/playground_engine/master/"
-	shaderBaseDirectory  = ""
-	modelBaseDirectory   = "pkg/model/assets/"
-	modelTargetDirectory = "assets"
+	downLoadBaseUrl       = "https://raw.githubusercontent.com/akosgarai/playground_engine/master/"
+	shaderBaseDirectory   = "pkg/shader/apps/"
+	modelBaseDirectory    = "pkg/model/assets/"
+	modelTargetDirectory  = "assets"
+	shaderTargetDirectory = "shaders"
 )
 
 var (
@@ -25,6 +26,18 @@ var (
 		"crystal-ball.png",
 		"door.jpg",
 		"metal.jpg",
+	}
+	shaderApps = []string{
+		"material.frag",
+		"material.vert",
+		"point.frag",
+		"point.vert",
+		"texturecolor.frag",
+		"texturecolor.vert",
+		"texture.frag",
+		"texturemat.frag",
+		"texturemat.vert",
+		"texture.vert",
 	}
 )
 
@@ -41,7 +54,21 @@ func fileExists(filepath string) bool {
 	return true
 }
 func downloadShaders() {
+	createTarget(shaderTargetDirectory)
 	fmt.Println("Downloading shaders ...")
+	for _, img := range shaderApps {
+		target := shaderTargetDirectory + "/" + img
+		if fileExists(target) {
+			continue
+		}
+		url := fmt.Sprintf("%s%s%s", downLoadBaseUrl, shaderBaseDirectory, img)
+		fmt.Printf("Downloading '%s'\n", url)
+		err := downloadFile(url, target)
+		if err != nil {
+			fmt.Printf("Something happened during download: '%s'.\n", err.Error())
+			fmt.Println("Please try to install again.")
+		}
+	}
 }
 func downloadFile(from, target string) error {
 	// create the file
