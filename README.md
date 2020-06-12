@@ -2,6 +2,34 @@
 
 This engine is written for playing around with the opengle v4.x features. It contains basic primitives, supports camera, light sources, materials, textures, (wavefront) model import / export solutions.
 
+## CLI
+
+This package provides a cli tool for downloading the necessary assets or shaders for an application.
+
+### Usage
+
+First of all, You have to install the cli-application.
+
+```
+go get github.com/akosgarai/playground_engine
+cd $GOPATH/src/github.com/akosgarai/playground_engine
+go install
+```
+
+After this step, You should be able to use the cli-tool. It's easy to use, it gets a command and a parameter as arguments. Without arguments it prints out the help menu. The most important command is the install, that You can use for downloading model textures or shaders.
+
+The following command creates a `shaders` directory (if not exists) and downloads the shader apps into the `shaders` dir.
+
+```
+playground_engine install shaders
+```
+
+This command creates an `assets` directory (if not exists) and downloads the assest files into this directory.
+
+```
+playground_engine install models
+```
+
 ![Sample gif from outer space](https://github.com/akosgarai/go_opengl_playground/blob/master/examples/07-textured-spheres/sample/sample.gif)
 
 ## Useful links
