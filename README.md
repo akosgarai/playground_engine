@@ -30,6 +30,8 @@ This command creates an `assets` directory (if not exists) and downloads the ass
 playground_engine install models
 ```
 
+## Sample
+
 ![Sample gif from outer space](https://github.com/akosgarai/go_opengl_playground/blob/master/examples/07-textured-spheres/sample/sample.gif)
 
 ## Useful links
