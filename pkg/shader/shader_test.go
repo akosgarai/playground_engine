@@ -358,9 +358,9 @@ func TestNewTextureShader(t *testing.T) {
 	}
 	func() {
 		defer func() {
-			if r := recover(); r == nil {
+			if r := recover(); r != nil {
 				defer glfw.Terminate()
-				t.Errorf("NewTextureShader should have panicked!")
+				t.Errorf("NewTextureShader shouldn't have panicked!")
 			}
 		}()
 		runtime.LockOSThread()
@@ -379,9 +379,9 @@ func TestNewMaterialShader(t *testing.T) {
 	}
 	func() {
 		defer func() {
-			if r := recover(); r == nil {
+			if r := recover(); r != nil {
 				defer glfw.Terminate()
-				t.Errorf("NewMaterialShader should have panicked!")
+				t.Errorf("NewMaterialShader shouldn't have panicked!")
 			}
 		}()
 		runtime.LockOSThread()
@@ -400,9 +400,9 @@ func TestNewTextureMatShader(t *testing.T) {
 	}
 	func() {
 		defer func() {
-			if r := recover(); r == nil {
+			if r := recover(); r != nil {
 				defer glfw.Terminate()
-				t.Errorf("NewTextureMatShader should have panicked!. %v", r)
+				t.Errorf("NewTextureMatShader shouldn't have panicked!. %v", r)
 			}
 		}()
 		runtime.LockOSThread()

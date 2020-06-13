@@ -1,6 +1,9 @@
 package shader
 
 import (
+	"path"
+	"runtime"
+
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 
@@ -8,7 +11,7 @@ import (
 )
 
 const (
-	defaultAppPath = "pkg/shader/apps/"
+	defaultAppPath = "/shaders/"
 )
 
 type Shader struct {
@@ -46,23 +49,27 @@ func NewShader(vertexShaderPath, fragmentShaderPath string, wrapper interfaces.G
 		wrapper: wrapper,
 	}
 }
+func baseDirShaders() string {
+	_, filename, _, _ := runtime.Caller(1)
+	return path.Dir(filename) + defaultAppPath
+}
 
 // NewTextureShader returns a Shader, that uses the default texture vertex & fragment shaders.
 // It works the same as NewShader, but the internal shader files are used.
 func NewTextureShader(wrapper interfaces.GLWrapper) *Shader {
-	return NewShader(defaultAppPath+"texture.vert", defaultAppPath+"texture.frag", wrapper)
+	return NewShader(baseDirShaders()+"texture.vert", baseDirShaders()+"texture.frag", wrapper)
 }
 
 // NewMaterialShader returns a Shader, that uses the default texture vertex & fragment shaders.
 // It works the same as NewShader, but the internal shader files are used.
 func NewMaterialShader(wrapper interfaces.GLWrapper) *Shader {
-	return NewShader(defaultAppPath+"material.vert", defaultAppPath+"material.frag", wrapper)
+	return NewShader(baseDirShaders()+"material.vert", baseDirShaders()+"material.frag", wrapper)
 }
 
 // NewTextureMatShader returns a Shader, that uses the default texture vertex & fragment shaders.
 // It works the same as NewShader, but the internal shader files are used.
 func NewTextureMatShader(wrapper interfaces.GLWrapper) *Shader {
-	return NewShader(defaultAppPath+"texturemat.vert", defaultAppPath+"texturemat.frag", wrapper)
+	return NewShader(baseDirShaders()+"texturemat.vert", baseDirShaders()+"texturemat.frag", wrapper)
 }
 
 // Use is a wrapper for gl.UseProgram
