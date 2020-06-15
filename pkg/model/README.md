@@ -13,3 +13,5 @@ This predefined model represents a "composite object". This model contains 2 cub
 ## Room model
 
 This predefined model represents a "composite object". This model contains 8 cuboids, floor, ceiling, 3 full wall, 1 door, a half wall next to the door, and a half wall above the door. It has 2 implementation. One is from plane materials and another one that is textured.
+
+## Terrain model
