@@ -378,3 +378,60 @@ func TestTexturedRoom(t *testing.T) {
 
 	CheckDefaultRoomOptions(room, t)
 }
+func TestTerrainBuilderNewTerrainBuilder(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetWidth(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetLength(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetIterations(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetMinHeight(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetMaxHeight(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetSeed(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderRandomSeed(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetPeekProbability(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetCliffProbability(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderMinHeightIsDefault(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderSetGlWrapper(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderGrassTexture(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderInitHeightMap(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderBuildHeightMap(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderAdjacentElevation(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderVertices(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderIndices(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestTerrainBuilderBuild(t *testing.T) {
+	t.Skip("Unimplemented")
+}
