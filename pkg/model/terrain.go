@@ -171,10 +171,10 @@ func (t *TerrainBuilder) buildHeightMap() {
 	if t.minHIsDefault {
 		defaultHeight = t.minH
 	}
-	for i := 0; i < t.iterations; i++ {
+	for i := 0; i <= t.iterations; i++ {
 		height := t.minH + float32(i)*iterationStep
-		for l := 0; l <= t.length; l++ {
-			for w := 0; w <= t.width; w++ {
+		for l := 0; l < t.length; l++ {
+			for w := 0; w < t.width; w++ {
 				if t.heightMap[l][w] != defaultHeight {
 					continue
 				}
@@ -204,8 +204,8 @@ func (t *TerrainBuilder) vertices() []vertex.Vertex {
 		{0.0, 0.0},
 	}
 	var vertices vertex.Vertices
-	for l := 0; l <= t.length; l++ {
-		for w := 0; w <= t.width; w++ {
+	for l := 0; l < t.length; l++ {
+		for w := 0; w < t.width; w++ {
 			texIndex := (w % 2) + (l%2)*2
 			vertices = append(vertices, vertex.Vertex{
 				Position:  mgl32.Vec3{-float32(t.width)/2.0 + float32(w), t.heightMap[l][w], -float32(t.length)/2.0 + float32(l)},

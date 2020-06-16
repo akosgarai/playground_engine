@@ -1,6 +1,7 @@
 package model
 
 import (
+	"reflect"
 	"testing"
 	"time"
 
@@ -514,9 +515,7 @@ func TestTerrainBuilderInitHeightMap(t *testing.T) {
 		}
 	}
 	terr = terr.MinHeightIsDefault(true)
-	t.Log(terr.heightMap)
 	terr.initHeightMap()
-	t.Log(terr.heightMap)
 	for l := 0; l < terr.length; l++ {
 		for w := 0; w < terr.width; w++ {
 			if terr.heightMap[l][w] != -2.0 {
@@ -526,17 +525,107 @@ func TestTerrainBuilderInitHeightMap(t *testing.T) {
 	}
 }
 func TestTerrainBuilderBuildHeightMap(t *testing.T) {
-	t.Skip("Unimplemented")
+	length := 4
+	width := 4
+	iteration := 10
+	minH := float32(-1.0)
+	maxH := float32(3.0)
+	seed := int64(0)
+	peakProb := 5
+	cliffProb := 5
+	expected := [][]float32{
+		{0, 0, 0, 0.20000005},
+		{-0.19999999, -0.19999999, 0, 0},
+		{-0.6, -0.19999999, 1, 0.20000005},
+		{0, -0.19999999, 0.6, 1},
+	}
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
+	terr.initHeightMap()
+	terr.buildHeightMap()
+	if !reflect.DeepEqual(terr.heightMap, expected) {
+		t.Error("Invalid heightmap")
+		t.Log(terr.heightMap)
+		t.Log(expected)
+	}
+	terr = NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb).MinHeightIsDefault(true)
+	terr.initHeightMap()
+	terr.buildHeightMap()
 }
 func TestTerrainBuilderAdjacentElevation(t *testing.T) {
-	t.Skip("Unimplemented")
+	length := 4
+	width := 4
+	iteration := 10
+	minH := float32(-1.0)
+	maxH := float32(3.0)
+	seed := int64(0)
+	peakProb := 5
+	cliffProb := 5
+	expected := [][]float32{
+		{0, 0, 0, 0.20000005},
+		{-0.19999999, -0.19999999, 0, 0},
+		{-0.6, -0.19999999, 1, 0.20000005},
+		{0, -0.19999999, 0.6, 1},
+	}
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
+	terr.initHeightMap()
+	terr.buildHeightMap()
+	if !reflect.DeepEqual(terr.heightMap, expected) {
+		t.Error("Invalid heightmap")
+		t.Log(terr.heightMap)
+		t.Log(expected)
+	}
 }
 func TestTerrainBuilderVertices(t *testing.T) {
-	t.Skip("Unimplemented")
+	length := 5
+	width := 5
+	iteration := 10
+	minH := float32(-1.0)
+	maxH := float32(3.0)
+	seed := int64(0)
+	peakProb := 5
+	cliffProb := 5
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
+	terr.initHeightMap()
+	terr.buildHeightMap()
+	v := terr.vertices()
+	if len(v) != length*width {
+		t.Errorf("Invalid vertices length. Instead of '%d', we have '%d'.", length*width, len(v))
+	}
 }
 func TestTerrainBuilderIndices(t *testing.T) {
-	t.Skip("Unimplemented")
+	length := 5
+	width := 5
+	iteration := 10
+	minH := float32(-1.0)
+	maxH := float32(3.0)
+	seed := int64(0)
+	peakProb := 5
+	cliffProb := 5
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
+	terr.initHeightMap()
+	terr.buildHeightMap()
+	v := terr.vertices()
+	i := terr.indices()
+	if len(i) != len(v)*6 {
+		t.Errorf("Invalid indices length. Instead of '%d', we have '%d'.", len(v)*6, len(i))
+	}
 }
 func TestTerrainBuilderBuild(t *testing.T) {
-	t.Skip("Unimplemented")
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing textures.")
+			}
+		}()
+		length := 5
+		width := 5
+		iteration := 10
+		minH := float32(-1.0)
+		maxH := float32(3.0)
+		seed := int64(0)
+		peakProb := 5
+		cliffProb := 5
+		terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb).Build()
+		t.Log(terr)
+	}()
 }
