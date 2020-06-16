@@ -152,10 +152,13 @@ func (t *TerrainBuilder) initHeightMap() {
 	if t.minHIsDefault {
 		defaultHeight = t.minH
 	}
+	t.heightMap = make([][]float32, t.length)
 	for l := 0; l < t.length; l++ {
-		t.heightMap = append(t.heightMap, []float32{})
-		for w := 0; w <= t.width; w++ {
-			t.heightMap[l] = append(t.heightMap[l], defaultHeight)
+		t.heightMap[l] = make([]float32, t.width)
+	}
+	for l := 0; l < t.length; l++ {
+		for w := 0; w < t.width; w++ {
+			t.heightMap[l][w] = defaultHeight
 		}
 	}
 }

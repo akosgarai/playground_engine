@@ -2,6 +2,7 @@ package model
 
 import (
 	"testing"
+	"time"
 
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/primitives/boundingobject"
@@ -379,46 +380,150 @@ func TestTexturedRoom(t *testing.T) {
 	CheckDefaultRoomOptions(room, t)
 }
 func TestTerrainBuilderNewTerrainBuilder(t *testing.T) {
-	t.Skip("Unimplemented")
+	terr := NewTerrainBuilder()
+	if terr.width != defaultTerrainWidth {
+		t.Errorf("Invalid default width. Instead of '%d', we have '%d'.\n", defaultTerrainWidth, terr.width)
+	}
+	if terr.length != defaultTerrainLength {
+		t.Errorf("Invalid default length. Instead of '%d', we have '%d'.\n", defaultTerrainLength, terr.length)
+	}
+	if terr.iterations != defaultIterations {
+		t.Errorf("Invalid default iterations. Instead of '%d', we have '%d'.\n", defaultIterations, terr.iterations)
+	}
+	if terr.minH != defaultMinHeight {
+		t.Errorf("Invalid default minH. Instead of '%f', we have '%f'.\n", defaultMinHeight, terr.minH)
+	}
+	if terr.maxH != defaultMaxHeight {
+		t.Errorf("Invalid default maxH. Instead of '%f', we have '%f'.\n", defaultMaxHeight, terr.maxH)
+	}
+	if terr.seed != defaultSeed {
+		t.Errorf("Invalid default seed. Instead of '%d', we have '%d'.\n", defaultSeed, terr.seed)
+	}
+	if terr.minHIsDefault != false {
+		t.Error("Invalid  minHIsDefault. Not false")
+	}
+	if terr.cliffProbability != 0 {
+		t.Errorf("Invalid default cliffProbability. Instead of '%d', we have '%d'.\n", 0, terr.cliffProbability)
+	}
+	if terr.peakProbability != 0 {
+		t.Errorf("Invalid default peakProbability. Instead of '%d', we have '%d'.\n", 0, terr.peakProbability)
+	}
 }
 func TestTerrainBuilderSetWidth(t *testing.T) {
-	t.Skip("Unimplemented")
+	width := defaultTerrainWidth + 1
+	terr := NewTerrainBuilder().SetWidth(width)
+	if terr.width != width {
+		t.Errorf("Invalid width. Instead of '%d', we have '%d'.", width, terr.width)
+	}
 }
 func TestTerrainBuilderSetLength(t *testing.T) {
-	t.Skip("Unimplemented")
+	length := defaultTerrainLength + 1
+	terr := NewTerrainBuilder().SetLength(length)
+	if terr.length != length {
+		t.Errorf("Invalid length. Instead of '%d', we have '%d'.", length, terr.length)
+	}
 }
 func TestTerrainBuilderSetIterations(t *testing.T) {
-	t.Skip("Unimplemented")
+	iterations := defaultIterations + 1
+	terr := NewTerrainBuilder().SetIterations(iterations)
+	if terr.iterations != iterations {
+		t.Errorf("Invalid iterations. Instead of '%d', we have '%d'.", iterations, terr.iterations)
+	}
 }
 func TestTerrainBuilderSetMinHeight(t *testing.T) {
-	t.Skip("Unimplemented")
+	height := defaultMinHeight + 1.0
+	terr := NewTerrainBuilder().SetMinHeight(height)
+	if terr.minH != height {
+		t.Errorf("Invalid minH. Instead of '%f', we have '%f'.", height, terr.minH)
+	}
 }
 func TestTerrainBuilderSetMaxHeight(t *testing.T) {
-	t.Skip("Unimplemented")
+	height := defaultMaxHeight + 1.0
+	terr := NewTerrainBuilder().SetMaxHeight(height)
+	if terr.maxH != height {
+		t.Errorf("Invalid maxH. Instead of '%f', we have '%f'.", height, terr.maxH)
+	}
 }
 func TestTerrainBuilderSetSeed(t *testing.T) {
-	t.Skip("Unimplemented")
+	seed := defaultSeed + 1
+	terr := NewTerrainBuilder().SetSeed(seed)
+	if terr.seed != seed {
+		t.Errorf("Invalid seed. Instead of '%d', we have '%d'.", seed, terr.seed)
+	}
 }
 func TestTerrainBuilderRandomSeed(t *testing.T) {
-	t.Skip("Unimplemented")
+	before := time.Now().UnixNano()
+	terr := NewTerrainBuilder().RandomSeed()
+	after := time.Now().UnixNano()
+	if terr.seed < before || terr.seed > after {
+		t.Errorf("Invalid random seed '%d'. It supposed to be beetween '%d' and '%d'.", terr.seed, before, after)
+	}
 }
 func TestTerrainBuilderSetPeekProbability(t *testing.T) {
-	t.Skip("Unimplemented")
+	prob := 1
+	terr := NewTerrainBuilder().SetPeekProbability(prob)
+	if terr.peakProbability != prob {
+		t.Errorf("Invalid peak prob. Instead of '%d', we have '%d'.", prob, terr.peakProbability)
+	}
 }
 func TestTerrainBuilderSetCliffProbability(t *testing.T) {
-	t.Skip("Unimplemented")
+	prob := 1
+	terr := NewTerrainBuilder().SetCliffProbability(prob)
+	if terr.cliffProbability != prob {
+		t.Errorf("Invalid cliff prob. Instead of '%d', we have '%d'.", prob, terr.cliffProbability)
+	}
 }
 func TestTerrainBuilderMinHeightIsDefault(t *testing.T) {
-	t.Skip("Unimplemented")
+	terr := NewTerrainBuilder().MinHeightIsDefault(true)
+	if !terr.minHIsDefault {
+		t.Error("Invalid minHIsDefault. It should be true.")
+	}
+	terr = terr.MinHeightIsDefault(false)
+	if terr.minHIsDefault {
+		t.Error("Invalid minHIsDefault. It should be false.")
+	}
 }
 func TestTerrainBuilderSetGlWrapper(t *testing.T) {
-	t.Skip("Unimplemented")
+	var wrapper testhelper.GLWrapperMock
+	terr := NewTerrainBuilder().SetGlWrapper(wrapper)
+	if terr.wrapper != wrapper {
+		t.Error("Invalid gl wrapper")
+	}
 }
 func TestTerrainBuilderGrassTexture(t *testing.T) {
-	t.Skip("Unimplemented")
+	var wrapper testhelper.GLWrapperMock
+	terr := NewTerrainBuilder().SetGlWrapper(wrapper)
+	if len(terr.tex) != 0 {
+		t.Errorf("Invalid texture length. Instead of '0', we have '%d'.", len(terr.tex))
+	}
+	terr = terr.GrassTexture()
+	if len(terr.tex) != 2 {
+		t.Errorf("Invalid texture length. Instead of '2', we have '%d'.", len(terr.tex))
+	}
 }
 func TestTerrainBuilderInitHeightMap(t *testing.T) {
-	t.Skip("Unimplemented")
+	length := 2
+	width := 2
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(-2.0)
+	terr.initHeightMap()
+	for l := 0; l < terr.length; l++ {
+		for w := 0; w < terr.width; w++ {
+			if terr.heightMap[l][w] != 0.0 {
+				t.Errorf("Invalid heightMap. Instead of '0.0', we have '%f' at (%d,%d)", terr.heightMap[l][w], l, w)
+			}
+		}
+	}
+	terr = terr.MinHeightIsDefault(true)
+	t.Log(terr.heightMap)
+	terr.initHeightMap()
+	t.Log(terr.heightMap)
+	for l := 0; l < terr.length; l++ {
+		for w := 0; w < terr.width; w++ {
+			if terr.heightMap[l][w] != -2.0 {
+				t.Errorf("Invalid heightMap. Instead of '-2.0', we have '%f' at (%d,%d)", terr.heightMap[l][w], l, w)
+			}
+		}
+	}
 }
 func TestTerrainBuilderBuildHeightMap(t *testing.T) {
 	t.Skip("Unimplemented")
