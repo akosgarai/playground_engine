@@ -569,10 +569,11 @@ func TestTerrainBuilderBuildHeightMap(t *testing.T) {
 	peakProb := 5
 	cliffProb := 5
 	expected := [][]float32{
-		{0, 0, 0, 0.20000005},
-		{-0.19999999, -0.19999999, 0, 0},
-		{-0.6, -0.19999999, 1, 0.20000005},
-		{0, -0.19999999, 0.6, 1},
+		{0, 0, 1.8, 1, 0},
+		{0, -0.19999999, 0, 1.4000001, 0},
+		{-0.19999999, -0.6, -0.19999999, 2.6000001, 0},
+		{-0.19999999, -0.19999999, -0.19999999, 0, 0},
+		{0, 0, -0.6, 0, -1},
 	}
 	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
 	terr.initHeightMap()
@@ -596,10 +597,11 @@ func TestTerrainBuilderAdjacentElevation(t *testing.T) {
 	peakProb := 5
 	cliffProb := 5
 	expected := [][]float32{
-		{0, 0, 0, 0.20000005},
-		{-0.19999999, -0.19999999, 0, 0},
-		{-0.6, -0.19999999, 1, 0.20000005},
-		{0, -0.19999999, 0.6, 1},
+		{0, 0, 1.8, 1, 0},
+		{0, -0.19999999, 0, 1.4000001, 0},
+		{-0.19999999, -0.6, -0.19999999, 2.6000001, 0},
+		{-0.19999999, -0.19999999, -0.19999999, 0, 0},
+		{0, 0, -0.6, 0, -1},
 	}
 	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
 	terr.initHeightMap()
@@ -623,7 +625,7 @@ func TestTerrainBuilderVertices(t *testing.T) {
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	v := terr.vertices()
-	if len(v) != length*width {
+	if len(v) != (length+1)*(width+1) {
 		t.Errorf("Invalid vertices length. Instead of '%d', we have '%d'.", length*width, len(v))
 	}
 }

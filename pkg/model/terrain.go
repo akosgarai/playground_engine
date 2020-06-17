@@ -252,12 +252,12 @@ func (t *TerrainBuilder) initHeightMap() {
 	if t.minHIsDefault {
 		defaultHeight = t.minH
 	}
-	t.heightMap = make([][]float32, t.length)
-	for l := 0; l < t.length; l++ {
-		t.heightMap[l] = make([]float32, t.width)
+	t.heightMap = make([][]float32, t.length+1)
+	for l := 0; l <= t.length; l++ {
+		t.heightMap[l] = make([]float32, t.width+1)
 	}
-	for l := 0; l < t.length; l++ {
-		for w := 0; w < t.width; w++ {
+	for l := 0; l <= t.length; l++ {
+		for w := 0; w <= t.width; w++ {
 			t.heightMap[l][w] = defaultHeight
 		}
 	}
@@ -273,8 +273,8 @@ func (t *TerrainBuilder) buildHeightMap() {
 	}
 	for i := 0; i <= t.iterations; i++ {
 		height := t.minH + float32(i)*iterationStep
-		for l := 0; l < t.length; l++ {
-			for w := 0; w < t.width; w++ {
+		for l := 0; l <= t.length; l++ {
+			for w := 0; w <= t.width; w++ {
 				if t.heightMap[l][w] != defaultHeight {
 					continue
 				}
@@ -304,8 +304,8 @@ func (t *TerrainBuilder) vertices() []vertex.Vertex {
 		{0.0, 0.0},
 	}
 	var vertices vertex.Vertices
-	for l := 0; l < t.length; l++ {
-		for w := 0; w < t.width; w++ {
+	for l := 0; l <= t.length; l++ {
+		for w := 0; w <= t.width; w++ {
 			texIndex := (w % 2) + (l%2)*2
 			vertices = append(vertices, vertex.Vertex{
 				Position:  mgl32.Vec3{-float32(t.width)/2.0 + float32(w), t.heightMap[l][w], -float32(t.length)/2.0 + float32(l)},
@@ -319,8 +319,8 @@ func (t *TerrainBuilder) vertices() []vertex.Vertex {
 }
 func (t *TerrainBuilder) indices() []uint32 {
 	var indices []uint32
-	for w := 0; w <= t.width-1; w++ {
-		for l := 0; l <= t.length-1; l++ {
+	for w := 0; w <= t.width; w++ {
+		for l := 0; l <= t.length; l++ {
 			i0 := uint32(w*(t.length+1) + l)
 			i1 := uint32(1) + i0
 			i2 := uint32(t.length+1) + i0
