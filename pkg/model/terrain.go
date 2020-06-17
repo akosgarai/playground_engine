@@ -131,6 +131,10 @@ func (t *Terrain) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
 	return coldet.CheckPointInSphere(*boundingPoint, *boundingSphere)
 }
 
+// Update function does nothing.
+func (t *Terrain) Update(dt float64) {
+}
+
 // TerrainBuilder is a helper structure for generating terrain. It has a fluid API,
 // so that the settings could be chained.
 type TerrainBuilder struct {
