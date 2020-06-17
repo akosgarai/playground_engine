@@ -13,6 +13,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/primitives/vertex"
 	"github.com/akosgarai/playground_engine/pkg/texture"
 
+	"github.com/akosgarai/coldet"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -118,6 +119,39 @@ func (t *Terrain) HeightAtPos(pos mgl32.Vec3) (float32, error) {
 	height := (rightFaceAvgHeight * (posX - float32(int(posX)))) + (leftFaceAvgHeight * (float32(1.0) - (posX - float32(int(posX))))) + (bottomFaceAvgHeight * (posZ - float32(int(posZ)))) + (topFaceAvgHeight * (float32(1.0) - (posZ - float32(int(posZ)))))
 	height = height / 2
 	return height, nil
+}
+
+// CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.
+func (m *Terrain) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
+	for i, _ := range m.meshes {
+		if m.meshes[i].IsBoundingObjectSet() {
+			meshBo := m.meshes[i].GetBoundingObject()
+			meshInWorld := m.meshes[i].GetPosition()
+			if !m.meshes[i].IsParentMesh() {
+				meshTransTransform := m.meshes[i].GetParentTranslationTransformation()
+				meshInWorld = mgl32.TransformCoordinate(meshInWorld, meshTransTransform)
+			}
+			pos := [3]float32{meshInWorld.X(), meshInWorld.Y(), meshInWorld.Z()}
+			params := meshBo.Params()
+			if meshBo.Type() == "AABB" {
+				aabb := coldet.NewBoundingBox(pos, params["width"], params["height"], params["length"])
+
+				if coldet.CheckSphereVsAabb(*boundingSphere, *aabb) {
+					//fmt.Printf("BoundingSphere: %v\naabb: %v\nparams: %v\n", boundingSphere, aabb, params)
+					return true
+				}
+			} else if meshBo.Type() == "Sphere" {
+				params := meshBo.Params()
+				bs := coldet.NewBoundingSphere(pos, params["radius"])
+
+				if coldet.CheckSphereVsSphere(*boundingSphere, *bs) {
+					//fmt.Printf("BoundingSphere: %v\nbs: %v\nparams: %v\n", boundingSphere, bs, params)
+					return true
+				}
+			}
+		}
+	}
+	return false
 }
 
 // TerrainBuilder is a helper structure for generating terrain. It has a fluid API,

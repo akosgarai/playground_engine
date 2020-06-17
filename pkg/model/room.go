@@ -24,7 +24,7 @@ const (
 )
 
 type Room struct {
-	Model
+	BaseCollisionDetectionModel
 	doorState            int
 	currentAnimationTime float64
 }
@@ -89,7 +89,7 @@ func NewMaterialRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room 
 	door.SetParent(floor)
 	door.SetBoundingObject(bo)
 
-	m := newModel()
+	m := newCDModel()
 	m.AddMesh(floor)
 	m.AddMesh(ceiling)
 	m.AddMesh(backWall)
@@ -98,7 +98,7 @@ func NewMaterialRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room 
 	m.AddMesh(frontWallMain)
 	m.AddMesh(frontWallRest)
 	m.AddMesh(door)
-	return &Room{Model: *m, doorState: _DOOR_OPENED, currentAnimationTime: 0}
+	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_OPENED, currentAnimationTime: 0}
 }
 func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	var concreteTexture texture.Textures
@@ -164,7 +164,7 @@ func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	door.SetParent(floor)
 	door.SetBoundingObject(bo)
 
-	m := newModel()
+	m := newCDModel()
 	m.AddMesh(floor)
 	m.AddMesh(ceiling)
 	m.AddMesh(backWall)
@@ -173,7 +173,7 @@ func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	m.AddMesh(frontWallMain)
 	m.AddMesh(frontWallRest)
 	m.AddMesh(door)
-	return &Room{Model: *m, doorState: _DOOR_OPENED, currentAnimationTime: 0}
+	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_OPENED, currentAnimationTime: 0}
 }
 
 func (r *Room) PushDoorState() {

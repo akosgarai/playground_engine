@@ -16,6 +16,42 @@ type Model struct {
 type BaseModel struct {
 	Model
 }
+type BaseCollisionDetectionModel struct {
+	Model
+}
+
+// CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.
+func (m *BaseCollisionDetectionModel) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
+	for i, _ := range m.meshes {
+		if m.meshes[i].IsBoundingObjectSet() {
+			meshBo := m.meshes[i].GetBoundingObject()
+			meshInWorld := m.meshes[i].GetPosition()
+			if !m.meshes[i].IsParentMesh() {
+				meshTransTransform := m.meshes[i].GetParentTranslationTransformation()
+				meshInWorld = mgl32.TransformCoordinate(meshInWorld, meshTransTransform)
+			}
+			pos := [3]float32{meshInWorld.X(), meshInWorld.Y(), meshInWorld.Z()}
+			params := meshBo.Params()
+			if meshBo.Type() == "AABB" {
+				aabb := coldet.NewBoundingBox(pos, params["width"], params["height"], params["length"])
+
+				if coldet.CheckSphereVsAabb(*boundingSphere, *aabb) {
+					//fmt.Printf("BoundingSphere: %v\naabb: %v\nparams: %v\n", boundingSphere, aabb, params)
+					return true
+				}
+			} else if meshBo.Type() == "Sphere" {
+				params := meshBo.Params()
+				bs := coldet.NewBoundingSphere(pos, params["radius"])
+
+				if coldet.CheckSphereVsSphere(*boundingSphere, *bs) {
+					//fmt.Printf("BoundingSphere: %v\nbs: %v\nparams: %v\n", boundingSphere, bs, params)
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
 
 // Update function loops over each of the meshes and calls their Update function.
 func (m *BaseModel) Update(dt float64) {
@@ -26,6 +62,13 @@ func (m *BaseModel) Update(dt float64) {
 func newModel() *Model {
 	return &Model{
 		meshes: []interfaces.Mesh{},
+	}
+}
+func newCDModel() *BaseCollisionDetectionModel {
+	return &BaseCollisionDetectionModel{
+		Model{
+			meshes: []interfaces.Mesh{},
+		},
 	}
 }
 
@@ -112,7 +155,7 @@ func (m *Model) RotateZ(angleDeg float32) {
 }
 
 // CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.
-func (m *Model) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
+func (m *BaseModel) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
 	for i, _ := range m.meshes {
 		if m.meshes[i].IsBoundingObjectSet() {
 			meshBo := m.meshes[i].GetBoundingObject()
