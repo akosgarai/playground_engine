@@ -711,3 +711,37 @@ func TestTerrainHeightAtPos(t *testing.T) {
 		}
 	}
 }
+func TestTerrainCollideTestWithSphere(t *testing.T) {
+	terrain := NewTerrainBuilder().SetScale(mgl32.Vec3{2, 1, 2}).SetGlWrapper(wrapperMock).GrassTexture().Build()
+	terrain.heightMap = [][]float32{
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	}
+	testData := []struct {
+		position [3]float32
+		radius   float32
+		collide  bool
+	}{
+		{[3]float32{15, 0, 15}, 1, false},
+		{[3]float32{11, 0, 10}, 1, false},
+		{[3]float32{10.2, 0, 10}, 1, false},
+		{[3]float32{10.000002, 0, 10}, 1, false},
+		{[3]float32{2, 1.1, 8}, 1, false},
+		{[3]float32{2, 0.9, 8}, 1, true},
+	}
+	for _, v := range testData {
+		bs := coldet.NewBoundingSphere(v.position, v.radius)
+		result := terrain.CollideTestWithSphere(bs)
+		if result != v.collide {
+			t.Errorf("Invalid collision.\nPosition:\t'%v'\nRadius:\t'%f'\nExpected:\t'%v'", v.position, v.radius, v.collide)
+		}
+	}
+}

@@ -121,37 +121,14 @@ func (t *Terrain) HeightAtPos(pos mgl32.Vec3) (float32, error) {
 	return height, nil
 }
 
-// CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.
-func (m *Terrain) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
-	for i, _ := range m.meshes {
-		if m.meshes[i].IsBoundingObjectSet() {
-			meshBo := m.meshes[i].GetBoundingObject()
-			meshInWorld := m.meshes[i].GetPosition()
-			if !m.meshes[i].IsParentMesh() {
-				meshTransTransform := m.meshes[i].GetParentTranslationTransformation()
-				meshInWorld = mgl32.TransformCoordinate(meshInWorld, meshTransTransform)
-			}
-			pos := [3]float32{meshInWorld.X(), meshInWorld.Y(), meshInWorld.Z()}
-			params := meshBo.Params()
-			if meshBo.Type() == "AABB" {
-				aabb := coldet.NewBoundingBox(pos, params["width"], params["height"], params["length"])
-
-				if coldet.CheckSphereVsAabb(*boundingSphere, *aabb) {
-					//fmt.Printf("BoundingSphere: %v\naabb: %v\nparams: %v\n", boundingSphere, aabb, params)
-					return true
-				}
-			} else if meshBo.Type() == "Sphere" {
-				params := meshBo.Params()
-				bs := coldet.NewBoundingSphere(pos, params["radius"])
-
-				if coldet.CheckSphereVsSphere(*boundingSphere, *bs) {
-					//fmt.Printf("BoundingSphere: %v\nbs: %v\nparams: %v\n", boundingSphere, bs, params)
-					return true
-				}
-			}
-		}
+// CollideTestWithSphere is the collision detection function for heightmap vs sphere.
+func (t *Terrain) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
+	height, err := t.HeightAtPos(mgl32.Vec3{boundingSphere.X(), boundingSphere.Y(), boundingSphere.Z()})
+	if err != nil {
+		return false
 	}
-	return false
+	boundingPoint := coldet.NewBoundingPoint([3]float32{boundingSphere.X(), height, boundingSphere.Z()})
+	return coldet.CheckPointInSphere(*boundingPoint, *boundingSphere)
 }
 
 // TerrainBuilder is a helper structure for generating terrain. It has a fluid API,
