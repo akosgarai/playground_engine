@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"math/rand"
 	"path"
 	"runtime"
@@ -18,10 +19,15 @@ import (
 const (
 	defaultTerrainWidth  = 10
 	defaultTerrainLength = 10
-	defaultIterations    = 5
+	defaultIterations    = 1
 	defaultMinHeight     = float32(0.0)
-	defaultMaxHeight     = float32(3.0)
+	defaultMaxHeight     = float32(0.0)
 	defaultSeed          = int64(0)
+	distanceTolerance    = float32(0.01)
+)
+
+var (
+	ErrorNotAboveTheSurface = errors.New("Not above the surface")
 )
 
 func max(a, b int) int {
@@ -39,6 +45,79 @@ func min(a, b int) int {
 
 type Terrain struct {
 	Model
+	heightMap     [][]float32
+	width, length int
+}
+
+// getDistanceFrom returns the distance between the given position vector and the given
+// heightMap coordinate. (pos(x,0,z), hm(x,0,z))
+func (t *Terrain) getDistanceFrom(pos mgl32.Vec3, w, l int) float32 {
+	posInXZPlane := mgl32.Vec3{pos.X(), 0.0, pos.Z()}
+	posHM := mgl32.Vec3{float32(w), 0.0, float32(l)}
+	return posHM.Sub(posInXZPlane).Len()
+}
+
+// GetTerrain returns the terrain mesh
+func (t *Terrain) GetTerrain() interfaces.Mesh {
+	return t.meshes[0]
+}
+func (t *Terrain) HeightAtPos(pos mgl32.Vec3) (float32, error) {
+	tMesh := t.GetTerrain()
+	scaleTr := tMesh.ScaleTransformation()
+	scaleX := scaleTr[0]
+	scaleZ := scaleTr[10]
+	posX := pos.X() / scaleX
+	posZ := pos.Z() / scaleZ
+	// Exclude points that are not above or under the mesh.
+	if posX > float32(t.width)/2.0 || posX < float32(-t.width)/2 || posZ > float32(t.length)/2.0 || posZ < float32(-t.length)/2.0 {
+		return -1, ErrorNotAboveTheSurface
+	}
+	var posX1, posX2, posZ1, posZ2 int
+	var mapIndexX1, mapIndexX2, mapIndexZ1, mapIndexZ2 int
+	posX1 = int(posX)
+	if float32(posX1) > posX {
+		posX1 = posX1 - 1
+	}
+	posZ1 = int(posZ)
+	if float32(posZ1) > posZ {
+		posZ1 = posZ1 - 1
+	}
+	posX2 = posX1 + 1
+	posZ2 = posZ1 + 1
+
+	dist1 := t.getDistanceFrom(mgl32.Vec3{posX, 0, posZ}, posX1, posZ1)
+	dist2 := t.getDistanceFrom(mgl32.Vec3{posX, 0, posZ}, posX2, posZ1)
+	dist3 := t.getDistanceFrom(mgl32.Vec3{posX, 0, posZ}, posX2, posZ2)
+	dist4 := t.getDistanceFrom(mgl32.Vec3{posX, 0, posZ}, posX1, posZ2)
+	// Use the point, if it is close.
+	mapIndexX1 = int(t.width/2 + posX1)
+	mapIndexX2 = int(t.width/2 + posX2)
+	mapIndexZ1 = int(t.length/2 + posZ1)
+	mapIndexZ2 = int(t.length/2 + posZ2)
+	if dist1 < distanceTolerance {
+		return t.heightMap[mapIndexZ1][mapIndexX1], nil
+	}
+	if dist2 < distanceTolerance {
+		return t.heightMap[mapIndexZ1][mapIndexX2], nil
+	}
+	if dist3 < distanceTolerance {
+		return t.heightMap[mapIndexZ2][mapIndexX2], nil
+	}
+	if dist4 < distanceTolerance {
+		return t.heightMap[mapIndexZ2][mapIndexX1], nil
+	}
+	// The interpolation algorithm: Get the average height of the faces.
+	// Use the distance from the faces as weight.
+	// ----
+	// |  |
+	// ----
+	leftFaceAvgHeight := (t.heightMap[mapIndexZ1][mapIndexX1] + t.heightMap[mapIndexZ2][mapIndexX1]) / 2.0
+	rightFaceAvgHeight := (t.heightMap[mapIndexZ1][mapIndexX2] + t.heightMap[mapIndexZ2][mapIndexX2]) / 2.0
+	topFaceAvgHeight := (t.heightMap[mapIndexZ2][mapIndexX1] + t.heightMap[mapIndexZ2][mapIndexX2]) / 2.0
+	bottomFaceAvgHeight := (t.heightMap[mapIndexZ1][mapIndexX1] + t.heightMap[mapIndexZ1][mapIndexX2]) / 2.0
+	height := (rightFaceAvgHeight * (posX - float32(int(posX)))) + (leftFaceAvgHeight * (float32(1.0) - (posX - float32(int(posX))))) + (bottomFaceAvgHeight * (posZ - float32(int(posZ)))) + (topFaceAvgHeight * (float32(1.0) - (posZ - float32(int(posZ)))))
+	height = height / 2
+	return height, nil
 }
 
 // TerrainBuilder is a helper structure for generating terrain. It has a fluid API,
@@ -53,6 +132,7 @@ type TerrainBuilder struct {
 	cliffProbability          int
 	wrapper                   interfaces.GLWrapper
 	tex                       texture.Textures
+	scale                     mgl32.Vec3
 }
 
 // NewTerrainBuilder returns a TerrainBuilder with default settings.
@@ -67,6 +147,7 @@ func NewTerrainBuilder() *TerrainBuilder {
 		minHIsDefault:    false,
 		peakProbability:  0,
 		cliffProbability: 0,
+		scale:            mgl32.Vec3{1, 1, 1},
 	}
 }
 
@@ -133,6 +214,10 @@ func (t *TerrainBuilder) MinHeightIsDefault(f bool) *TerrainBuilder {
 // SetGlWrapper sets the wrapper.
 func (t *TerrainBuilder) SetGlWrapper(w interfaces.GLWrapper) *TerrainBuilder {
 	t.wrapper = w
+	return t
+}
+func (t *TerrainBuilder) SetScale(s mgl32.Vec3) *TerrainBuilder {
+	t.scale = s
 	return t
 }
 
@@ -244,7 +329,8 @@ func (t *TerrainBuilder) Build() *Terrain {
 	v := t.vertices()
 	i := t.indices()
 	terrainMesh := mesh.NewTexturedMesh(v, i, t.tex, t.wrapper)
+	terrainMesh.SetScale(t.scale)
 	m := newModel()
 	m.AddMesh(terrainMesh)
-	return &Terrain{Model: *m}
+	return &Terrain{Model: *m, heightMap: t.heightMap, width: t.width, length: t.length}
 }

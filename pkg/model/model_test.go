@@ -629,3 +629,50 @@ func TestTerrainBuilderBuild(t *testing.T) {
 		t.Log(terr)
 	}()
 }
+func TestTerrainHeightAtPos(t *testing.T) {
+	terrain := NewTerrainBuilder().SetScale(mgl32.Vec3{2, 1, 2}).SetGlWrapper(wrapperMock).GrassTexture().Build()
+	terrain.heightMap = [][]float32{
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+	}
+	testData := []struct {
+		position mgl32.Vec3
+		height   float32
+		err      error
+	}{
+		{mgl32.Vec3{15, 0, 15}, -1, ErrorNotAboveTheSurface},
+		{mgl32.Vec3{11, 0, 10}, -1, ErrorNotAboveTheSurface},
+		{mgl32.Vec3{10.2, 0, 10}, -1, ErrorNotAboveTheSurface},
+		{mgl32.Vec3{10.000002, 0, 10}, -1, ErrorNotAboveTheSurface},
+		{mgl32.Vec3{2, 0, 8}, 0, nil},
+		{mgl32.Vec3{0, 0, 0}, 0, nil},
+		{mgl32.Vec3{-10, 0, -10}, 0, nil},
+		{mgl32.Vec3{-10, 0, -8}, 0, nil},
+		{mgl32.Vec3{-9, 0, -9}, 0.25, nil},
+		{mgl32.Vec3{-8, 0, -8.01}, 1.0, nil},
+		{mgl32.Vec3{-8.01, 0, -8.01}, 1.0, nil},
+		{mgl32.Vec3{-8.01, 0, -8}, 1.0, nil},
+		{mgl32.Vec3{-8, 0, -8}, 1.0, nil},
+		{mgl32.Vec3{-7.99, 0, -8}, 1.0, nil},
+		{mgl32.Vec3{-8, 0, -7.99}, 1.0, nil},
+		{mgl32.Vec3{-7.99, 0, -7.99}, 1.0, nil},
+		{mgl32.Vec3{-7, 0, -7}, 1.0, nil},
+		{mgl32.Vec3{-6, 0, -6}, 1.0, nil},
+		{mgl32.Vec3{-5, 0, -5}, 0.25, nil},
+		{mgl32.Vec3{-10, 0, -7}, 0.25, nil},
+	}
+	for _, v := range testData {
+		x, err := terrain.HeightAtPos(v.position)
+		if x != v.height || err != v.err {
+			t.Errorf("Invalid height results.\n - At position '%v',\n\texpected height: '%f', error: '%v',\n\tgiven height: '%f', error: '%v'.", v.position, v.height, v.err, x, err)
+		}
+	}
+}

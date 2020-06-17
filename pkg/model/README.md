@@ -33,5 +33,6 @@ This is the builder for the terrain.
 - `cliffProbability` this value (integer) represents the percentage of the chance of the generated height will be a cliff. It can be updated with the `SetCliffProbability` function.
 - `wrapper` the wrapper pkg (interfaces.GLWrapper) for the gl functions. It can be set with the `SetGlWrapper` function.
 - `tex` the texture container (texture.Textures) for the surface textures. It can be set to the grass textures with the `GrassTexture` function.
+- `scale` the scale vector (mgl32.Vec3) of the terrain mesh. It can be updated with the `SetScale` function.
 
 The `Build` function returns the `Terrain` model, that is generated with the given setup.
