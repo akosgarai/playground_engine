@@ -127,7 +127,8 @@ func (t *Terrain) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
 	if err != nil {
 		return false
 	}
-	boundingPoint := coldet.NewBoundingPoint([3]float32{boundingSphere.X(), height, boundingSphere.Z()})
+	bpPos := t.GetTerrain().GetPosition().Add(mgl32.Vec3{boundingSphere.X(), height, boundingSphere.Z()})
+	boundingPoint := coldet.NewBoundingPoint([3]float32{bpPos.X(), bpPos.Y(), bpPos.Z()})
 	return coldet.CheckPointInSphere(*boundingPoint, *boundingSphere)
 }
 
