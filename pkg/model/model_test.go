@@ -256,6 +256,24 @@ func TestBug(t *testing.T) {
 		}()
 		bug.Update(10)
 	}()
+	testData := []struct {
+		position  [3]float32
+		radius    float32
+		intersect bool
+		msg       string
+	}{
+		{[3]float32{0, 0, 0}, 0.5, true, "Should intersect at x=-0.5."},
+		{[3]float32{-1.5, 1.3, 0.0}, 1.0, true, "Should intersect at y=1."},
+		{[3]float32{-2, -2, -2}, 1.5, false, "Shouldn't intersect."},
+	}
+
+	for _, tt := range testData {
+		base := coldet.NewBoundingSphere(tt.position, tt.radius)
+		result := bug.CollideTestWithSphere(base)
+		if result != tt.intersect {
+			t.Errorf("%s expected: '%v', result: '%v'.", tt.msg, tt.intersect, result)
+		}
+	}
 }
 func TestMaterialStreetLamp(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
@@ -283,6 +301,23 @@ func TestMaterialStreetLamp(t *testing.T) {
 		}()
 		lamp.Update(10)
 	}()
+	testData := []struct {
+		position  [3]float32
+		radius    float32
+		intersect bool
+		msg       string
+	}{
+		{[3]float32{-0.6, 3, 0}, 0.5, true, "Should intersect at x."},
+		{[3]float32{-2, -2, -2}, 1.5, false, "Shouldn't intersect."},
+	}
+
+	for _, tt := range testData {
+		base := coldet.NewBoundingSphere(tt.position, tt.radius)
+		result := lamp.CollideTestWithSphere(base)
+		if result != tt.intersect {
+			t.Errorf("%s expected: '%v', result: '%v'.", tt.msg, tt.intersect, result)
+		}
+	}
 }
 func TestTexturedStreetLamp(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
