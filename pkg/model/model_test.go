@@ -730,47 +730,51 @@ func TestTerrainHeightAtPos(t *testing.T) {
 	tb.GrassTexture()
 	terrain := tb.Build()
 	terrain.heightMap = [][]float32{
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	}
 	testData := []struct {
-		position mgl32.Vec3
-		height   float32
-		err      error
+		position  mgl32.Vec3
+		height    float32
+		debugMode bool
+		err       error
 	}{
-		{mgl32.Vec3{15, 0, 15}, -1, ErrorNotAboveTheSurface},
-		{mgl32.Vec3{11, 0, 10}, -1, ErrorNotAboveTheSurface},
-		{mgl32.Vec3{10.2, 0, 10}, -1, ErrorNotAboveTheSurface},
-		{mgl32.Vec3{10.000002, 0, 10}, -1, ErrorNotAboveTheSurface},
-		{mgl32.Vec3{2, 0, 8}, 0, nil},
-		{mgl32.Vec3{0, 0, 0}, 0, nil},
-		{mgl32.Vec3{-10, 0, -10}, 0, nil},
-		{mgl32.Vec3{-10, 0, -8}, 0, nil},
-		{mgl32.Vec3{-9, 0, -9}, 0.25, nil},
-		{mgl32.Vec3{-8, 0, -8.01}, 1.0, nil},
-		{mgl32.Vec3{-8.01, 0, -8.01}, 1.0, nil},
-		{mgl32.Vec3{-8.01, 0, -8}, 1.0, nil},
-		{mgl32.Vec3{-8, 0, -8}, 1.0, nil},
-		{mgl32.Vec3{-7.99, 0, -8}, 1.0, nil},
-		{mgl32.Vec3{-8, 0, -7.99}, 1.0, nil},
-		{mgl32.Vec3{-7.99, 0, -7.99}, 1.0, nil},
-		{mgl32.Vec3{-7, 0, -7}, 1.0, nil},
-		{mgl32.Vec3{-6, 0, -6}, 1.0, nil},
-		{mgl32.Vec3{-5, 0, -5}, 0.25, nil},
-		{mgl32.Vec3{-10, 0, -7}, 0.25, nil},
+		{mgl32.Vec3{15, 0, 15}, -1, false, ErrorNotAboveTheSurface},
+		{mgl32.Vec3{11, 0, 10}, -1, false, ErrorNotAboveTheSurface},
+		{mgl32.Vec3{10.2, 0, 10}, -1, false, ErrorNotAboveTheSurface},
+		{mgl32.Vec3{10.000002, 0, 10}, -1, false, ErrorNotAboveTheSurface},
+		{mgl32.Vec3{2, 0, 8}, 0, false, nil},
+		{mgl32.Vec3{0, 0, 0}, 0, false, nil},
+		{mgl32.Vec3{-10, 0, -10}, 0, false, nil},
+		{mgl32.Vec3{-10, 0, -8}, 0, false, nil},
+		{mgl32.Vec3{-9, 0, -9}, 0.25, false, nil},
+		{mgl32.Vec3{-8, 0, -8.01}, 0.995, false, nil},
+		{mgl32.Vec3{-8.01, 0, -8.01}, 0.990025, false, nil},
+		{mgl32.Vec3{-8.01, 0, -8}, 0.995, false, nil},
+		{mgl32.Vec3{-8, 0, -8}, 1.0, false, nil},
+		{mgl32.Vec3{-7.99, 0, -8}, 1.0, false, nil},
+		{mgl32.Vec3{-8, 0, -7.99}, 1.0, false, nil},
+		{mgl32.Vec3{-7.99, 0, -7.99}, 1.0, false, nil},
+		{mgl32.Vec3{-7, 0, -7}, 1.0, false, nil},
+		{mgl32.Vec3{-6, 0, -6}, 1.0, false, nil},
+		{mgl32.Vec3{-5, 0, -5}, 0.25, true, nil},
+		{mgl32.Vec3{-10, 0, -7}, 0.0, false, nil},
 	}
 	for _, v := range testData {
+		terrain.debugMode = v.debugMode
 		x, err := terrain.HeightAtPos(v.position)
-		if x != v.height || err != v.err {
+		if !testhelper.Float32ApproxEqual(x, v.height, 0.00001) || err != v.err {
 			t.Errorf("Invalid height results.\n - At position '%v',\n\texpected height: '%f', error: '%v',\n\tgiven height: '%f', error: '%v'.", v.position, v.height, v.err, x, err)
+			t.Log(terrain.heightMap)
 		}
 	}
 }
@@ -781,16 +785,17 @@ func TestTerrainCollideTestWithSphere(t *testing.T) {
 	tb.GrassTexture()
 	terrain := tb.Build()
 	terrain.heightMap = [][]float32{
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	}
 	testData := []struct {
 		position [3]float32

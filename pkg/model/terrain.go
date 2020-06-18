@@ -49,14 +49,7 @@ type Terrain struct {
 	Model
 	heightMap     [][]float32
 	width, length int
-}
-
-// getDistanceFrom returns the distance between the given position vector and the given
-// heightMap coordinate. (pos(x,0,z), hm(x,0,z))
-func (t *Terrain) getDistanceFrom(pos mgl32.Vec3, w, l int) float32 {
-	posInXZPlane := mgl32.Vec3{pos.X(), 0.0, pos.Z()}
-	posHM := mgl32.Vec3{float32(w), 0.0, float32(l)}
-	return posHM.Sub(posInXZPlane).Len()
+	debugMode     bool
 }
 
 // GetTerrain returns the terrain mesh
@@ -87,38 +80,31 @@ func (t *Terrain) HeightAtPos(pos mgl32.Vec3) (float32, error) {
 	posX2 = posX1 + 1
 	posZ2 = posZ1 + 1
 
-	dist1 := t.getDistanceFrom(mgl32.Vec3{posX, 0, posZ}, posX1, posZ1)
-	dist2 := t.getDistanceFrom(mgl32.Vec3{posX, 0, posZ}, posX2, posZ1)
-	dist3 := t.getDistanceFrom(mgl32.Vec3{posX, 0, posZ}, posX2, posZ2)
-	dist4 := t.getDistanceFrom(mgl32.Vec3{posX, 0, posZ}, posX1, posZ2)
-	// Use the point, if it is close.
 	mapIndexX1 = int(t.width/2 + posX1)
 	mapIndexX2 = int(t.width/2 + posX2)
 	mapIndexZ1 = int(t.length/2 + posZ1)
 	mapIndexZ2 = int(t.length/2 + posZ2)
-	if dist1 < distanceTolerance {
-		return t.heightMap[mapIndexZ1][mapIndexX1], nil
-	}
-	if dist2 < distanceTolerance {
-		return t.heightMap[mapIndexZ1][mapIndexX2], nil
-	}
-	if dist3 < distanceTolerance {
-		return t.heightMap[mapIndexZ2][mapIndexX2], nil
-	}
-	if dist4 < distanceTolerance {
-		return t.heightMap[mapIndexZ2][mapIndexX1], nil
-	}
-	// The interpolation algorithm: Get the average height of the faces.
-	// Use the distance from the faces as weight.
+	// The interpolation algorithm:
+	// Let wX = position.X() - int(position.X())
+	// Let wZ = position.Z() - int(position.Z())
+	// A  B
 	// ----
 	// |  |
 	// ----
-	leftFaceAvgHeight := (t.heightMap[mapIndexZ1][mapIndexX1] + t.heightMap[mapIndexZ2][mapIndexX1]) / 2.0
-	rightFaceAvgHeight := (t.heightMap[mapIndexZ1][mapIndexX2] + t.heightMap[mapIndexZ2][mapIndexX2]) / 2.0
-	topFaceAvgHeight := (t.heightMap[mapIndexZ2][mapIndexX1] + t.heightMap[mapIndexZ2][mapIndexX2]) / 2.0
-	bottomFaceAvgHeight := (t.heightMap[mapIndexZ1][mapIndexX1] + t.heightMap[mapIndexZ1][mapIndexX2]) / 2.0
-	height := (rightFaceAvgHeight * (posX - float32(int(posX)))) + (leftFaceAvgHeight * (float32(1.0) - (posX - float32(int(posX))))) + (bottomFaceAvgHeight * (posZ - float32(int(posZ)))) + (topFaceAvgHeight * (float32(1.0) - (posZ - float32(int(posZ)))))
-	height = height / 2
+	// D  C
+	// Let heightAtTheGivenPosition = (heightA*(1-wX) + heightB*(wX)) * wZ + (heightD*(1-wX) + heightC*(wX)) * (1-wZ)
+	wX := posX - float32(int(posX))
+	if wX < 0 {
+		wX = 1.0 + wX
+	}
+	wZ := posZ - float32(int(posZ))
+	if wZ < 0 {
+		wZ = 1.0 + wZ
+	}
+	if t.debugMode {
+		fmt.Printf("Terrain.HeightAtPos:\n\twx:\t%f\n\twZ:\t%f\nMapIndex:\n\tZ1:\t%d\n\tZ2:\t%d\n\tX1:\t%d\n\tX2:\t%d\n", wX, wZ, mapIndexZ1, mapIndexZ2, mapIndexX1, mapIndexX2)
+	}
+	height := (t.heightMap[mapIndexZ2][mapIndexX1]*(1.0-wX)+t.heightMap[mapIndexZ2][mapIndexX2]*wX)*wZ + (t.heightMap[mapIndexZ1][mapIndexX1]*(1.0-wX)+t.heightMap[mapIndexZ1][mapIndexX2]*wX)*(1-wZ)
 	return height, nil
 }
 
@@ -362,5 +348,5 @@ func (t *TerrainBuilder) Build() *Terrain {
 	terrainMesh.SetScale(t.scale)
 	m := newModel()
 	m.AddMesh(terrainMesh)
-	return &Terrain{Model: *m, heightMap: t.heightMap, width: t.width, length: t.length}
+	return &Terrain{Model: *m, heightMap: t.heightMap, width: t.width, length: t.length, debugMode: t.debugMode}
 }
