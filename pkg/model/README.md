@@ -34,5 +34,32 @@ This is the builder for the terrain.
 - `wrapper` the wrapper pkg (interfaces.GLWrapper) for the gl functions. It can be set with the `SetGlWrapper` function.
 - `tex` the texture container (texture.Textures) for the surface textures. It can be set to the grass textures with the `GrassTexture` function.
 - `scale` the scale vector (mgl32.Vec3) of the terrain mesh. It can be updated with the `SetScale` function.
+- `debugMode` is this flag is set true, useful information will be printed to the console. It can be set with the `SetDebugMode` function.
 
 The `Build` function returns the `Terrain` model, that is generated with the given setup.
+
+### Terrain
+
+The Terrain represents the surface, the ground, whatever. It contains the `heightMap` that the builder generated and also the width, length, debugModes. The `HeightAtPos` function returns the height value in a given position. The calculation is based on a basic interpolation algorithm.
+
+**The interpolation**
+
+- If the given point is not above or below the surface, it returns error. Otherwise it is based on the following pseudo algorithm:
+
+```
+The interpolation algorithm:
+Let wX = position.X() - int(position.X()). If wX less than 0, increase it with 1.0.
+Let wZ = position.Z() - int(position.Z()). If wZ less than 0, increase it with 1.0.
+
+Y+
+^
+|  A  B
+|  ----
+|  |  |
+|  ----
+|  D  C
+|
+-------->X+
+
+Let heightAtTheGivenPosition = (heightA*(1-wX) + heightB*(wX)) * wZ + (heightD*(1-wX) + heightC*(wX)) * (1-wZ)
+```

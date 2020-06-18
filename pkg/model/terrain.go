@@ -56,6 +56,9 @@ type Terrain struct {
 func (t *Terrain) GetTerrain() interfaces.Mesh {
 	return t.meshes[0]
 }
+
+// HeightAtPos returns the height value at the given position, and nil. In case of the position
+// is not under or above the surface, it returns 01 and error.
 func (t *Terrain) HeightAtPos(pos mgl32.Vec3) (float32, error) {
 	tMesh := t.GetTerrain()
 	scaleTr := tMesh.ScaleTransformation()
@@ -84,15 +87,7 @@ func (t *Terrain) HeightAtPos(pos mgl32.Vec3) (float32, error) {
 	mapIndexX2 = int(t.width/2 + posX2)
 	mapIndexZ1 = int(t.length/2 + posZ1)
 	mapIndexZ2 = int(t.length/2 + posZ2)
-	// The interpolation algorithm:
-	// Let wX = position.X() - int(position.X())
-	// Let wZ = position.Z() - int(position.Z())
-	// A  B
-	// ----
-	// |  |
-	// ----
-	// D  C
-	// Let heightAtTheGivenPosition = (heightA*(1-wX) + heightB*(wX)) * wZ + (heightD*(1-wX) + heightC*(wX)) * (1-wZ)
+
 	wX := posX - float32(int(posX))
 	if wX < 0 {
 		wX = 1.0 + wX
