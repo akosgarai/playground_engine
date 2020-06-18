@@ -110,6 +110,10 @@ func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	doorTexture.AddTexture(fileDir+"/assets/door.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
 	doorTexture.AddTexture(fileDir+"/assets/door.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
 
+	var windowTexture texture.Textures
+	windowTexture.AddTexture(fileDir+"/assets/window.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
+	windowTexture.AddTexture(fileDir+"/assets/window.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
+
 	floorCuboid := cuboid.New(1.0, 1.0, 0.005)
 	floorV, floorI, bo := floorCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_DEFAULT)
 
@@ -142,13 +146,42 @@ func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 
 	// front wall parts
 
-	frontCuboid := cuboid.New(0.6, 1.0, 0.005)
-	V, I, bo := frontCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_DEFAULT)
-	frontWallMain := mesh.NewTexturedMesh(V, I, concreteTexture, glWrapper)
-	frontWallMain.SetPosition(mgl32.Vec3{0.2, 0.5, 0.4975})
-	frontWallMain.RotateX(90)
-	frontWallMain.SetParent(floor)
-	frontWallMain.SetBoundingObject(bo)
+	frontLongCuboid := cuboid.New(0.2, 1.0, 0.005)
+	V, I, bo := frontLongCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_DEFAULT)
+	frontWallMain1 := mesh.NewTexturedMesh(V, I, concreteTexture, glWrapper)
+	frontWallMain1.SetPosition(mgl32.Vec3{0.0, 0.5, 0.4975})
+	frontWallMain1.RotateX(90)
+	frontWallMain1.SetParent(floor)
+	frontWallMain1.SetBoundingObject(bo)
+
+	frontWallMain2 := mesh.NewTexturedMesh(V, I, concreteTexture, glWrapper)
+	frontWallMain2.SetPosition(mgl32.Vec3{0.4, 0.5, 0.4975})
+	frontWallMain2.RotateX(90)
+	frontWallMain2.SetParent(floor)
+	frontWallMain2.SetBoundingObject(bo)
+
+	frontSmallCuboid := cuboid.New(0.2, 0.3, 0.005)
+	V, I, bo = frontSmallCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_DEFAULT)
+	frontWallMain3 := mesh.NewTexturedMesh(V, I, concreteTexture, glWrapper)
+	frontWallMain3.SetPosition(mgl32.Vec3{0.2, 0.15, 0.4975})
+	frontWallMain3.RotateX(90)
+	frontWallMain3.SetParent(floor)
+	frontWallMain3.SetBoundingObject(bo)
+
+	frontWallMain4 := mesh.NewTexturedMesh(V, I, concreteTexture, glWrapper)
+	frontWallMain4.SetPosition(mgl32.Vec3{0.2, 0.85, 0.4975})
+	frontWallMain4.RotateX(90)
+	frontWallMain4.SetParent(floor)
+	frontWallMain4.SetBoundingObject(bo)
+
+	windowCuboid := cuboid.New(0.2, 0.4, 0.005)
+	V, I, bo = windowCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_DEFAULT)
+	window := mesh.NewTexturedMesh(V, I, windowTexture, glWrapper)
+	window.SetPosition(mgl32.Vec3{0.2, 0.5, 0.4975})
+	window.RotateX(90)
+	window.SetParent(floor)
+	window.SetBoundingObject(bo)
+
 	frontTopCuboid := cuboid.New(0.4, 0.4, 0.005)
 	V, I, bo = frontTopCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_DEFAULT)
 	frontWallRest := mesh.NewTexturedMesh(V, I, concreteTexture, glWrapper)
@@ -170,9 +203,13 @@ func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	m.AddMesh(backWall)
 	m.AddMesh(rightWall)
 	m.AddMesh(leftWall)
-	m.AddMesh(frontWallMain)
+	m.AddMesh(frontWallMain1)
 	m.AddMesh(frontWallRest)
 	m.AddMesh(door)
+	m.AddMesh(frontWallMain2)
+	m.AddMesh(frontWallMain3)
+	m.AddMesh(frontWallMain4)
+	m.AddMesh(window)
 	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_OPENED, currentAnimationTime: 0}
 }
 
