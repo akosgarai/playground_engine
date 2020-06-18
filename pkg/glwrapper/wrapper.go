@@ -46,6 +46,9 @@ const (
 	TEXTURE_CUBE_MAP            = gl.TEXTURE_CUBE_MAP
 	TEXTURE_CUBE_MAP_POSITIVE_X = gl.TEXTURE_CUBE_MAP_POSITIVE_X
 	TEXTURE_WRAP_T              = gl.TEXTURE_WRAP_T
+	BLEND                       = gl.BLEND
+	SRC_APLHA                   = gl.SRC_ALPHA
+	ONE_MINUS_SRC_ALPHA         = gl.ONE_MINUS_SRC_ALPHA
 )
 
 type Wrapper struct {
@@ -276,4 +279,9 @@ func (w Wrapper) DepthFunc(xfunc uint32) {
 // Wrapper for gl.Viewport function.
 func (w Wrapper) Viewport(x int32, y int32, width int32, height int32) {
 	gl.Viewport(x, y, width, height)
+}
+
+// Wrapper for gl.BlendFunc function.
+func (w Wrapper) BlendFunc(sfactor uint32, dfactor uint32) {
+	gl.BlendFunc(sfactor, dfactor)
 }
