@@ -171,90 +171,76 @@ func NewTerrainBuilder() *TerrainBuilder {
 }
 
 // SetWidth updates the width.
-func (t *TerrainBuilder) SetWidth(width int) *TerrainBuilder {
+func (t *TerrainBuilder) SetWidth(width int) {
 	t.width = width
-	return t
 }
 
 // SetLength updates the length.
-func (t *TerrainBuilder) SetLength(length int) *TerrainBuilder {
+func (t *TerrainBuilder) SetLength(length int) {
 	t.length = length
-	return t
 }
 
 // SetIterations updates the iterations.
-func (t *TerrainBuilder) SetIterations(iterations int) *TerrainBuilder {
+func (t *TerrainBuilder) SetIterations(iterations int) {
 	t.iterations = iterations
-	return t
 }
 
 // SetMinHeight updates the minH.
-func (t *TerrainBuilder) SetMinHeight(height float32) *TerrainBuilder {
+func (t *TerrainBuilder) SetMinHeight(height float32) {
 	t.minH = height
-	return t
 }
 
 // SetMaxHeight updates the maxH.
-func (t *TerrainBuilder) SetMaxHeight(height float32) *TerrainBuilder {
+func (t *TerrainBuilder) SetMaxHeight(height float32) {
 	t.maxH = height
-	return t
 }
 
 // SetSeed updates the seed.
-func (t *TerrainBuilder) SetSeed(seed int64) *TerrainBuilder {
+func (t *TerrainBuilder) SetSeed(seed int64) {
 	t.seed = seed
-	return t
 }
 
 // RandomSeeds sets up a random seed value.
-func (t *TerrainBuilder) RandomSeed() *TerrainBuilder {
+func (t *TerrainBuilder) RandomSeed() {
 	t.seed = time.Now().UnixNano()
-	return t
 }
 
 // SetPeakProbability sets the peakProbability value.
-func (t *TerrainBuilder) SetPeakProbability(p int) *TerrainBuilder {
+func (t *TerrainBuilder) SetPeakProbability(p int) {
 	t.peakProbability = p
-	return t
 }
 
 // SetCliffProbability sets the cliffProbability value.
-func (t *TerrainBuilder) SetCliffProbability(p int) *TerrainBuilder {
+func (t *TerrainBuilder) SetCliffProbability(p int) {
 	t.cliffProbability = p
-	return t
 }
 
 // MinHeightIsDefault sets the minHIsDefault flag.
-func (t *TerrainBuilder) MinHeightIsDefault(f bool) *TerrainBuilder {
+func (t *TerrainBuilder) MinHeightIsDefault(f bool) {
 	t.minHIsDefault = f
-	return t
 }
 
 // SetGlWrapper sets the wrapper.
-func (t *TerrainBuilder) SetGlWrapper(w interfaces.GLWrapper) *TerrainBuilder {
+func (t *TerrainBuilder) SetGlWrapper(w interfaces.GLWrapper) {
 	t.wrapper = w
-	return t
 }
 
 // SetScale sets the scale.
-func (t *TerrainBuilder) SetScale(s mgl32.Vec3) *TerrainBuilder {
+func (t *TerrainBuilder) SetScale(s mgl32.Vec3) {
 	t.scale = s
-	return t
 }
 
 //SetDebugMode updates the debug flag
-func (t *TerrainBuilder) SetDebugMode(v bool) *TerrainBuilder {
+func (t *TerrainBuilder) SetDebugMode(v bool) {
 	t.debugMode = v
-	return t
 }
 
 // GrassTexture sets the texture to grass.
-func (t *TerrainBuilder) GrassTexture() *TerrainBuilder {
+func (t *TerrainBuilder) GrassTexture() {
 	_, filename, _, _ := runtime.Caller(1)
 	fileDir := path.Dir(filename)
 	t.tex.AddTexture(fileDir+"/assets/grass.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", t.wrapper)
 	t.tex.AddTexture(fileDir+"/assets/grass.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", t.wrapper)
-	return t
 }
 
 // It sets the default values to the map. By default, it is 0, but if we set the

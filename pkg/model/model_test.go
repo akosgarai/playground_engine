@@ -447,49 +447,56 @@ func TestTerrainBuilderNewTerrainBuilder(t *testing.T) {
 }
 func TestTerrainBuilderSetWidth(t *testing.T) {
 	width := defaultTerrainWidth + 1
-	terr := NewTerrainBuilder().SetWidth(width)
+	terr := NewTerrainBuilder()
+	terr.SetWidth(width)
 	if terr.width != width {
 		t.Errorf("Invalid width. Instead of '%d', we have '%d'.", width, terr.width)
 	}
 }
 func TestTerrainBuilderSetLength(t *testing.T) {
 	length := defaultTerrainLength + 1
-	terr := NewTerrainBuilder().SetLength(length)
+	terr := NewTerrainBuilder()
+	terr.SetLength(length)
 	if terr.length != length {
 		t.Errorf("Invalid length. Instead of '%d', we have '%d'.", length, terr.length)
 	}
 }
 func TestTerrainBuilderSetIterations(t *testing.T) {
 	iterations := defaultIterations + 1
-	terr := NewTerrainBuilder().SetIterations(iterations)
+	terr := NewTerrainBuilder()
+	terr.SetIterations(iterations)
 	if terr.iterations != iterations {
 		t.Errorf("Invalid iterations. Instead of '%d', we have '%d'.", iterations, terr.iterations)
 	}
 }
 func TestTerrainBuilderSetMinHeight(t *testing.T) {
 	height := defaultMinHeight + 1.0
-	terr := NewTerrainBuilder().SetMinHeight(height)
+	terr := NewTerrainBuilder()
+	terr.SetMinHeight(height)
 	if terr.minH != height {
 		t.Errorf("Invalid minH. Instead of '%f', we have '%f'.", height, terr.minH)
 	}
 }
 func TestTerrainBuilderSetMaxHeight(t *testing.T) {
 	height := defaultMaxHeight + 1.0
-	terr := NewTerrainBuilder().SetMaxHeight(height)
+	terr := NewTerrainBuilder()
+	terr.SetMaxHeight(height)
 	if terr.maxH != height {
 		t.Errorf("Invalid maxH. Instead of '%f', we have '%f'.", height, terr.maxH)
 	}
 }
 func TestTerrainBuilderSetSeed(t *testing.T) {
 	seed := defaultSeed + 1
-	terr := NewTerrainBuilder().SetSeed(seed)
+	terr := NewTerrainBuilder()
+	terr.SetSeed(seed)
 	if terr.seed != seed {
 		t.Errorf("Invalid seed. Instead of '%d', we have '%d'.", seed, terr.seed)
 	}
 }
 func TestTerrainBuilderRandomSeed(t *testing.T) {
 	before := time.Now().UnixNano()
-	terr := NewTerrainBuilder().RandomSeed()
+	terr := NewTerrainBuilder()
+	terr.RandomSeed()
 	after := time.Now().UnixNano()
 	if terr.seed < before || terr.seed > after {
 		t.Errorf("Invalid random seed '%d'. It supposed to be beetween '%d' and '%d'.", terr.seed, before, after)
@@ -497,42 +504,47 @@ func TestTerrainBuilderRandomSeed(t *testing.T) {
 }
 func TestTerrainBuilderSetPeakProbability(t *testing.T) {
 	prob := 1
-	terr := NewTerrainBuilder().SetPeakProbability(prob)
+	terr := NewTerrainBuilder()
+	terr.SetPeakProbability(prob)
 	if terr.peakProbability != prob {
 		t.Errorf("Invalid peak prob. Instead of '%d', we have '%d'.", prob, terr.peakProbability)
 	}
 }
 func TestTerrainBuilderSetCliffProbability(t *testing.T) {
 	prob := 1
-	terr := NewTerrainBuilder().SetCliffProbability(prob)
+	terr := NewTerrainBuilder()
+	terr.SetCliffProbability(prob)
 	if terr.cliffProbability != prob {
 		t.Errorf("Invalid cliff prob. Instead of '%d', we have '%d'.", prob, terr.cliffProbability)
 	}
 }
 func TestTerrainBuilderMinHeightIsDefault(t *testing.T) {
-	terr := NewTerrainBuilder().MinHeightIsDefault(true)
+	terr := NewTerrainBuilder()
+	terr.MinHeightIsDefault(true)
 	if !terr.minHIsDefault {
 		t.Error("Invalid minHIsDefault. It should be true.")
 	}
-	terr = terr.MinHeightIsDefault(false)
+	terr.MinHeightIsDefault(false)
 	if terr.minHIsDefault {
 		t.Error("Invalid minHIsDefault. It should be false.")
 	}
 }
 func TestTerrainBuilderSetGlWrapper(t *testing.T) {
 	var wrapper testhelper.GLWrapperMock
-	terr := NewTerrainBuilder().SetGlWrapper(wrapper)
+	terr := NewTerrainBuilder()
+	terr.SetGlWrapper(wrapper)
 	if terr.wrapper != wrapper {
 		t.Error("Invalid gl wrapper")
 	}
 }
 func TestTerrainBuilderGrassTexture(t *testing.T) {
 	var wrapper testhelper.GLWrapperMock
-	terr := NewTerrainBuilder().SetGlWrapper(wrapper)
+	terr := NewTerrainBuilder()
+	terr.SetGlWrapper(wrapper)
 	if len(terr.tex) != 0 {
 		t.Errorf("Invalid texture length. Instead of '0', we have '%d'.", len(terr.tex))
 	}
-	terr = terr.GrassTexture()
+	terr.GrassTexture()
 	if len(terr.tex) != 2 {
 		t.Errorf("Invalid texture length. Instead of '2', we have '%d'.", len(terr.tex))
 	}
@@ -540,7 +552,11 @@ func TestTerrainBuilderGrassTexture(t *testing.T) {
 func TestTerrainBuilderInitHeightMap(t *testing.T) {
 	length := 2
 	width := 2
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(-2.0)
+	minH := float32(-2)
+	terr := NewTerrainBuilder()
+	terr.SetLength(length)
+	terr.SetWidth(width)
+	terr.SetMinHeight(minH)
 	terr.initHeightMap()
 	for l := 0; l < terr.length; l++ {
 		for w := 0; w < terr.width; w++ {
@@ -549,7 +565,7 @@ func TestTerrainBuilderInitHeightMap(t *testing.T) {
 			}
 		}
 	}
-	terr = terr.MinHeightIsDefault(true)
+	terr.MinHeightIsDefault(true)
 	terr.initHeightMap()
 	for l := 0; l < terr.length; l++ {
 		for w := 0; w < terr.width; w++ {
@@ -575,7 +591,15 @@ func TestTerrainBuilderBuildHeightMap(t *testing.T) {
 		{-0.19999999, -0.19999999, -0.19999999, 0, 0},
 		{0, 0, -0.6, 0, -1},
 	}
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
+	terr := NewTerrainBuilder()
+	terr.SetLength(length)
+	terr.SetWidth(width)
+	terr.SetMinHeight(minH)
+	terr.SetMaxHeight(maxH)
+	terr.SetIterations(iteration)
+	terr.SetSeed(seed)
+	terr.SetPeakProbability(peakProb)
+	terr.SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	if !reflect.DeepEqual(terr.heightMap, expected) {
@@ -583,7 +607,7 @@ func TestTerrainBuilderBuildHeightMap(t *testing.T) {
 		t.Log(terr.heightMap)
 		t.Log(expected)
 	}
-	terr = NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb).MinHeightIsDefault(true)
+	terr.MinHeightIsDefault(true)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 }
@@ -603,7 +627,15 @@ func TestTerrainBuilderAdjacentElevation(t *testing.T) {
 		{-0.19999999, -0.19999999, -0.19999999, 0, 0},
 		{0, 0, -0.6, 0, -1},
 	}
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
+	terr := NewTerrainBuilder()
+	terr.SetLength(length)
+	terr.SetWidth(width)
+	terr.SetMinHeight(minH)
+	terr.SetMaxHeight(maxH)
+	terr.SetIterations(iteration)
+	terr.SetSeed(seed)
+	terr.SetPeakProbability(peakProb)
+	terr.SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	if !reflect.DeepEqual(terr.heightMap, expected) {
@@ -621,7 +653,15 @@ func TestTerrainBuilderVertices(t *testing.T) {
 	seed := int64(0)
 	peakProb := 5
 	cliffProb := 5
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
+	terr := NewTerrainBuilder()
+	terr.SetLength(length)
+	terr.SetWidth(width)
+	terr.SetMinHeight(minH)
+	terr.SetMaxHeight(maxH)
+	terr.SetIterations(iteration)
+	terr.SetSeed(seed)
+	terr.SetPeakProbability(peakProb)
+	terr.SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	v := terr.vertices()
@@ -638,7 +678,15 @@ func TestTerrainBuilderIndices(t *testing.T) {
 	seed := int64(0)
 	peakProb := 5
 	cliffProb := 5
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
+	terr := NewTerrainBuilder()
+	terr.SetLength(length)
+	terr.SetWidth(width)
+	terr.SetMinHeight(minH)
+	terr.SetMaxHeight(maxH)
+	terr.SetIterations(iteration)
+	terr.SetSeed(seed)
+	terr.SetPeakProbability(peakProb)
+	terr.SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	i := terr.indices()
@@ -661,12 +709,26 @@ func TestTerrainBuilderBuild(t *testing.T) {
 		seed := int64(0)
 		peakProb := 5
 		cliffProb := 5
-		terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb).SetDebugMode(true).Build()
+		tb := NewTerrainBuilder()
+		tb.SetLength(length)
+		tb.SetWidth(width)
+		tb.SetMinHeight(minH)
+		tb.SetMaxHeight(maxH)
+		tb.SetIterations(iteration)
+		tb.SetSeed(seed)
+		tb.SetPeakProbability(peakProb)
+		tb.SetCliffProbability(cliffProb)
+		tb.SetDebugMode(true)
+		terr := tb.Build()
 		t.Log(terr)
 	}()
 }
 func TestTerrainHeightAtPos(t *testing.T) {
-	terrain := NewTerrainBuilder().SetScale(mgl32.Vec3{2, 1, 2}).SetGlWrapper(wrapperMock).GrassTexture().Build()
+	tb := NewTerrainBuilder()
+	tb.SetScale(mgl32.Vec3{2, 1, 2})
+	tb.SetGlWrapper(wrapperMock)
+	tb.GrassTexture()
+	terrain := tb.Build()
 	terrain.heightMap = [][]float32{
 		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
@@ -713,7 +775,11 @@ func TestTerrainHeightAtPos(t *testing.T) {
 	}
 }
 func TestTerrainCollideTestWithSphere(t *testing.T) {
-	terrain := NewTerrainBuilder().SetScale(mgl32.Vec3{2, 1, 2}).SetGlWrapper(wrapperMock).GrassTexture().Build()
+	tb := NewTerrainBuilder()
+	tb.SetScale(mgl32.Vec3{2, 1, 2})
+	tb.SetGlWrapper(wrapperMock)
+	tb.GrassTexture()
+	terrain := tb.Build()
 	terrain.heightMap = [][]float32{
 		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		[]float32{0, 1, 1, 0, 0, 0, 0, 0, 0, 0},
