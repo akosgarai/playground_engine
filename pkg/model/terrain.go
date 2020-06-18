@@ -272,6 +272,11 @@ func (t *TerrainBuilder) buildHeightMap() {
 	if t.minHIsDefault {
 		defaultHeight = t.minH
 	}
+	if t.debugMode {
+		fmt.Printf("TerrainBuilder.buildHeightMap defaultHeight '%f'.\n", defaultHeight)
+		fmt.Printf("TerrainBuilder.buildHeightMap iterations '%d'.\n", t.iterations)
+		fmt.Printf("TerrainBuilder.buildHeightMap peakProbability '%d'.\n", t.peakProbability)
+	}
 	for i := 0; i < t.iterations; i++ {
 		height := t.minH + float32(i)*iterationStep
 		for l := 0; l <= t.length; l++ {
@@ -280,6 +285,9 @@ func (t *TerrainBuilder) buildHeightMap() {
 					continue
 				}
 				random := rand.Intn(100)
+				if t.debugMode {
+					fmt.Printf("TerrainBuilder.buildHeightMap current random: '%d'.\n", random)
+				}
 				if t.adjacentElevation(w, l, height-iterationStep) || random < t.peakProbability {
 					t.heightMap[l][w] = height
 				}
