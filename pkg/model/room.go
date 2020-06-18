@@ -111,8 +111,8 @@ func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	doorTexture.AddTexture(fileDir+"/assets/door.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
 
 	var windowTexture texture.Textures
-	windowTexture.AddTexture(fileDir+"/assets/window.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
-	windowTexture.AddTexture(fileDir+"/assets/window.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
+	windowTexture.AddTexture(fileDir+"/assets/blending_transparent_window.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
+	windowTexture.AddTexture(fileDir+"/assets/blending_transparent_window.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
 
 	floorCuboid := cuboid.New(1.0, 1.0, 0.005)
 	floorV, floorI, bo := floorCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_DEFAULT)
