@@ -641,10 +641,9 @@ func TestTerrainBuilderIndices(t *testing.T) {
 	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
-	v := terr.vertices()
 	i := terr.indices()
-	if len(i) != len(v)*6 {
-		t.Errorf("Invalid indices length. Instead of '%d', we have '%d'.", len(v)*6, len(i))
+	if len(i) != length*width*6 {
+		t.Errorf("Invalid indices length. Instead of '%d', we have '%d'.", length*width*6, len(i))
 	}
 }
 func TestTerrainBuilderBuild(t *testing.T) {

@@ -320,8 +320,8 @@ func (t *TerrainBuilder) vertices() []vertex.Vertex {
 }
 func (t *TerrainBuilder) indices() []uint32 {
 	var indices []uint32
-	for w := 0; w <= t.width; w++ {
-		for l := 0; l <= t.length; l++ {
+	for w := 0; w < t.width; w++ {
+		for l := 0; l < t.length; l++ {
 			i0 := uint32(w*(t.length+1) + l)
 			i1 := uint32(1) + i0
 			i2 := uint32(t.length+1) + i0
