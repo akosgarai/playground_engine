@@ -495,9 +495,9 @@ func TestTerrainBuilderRandomSeed(t *testing.T) {
 		t.Errorf("Invalid random seed '%d'. It supposed to be beetween '%d' and '%d'.", terr.seed, before, after)
 	}
 }
-func TestTerrainBuilderSetPeekProbability(t *testing.T) {
+func TestTerrainBuilderSetPeakProbability(t *testing.T) {
 	prob := 1
-	terr := NewTerrainBuilder().SetPeekProbability(prob)
+	terr := NewTerrainBuilder().SetPeakProbability(prob)
 	if terr.peakProbability != prob {
 		t.Errorf("Invalid peak prob. Instead of '%d', we have '%d'.", prob, terr.peakProbability)
 	}
@@ -575,7 +575,7 @@ func TestTerrainBuilderBuildHeightMap(t *testing.T) {
 		{-0.19999999, -0.19999999, -0.19999999, 0, 0},
 		{0, 0, -0.6, 0, -1},
 	}
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	if !reflect.DeepEqual(terr.heightMap, expected) {
@@ -583,7 +583,7 @@ func TestTerrainBuilderBuildHeightMap(t *testing.T) {
 		t.Log(terr.heightMap)
 		t.Log(expected)
 	}
-	terr = NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb).MinHeightIsDefault(true)
+	terr = NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb).MinHeightIsDefault(true)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 }
@@ -603,7 +603,7 @@ func TestTerrainBuilderAdjacentElevation(t *testing.T) {
 		{-0.19999999, -0.19999999, -0.19999999, 0, 0},
 		{0, 0, -0.6, 0, -1},
 	}
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	if !reflect.DeepEqual(terr.heightMap, expected) {
@@ -621,7 +621,7 @@ func TestTerrainBuilderVertices(t *testing.T) {
 	seed := int64(0)
 	peakProb := 5
 	cliffProb := 5
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	v := terr.vertices()
@@ -638,7 +638,7 @@ func TestTerrainBuilderIndices(t *testing.T) {
 	seed := int64(0)
 	peakProb := 5
 	cliffProb := 5
-	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb)
+	terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb)
 	terr.initHeightMap()
 	terr.buildHeightMap()
 	v := terr.vertices()
@@ -662,7 +662,7 @@ func TestTerrainBuilderBuild(t *testing.T) {
 		seed := int64(0)
 		peakProb := 5
 		cliffProb := 5
-		terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeekProbability(peakProb).SetCliffProbability(cliffProb).Build()
+		terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb).Build()
 		t.Log(terr)
 	}()
 }

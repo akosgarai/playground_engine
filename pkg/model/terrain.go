@@ -209,8 +209,8 @@ func (t *TerrainBuilder) RandomSeed() *TerrainBuilder {
 	return t
 }
 
-// SetPeekProbability sets the peakProbability value.
-func (t *TerrainBuilder) SetPeekProbability(p int) *TerrainBuilder {
+// SetPeakProbability sets the peakProbability value.
+func (t *TerrainBuilder) SetPeakProbability(p int) *TerrainBuilder {
 	t.peakProbability = p
 	return t
 }
@@ -309,7 +309,7 @@ func (t *TerrainBuilder) vertices() []vertex.Vertex {
 		for w := 0; w <= t.width; w++ {
 			texIndex := (w % 2) + (l%2)*2
 			vertices = append(vertices, vertex.Vertex{
-				Position:  mgl32.Vec3{-float32(t.width)/2.0 + float32(w), t.heightMap[l][w], -float32(t.length)/2.0 + float32(l)},
+				Position:  mgl32.Vec3{-float32(t.width+1)/2.0 + float32(w), t.heightMap[l][w], -float32(t.length+1)/2.0 + float32(l)},
 				Normal:    mgl32.Vec3{0, 1, 0},
 				TexCoords: textureCoords[texIndex],
 			})
