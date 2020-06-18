@@ -264,6 +264,9 @@ func (t *TerrainBuilder) initHeightMap() {
 // buildHeightMap sets the final values of the height map.
 func (t *TerrainBuilder) buildHeightMap() {
 	iterationStep := (t.maxH - t.minH) / float32(t.iterations)
+	if t.debugMode {
+		fmt.Printf("Setup random seed to '%d'.\n", t.seed)
+	}
 	rand.Seed(t.seed)
 	defaultHeight := float32(0.0)
 	if t.minHIsDefault {
