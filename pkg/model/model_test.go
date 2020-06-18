@@ -613,8 +613,8 @@ func TestTerrainBuilderAdjacentElevation(t *testing.T) {
 	}
 }
 func TestTerrainBuilderVertices(t *testing.T) {
-	length := 5
-	width := 5
+	length := 4
+	width := 4
 	iteration := 10
 	minH := float32(-1.0)
 	maxH := float32(3.0)
