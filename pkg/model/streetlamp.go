@@ -28,7 +28,7 @@ var (
 )
 
 type StreetLamp struct {
-	Model
+	BaseCollisionDetectionModel
 }
 
 // NewStreetLamp returns a street lamp like model. The StreetLamp is a mesh system.
@@ -63,12 +63,12 @@ func NewMaterialStreetLamp(position mgl32.Vec3, scale float32, glWrapper interfa
 	bulb.SetParent(top)
 	bulb.SetBoundingObject(bo)
 
-	m := newModel()
+	m := newCDModel()
 	m.AddMesh(pole)
 	m.AddMesh(top)
 	m.AddMesh(bulb)
 
-	return &StreetLamp{Model: *m}
+	return &StreetLamp{BaseCollisionDetectionModel: *m}
 }
 
 // NewTexturedStreetLamp returns a StreetLamp model that uses textured and textured material meshes.
@@ -118,12 +118,12 @@ func NewTexturedStreetLamp(position mgl32.Vec3, scale float32, glWrapper interfa
 	bulb.SetParent(top)
 	bulb.SetBoundingObject(bo)
 
-	m := newModel()
+	m := newCDModel()
 	m.AddMesh(pole)
 	m.AddMesh(top)
 	m.AddMesh(bulb)
 
-	return &StreetLamp{Model: *m}
+	return &StreetLamp{BaseCollisionDetectionModel: *m}
 }
 
 // GetPolePosition returns the current position of the pole mesh.

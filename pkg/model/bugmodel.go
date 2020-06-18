@@ -10,7 +10,7 @@ import (
 )
 
 type Bug struct {
-	Model
+	BaseCollisionDetectionModel
 }
 
 // NewBug returns a bug instance. A Bug is a sphered mesh system. Its 'Body'
@@ -49,13 +49,13 @@ func NewBug(position, scale mgl32.Vec3, wrapper interfaces.GLWrapper) *Bug {
 	Eye2.SetParent(Body)
 	Eye2.SetBoundingObject(bo)
 
-	m := newModel()
+	m := newCDModel()
 	m.AddMesh(Bottom)
 	m.AddMesh(Body)
 	m.AddMesh(Eye1)
 	m.AddMesh(Eye2)
 
-	return &Bug{Model: *m}
+	return &Bug{BaseCollisionDetectionModel: *m}
 }
 
 // GetBottomPosition returns the current position of the bottom mesh.
