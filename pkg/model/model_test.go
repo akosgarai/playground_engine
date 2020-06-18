@@ -661,7 +661,7 @@ func TestTerrainBuilderBuild(t *testing.T) {
 		seed := int64(0)
 		peakProb := 5
 		cliffProb := 5
-		terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb).Build()
+		terr := NewTerrainBuilder().SetLength(length).SetWidth(width).SetMinHeight(minH).SetMaxHeight(maxH).SetIterations(iteration).SetSeed(seed).SetPeakProbability(peakProb).SetCliffProbability(cliffProb).SetDebugMode(true).Build()
 		t.Log(terr)
 	}()
 }

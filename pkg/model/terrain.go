@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"path"
 	"runtime"
@@ -149,6 +150,7 @@ type TerrainBuilder struct {
 	wrapper                   interfaces.GLWrapper
 	tex                       texture.Textures
 	scale                     mgl32.Vec3
+	debugMode                 bool
 }
 
 // NewTerrainBuilder returns a TerrainBuilder with default settings.
@@ -164,6 +166,7 @@ func NewTerrainBuilder() *TerrainBuilder {
 		peakProbability:  0,
 		cliffProbability: 0,
 		scale:            mgl32.Vec3{1, 1, 1},
+		debugMode:        false,
 	}
 }
 
@@ -232,8 +235,16 @@ func (t *TerrainBuilder) SetGlWrapper(w interfaces.GLWrapper) *TerrainBuilder {
 	t.wrapper = w
 	return t
 }
+
+// SetScale sets the scale.
 func (t *TerrainBuilder) SetScale(s mgl32.Vec3) *TerrainBuilder {
 	t.scale = s
+	return t
+}
+
+//SetDebugMode updates the debug flag
+func (t *TerrainBuilder) SetDebugMode(v bool) *TerrainBuilder {
+	t.debugMode = v
 	return t
 }
 
@@ -341,7 +352,13 @@ func (t *TerrainBuilder) indices() []uint32 {
 // Build returns a Terrain
 func (t *TerrainBuilder) Build() *Terrain {
 	t.initHeightMap()
+	if t.debugMode {
+		fmt.Printf("TerrainBuilder.heightMap after init:\n'%v'\n", t.heightMap)
+	}
 	t.buildHeightMap()
+	if t.debugMode {
+		fmt.Printf("TerrainBuilder.heightMap after build:\n'%v'\n", t.heightMap)
+	}
 	v := t.vertices()
 	i := t.indices()
 	terrainMesh := mesh.NewTexturedMesh(v, i, t.tex, t.wrapper)
