@@ -25,7 +25,9 @@ var (
 		"concrete-wall.jpg",
 		"crystal-ball.png",
 		"door.jpg",
+		"grass.jpg",
 		"metal.jpg",
+		"window.png",
 	}
 	shaderApps = []string{
 		"material.frag",
