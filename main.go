@@ -18,7 +18,23 @@ const (
 var (
 	commands = map[string][]string{
 		"help":    []string{},
-		"install": []string{"shaders", "models"},
+		"install": []string{"shaders", "models", "model"},
+	}
+
+	models = map[string][]string{
+		"bug": []string{},
+		"room": []string{
+			"concrete-wall.jpg",
+			"door.jpg",
+			"window.png",
+		},
+		"streetlamp": []string{
+			"crystal-ball.png",
+			"metal.jpg",
+		},
+		"terrain": []string{
+			"grass.jpg",
+		},
 	}
 
 	modelImages = []string{
@@ -93,6 +109,29 @@ func downloadFile(from, target string) error {
 	}
 	return nil
 }
+func downloadModel(modelName string) {
+	createTarget(modelTargetDirectory)
+	fmt.Println("Downloading models ...")
+	if _, ok := models[modelName]; !ok {
+		fmt.Printf("Invalid model name '%s'. Options:\n", modelName)
+		for key, _ := range models {
+			fmt.Printf("\t%s\n", key)
+		}
+	}
+	for _, img := range models[modelName] {
+		target := modelTargetDirectory + "/" + img
+		if fileExists(target) {
+			continue
+		}
+		url := fmt.Sprintf("%s%s%s", downLoadBaseUrl, modelBaseDirectory, img)
+		fmt.Printf("Downloading '%s'\n", url)
+		err := downloadFile(url, target)
+		if err != nil {
+			fmt.Printf("Something happened during download: '%s'.\n", err.Error())
+			fmt.Println("Please try to install again.")
+		}
+	}
+}
 func downloadModels() {
 	createTarget(modelTargetDirectory)
 	fmt.Println("Downloading models ...")
@@ -129,8 +168,12 @@ func helpMenu() {
 func helpMenuInstall() {
 	fmt.Println("With the install tool, You can download the necessary stuff for your application.\n")
 	for _, param := range commands["install"] {
-		fmt.Printf("If You want to download the %s, use the following command:\n\n", param)
-		fmt.Printf("\tplayground_engine install %s\n\n", param)
+		if param == "model" {
+			fmt.Printf("If You want to download a model, use the following command:\n\n\tplayground_engine install model modelname\n\n")
+		} else {
+			fmt.Printf("If You want to download the %s, use the following command:\n\n", param)
+			fmt.Printf("\tplayground_engine install %s\n\n", param)
+		}
 	}
 }
 func installCommandHandler(args []string) {
@@ -147,6 +190,13 @@ func installCommandHandler(args []string) {
 		break
 	case "models":
 		downloadModels()
+		break
+	case "model":
+		if len(args) < 2 {
+			helpMenuInstall()
+			return
+		}
+		downloadModel(args[1])
 		break
 	default:
 	}
