@@ -73,6 +73,13 @@ func NewTextureShaderBlending(wrapper interfaces.GLWrapper) *Shader {
 	return NewShader(baseDirShaders()+"texture.vert", baseDirShaders()+"texture_blending.frag", wrapper)
 }
 
+// NewTextureShaderBlendingWithFog returns a Shader, that uses the default texture vertex & fragment shaders.
+// It works the same as NewShader, but the internal shader files are used. In this application, the `Fog`
+// structure has to be filled. The `fog.minDistance`, `fog.maxDistance` floats and the `fog.color` mgl32.Vec3.
+func NewTextureShaderBlendingWithFog(wrapper interfaces.GLWrapper) *Shader {
+	return NewShader(baseDirShaders()+"texture.vert", baseDirShaders()+"texture_blending_with_fog.frag", wrapper)
+}
+
 // NewMaterialShader returns a Shader, that uses the default texture vertex & fragment shaders.
 // It works the same as NewShader, but the internal shader files are used.
 func NewMaterialShader(wrapper interfaces.GLWrapper) *Shader {
@@ -103,6 +110,13 @@ func NewTextureMatShaderBlending(wrapper interfaces.GLWrapper) *Shader {
 // structure has to be filled. The `fog.minDistance`, `fog.maxDistance` floats and the `fog.color` mgl32.Vec3.
 func NewTextureMatShaderWithFog(wrapper interfaces.GLWrapper) *Shader {
 	return NewShader(baseDirShaders()+"texturemat.vert", baseDirShaders()+"texturemat_with_fog.frag", wrapper)
+}
+
+// NewTextureMatShaderBlendingWithFog returns a Shader, that uses the default texture vertex & fragment shaders.
+// It works the same as NewShader, but the internal shader files are used. In this application, the `Fog`
+// structure has to be filled. The `fog.minDistance`, `fog.maxDistance` floats and the `fog.color` mgl32.Vec3.
+func NewTextureMatShaderBlendingWithFog(wrapper interfaces.GLWrapper) *Shader {
+	return NewShader(baseDirShaders()+"texturemat.vert", baseDirShaders()+"texturemat_blending_with_fog.frag", wrapper)
 }
 
 // Use is a wrapper for gl.UseProgram
