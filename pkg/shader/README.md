@@ -57,6 +57,11 @@ For the lightsources the following variables are set:
 
 They are used for tracking the number of the distinct lighstources. The loop counters are maximized to these values.
 
+For the fog, the following variables needs to be set as uniforms:
+
+- `fog.maxDistance`
+- `fog.maxDistance`
+- `fog.color`
 
 ### Material
 

@@ -67,6 +67,10 @@ type Application struct {
 	// that is checked for rotating the camera
 	// if the mouse is close to the window edge
 	rotateOnEdgeDistance float32
+
+	// uniforms, that needs to be set for every shader.
+	uniformFloat  map[string]float32    // map for float32
+	uniformVector map[string]mgl32.Vec3 // map for 3 float32
 }
 
 // New returns an application instance
@@ -81,6 +85,8 @@ func New() *Application {
 		keyDowns:                  make(map[glfw.Key]bool),
 		cameraKeyboardMovementMap: make(map[string]glfw.Key),
 		rotateOnEdgeDistance:      0.0,
+		uniformFloat:              make(map[string]float32),
+		uniformVector:             make(map[string]mgl32.Vec3),
 	}
 }
 
@@ -304,7 +310,7 @@ func (a *Application) Update(dt float64) {
 
 // Draw calls Draw function in every drawable item. It loops on the shaderMap (shaders).
 // For each shader, first set it to used state, setup camera realted uniforms,
-// then setup light related uniforms. Then we can pass the shader to the Model for drawing.
+// then setup light related uniformsi and custom uniforms. Then we can pass the shader to the Model for drawing.
 func (a *Application) Draw() {
 	for s, _ := range a.shaderMap {
 		s.Use()
@@ -318,6 +324,8 @@ func (a *Application) Draw() {
 			s.SetUniformMat4("projection", mgl32.Ident4())
 		}
 		a.lightHandler(s)
+		// custom uniform setup.
+		a.customUniforms(s)
 		for index, _ := range a.shaderMap[s] {
 			a.shaderMap[s][index].Draw(s)
 		}
@@ -383,6 +391,28 @@ func (a *Application) GetMouseButtonState(button glfw.MouseButton) bool {
 // GetKeyState returns the state of the given key
 func (a *Application) GetKeyState(key glfw.Key) bool {
 	return a.keyDowns[key]
+}
+
+// SetUniformFloat sets the given float value to the given string key in
+// the uniformFloat map.
+func (a *Application) SetUniformFloat(key string, value float32) {
+	a.uniformFloat[key] = value
+}
+
+// SetUniformVector sets the given mgl32.Vec3 value to the given string key in
+// the uniformVector map.
+func (a *Application) SetUniformVector(key string, value mgl32.Vec3) {
+	a.uniformVector[key] = value
+}
+
+// Setup custom uniforms for the shader application.
+func (a *Application) customUniforms(s interfaces.Shader) {
+	for name, value := range a.uniformFloat {
+		s.SetUniform1f(name, value)
+	}
+	for name, value := range a.uniformVector {
+		s.SetUniform3f(name, value.X(), value.Y(), value.Z())
+	}
 }
 
 // Setup light related uniforms.
