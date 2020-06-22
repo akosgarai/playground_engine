@@ -67,6 +67,12 @@ func NewTextureShaderWithFog(wrapper interfaces.GLWrapper) *Shader {
 	return NewShader(baseDirShaders()+"texture.vert", baseDirShaders()+"texture_with_fog.frag", wrapper)
 }
 
+// NewTextureShaderBlending returns a Shader, that uses the default texture vertex & fragment shaders.
+// It works the same as NewShader, but the internal shader files are used.
+func NewTextureShaderBlending(wrapper interfaces.GLWrapper) *Shader {
+	return NewShader(baseDirShaders()+"texture.vert", baseDirShaders()+"texture_blending.frag", wrapper)
+}
+
 // NewMaterialShader returns a Shader, that uses the default texture vertex & fragment shaders.
 // It works the same as NewShader, but the internal shader files are used.
 func NewMaterialShader(wrapper interfaces.GLWrapper) *Shader {
@@ -84,6 +90,12 @@ func NewMaterialShaderWithFog(wrapper interfaces.GLWrapper) *Shader {
 // It works the same as NewShader, but the internal shader files are used.
 func NewTextureMatShader(wrapper interfaces.GLWrapper) *Shader {
 	return NewShader(baseDirShaders()+"texturemat.vert", baseDirShaders()+"texturemat.frag", wrapper)
+}
+
+// NewTextureMatShaderBlending returns a Shader, that uses the default texture vertex & fragment shaders.
+// It works the same as NewShader, but the internal shader files are used.
+func NewTextureMatShaderBlending(wrapper interfaces.GLWrapper) *Shader {
+	return NewShader(baseDirShaders()+"texturemat.vert", baseDirShaders()+"texturemat_blending.frag", wrapper)
 }
 
 // NewTextureMatShaderWithFog returns a Shader, that uses the default texture vertex & fragment shaders.
