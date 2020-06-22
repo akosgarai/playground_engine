@@ -373,6 +373,27 @@ func TestNewTextureShader(t *testing.T) {
 		}
 	}()
 }
+func TestNewTextureShaderWithFog(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer glfw.Terminate()
+				t.Errorf("NewTextureShaderWithFog shouldn't have panicked!")
+			}
+		}()
+		runtime.LockOSThread()
+		InitGlfw()
+		defer glfw.Terminate()
+		realGlWrapper.InitOpenGL()
+		shader := NewTextureShaderWithFog(realGlWrapper)
+		if shader.id == 0 || shader.GetId() == 0 {
+			t.Error("Invalid shader program id")
+		}
+	}()
+}
 func TestNewMaterialShader(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
@@ -394,6 +415,27 @@ func TestNewMaterialShader(t *testing.T) {
 		}
 	}()
 }
+func TestNewMaterialShaderWithFog(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer glfw.Terminate()
+				t.Errorf("NewMaterialShaderWithFog shouldn't have panicked!")
+			}
+		}()
+		runtime.LockOSThread()
+		InitGlfw()
+		defer glfw.Terminate()
+		realGlWrapper.InitOpenGL()
+		shader := NewMaterialShaderWithFog(realGlWrapper)
+		if shader.id == 0 || shader.GetId() == 0 {
+			t.Error("Invalid shader program id")
+		}
+	}()
+}
 func TestNewTextureMatShader(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
@@ -410,6 +452,27 @@ func TestNewTextureMatShader(t *testing.T) {
 		defer glfw.Terminate()
 		realGlWrapper.InitOpenGL()
 		shader := NewTextureMatShader(realGlWrapper)
+		if shader.id == 0 || shader.GetId() == 0 {
+			t.Error("Invalid shader program id")
+		}
+	}()
+}
+func TestNewTextureMatShaderWithFog(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer glfw.Terminate()
+				t.Errorf("NewTextureMatShaderWithFog shouldn't have panicked!. %v", r)
+			}
+		}()
+		runtime.LockOSThread()
+		InitGlfw()
+		defer glfw.Terminate()
+		realGlWrapper.InitOpenGL()
+		shader := NewTextureMatShaderWithFog(realGlWrapper)
 		if shader.id == 0 || shader.GetId() == 0 {
 			t.Error("Invalid shader program id")
 		}
