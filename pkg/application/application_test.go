@@ -481,6 +481,38 @@ func TestSetupSpotLightForShader(t *testing.T) {
 		app.setupSpotLightForShader(sm)
 	}()
 }
+func TestSetUniformFloat(t *testing.T) {
+	app := New()
+	key := "testname"
+	value := float32(42.0)
+	if _, ok := app.uniformFloat[key]; ok {
+		t.Errorf("Key '%s' shouldn't be set.", key)
+	}
+	app.SetUniformFloat(key, value)
+	if _, ok := app.uniformFloat[key]; !ok {
+		t.Errorf("Key '%s' should be set.", key)
+	}
+	val := app.uniformFloat[key]
+	if val != value {
+		t.Errorf("Invalud value for key '%s'. Instead of '%f', we have '%f'.", key, value, val)
+	}
+}
+func TestSetUniformVector(t *testing.T) {
+	app := New()
+	key := "testname"
+	value := mgl32.Vec3{42.0, 0.0, 0.0}
+	if _, ok := app.uniformVector[key]; ok {
+		t.Errorf("Key '%s' shouldn't be set.", key)
+	}
+	app.SetUniformVector(key, value)
+	if _, ok := app.uniformVector[key]; !ok {
+		t.Errorf("Key '%s' should be set.", key)
+	}
+	val := app.uniformVector[key]
+	if val != value {
+		t.Errorf("Invalud value for key '%s'. Instead of '%v', we have '%v'.", key, value, val)
+	}
+}
 func TestDraw(t *testing.T) {
 	func() {
 		defer func() {
@@ -501,6 +533,10 @@ func TestDraw(t *testing.T) {
 		app.Draw()
 		// with camera
 		app.SetCamera(cm)
+		app.Draw()
+		// with custom uniforms
+		app.SetUniformFloat("testFloat", float32(42.0))
+		app.SetUniformVector("testVector", mgl32.Vec3{1.0, 2.0, 3.0})
 		app.Draw()
 	}()
 }

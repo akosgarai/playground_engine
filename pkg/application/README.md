@@ -13,6 +13,8 @@ The common application related stuff goes here. It holds
 - `spotLightSources`, for storing the spot lights.
 - `cameraKeyboardMovementMap`, makes connection between the keyboard buttons and the camera state updates.
 - `rotateOnEdgeDistance`, for the mouse rotations.
+- `uniformFloat`, for storing the float uniforms that needs to be set for every shader.
+- `uniformVector`, for storing the vector uniforms that needs to be set for every shader.
 
 ## New
 
@@ -60,7 +62,7 @@ Update loops on the shaderMap, and calls Update function on every Model. It also
 
 ## Draw
 
-Draw calls Draw function in every drawable item. It loops on the shaderMap (shaders). For each shader, first set it to used state, setup camera realted uniforms, then setup light related uniforms. Then we can pass the shader to the Model for drawing.
+Draw calls Draw function in every drawable item. It loops on the shaderMap (shaders). For each shader, first set it to used state, setup camera realted uniforms, then setup light related uniforms and custom uniforms. Then we can pass the shader to the Model for drawing.
 
 ## KeyCallback
 
@@ -97,3 +99,11 @@ AddPointLightSource sets up a point light source. It takes a PointLight input th
 ## AddSpotLightSource
 
 AddSpotLightSource sets up a spot light source. It takes a SpotLight input that contains the model related info, and it also contains the uniform names in [10]string format. The order has to be the following: `PositionUniformName`, `DirectionUniformName`, `AmbientUniformName`, `DiffuseUniformName`, `SpecularUniformName`, `ConstantTermUniformName`, `LinearTermUniformName`, `QuadraticTermUniformName`, `CutoffUniformName`.
+
+## SetUniformFloat
+
+SetUniformFloat sets the given float value to the given string key in the uniformFloat map.
+
+# SetUniformVector
+
+SetUniformVector sets the given mgl32.Vec3 value to the given string key in the uniformVector map.
