@@ -42,6 +42,20 @@ func TestAddMesh(t *testing.T) {
 		}
 	}
 }
+func TestSetTransparent(t *testing.T) {
+	model := New()
+	if model.transparent != false {
+		t.Error("Invalid initial transparent value. It should be false.")
+	}
+	model.SetTransparent(true)
+	if model.transparent != true {
+		t.Error("Invalid updated transparent value. It should be true.")
+	}
+	model.SetTransparent(false)
+	if model.transparent != false {
+		t.Error("Invalid updated transparent value. It should be false.")
+	}
+}
 func TestDraw(t *testing.T) {
 	func() {
 		defer func() {
