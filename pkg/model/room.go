@@ -210,6 +210,7 @@ func NewTextureRoom(position mgl32.Vec3, glWrapper interfaces.GLWrapper) *Room {
 	m.AddMesh(frontWallMain3)
 	m.AddMesh(frontWallMain4)
 	m.AddMesh(window)
+	m.SetTransparent(true)
 	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_OPENED, currentAnimationTime: 0}
 }
 
