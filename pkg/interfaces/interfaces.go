@@ -115,4 +115,5 @@ type Model interface {
 	Update(float64)
 	Export(string)
 	CollideTestWithSphere(*coldet.Sphere) bool
+	IsTransparent() bool
 }
