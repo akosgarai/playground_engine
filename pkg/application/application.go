@@ -312,6 +312,7 @@ func (a *Application) Update(dt float64) {
 // For each shader, first set it to used state, setup camera realted uniforms,
 // then setup light related uniformsi and custom uniforms. Then we can pass the shader to the Model for drawing.
 func (a *Application) Draw() {
+	// Draw the non transparent models first
 	for s, _ := range a.shaderMap {
 		s.Use()
 		if a.cameraSet {
@@ -327,7 +328,30 @@ func (a *Application) Draw() {
 		// custom uniform setup.
 		a.customUniforms(s)
 		for index, _ := range a.shaderMap[s] {
-			a.shaderMap[s][index].Draw(s)
+			if !a.shaderMap[s][index].IsTransparent() {
+				a.shaderMap[s][index].Draw(s)
+			}
+		}
+	}
+	// Draw transparent models
+	for s, _ := range a.shaderMap {
+		s.Use()
+		if a.cameraSet {
+			s.SetUniformMat4("view", a.camera.GetViewMatrix())
+			s.SetUniformMat4("projection", a.camera.GetProjectionMatrix())
+			cameraPos := a.camera.GetPosition()
+			s.SetUniform3f("viewPosition", cameraPos.X(), cameraPos.Y(), cameraPos.Z())
+		} else {
+			s.SetUniformMat4("view", mgl32.Ident4())
+			s.SetUniformMat4("projection", mgl32.Ident4())
+		}
+		a.lightHandler(s)
+		// custom uniform setup.
+		a.customUniforms(s)
+		for index, _ := range a.shaderMap[s] {
+			if a.shaderMap[s][index].IsTransparent() {
+				a.shaderMap[s][index].Draw(s)
+			}
 		}
 	}
 }

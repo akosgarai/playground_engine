@@ -11,7 +11,8 @@ import (
 )
 
 type Model struct {
-	meshes []interfaces.Mesh
+	meshes      []interfaces.Mesh
+	transparent bool
 }
 type BaseModel struct {
 	Model
@@ -61,13 +62,15 @@ func (m *BaseModel) Update(dt float64) {
 }
 func newModel() *Model {
 	return &Model{
-		meshes: []interfaces.Mesh{},
+		meshes:      []interfaces.Mesh{},
+		transparent: false,
 	}
 }
 func newCDModel() *BaseCollisionDetectionModel {
 	return &BaseCollisionDetectionModel{
 		Model{
-			meshes: []interfaces.Mesh{},
+			meshes:      []interfaces.Mesh{},
+			transparent: false,
 		},
 	}
 }
@@ -152,6 +155,16 @@ func (m *Model) RotateZ(angleDeg float32) {
 			m.meshes[i].RotatePosition(angleDeg, mgl32.Vec3{0.0, 0.0, 1.0})
 		}
 	}
+}
+
+// SetTransparent function updates the transparent flag.
+func (m *Model) SetTransparent(t bool) {
+	m.transparent = t
+}
+
+// IsTransparent function returns the transparent flag.
+func (m *Model) IsTransparent() bool {
+	return m.transparent
 }
 
 // CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.

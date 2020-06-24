@@ -1,6 +1,6 @@
 # Model
 
-The purpose of this package, to gather the mashes that are connected to the same object (eg a composite object - a lamp with pole, and bulb). The meshes of a model are moving together, they are rotating, in the same time.
+The purpose of this package, to gather the mashes that are connected to the same object (eg a composite object - a lamp with pole, and bulb). The meshes of a model are moving together, they are rotating, in the same time. The model contains a transparency flag, that can be used to prevent the early drawing.
 
 ## Bug model
 
