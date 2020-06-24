@@ -56,6 +56,20 @@ func TestSetTransparent(t *testing.T) {
 		t.Error("Invalid updated transparent value. It should be false.")
 	}
 }
+func TestIsTransparent(t *testing.T) {
+	model := New()
+	if model.IsTransparent() != false {
+		t.Error("Invalid initial transparent value. It should be false.")
+	}
+	model.SetTransparent(true)
+	if model.IsTransparent() != true {
+		t.Error("Invalid updated transparent value. It should be true.")
+	}
+	model.SetTransparent(false)
+	if model.IsTransparent() != false {
+		t.Error("Invalid updated transparent value. It should be false.")
+	}
+}
 func TestDraw(t *testing.T) {
 	func() {
 		defer func() {

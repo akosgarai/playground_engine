@@ -162,6 +162,11 @@ func (m *Model) SetTransparent(t bool) {
 	m.transparent = t
 }
 
+// IsTransparent function returns the transparent flag.
+func (m *Model) IsTransparent() bool {
+	return m.transparent
+}
+
 // CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.
 func (m *BaseModel) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
 	for i, _ := range m.meshes {
