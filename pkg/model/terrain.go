@@ -297,9 +297,33 @@ func (t *TerrainBuilder) vertices() []vertex.Vertex {
 	for l := 0; l <= t.length; l++ {
 		for w := 0; w <= t.width; w++ {
 			texIndex := (w % 2) + (l%2)*2
+			var iL, iW int
+			if l == t.length {
+				iL = l
+			} else {
+				iL = l + 1
+			}
+			if w == t.width {
+				iW = w
+			} else {
+				iW = w + 1
+			}
+			currentPos := mgl32.Vec3{
+				-float32(t.width)/2.0 + float32(w),
+				t.heightMap[l][w],
+				-float32(t.length)/2.0 + float32(l)}
+			nextPosX := mgl32.Vec3{
+				-float32(t.width)/2.0 + float32(iW),
+				t.heightMap[l][iW],
+				-float32(t.length)/2.0 + float32(l)}
+			nextPosY := mgl32.Vec3{
+				-float32(t.width)/2.0 + float32(w),
+				t.heightMap[iL][w],
+				-float32(t.length)/2.0 + float32(iL)}
+			normal := nextPosX.Sub(currentPos).Cross(nextPosY.Sub(currentPos)).Normalize()
 			vertices = append(vertices, vertex.Vertex{
-				Position:  mgl32.Vec3{-float32(t.width)/2.0 + float32(w), t.heightMap[l][w], -float32(t.length)/2.0 + float32(l)},
-				Normal:    mgl32.Vec3{0, 1, 0},
+				Position:  currentPos,
+				Normal:    normal,
 				TexCoords: textureCoords[texIndex],
 			})
 		}
