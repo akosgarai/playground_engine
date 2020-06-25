@@ -248,8 +248,8 @@ func (t *TerrainBuilder) SurfaceTextureGrass() {
 func (t *TerrainBuilder) LiquidTextureWater() {
 	_, filename, _, _ := runtime.Caller(1)
 	fileDir := path.Dir(filename)
-	t.liquidTex.AddTexture(fileDir+"/assets/grass.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", t.wrapper)
-	t.liquidTex.AddTexture(fileDir+"/assets/grass.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", t.wrapper)
+	t.liquidTex.AddTexture(fileDir+"/assets/water.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", t.wrapper)
+	t.liquidTex.AddTexture(fileDir+"/assets/water.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", t.wrapper)
 }
 
 // It sets the default values to the map. By default, it is 0, but if we set the
@@ -426,6 +426,7 @@ func (t *TerrainBuilder) buildLiquid() *Liquid {
 
 	m := newModel()
 	m.AddMesh(liquidMesh)
+	m.SetTransparent(true)
 
 	return &Liquid{
 		Model:     *m,
