@@ -66,6 +66,8 @@ vec4 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewD
 vec4 CalculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 const float Eta = 0.75; // Ratio of indices of refraction air - water.
+const float FresnelPower = 5.0;
+const float F = ((1.0-Eta) * (1.0-Eta)) / ((1.0+Eta) * (1.0+Eta));
 
 void main()
 {
@@ -100,11 +102,13 @@ void main()
         resultReflect += CalculateSpotLight(spotLight[i], norm, FragPos, reflectDir);
         resultRefract += CalculateSpotLight(spotLight[i], norm, FragPos, refractDir);
     }
-    float Ratio = dot(viewDirection, norm);
-    vec4 refl = mix(resultView, resultView+resultReflect, Ratio);
-    vec4 refr = mix(resultView, resultView+resultRefract, Ratio);
-    vec4 mixed = mix(refr, refl, Ratio);
-    FragColor = mix(resultView,resultView+mixed, Ratio);
+    float Ratio = F + (1.0 - F) * pow((1.0 - dot(-viewDirection, norm)), FresnelPower);
+    float RatioRl = F + (1.0 - F) * pow((1.0 - dot(-reflectDir, norm)), FresnelPower);
+    float RatioRr = F + (1.0 - F) * pow((1.0 - dot(-refractDir, norm)), FresnelPower);
+    vec4 rr = mix(resultView, resultView+resultRefract,RatioRr);
+    vec4 rl = mix(resultView, resultView+resultReflect,RatioRl);
+    vec4 mixed = mix(rr, rl, Ratio);
+    FragColor = mix(resultView,resultView+mixed, dot(-viewDirection, norm));
 }
 
 // calculates the color when using a directional light.
