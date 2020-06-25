@@ -82,6 +82,9 @@ func TestDraw(t *testing.T) {
 		msh := mesh.NewPointMesh(wrapperMock)
 		model.AddMesh(msh)
 		model.Draw(shaderMock)
+		model.SetUniformFloat("name", float32(0.1))
+		model.SetUniformVector("name", mgl32.Vec3{0.0, 1.0, 1.0})
+		model.Draw(shaderMock)
 	}()
 }
 func TestSetSpeed(t *testing.T) {
@@ -251,6 +254,56 @@ func TestExport(t *testing.T) {
 		}()
 		model := New()
 		model.Export("invalid-path")
+	}()
+}
+func TestSetUniformFloat(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("SetUniformFloat shouldn't have panic.")
+			}
+		}()
+		model := New()
+		testData := []struct {
+			key   string
+			value float32
+		}{
+			{"testName", float32(0.0)},
+			{"testName2", float32(1.0)},
+			{"testName", float32(1.0)},
+		}
+		for _, tt := range testData {
+			model.SetUniformFloat(tt.key, tt.value)
+			if model.uniformFloat[tt.key] != tt.value {
+				t.Errorf("Invalud uniform value for key '%s'. Instead of '%f', we have '%f'.", tt.key, tt.value, model.uniformFloat[tt.key])
+			}
+		}
+
+	}()
+}
+func TestSetUniformVector(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("SetUniformVector shouldn't have panic.")
+			}
+		}()
+		model := New()
+		testData := []struct {
+			key   string
+			value mgl32.Vec3
+		}{
+			{"testName", mgl32.Vec3{0.0, 0.0, 0.0}},
+			{"testName2", mgl32.Vec3{0.0, 1.0, 0.0}},
+			{"testName", mgl32.Vec3{1.0, 0.0, 1.0}},
+		}
+		for _, tt := range testData {
+			model.SetUniformVector(tt.key, tt.value)
+			if model.uniformVector[tt.key] != tt.value {
+				t.Errorf("Invalud uniform value for key '%s'. Instead of '%v', we have '%v'.", tt.key, tt.value, model.uniformVector[tt.key])
+			}
+		}
+
 	}()
 }
 func TestBug(t *testing.T) {

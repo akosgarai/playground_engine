@@ -13,6 +13,9 @@ import (
 type Model struct {
 	meshes      []interfaces.Mesh
 	transparent bool
+	// uniforms, that needs to be set for this model.
+	uniformFloat  map[string]float32    // map for float32
+	uniformVector map[string]mgl32.Vec3 // map for 3 float32
 }
 type BaseModel struct {
 	Model
@@ -62,15 +65,19 @@ func (m *BaseModel) Update(dt float64) {
 }
 func newModel() *Model {
 	return &Model{
-		meshes:      []interfaces.Mesh{},
-		transparent: false,
+		meshes:        []interfaces.Mesh{},
+		transparent:   false,
+		uniformFloat:  make(map[string]float32),
+		uniformVector: make(map[string]mgl32.Vec3),
 	}
 }
 func newCDModel() *BaseCollisionDetectionModel {
 	return &BaseCollisionDetectionModel{
 		Model{
-			meshes:      []interfaces.Mesh{},
-			transparent: false,
+			meshes:        []interfaces.Mesh{},
+			transparent:   false,
+			uniformFloat:  make(map[string]float32),
+			uniformVector: make(map[string]mgl32.Vec3),
 		},
 	}
 }
@@ -89,6 +96,7 @@ func (m *Model) AddMesh(msh interfaces.Mesh) {
 
 // Draw function loops over each of the meshes and calls their Draw function.
 func (m *Model) Draw(s interfaces.Shader) {
+	m.customUniforms(s)
 	for i, _ := range m.meshes {
 		m.meshes[i].Draw(s)
 	}
@@ -165,6 +173,28 @@ func (m *Model) SetTransparent(t bool) {
 // IsTransparent function returns the transparent flag.
 func (m *Model) IsTransparent() bool {
 	return m.transparent
+}
+
+// SetUniformFloat sets the given float value to the given string key in
+// the uniformFloat map.
+func (m *Model) SetUniformFloat(key string, value float32) {
+	m.uniformFloat[key] = value
+}
+
+// SetUniformVector sets the given mgl32.Vec3 value to the given string key in
+// the uniformVector map.
+func (m *Model) SetUniformVector(key string, value mgl32.Vec3) {
+	m.uniformVector[key] = value
+}
+
+// Setup custom uniforms for the shader application.
+func (m *Model) customUniforms(s interfaces.Shader) {
+	for name, value := range m.uniformFloat {
+		s.SetUniform1f(name, value)
+	}
+	for name, value := range m.uniformVector {
+		s.SetUniform3f(name, value.X(), value.Y(), value.Z())
+	}
 }
 
 // CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.
