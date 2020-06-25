@@ -581,14 +581,14 @@ func TestTerrainBuilderSetGlWrapper(t *testing.T) {
 		t.Error("Invalid gl wrapper")
 	}
 }
-func TestTerrainBuilderGrassTexture(t *testing.T) {
+func TestTerrainBuilderSurfaceTextureGrass(t *testing.T) {
 	var wrapper testhelper.GLWrapperMock
 	terr := NewTerrainBuilder()
 	terr.SetGlWrapper(wrapper)
 	if len(terr.tex) != 0 {
 		t.Errorf("Invalid texture length. Instead of '0', we have '%d'.", len(terr.tex))
 	}
-	terr.GrassTexture()
+	terr.SurfaceTextureGrass()
 	if len(terr.tex) != 2 {
 		t.Errorf("Invalid texture length. Instead of '2', we have '%d'.", len(terr.tex))
 	}
@@ -601,7 +601,7 @@ func TestTerrainBuilderInitHeightMap(t *testing.T) {
 	terr.SetLength(length)
 	terr.SetWidth(width)
 	terr.SetMinHeight(minH)
-	terr.initHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
 	for l := 0; l < terr.length; l++ {
 		for w := 0; w < terr.width; w++ {
 			if terr.heightMap[l][w] != 0.0 {
@@ -610,7 +610,7 @@ func TestTerrainBuilderInitHeightMap(t *testing.T) {
 		}
 	}
 	terr.MinHeightIsDefault(true)
-	terr.initHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, terr.minH)
 	for l := 0; l < terr.length; l++ {
 		for w := 0; w < terr.width; w++ {
 			if terr.heightMap[l][w] != -2.0 {
@@ -644,16 +644,16 @@ func TestTerrainBuilderBuildHeightMap(t *testing.T) {
 	terr.SetSeed(seed)
 	terr.SetPeakProbability(peakProb)
 	terr.SetCliffProbability(cliffProb)
-	terr.initHeightMap()
-	terr.buildHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
+	terr.buildTerrainHeightMap()
 	if !reflect.DeepEqual(terr.heightMap, expected) {
 		t.Error("Invalid heightmap")
 		t.Log(terr.heightMap)
 		t.Log(expected)
 	}
 	terr.MinHeightIsDefault(true)
-	terr.initHeightMap()
-	terr.buildHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, terr.minH)
+	terr.buildTerrainHeightMap()
 }
 func TestTerrainBuilderAdjacentElevation(t *testing.T) {
 	length := 4
@@ -680,8 +680,8 @@ func TestTerrainBuilderAdjacentElevation(t *testing.T) {
 	terr.SetSeed(seed)
 	terr.SetPeakProbability(peakProb)
 	terr.SetCliffProbability(cliffProb)
-	terr.initHeightMap()
-	terr.buildHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
+	terr.buildTerrainHeightMap()
 	if !reflect.DeepEqual(terr.heightMap, expected) {
 		t.Error("Invalid heightmap")
 		t.Log(terr.heightMap)
@@ -706,9 +706,9 @@ func TestTerrainBuilderVertices(t *testing.T) {
 	terr.SetSeed(seed)
 	terr.SetPeakProbability(peakProb)
 	terr.SetCliffProbability(cliffProb)
-	terr.initHeightMap()
-	terr.buildHeightMap()
-	v := terr.vertices()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
+	terr.buildTerrainHeightMap()
+	v := terr.vertices(terr.width, terr.length, terr.heightMap)
 	if len(v) != (length+1)*(width+1) {
 		t.Errorf("Invalid vertices length. Instead of '%d', we have '%d'.", length*width, len(v))
 	}
@@ -731,9 +731,9 @@ func TestTerrainBuilderIndices(t *testing.T) {
 	terr.SetSeed(seed)
 	terr.SetPeakProbability(peakProb)
 	terr.SetCliffProbability(cliffProb)
-	terr.initHeightMap()
-	terr.buildHeightMap()
-	i := terr.indices()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
+	terr.buildTerrainHeightMap()
+	i := terr.indices(terr.width, terr.length)
 	if len(i) != length*width*6 {
 		t.Errorf("Invalid indices length. Instead of '%d', we have '%d'.", length*width*6, len(i))
 	}
@@ -767,11 +767,98 @@ func TestTerrainBuilderBuild(t *testing.T) {
 		t.Log(terr)
 	}()
 }
+func TestTerrainBuilderBuildTerrain(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing textures.")
+			}
+		}()
+		length := 5
+		width := 5
+		iteration := 10
+		minH := float32(-1.0)
+		maxH := float32(3.0)
+		seed := int64(0)
+		peakProb := 5
+		cliffProb := 5
+		tb := NewTerrainBuilder()
+		tb.SetLength(length)
+		tb.SetWidth(width)
+		tb.SetMinHeight(minH)
+		tb.SetMaxHeight(maxH)
+		tb.SetIterations(iteration)
+		tb.SetSeed(seed)
+		tb.SetPeakProbability(peakProb)
+		tb.SetCliffProbability(cliffProb)
+		tb.SetDebugMode(true)
+		terr := tb.buildTerrain()
+		t.Log(terr)
+	}()
+}
+func TestTerrainBuilderBuildWithLiquid(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing textures.")
+			}
+		}()
+		length := 5
+		width := 5
+		iteration := 10
+		minH := float32(-1.0)
+		maxH := float32(3.0)
+		seed := int64(0)
+		peakProb := 5
+		cliffProb := 5
+		tb := NewTerrainBuilder()
+		tb.SetLength(length)
+		tb.SetWidth(width)
+		tb.SetMinHeight(minH)
+		tb.SetMaxHeight(maxH)
+		tb.SetIterations(iteration)
+		tb.SetSeed(seed)
+		tb.SetPeakProbability(peakProb)
+		tb.SetCliffProbability(cliffProb)
+		tb.SetDebugMode(true)
+		terr, water := tb.BuildWithLiquid()
+		t.Log(terr, water)
+	}()
+}
+func TestTerrainBuilderBuildLiquid(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing textures.")
+			}
+		}()
+		length := 5
+		width := 5
+		iteration := 10
+		minH := float32(-1.0)
+		maxH := float32(3.0)
+		seed := int64(0)
+		peakProb := 5
+		cliffProb := 5
+		tb := NewTerrainBuilder()
+		tb.SetLength(length)
+		tb.SetWidth(width)
+		tb.SetMinHeight(minH)
+		tb.SetMaxHeight(maxH)
+		tb.SetIterations(iteration)
+		tb.SetSeed(seed)
+		tb.SetPeakProbability(peakProb)
+		tb.SetCliffProbability(cliffProb)
+		tb.SetDebugMode(true)
+		water := tb.buildWater()
+		t.Log(water)
+	}()
+}
 func TestTerrainHeightAtPos(t *testing.T) {
 	tb := NewTerrainBuilder()
 	tb.SetScale(mgl32.Vec3{2, 1, 2})
 	tb.SetGlWrapper(wrapperMock)
-	tb.GrassTexture()
+	tb.SurfaceTextureGrass()
 	terrain := tb.Build()
 	terrain.heightMap = [][]float32{
 		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -826,7 +913,7 @@ func TestTerrainCollideTestWithSphere(t *testing.T) {
 	tb := NewTerrainBuilder()
 	tb.SetScale(mgl32.Vec3{2, 1, 2})
 	tb.SetGlWrapper(wrapperMock)
-	tb.GrassTexture()
+	tb.SurfaceTextureGrass()
 	terrain := tb.Build()
 	terrain.heightMap = [][]float32{
 		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
