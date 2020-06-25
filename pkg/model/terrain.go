@@ -423,7 +423,7 @@ func (t *TerrainBuilder) buildLiquid() *Liquid {
 	if t.debugMode {
 		fmt.Printf("TerrainBuilder.buildLiquid.heightMap after init:\n'%v'\n", waterHeightMap)
 	}
-	v := t.vertices(waterWidth, waterLength, waterMultiplier, waterMultiplier, waterHeightMap)
+	v := t.vertices(waterWidth, waterLength, waterWidth, waterLength, waterHeightMap)
 	i := t.indices(waterWidth, waterLength)
 	liquidMesh := mesh.NewTexturedMesh(v, i, t.liquidTex, t.wrapper)
 	scaleValue := float32(1.0) / float32(waterMultiplier)
