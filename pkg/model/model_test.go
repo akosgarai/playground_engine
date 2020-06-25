@@ -968,3 +968,30 @@ func TestTerrainCollideTestWithSphere(t *testing.T) {
 		}
 	}
 }
+func TestLiquidCollideTestWithSphere(t *testing.T) {
+	tb := NewTerrainBuilder()
+	tb.SetScale(mgl32.Vec3{2, 1, 2})
+	tb.SetGlWrapper(wrapperMock)
+	tb.SurfaceTextureGrass()
+	tb.LiquidTextureWater()
+	_, water := tb.BuildWithLiquid()
+	testData := []struct {
+		position [3]float32
+		radius   float32
+		collide  bool
+	}{
+		{[3]float32{15, 0, 15}, 1, false},
+		{[3]float32{11, 0, 10}, 1, false},
+		{[3]float32{10.2, 0, 10}, 1, false},
+		{[3]float32{10.000002, 0, 10}, 1, false},
+		{[3]float32{2, 2.1, 8}, 1, false},
+		{[3]float32{2, 1.9, 8}, 1, false},
+	}
+	for _, v := range testData {
+		bs := coldet.NewBoundingSphere(v.position, v.radius)
+		result := water.CollideTestWithSphere(bs)
+		if result != v.collide {
+			t.Errorf("Invalid collision.\nPosition:\t'%v'\nRadius:\t'%f'\nExpected:\t'%v'", v.position, v.radius, v.collide)
+		}
+	}
+}

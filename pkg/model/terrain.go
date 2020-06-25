@@ -57,6 +57,11 @@ func (w *Liquid) GetLiquid() interfaces.Mesh {
 	return w.meshes[0]
 }
 
+// CollideTestWithSphere is the collision detection function for liquid vs sphere.
+func (t *Liquid) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
+	return false
+}
+
 type Terrain struct {
 	Model
 	heightMap     [][]float32
