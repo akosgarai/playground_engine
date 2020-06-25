@@ -521,6 +521,22 @@ func TestTerrainBuilderSetSeed(t *testing.T) {
 		t.Errorf("Invalid seed. Instead of '%d', we have '%d'.", seed, terr.seed)
 	}
 }
+func TestTerrainBuilderSetScale(t *testing.T) {
+	scale := mgl32.Vec3{2, 2, 2}
+	terr := NewTerrainBuilder()
+	terr.SetScale(scale)
+	if terr.scale != scale {
+		t.Errorf("Invalid scale. Instead of '%v', we have '%v'.", scale, terr.scale)
+	}
+}
+func TestTerrainBuilderSetPosition(t *testing.T) {
+	position := mgl32.Vec3{2, 2, 2}
+	terr := NewTerrainBuilder()
+	terr.SetPosition(position)
+	if terr.position != position {
+		t.Errorf("Invalid position. Instead of '%v', we have '%v'.", position, terr.position)
+	}
+}
 func TestTerrainBuilderRandomSeed(t *testing.T) {
 	before := time.Now().UnixNano()
 	terr := NewTerrainBuilder()

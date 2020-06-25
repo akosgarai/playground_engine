@@ -132,6 +132,7 @@ type TerrainBuilder struct {
 	tex                       texture.Textures
 	scale                     mgl32.Vec3
 	debugMode                 bool
+	position                  mgl32.Vec3
 }
 
 // NewTerrainBuilder returns a TerrainBuilder with default settings.
@@ -148,6 +149,7 @@ func NewTerrainBuilder() *TerrainBuilder {
 		cliffProbability: 0,
 		scale:            mgl32.Vec3{1, 1, 1},
 		debugMode:        false,
+		position:         mgl32.Vec3{0, 0, 0},
 	}
 }
 
@@ -209,6 +211,11 @@ func (t *TerrainBuilder) SetGlWrapper(w interfaces.GLWrapper) {
 // SetScale sets the scale.
 func (t *TerrainBuilder) SetScale(s mgl32.Vec3) {
 	t.scale = s
+}
+
+// SetPosition sets the position.
+func (t *TerrainBuilder) SetPosition(p mgl32.Vec3) {
+	t.position = p
 }
 
 //SetDebugMode updates the debug flag
@@ -365,6 +372,7 @@ func (t *TerrainBuilder) Build() *Terrain {
 	i := t.indices()
 	terrainMesh := mesh.NewTexturedMesh(v, i, t.tex, t.wrapper)
 	terrainMesh.SetScale(t.scale)
+	terrainMesh.SetPosition(t.position)
 	m := newModel()
 	m.AddMesh(terrainMesh)
 	return &Terrain{Model: *m, heightMap: t.heightMap, width: t.width, length: t.length, debugMode: t.debugMode}
