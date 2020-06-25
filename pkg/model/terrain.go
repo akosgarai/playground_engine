@@ -45,15 +45,15 @@ func min(a, b int) int {
 	return b
 }
 
-type Water struct {
+type Liquid struct {
 	Model
 	heightMap     [][]float32
 	width, length int
 	debugMode     bool
 }
 
-// GetWater returns the water mesh
-func (w *Water) GetWater() interfaces.Mesh {
+// GetLiquid returns the liquid mesh
+func (w *Liquid) GetLiquid() interfaces.Mesh {
 	return w.meshes[0]
 }
 
@@ -381,9 +381,9 @@ func (t *TerrainBuilder) Build() *Terrain {
 	return t.buildTerrain()
 }
 
-// BuildWithLiquid returns a Terrain and a Water that is generated for the terrain.
-func (t *TerrainBuilder) BuildWithLiquid() (*Terrain, *Water) {
-	return t.buildTerrain(), t.buildWater()
+// BuildWithLiquid returns a Terrain and a Liquid that is generated for the terrain.
+func (t *TerrainBuilder) BuildWithLiquid() (*Terrain, *Liquid) {
+	return t.buildTerrain(), t.buildLiquid()
 }
 func (t *TerrainBuilder) buildTerrain() *Terrain {
 	defaultHeight := float32(0.0)
@@ -408,14 +408,14 @@ func (t *TerrainBuilder) buildTerrain() *Terrain {
 	return &Terrain{Model: *m, heightMap: t.heightMap, width: t.width, length: t.length, debugMode: t.debugMode}
 }
 
-func (t *TerrainBuilder) buildWater() *Water {
+func (t *TerrainBuilder) buildLiquid() *Liquid {
 	waterTopLevel := float32(0.0)
 	waterMultiplier := 10
 	waterWidth := t.width * int(t.scale.X()) * waterMultiplier
 	waterLength := t.length * int(t.scale.Z()) * waterMultiplier
 	waterHeightMap := t.initHeightMap(waterWidth, waterLength, waterTopLevel)
 	if t.debugMode {
-		fmt.Printf("TerrainBuilder.buildWater.heightMap after init:\n'%v'\n", waterHeightMap)
+		fmt.Printf("TerrainBuilder.buildLiquid.heightMap after init:\n'%v'\n", waterHeightMap)
 	}
 	v := t.vertices(waterWidth, waterLength, waterHeightMap)
 	i := t.indices(waterWidth, waterLength)
@@ -427,7 +427,7 @@ func (t *TerrainBuilder) buildWater() *Water {
 	m := newModel()
 	m.AddMesh(liquidMesh)
 
-	return &Water{
+	return &Liquid{
 		Model:     *m,
 		heightMap: waterHeightMap,
 		width:     waterWidth,

@@ -850,7 +850,7 @@ func TestTerrainBuilderBuildLiquid(t *testing.T) {
 		tb.SetPeakProbability(peakProb)
 		tb.SetCliffProbability(cliffProb)
 		tb.SetDebugMode(true)
-		water := tb.buildWater()
+		water := tb.buildLiquid()
 		t.Log(water)
 	}()
 }
