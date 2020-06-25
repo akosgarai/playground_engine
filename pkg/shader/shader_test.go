@@ -373,6 +373,27 @@ func TestNewTextureShader(t *testing.T) {
 		}
 	}()
 }
+func TestNewTextureShaderLiquid(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer glfw.Terminate()
+				t.Errorf("NewTextureShaderLiquid shouldn't have panicked!")
+			}
+		}()
+		runtime.LockOSThread()
+		InitGlfw()
+		defer glfw.Terminate()
+		realGlWrapper.InitOpenGL()
+		shader := NewTextureShaderLiquid(realGlWrapper)
+		if shader.id == 0 || shader.GetId() == 0 {
+			t.Error("Invalid shader program id")
+		}
+	}()
+}
 func TestNewTextureShaderBlending(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")

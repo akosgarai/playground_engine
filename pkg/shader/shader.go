@@ -60,6 +60,12 @@ func NewTextureShader(wrapper interfaces.GLWrapper) *Shader {
 	return NewShader(baseDirShaders()+"texture.vert", baseDirShaders()+"texture.frag", wrapper)
 }
 
+// NewTextureShaderLiquid returns a Shader, that uses the default texture vertex & fragment shaders.
+// It works the same as NewShader, but the internal shader files are used.
+func NewTextureShaderLiquid(wrapper interfaces.GLWrapper) *Shader {
+	return NewShader(baseDirShaders()+"texture_liquid.vert", baseDirShaders()+"texture_liquid.frag", wrapper)
+}
+
 // NewTextureShaderWithFog returns a Shader, that uses the default texture vertex & fragment shaders.
 // It works the same as NewShader, but the internal shader files are used. In this application, the `Fog`
 // structure has to be filled. The `fog.minDistance`, `fog.maxDistance` floats and the `fog.color` mgl32.Vec3.
