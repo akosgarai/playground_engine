@@ -34,6 +34,7 @@ var (
 		},
 		"terrain": []string{
 			"grass.jpg",
+			"water.png",
 		},
 	}
 
@@ -43,6 +44,7 @@ var (
 		"door.jpg",
 		"grass.jpg",
 		"metal.jpg",
+		"water.png",
 		"window.png",
 	}
 	shaderApps = []string{
