@@ -320,17 +320,14 @@ func (t *TerrainBuilder) adjacentElevation(cW, cL int, elevation float32) bool {
 	}
 	return false
 }
-func (t *TerrainBuilder) vertices(width, length int, heightMap [][]float32) []vertex.Vertex {
-	textureCoords := [4]mgl32.Vec2{
-		{0.0, 1.0},
-		{1.0, 1.0},
-		{1.0, 0.0},
-		{0.0, 0.0},
-	}
+func (t *TerrainBuilder) vertices(width, length, textureWidth, textureHeight int, heightMap [][]float32) []vertex.Vertex {
+	textureStepX := float32(1.0) / float32(textureWidth)
+	textureStepY := float32(1.0) / float32(textureHeight)
 	var vertices vertex.Vertices
 	for l := 0; l <= length; l++ {
 		for w := 0; w <= width; w++ {
-			texIndex := (w % 2) + (l%2)*2
+			textureModX := w % (textureWidth + 1)
+			textureModY := l % (textureHeight + 1)
 			var iL, iW int
 			if l == length {
 				iL = l
@@ -358,7 +355,7 @@ func (t *TerrainBuilder) vertices(width, length int, heightMap [][]float32) []ve
 			vertices = append(vertices, vertex.Vertex{
 				Position:  currentPos,
 				Normal:    normal,
-				TexCoords: textureCoords[texIndex],
+				TexCoords: mgl32.Vec2{float32(textureModX) * textureStepX, float32(textureModY) * textureStepY},
 			})
 		}
 	}
@@ -407,7 +404,7 @@ func (t *TerrainBuilder) buildTerrain() *Terrain {
 	if t.debugMode {
 		fmt.Printf("TerrainBuilder.heightMap after build:\n'%v'\n", t.heightMap)
 	}
-	v := t.vertices(t.width, t.length, t.heightMap)
+	v := t.vertices(t.width, t.length, 1, 1, t.heightMap)
 	i := t.indices(t.width, t.length)
 	terrainMesh := mesh.NewTexturedMesh(v, i, t.tex, t.wrapper)
 	terrainMesh.SetScale(t.scale)
@@ -426,7 +423,7 @@ func (t *TerrainBuilder) buildLiquid() *Liquid {
 	if t.debugMode {
 		fmt.Printf("TerrainBuilder.buildLiquid.heightMap after init:\n'%v'\n", waterHeightMap)
 	}
-	v := t.vertices(waterWidth, waterLength, waterHeightMap)
+	v := t.vertices(waterWidth, waterLength, waterMultiplier, waterMultiplier, waterHeightMap)
 	i := t.indices(waterWidth, waterLength)
 	liquidMesh := mesh.NewTexturedMesh(v, i, t.liquidTex, t.wrapper)
 	scaleValue := float32(1.0) / float32(waterMultiplier)

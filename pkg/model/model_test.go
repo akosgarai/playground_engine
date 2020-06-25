@@ -708,7 +708,7 @@ func TestTerrainBuilderVertices(t *testing.T) {
 	terr.SetCliffProbability(cliffProb)
 	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
 	terr.buildTerrainHeightMap()
-	v := terr.vertices(terr.width, terr.length, terr.heightMap)
+	v := terr.vertices(terr.width, terr.length, 1, 1, terr.heightMap)
 	if len(v) != (length+1)*(width+1) {
 		t.Errorf("Invalid vertices length. Instead of '%d', we have '%d'.", length*width, len(v))
 	}
