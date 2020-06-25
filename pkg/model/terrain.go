@@ -53,13 +53,17 @@ type Liquid struct {
 }
 
 // GetLiquid returns the liquid mesh
-func (w *Liquid) GetLiquid() interfaces.Mesh {
-	return w.meshes[0]
+func (l *Liquid) GetLiquid() interfaces.Mesh {
+	return l.meshes[0]
 }
 
 // CollideTestWithSphere is the collision detection function for liquid vs sphere.
-func (t *Liquid) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
+func (l *Liquid) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
 	return false
+}
+
+// Update function does nothing.
+func (l *Liquid) Update(dt float64) {
 }
 
 type Terrain struct {
