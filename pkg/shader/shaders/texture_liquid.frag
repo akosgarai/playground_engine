@@ -57,6 +57,7 @@ uniform Material material;
 uniform int NumberOfDirectionalLightSources;
 uniform int NumberOfPointLightSources;
 uniform int NumberOfSpotLightSources;
+uniform float Eta;
 
 uniform vec3 viewPosition;
 
@@ -65,9 +66,7 @@ vec4 CalculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir
 vec4 CalculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec4 CalculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
-const float Eta = 0.75; // Ratio of indices of refraction air - water.
 const float FresnelPower = 5.0;
-const float F = ((1.0-Eta) * (1.0-Eta)) / ((1.0+Eta) * (1.0+Eta));
 
 void main()
 {
@@ -102,6 +101,7 @@ void main()
         resultReflect += CalculateSpotLight(spotLight[i], norm, FragPos, reflectDir);
         resultRefract += CalculateSpotLight(spotLight[i], norm, FragPos, refractDir);
     }
+    float F = ((1.0-Eta) * (1.0-Eta)) / ((1.0+Eta) * (1.0+Eta));
     float Ratio = F + (1.0 - F) * pow((1.0 - dot(-viewDirection, norm)), FresnelPower);
     float RatioRl = F + (1.0 - F) * pow((1.0 - dot(-reflectDir, norm)), FresnelPower);
     float RatioRr = F + (1.0 - F) * pow((1.0 - dot(-refractDir, norm)), FresnelPower);

@@ -12,9 +12,9 @@ uniform mat4 view;
 uniform mat4 projection;
 uniform float time;
 uniform vec3 viewPosition;
+uniform float amplitude;
+uniform float frequency;
 
-const float amplitude = 0.125;
-const float frequency = 4;
 const float PI = 3.14159;
 
 void main()

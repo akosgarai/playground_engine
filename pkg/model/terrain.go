@@ -155,6 +155,9 @@ type TerrainBuilder struct {
 	scale                     mgl32.Vec3
 	debugMode                 bool
 	position                  mgl32.Vec3
+	liquidAmplitude           float32
+	liquidFrequency           float32
+	liquidEta                 float32
 }
 
 // NewTerrainBuilder returns a TerrainBuilder with default settings.
@@ -172,6 +175,9 @@ func NewTerrainBuilder() *TerrainBuilder {
 		scale:            mgl32.Vec3{1, 1, 1},
 		debugMode:        false,
 		position:         mgl32.Vec3{0, 0, 0},
+		liquidEta:        0.0,
+		liquidAmplitude:  0.0,
+		liquidFrequency:  0.0,
 	}
 }
 
@@ -243,6 +249,21 @@ func (t *TerrainBuilder) SetPosition(p mgl32.Vec3) {
 //SetDebugMode updates the debug flag
 func (t *TerrainBuilder) SetDebugMode(v bool) {
 	t.debugMode = v
+}
+
+// SetLiquidEta sets the liquidEta.
+func (t *TerrainBuilder) SetLiquidEta(e float32) {
+	t.liquidEta = e
+}
+
+// SetLiquidAmplitude sets the liquidAmplitude.
+func (t *TerrainBuilder) SetLiquidAmplitude(a float32) {
+	t.liquidAmplitude = a
+}
+
+// SetLiquidFrequency sets the liquidFrequency.
+func (t *TerrainBuilder) SetLiquidFrequency(f float32) {
+	t.liquidFrequency = f
 }
 
 // SurfaceTextureGrass sets the surface texture to grass.
@@ -433,6 +454,9 @@ func (t *TerrainBuilder) buildLiquid() *Liquid {
 	m := newModel()
 	m.AddMesh(liquidMesh)
 	m.SetTransparent(true)
+	m.SetUniformFloat("Eta", t.liquidEta)
+	m.SetUniformFloat("amplitude", t.liquidAmplitude)
+	m.SetUniformFloat("frequency", t.liquidFrequency)
 
 	return &Liquid{
 		Model:     *m,

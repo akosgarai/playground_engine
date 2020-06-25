@@ -1048,3 +1048,27 @@ func TestLiquidCollideTestWithSphere(t *testing.T) {
 		}
 	}
 }
+func TestTerrainBuilderSetLiquidEta(t *testing.T) {
+	eta := float32(1)
+	terr := NewTerrainBuilder()
+	terr.SetLiquidEta(eta)
+	if terr.liquidEta != eta {
+		t.Errorf("Invalid liquid eta. Instead of '%f', we have '%f'.", eta, terr.liquidEta)
+	}
+}
+func TestTerrainBuilderSetLiquidAmplitude(t *testing.T) {
+	ampl := float32(1)
+	terr := NewTerrainBuilder()
+	terr.SetLiquidAmplitude(ampl)
+	if terr.liquidAmplitude != ampl {
+		t.Errorf("Invalid liquid amplitude. Instead of '%f', we have '%f'.", ampl, terr.liquidAmplitude)
+	}
+}
+func TestTerrainBuilderSetLiquidFrequency(t *testing.T) {
+	freq := float32(1)
+	terr := NewTerrainBuilder()
+	terr.SetLiquidFrequency(freq)
+	if terr.liquidFrequency != freq {
+		t.Errorf("Invalid liquid frequency. Instead of '%f', we have '%f'.", freq, terr.liquidFrequency)
+	}
+}
