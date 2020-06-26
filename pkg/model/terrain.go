@@ -296,8 +296,7 @@ func (t *TerrainBuilder) LiquidTextureWater() {
 	t.liquidTex.AddTexture(fileDir+"/assets/water.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", t.wrapper)
 }
 
-// It sets the default values to the map. By default, it is 0, but if we set the
-// minHIsDefault flag then the minH value is used as default.
+// It sets the default values to the map.
 func (t *TerrainBuilder) initHeightMap(width, length int, defaultHeight float32) [][]float32 {
 	heightMap := make([][]float32, length+1)
 	for l := 0; l <= length; l++ {
@@ -311,8 +310,9 @@ func (t *TerrainBuilder) initHeightMap(width, length int, defaultHeight float32)
 	return heightMap
 }
 
-// It creates the heightmap for the liquid surface. The height value has to be the difference
-// between the waterlevel and the height of terrain in that position.
+// It creates the heightmap for the liquid surface. The width, length is calculated from
+// the terrain map and the given scale values. The height value calculation uses the same
+// interpolation logic as the HeightAtPos function.
 func (t *TerrainBuilder) initHeightMapLiquid(scaleX, scaleZ int, waterLevel float32) [][]float32 {
 	width := t.width * scaleX
 	length := t.length * scaleZ
