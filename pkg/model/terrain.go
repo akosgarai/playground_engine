@@ -158,26 +158,30 @@ type TerrainBuilder struct {
 	liquidAmplitude           float32
 	liquidFrequency           float32
 	liquidEta                 float32
+	liquidWaterLevel          float32
+	liquidDetailMultiplier    int
 }
 
 // NewTerrainBuilder returns a TerrainBuilder with default settings.
 func NewTerrainBuilder() *TerrainBuilder {
 	return &TerrainBuilder{
-		width:            defaultTerrainWidth,
-		length:           defaultTerrainLength,
-		iterations:       defaultIterations,
-		minH:             defaultMinHeight,
-		maxH:             defaultMaxHeight,
-		seed:             defaultSeed,
-		minHIsDefault:    false,
-		peakProbability:  0,
-		cliffProbability: 0,
-		scale:            mgl32.Vec3{1, 1, 1},
-		debugMode:        false,
-		position:         mgl32.Vec3{0, 0, 0},
-		liquidEta:        0.0,
-		liquidAmplitude:  0.0,
-		liquidFrequency:  0.0,
+		width:                  defaultTerrainWidth,
+		length:                 defaultTerrainLength,
+		iterations:             defaultIterations,
+		minH:                   defaultMinHeight,
+		maxH:                   defaultMaxHeight,
+		seed:                   defaultSeed,
+		minHIsDefault:          false,
+		peakProbability:        0,
+		cliffProbability:       0,
+		scale:                  mgl32.Vec3{1, 1, 1},
+		debugMode:              false,
+		position:               mgl32.Vec3{0, 0, 0},
+		liquidEta:              0.0,
+		liquidAmplitude:        0.0,
+		liquidFrequency:        0.0,
+		liquidWaterLevel:       0.0,
+		liquidDetailMultiplier: 1,
 	}
 }
 
@@ -264,6 +268,16 @@ func (t *TerrainBuilder) SetLiquidAmplitude(a float32) {
 // SetLiquidFrequency sets the liquidFrequency.
 func (t *TerrainBuilder) SetLiquidFrequency(f float32) {
 	t.liquidFrequency = f
+}
+
+// SetLiquidWaterLevel sets the liquidWaterLevel.
+func (t *TerrainBuilder) SetLiquidWaterLevel(f float32) {
+	t.liquidWaterLevel = f
+}
+
+// SetLiquidDetailMultiplier sets the liquidDetailMultiplier.
+func (t *TerrainBuilder) SetLiquidDetailMultiplier(f int) {
+	t.liquidDetailMultiplier = f
 }
 
 // SurfaceTextureGrass sets the surface texture to grass.
@@ -460,20 +474,18 @@ func (t *TerrainBuilder) buildTerrain() *Terrain {
 }
 
 func (t *TerrainBuilder) buildLiquid() *Liquid {
-	waterTopLevel := float32(0.0)
-	waterMultiplier := 10
-	waterWidth := t.width * int(t.scale.X()) * waterMultiplier
-	waterLength := t.length * int(t.scale.Z()) * waterMultiplier
-	waterHeightMap := t.initHeightMapLiquid(int(t.scale.X())*waterMultiplier, int(t.scale.Z())*waterMultiplier, waterTopLevel)
+	waterWidth := t.width * int(t.scale.X()) * t.liquidDetailMultiplier
+	waterLength := t.length * int(t.scale.Z()) * t.liquidDetailMultiplier
+	waterHeightMap := t.initHeightMapLiquid(int(t.scale.X())*t.liquidDetailMultiplier, int(t.scale.Z())*t.liquidDetailMultiplier, t.liquidWaterLevel)
 	if t.debugMode {
 		fmt.Printf("TerrainBuilder.buildLiquid.heightMap after init:\n'%v'\n", waterHeightMap)
 	}
 	v := t.vertices(waterWidth, waterLength, waterWidth, waterLength, waterHeightMap)
 	i := t.indices(waterWidth, waterLength)
 	liquidMesh := mesh.NewTexturedMesh(v, i, t.liquidTex, t.wrapper)
-	scaleValue := float32(1.0) / float32(waterMultiplier)
+	scaleValue := float32(1.0) / float32(t.liquidDetailMultiplier)
 	liquidMesh.SetScale(mgl32.Vec3{scaleValue, 1.0, scaleValue})
-	liquidMesh.SetPosition(mgl32.Vec3{t.position.X(), t.position.Y() + waterTopLevel, t.position.Z()})
+	liquidMesh.SetPosition(mgl32.Vec3{t.position.X(), t.position.Y() + t.liquidWaterLevel, t.position.Z()})
 
 	m := newModel()
 	m.AddMesh(liquidMesh)
@@ -481,7 +493,7 @@ func (t *TerrainBuilder) buildLiquid() *Liquid {
 	m.SetUniformFloat("Eta", t.liquidEta)
 	m.SetUniformFloat("amplitude", t.liquidAmplitude)
 	m.SetUniformFloat("frequency", t.liquidFrequency)
-	m.SetUniformFloat("waterLevel", waterTopLevel)
+	m.SetUniformFloat("waterLevel", t.liquidWaterLevel)
 
 	return &Liquid{
 		Model:     *m,

@@ -1072,3 +1072,19 @@ func TestTerrainBuilderSetLiquidFrequency(t *testing.T) {
 		t.Errorf("Invalid liquid frequency. Instead of '%f', we have '%f'.", freq, terr.liquidFrequency)
 	}
 }
+func TestTerrainBuilderSetLiquidWaterLevel(t *testing.T) {
+	wl := float32(1)
+	terr := NewTerrainBuilder()
+	terr.SetLiquidWaterLevel(wl)
+	if terr.liquidWaterLevel != wl {
+		t.Errorf("Invalid liquid waterlevel. Instead of '%f', we have '%f'.", wl, terr.liquidWaterLevel)
+	}
+}
+func TestTerrainBuilderSetLiquidDetailMultiplier(t *testing.T) {
+	dm := 3
+	terr := NewTerrainBuilder()
+	terr.SetLiquidDetailMultiplier(dm)
+	if terr.liquidDetailMultiplier != dm {
+		t.Errorf("Invalid liquid detail multiplier. Instead of '%d', we have '%d'.", dm, terr.liquidDetailMultiplier)
+	}
+}
