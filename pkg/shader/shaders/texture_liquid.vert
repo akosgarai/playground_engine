@@ -3,9 +3,11 @@ layout(location = 0) in vec3 vVertex;
 layout(location = 1) in vec3 vNormal;
 layout(location = 2) in vec2 vTexCoord;
 
-out vec3 FragPos;
+out vec3 SurfacePos;
+out vec3 BottomPos;
 out vec3 Normal;
 out vec2 TexCoords;
+out float Depth;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -21,12 +23,21 @@ const float PI = 3.14159;
 void main()
 {
     vec3 Surface = vec3(vVertex.x, waterLevel, vVertex.z);
-    FragPos = vec3(model * vec4(Surface, 1.0));
-    float distance = length(FragPos);
-    float h = amplitude*sin(-PI*distance*frequency+time);
+    SurfacePos = vec3(model * vec4(Surface, 1.0));
+    BottomPos =  vec3(model * vec4(vVertex, 1.0));
+    float h = 0.0;
+    Depth = waterLevel - vVertex.y;
+    // waves are not allowed for underground water
+    if (Depth > 0.0) {
+        float distance = length(SurfacePos);
+        h = amplitude*sin(-PI*distance*frequency+time);
+    }
 
-    Normal = mat3(transpose(inverse(model))) * vNormal;
+    // vNormal connects to the bottom normal vector.
+    // For the surface on the water level, we can expect that
+    // it points to the up direction.
+    Normal = mat3(transpose(inverse(model))) * vec3(0.0,-1.0,0.0);
     TexCoords = vTexCoord;
-    FragPos = vec3(FragPos.x, FragPos.y+h, FragPos.z);
-    gl_Position = projection * view * vec4(FragPos, 1.0);
+    SurfacePos = vec3(SurfacePos.x, SurfacePos.y+h, SurfacePos.z);
+    gl_Position = projection * view * vec4(SurfacePos, 1.0);
 }

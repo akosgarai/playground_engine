@@ -42,9 +42,11 @@ struct SpotLight {
     float quadratic;
 };
 
-in vec3 FragPos;
+in vec3 SurfacePos;
+in vec3 BottomPos;
 in vec3 Normal;
 in vec2 TexCoords;
+in float Depth;
 
 #define MAX_DIRECTION_LIGHTS 16
 #define MAX_POINT_LIGHTS 16
@@ -70,15 +72,21 @@ const float FresnelPower = 5.0;
 
 void main()
 {
-    vec3 norm = normalize(Normal);
-    vec3 viewDirection = normalize(viewPosition - FragPos);
+    vec3 normal = normalize(Normal);
+    vec3 viewDirection = normalize(viewPosition - SurfacePos);
 
     vec4 resultReflect = vec4(0);
     vec4 resultRefract = vec4(0);
     vec4 resultView = vec4(0);
+    float eta = Eta;
+    vec3 norm = normal;
+    if (viewPosition.y < SurfacePos.y) {
+        eta = 1.0 / Eta;
+    }
+
 
     vec3 reflectDir = reflect(viewDirection, norm);
-    vec3 refractDir = refract(viewDirection, norm, Eta);
+    vec3 refractDir = refract(viewDirection, norm, eta);
 
     // calculate Directional lighting
     int nrDirLight = min(NumberOfDirectionalLightSources, MAX_DIRECTION_LIGHTS);
@@ -90,25 +98,24 @@ void main()
     // calculate Point lighting
     int nrPointLight = min(NumberOfPointLightSources, MAX_POINT_LIGHTS);
     for (int i = 0; i < nrPointLight; i++) {
-        resultView += CalculatePointLight(pointLight[i], norm, FragPos, viewDirection);
-        resultReflect += CalculatePointLight(pointLight[i], norm, FragPos, reflectDir);
-        resultRefract += CalculatePointLight(pointLight[i], norm, FragPos, refractDir);
+        resultView += CalculatePointLight(pointLight[i], norm, SurfacePos, viewDirection);
+        resultReflect += CalculatePointLight(pointLight[i], norm, BottomPos, reflectDir);
+        resultRefract += CalculatePointLight(pointLight[i], norm, BottomPos, refractDir);
     }
     // calculate spot lighting
     int nrSpotLight = min(NumberOfSpotLightSources, MAX_SPOT_LIGHTS);
     for (int i = 0; i < nrSpotLight; i++) {
-        resultView += CalculateSpotLight(spotLight[i], norm, FragPos, viewDirection);
-        resultReflect += CalculateSpotLight(spotLight[i], norm, FragPos, reflectDir);
-        resultRefract += CalculateSpotLight(spotLight[i], norm, FragPos, refractDir);
+        resultView += CalculateSpotLight(spotLight[i], norm, SurfacePos, viewDirection);
+        resultReflect += CalculateSpotLight(spotLight[i], norm, BottomPos, reflectDir);
+        resultRefract += CalculateSpotLight(spotLight[i], norm, BottomPos, refractDir);
     }
-    float F = ((1.0-Eta) * (1.0-Eta)) / ((1.0+Eta) * (1.0+Eta));
-    float Ratio = F + (1.0 - F) * pow((1.0 - dot(-viewDirection, norm)), FresnelPower);
-    float RatioRl = F + (1.0 - F) * pow((1.0 - dot(-reflectDir, norm)), FresnelPower);
-    float RatioRr = F + (1.0 - F) * pow((1.0 - dot(-refractDir, norm)), FresnelPower);
-    vec4 rr = mix(resultView, resultView+resultRefract,RatioRr);
-    vec4 rl = mix(resultView, resultView+resultReflect,RatioRl);
-    vec4 mixed = mix(rr, rl, Ratio);
-    FragColor = mix(resultView,resultView+mixed, dot(-viewDirection, norm));
+    FragColor = resultView;
+    if (Depth > 0.0) {
+        float F = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
+        float Ratio = F + (1.0 - F) * pow((1.0 - dot(-viewDirection, norm)), FresnelPower);
+        vec4 mixed = mix(resultRefract, resultReflect, Ratio);
+        FragColor = vec4(vec3(mixed), mixed.w/(resultView.w+mixed.w));
+    }
 }
 
 // calculates the color when using a directional light.
