@@ -45,6 +45,27 @@ func min(a, b int) int {
 	return b
 }
 
+type Liquid struct {
+	Model
+	heightMap     [][]float32
+	width, length int
+	debugMode     bool
+}
+
+// GetLiquid returns the liquid mesh
+func (l *Liquid) GetLiquid() interfaces.Mesh {
+	return l.meshes[0]
+}
+
+// CollideTestWithSphere is the collision detection function for liquid vs sphere.
+func (l *Liquid) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
+	return false
+}
+
+// Update function does nothing.
+func (l *Liquid) Update(dt float64) {
+}
+
 type Terrain struct {
 	Model
 	heightMap     [][]float32
@@ -130,24 +151,37 @@ type TerrainBuilder struct {
 	cliffProbability          int
 	wrapper                   interfaces.GLWrapper
 	tex                       texture.Textures
+	liquidTex                 texture.Textures
 	scale                     mgl32.Vec3
 	debugMode                 bool
+	position                  mgl32.Vec3
+	liquidAmplitude           float32
+	liquidFrequency           float32
+	liquidEta                 float32
+	liquidWaterLevel          float32
+	liquidDetailMultiplier    int
 }
 
 // NewTerrainBuilder returns a TerrainBuilder with default settings.
 func NewTerrainBuilder() *TerrainBuilder {
 	return &TerrainBuilder{
-		width:            defaultTerrainWidth,
-		length:           defaultTerrainLength,
-		iterations:       defaultIterations,
-		minH:             defaultMinHeight,
-		maxH:             defaultMaxHeight,
-		seed:             defaultSeed,
-		minHIsDefault:    false,
-		peakProbability:  0,
-		cliffProbability: 0,
-		scale:            mgl32.Vec3{1, 1, 1},
-		debugMode:        false,
+		width:                  defaultTerrainWidth,
+		length:                 defaultTerrainLength,
+		iterations:             defaultIterations,
+		minH:                   defaultMinHeight,
+		maxH:                   defaultMaxHeight,
+		seed:                   defaultSeed,
+		minHIsDefault:          false,
+		peakProbability:        0,
+		cliffProbability:       0,
+		scale:                  mgl32.Vec3{1, 1, 1},
+		debugMode:              false,
+		position:               mgl32.Vec3{0, 0, 0},
+		liquidEta:              0.0,
+		liquidAmplitude:        0.0,
+		liquidFrequency:        0.0,
+		liquidWaterLevel:       0.0,
+		liquidDetailMultiplier: 1,
 	}
 }
 
@@ -211,39 +245,98 @@ func (t *TerrainBuilder) SetScale(s mgl32.Vec3) {
 	t.scale = s
 }
 
+// SetPosition sets the position.
+func (t *TerrainBuilder) SetPosition(p mgl32.Vec3) {
+	t.position = p
+}
+
 //SetDebugMode updates the debug flag
 func (t *TerrainBuilder) SetDebugMode(v bool) {
 	t.debugMode = v
 }
 
-// GrassTexture sets the texture to grass.
-func (t *TerrainBuilder) GrassTexture() {
+// SetLiquidEta sets the liquidEta.
+func (t *TerrainBuilder) SetLiquidEta(e float32) {
+	t.liquidEta = e
+}
+
+// SetLiquidAmplitude sets the liquidAmplitude.
+func (t *TerrainBuilder) SetLiquidAmplitude(a float32) {
+	t.liquidAmplitude = a
+}
+
+// SetLiquidFrequency sets the liquidFrequency.
+func (t *TerrainBuilder) SetLiquidFrequency(f float32) {
+	t.liquidFrequency = f
+}
+
+// SetLiquidWaterLevel sets the liquidWaterLevel.
+func (t *TerrainBuilder) SetLiquidWaterLevel(f float32) {
+	t.liquidWaterLevel = f
+}
+
+// SetLiquidDetailMultiplier sets the liquidDetailMultiplier.
+func (t *TerrainBuilder) SetLiquidDetailMultiplier(f int) {
+	t.liquidDetailMultiplier = f
+}
+
+// SurfaceTextureGrass sets the surface texture to grass.
+func (t *TerrainBuilder) SurfaceTextureGrass() {
 	_, filename, _, _ := runtime.Caller(1)
 	fileDir := path.Dir(filename)
 	t.tex.AddTexture(fileDir+"/assets/grass.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", t.wrapper)
 	t.tex.AddTexture(fileDir+"/assets/grass.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", t.wrapper)
 }
 
-// It sets the default values to the map. By default, it is 0, but if we set the
-// minHIsDefault flag then the minH value is used as default.
-func (t *TerrainBuilder) initHeightMap() {
-	defaultHeight := float32(0.0)
-	if t.minHIsDefault {
-		defaultHeight = t.minH
-	}
-	t.heightMap = make([][]float32, t.length+1)
-	for l := 0; l <= t.length; l++ {
-		t.heightMap[l] = make([]float32, t.width+1)
-	}
-	for l := 0; l <= t.length; l++ {
-		for w := 0; w <= t.width; w++ {
-			t.heightMap[l][w] = defaultHeight
-		}
-	}
+// LiquidTextureWater sets the liquid texture to water.
+func (t *TerrainBuilder) LiquidTextureWater() {
+	_, filename, _, _ := runtime.Caller(1)
+	fileDir := path.Dir(filename)
+	t.liquidTex.AddTexture(fileDir+"/assets/water.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", t.wrapper)
+	t.liquidTex.AddTexture(fileDir+"/assets/water.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", t.wrapper)
 }
 
-// buildHeightMap sets the final values of the height map.
-func (t *TerrainBuilder) buildHeightMap() {
+// It sets the default values to the map.
+func (t *TerrainBuilder) initHeightMap(width, length int, defaultHeight float32) [][]float32 {
+	heightMap := make([][]float32, length+1)
+	for l := 0; l <= length; l++ {
+		heightMap[l] = make([]float32, width+1)
+	}
+	for l := 0; l <= length; l++ {
+		for w := 0; w <= width; w++ {
+			heightMap[l][w] = defaultHeight
+		}
+	}
+	return heightMap
+}
+
+// It creates the heightmap for the liquid surface. The width, length is calculated from
+// the terrain map and the given scale values. The height value calculation uses the same
+// interpolation logic as the HeightAtPos function.
+func (t *TerrainBuilder) initHeightMapLiquid(scaleX, scaleZ int, waterLevel float32) [][]float32 {
+	width := t.width * scaleX
+	length := t.length * scaleZ
+	heightMap := make([][]float32, length+1)
+	for l := 0; l <= length; l++ {
+		heightMap[l] = make([]float32, width+1)
+	}
+	for l := 0; l < t.length; l++ {
+		for w := 0; w < t.width; w++ {
+			for sL := 0; sL < scaleZ; sL++ {
+				for sW := 0; sW < scaleX; sW++ {
+					sdZ := float32(sL) * float32(1.0) / float32(scaleZ)
+					sdX := float32(sW) * float32(1.0) / float32(scaleX)
+					height := (t.heightMap[l+1][w]*(1.0-sdX)+t.heightMap[l+1][w+1]*sdX)*sdZ + (t.heightMap[l][w]*(1.0-sdX)+t.heightMap[l][w+1]*sdX)*(1-sdZ)
+					heightMap[l*(scaleZ-1)+sL][w*(scaleX-1)+sW] = waterLevel - height
+				}
+			}
+		}
+	}
+	return heightMap
+}
+
+// buildTerrainHeightMap sets the final values of the height map.
+func (t *TerrainBuilder) buildTerrainHeightMap() {
 	iterationStep := (t.maxH - t.minH) / float32(t.iterations)
 	if t.debugMode {
 		fmt.Printf("Setup random seed to '%d'.\n", t.seed)
@@ -254,9 +347,9 @@ func (t *TerrainBuilder) buildHeightMap() {
 		defaultHeight = t.minH
 	}
 	if t.debugMode {
-		fmt.Printf("TerrainBuilder.buildHeightMap defaultHeight '%f'.\n", defaultHeight)
-		fmt.Printf("TerrainBuilder.buildHeightMap iterations '%d'.\n", t.iterations)
-		fmt.Printf("TerrainBuilder.buildHeightMap peakProbability '%d'.\n", t.peakProbability)
+		fmt.Printf("TerrainBuilder.buildTerrainHeightMap defaultHeight '%f'.\n", defaultHeight)
+		fmt.Printf("TerrainBuilder.buildTerrainHeightMap iterations '%d'.\n", t.iterations)
+		fmt.Printf("TerrainBuilder.buildTerrainHeightMap peakProbability '%d'.\n", t.peakProbability)
 	}
 	for i := 0; i < t.iterations; i++ {
 		height := t.minH + float32(i)*iterationStep
@@ -267,7 +360,7 @@ func (t *TerrainBuilder) buildHeightMap() {
 				}
 				random := rand.Intn(100)
 				if t.debugMode {
-					fmt.Printf("TerrainBuilder.buildHeightMap current random: '%d'.\n", random)
+					fmt.Printf("TerrainBuilder.buildTerrainHeightMap current random: '%d'.\n", random)
 				}
 				if t.adjacentElevation(w, l, height-iterationStep) || random < t.peakProbability {
 					t.heightMap[l][w] = height
@@ -286,58 +379,55 @@ func (t *TerrainBuilder) adjacentElevation(cW, cL int, elevation float32) bool {
 	}
 	return false
 }
-func (t *TerrainBuilder) vertices() []vertex.Vertex {
-	textureCoords := [4]mgl32.Vec2{
-		{0.0, 1.0},
-		{1.0, 1.0},
-		{1.0, 0.0},
-		{0.0, 0.0},
-	}
+func (t *TerrainBuilder) vertices(width, length, textureWidth, textureHeight int, heightMap [][]float32) []vertex.Vertex {
+	textureStepX := float32(1.0) / float32(textureWidth)
+	textureStepY := float32(1.0) / float32(textureHeight)
 	var vertices vertex.Vertices
-	for l := 0; l <= t.length; l++ {
-		for w := 0; w <= t.width; w++ {
-			texIndex := (w % 2) + (l%2)*2
+	for l := 0; l <= length; l++ {
+		for w := 0; w <= width; w++ {
+			textureModX := w % (textureWidth + 1)
+			textureModY := l % (textureHeight + 1)
 			var iL, iW int
-			if l == t.length {
+			if l == length {
 				iL = l
 			} else {
 				iL = l + 1
 			}
-			if w == t.width {
+			if w == width {
 				iW = w
 			} else {
 				iW = w + 1
 			}
 			currentPos := mgl32.Vec3{
-				-float32(t.width)/2.0 + float32(w),
-				t.heightMap[l][w],
-				-float32(t.length)/2.0 + float32(l)}
+				-float32(width)/2.0 + float32(w),
+				heightMap[l][w],
+				-float32(length)/2.0 + float32(l)}
 			nextPosX := mgl32.Vec3{
-				-float32(t.width)/2.0 + float32(iW),
-				t.heightMap[l][iW],
-				-float32(t.length)/2.0 + float32(l)}
+				-float32(width)/2.0 + float32(iW),
+				heightMap[l][iW],
+				-float32(length)/2.0 + float32(l)}
 			nextPosY := mgl32.Vec3{
-				-float32(t.width)/2.0 + float32(w),
-				t.heightMap[iL][w],
-				-float32(t.length)/2.0 + float32(iL)}
+				-float32(width)/2.0 + float32(w),
+				heightMap[iL][w],
+				-float32(length)/2.0 + float32(iL)}
 			normal := nextPosX.Sub(currentPos).Cross(nextPosY.Sub(currentPos)).Normalize()
 			vertices = append(vertices, vertex.Vertex{
 				Position:  currentPos,
 				Normal:    normal,
-				TexCoords: textureCoords[texIndex],
+				TexCoords: mgl32.Vec2{float32(textureModX) * textureStepX, float32(textureModY) * textureStepY},
 			})
 		}
 	}
 
 	return vertices
 }
-func (t *TerrainBuilder) indices() []uint32 {
+func (t *TerrainBuilder) indices(width, length int) []uint32 {
 	var indices []uint32
-	for w := 0; w < t.width; w++ {
-		for l := 0; l < t.length; l++ {
-			i0 := uint32(w*(t.length+1) + l)
+	for w := 0; w < width; w++ {
+		for l := 0; l < length; l++ {
+			i0 := uint32(w*(length+1) + l)
 			i1 := uint32(1) + i0
-			i2 := uint32(t.length+1) + i0
+			i2 := uint32(length+1) + i0
 			i3 := uint32(1) + i2
 			indices = append(indices, i0)
 			indices = append(indices, i1)
@@ -353,19 +443,63 @@ func (t *TerrainBuilder) indices() []uint32 {
 
 // Build returns a Terrain
 func (t *TerrainBuilder) Build() *Terrain {
-	t.initHeightMap()
-	if t.debugMode {
-		fmt.Printf("TerrainBuilder.heightMap after init:\n'%v'\n", t.heightMap)
+	return t.buildTerrain()
+}
+
+// BuildWithLiquid returns a Terrain and a Liquid that is generated for the terrain.
+func (t *TerrainBuilder) BuildWithLiquid() (*Terrain, *Liquid) {
+	return t.buildTerrain(), t.buildLiquid()
+}
+func (t *TerrainBuilder) buildTerrain() *Terrain {
+	defaultHeight := float32(0.0)
+	if t.minHIsDefault {
+		defaultHeight = t.minH
 	}
-	t.buildHeightMap()
+	t.heightMap = t.initHeightMap(t.width, t.length, defaultHeight)
+	if t.debugMode {
+		fmt.Printf("TerrainBuilder.buildTerrain.heightMap after init:\n'%v'\n", t.heightMap)
+	}
+	t.buildTerrainHeightMap()
 	if t.debugMode {
 		fmt.Printf("TerrainBuilder.heightMap after build:\n'%v'\n", t.heightMap)
 	}
-	v := t.vertices()
-	i := t.indices()
+	v := t.vertices(t.width, t.length, 1, 1, t.heightMap)
+	i := t.indices(t.width, t.length)
 	terrainMesh := mesh.NewTexturedMesh(v, i, t.tex, t.wrapper)
 	terrainMesh.SetScale(t.scale)
+	terrainMesh.SetPosition(t.position)
 	m := newModel()
 	m.AddMesh(terrainMesh)
 	return &Terrain{Model: *m, heightMap: t.heightMap, width: t.width, length: t.length, debugMode: t.debugMode}
+}
+
+func (t *TerrainBuilder) buildLiquid() *Liquid {
+	waterWidth := t.width * int(t.scale.X()) * t.liquidDetailMultiplier
+	waterLength := t.length * int(t.scale.Z()) * t.liquidDetailMultiplier
+	waterHeightMap := t.initHeightMapLiquid(int(t.scale.X())*t.liquidDetailMultiplier, int(t.scale.Z())*t.liquidDetailMultiplier, t.liquidWaterLevel)
+	if t.debugMode {
+		fmt.Printf("TerrainBuilder.buildLiquid.heightMap after init:\n'%v'\n", waterHeightMap)
+	}
+	v := t.vertices(waterWidth, waterLength, waterWidth, waterLength, waterHeightMap)
+	i := t.indices(waterWidth, waterLength)
+	liquidMesh := mesh.NewTexturedMesh(v, i, t.liquidTex, t.wrapper)
+	scaleValue := float32(1.0) / float32(t.liquidDetailMultiplier)
+	liquidMesh.SetScale(mgl32.Vec3{scaleValue, 1.0, scaleValue})
+	liquidMesh.SetPosition(mgl32.Vec3{t.position.X(), t.position.Y() + t.liquidWaterLevel, t.position.Z()})
+
+	m := newModel()
+	m.AddMesh(liquidMesh)
+	m.SetTransparent(true)
+	m.SetUniformFloat("Eta", t.liquidEta)
+	m.SetUniformFloat("amplitude", t.liquidAmplitude)
+	m.SetUniformFloat("frequency", t.liquidFrequency)
+	m.SetUniformFloat("waterLevel", t.liquidWaterLevel)
+
+	return &Liquid{
+		Model:     *m,
+		heightMap: waterHeightMap,
+		width:     waterWidth,
+		length:    waterLength,
+		debugMode: t.debugMode,
+	}
 }

@@ -82,6 +82,9 @@ func TestDraw(t *testing.T) {
 		msh := mesh.NewPointMesh(wrapperMock)
 		model.AddMesh(msh)
 		model.Draw(shaderMock)
+		model.SetUniformFloat("name", float32(0.1))
+		model.SetUniformVector("name", mgl32.Vec3{0.0, 1.0, 1.0})
+		model.Draw(shaderMock)
 	}()
 }
 func TestSetSpeed(t *testing.T) {
@@ -251,6 +254,56 @@ func TestExport(t *testing.T) {
 		}()
 		model := New()
 		model.Export("invalid-path")
+	}()
+}
+func TestSetUniformFloat(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("SetUniformFloat shouldn't have panic.")
+			}
+		}()
+		model := New()
+		testData := []struct {
+			key   string
+			value float32
+		}{
+			{"testName", float32(0.0)},
+			{"testName2", float32(1.0)},
+			{"testName", float32(1.0)},
+		}
+		for _, tt := range testData {
+			model.SetUniformFloat(tt.key, tt.value)
+			if model.uniformFloat[tt.key] != tt.value {
+				t.Errorf("Invalud uniform value for key '%s'. Instead of '%f', we have '%f'.", tt.key, tt.value, model.uniformFloat[tt.key])
+			}
+		}
+
+	}()
+}
+func TestSetUniformVector(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("SetUniformVector shouldn't have panic.")
+			}
+		}()
+		model := New()
+		testData := []struct {
+			key   string
+			value mgl32.Vec3
+		}{
+			{"testName", mgl32.Vec3{0.0, 0.0, 0.0}},
+			{"testName2", mgl32.Vec3{0.0, 1.0, 0.0}},
+			{"testName", mgl32.Vec3{1.0, 0.0, 1.0}},
+		}
+		for _, tt := range testData {
+			model.SetUniformVector(tt.key, tt.value)
+			if model.uniformVector[tt.key] != tt.value {
+				t.Errorf("Invalud uniform value for key '%s'. Instead of '%v', we have '%v'.", tt.key, tt.value, model.uniformVector[tt.key])
+			}
+		}
+
 	}()
 }
 func TestBug(t *testing.T) {
@@ -521,6 +574,22 @@ func TestTerrainBuilderSetSeed(t *testing.T) {
 		t.Errorf("Invalid seed. Instead of '%d', we have '%d'.", seed, terr.seed)
 	}
 }
+func TestTerrainBuilderSetScale(t *testing.T) {
+	scale := mgl32.Vec3{2, 2, 2}
+	terr := NewTerrainBuilder()
+	terr.SetScale(scale)
+	if terr.scale != scale {
+		t.Errorf("Invalid scale. Instead of '%v', we have '%v'.", scale, terr.scale)
+	}
+}
+func TestTerrainBuilderSetPosition(t *testing.T) {
+	position := mgl32.Vec3{2, 2, 2}
+	terr := NewTerrainBuilder()
+	terr.SetPosition(position)
+	if terr.position != position {
+		t.Errorf("Invalid position. Instead of '%v', we have '%v'.", position, terr.position)
+	}
+}
 func TestTerrainBuilderRandomSeed(t *testing.T) {
 	before := time.Now().UnixNano()
 	terr := NewTerrainBuilder()
@@ -565,14 +634,14 @@ func TestTerrainBuilderSetGlWrapper(t *testing.T) {
 		t.Error("Invalid gl wrapper")
 	}
 }
-func TestTerrainBuilderGrassTexture(t *testing.T) {
+func TestTerrainBuilderSurfaceTextureGrass(t *testing.T) {
 	var wrapper testhelper.GLWrapperMock
 	terr := NewTerrainBuilder()
 	terr.SetGlWrapper(wrapper)
 	if len(terr.tex) != 0 {
 		t.Errorf("Invalid texture length. Instead of '0', we have '%d'.", len(terr.tex))
 	}
-	terr.GrassTexture()
+	terr.SurfaceTextureGrass()
 	if len(terr.tex) != 2 {
 		t.Errorf("Invalid texture length. Instead of '2', we have '%d'.", len(terr.tex))
 	}
@@ -585,7 +654,7 @@ func TestTerrainBuilderInitHeightMap(t *testing.T) {
 	terr.SetLength(length)
 	terr.SetWidth(width)
 	terr.SetMinHeight(minH)
-	terr.initHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
 	for l := 0; l < terr.length; l++ {
 		for w := 0; w < terr.width; w++ {
 			if terr.heightMap[l][w] != 0.0 {
@@ -594,7 +663,7 @@ func TestTerrainBuilderInitHeightMap(t *testing.T) {
 		}
 	}
 	terr.MinHeightIsDefault(true)
-	terr.initHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, terr.minH)
 	for l := 0; l < terr.length; l++ {
 		for w := 0; w < terr.width; w++ {
 			if terr.heightMap[l][w] != -2.0 {
@@ -628,16 +697,16 @@ func TestTerrainBuilderBuildHeightMap(t *testing.T) {
 	terr.SetSeed(seed)
 	terr.SetPeakProbability(peakProb)
 	terr.SetCliffProbability(cliffProb)
-	terr.initHeightMap()
-	terr.buildHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
+	terr.buildTerrainHeightMap()
 	if !reflect.DeepEqual(terr.heightMap, expected) {
 		t.Error("Invalid heightmap")
 		t.Log(terr.heightMap)
 		t.Log(expected)
 	}
 	terr.MinHeightIsDefault(true)
-	terr.initHeightMap()
-	terr.buildHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, terr.minH)
+	terr.buildTerrainHeightMap()
 }
 func TestTerrainBuilderAdjacentElevation(t *testing.T) {
 	length := 4
@@ -664,8 +733,8 @@ func TestTerrainBuilderAdjacentElevation(t *testing.T) {
 	terr.SetSeed(seed)
 	terr.SetPeakProbability(peakProb)
 	terr.SetCliffProbability(cliffProb)
-	terr.initHeightMap()
-	terr.buildHeightMap()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
+	terr.buildTerrainHeightMap()
 	if !reflect.DeepEqual(terr.heightMap, expected) {
 		t.Error("Invalid heightmap")
 		t.Log(terr.heightMap)
@@ -690,9 +759,9 @@ func TestTerrainBuilderVertices(t *testing.T) {
 	terr.SetSeed(seed)
 	terr.SetPeakProbability(peakProb)
 	terr.SetCliffProbability(cliffProb)
-	terr.initHeightMap()
-	terr.buildHeightMap()
-	v := terr.vertices()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
+	terr.buildTerrainHeightMap()
+	v := terr.vertices(terr.width, terr.length, 1, 1, terr.heightMap)
 	if len(v) != (length+1)*(width+1) {
 		t.Errorf("Invalid vertices length. Instead of '%d', we have '%d'.", length*width, len(v))
 	}
@@ -715,9 +784,9 @@ func TestTerrainBuilderIndices(t *testing.T) {
 	terr.SetSeed(seed)
 	terr.SetPeakProbability(peakProb)
 	terr.SetCliffProbability(cliffProb)
-	terr.initHeightMap()
-	terr.buildHeightMap()
-	i := terr.indices()
+	terr.heightMap = terr.initHeightMap(terr.width, terr.length, 0.0)
+	terr.buildTerrainHeightMap()
+	i := terr.indices(terr.width, terr.length)
 	if len(i) != length*width*6 {
 		t.Errorf("Invalid indices length. Instead of '%d', we have '%d'.", length*width*6, len(i))
 	}
@@ -751,11 +820,98 @@ func TestTerrainBuilderBuild(t *testing.T) {
 		t.Log(terr)
 	}()
 }
+func TestTerrainBuilderBuildTerrain(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing textures.")
+			}
+		}()
+		length := 5
+		width := 5
+		iteration := 10
+		minH := float32(-1.0)
+		maxH := float32(3.0)
+		seed := int64(0)
+		peakProb := 5
+		cliffProb := 5
+		tb := NewTerrainBuilder()
+		tb.SetLength(length)
+		tb.SetWidth(width)
+		tb.SetMinHeight(minH)
+		tb.SetMaxHeight(maxH)
+		tb.SetIterations(iteration)
+		tb.SetSeed(seed)
+		tb.SetPeakProbability(peakProb)
+		tb.SetCliffProbability(cliffProb)
+		tb.SetDebugMode(true)
+		terr := tb.buildTerrain()
+		t.Log(terr)
+	}()
+}
+func TestTerrainBuilderBuildWithLiquid(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing textures.")
+			}
+		}()
+		length := 5
+		width := 5
+		iteration := 10
+		minH := float32(-1.0)
+		maxH := float32(3.0)
+		seed := int64(0)
+		peakProb := 5
+		cliffProb := 5
+		tb := NewTerrainBuilder()
+		tb.SetLength(length)
+		tb.SetWidth(width)
+		tb.SetMinHeight(minH)
+		tb.SetMaxHeight(maxH)
+		tb.SetIterations(iteration)
+		tb.SetSeed(seed)
+		tb.SetPeakProbability(peakProb)
+		tb.SetCliffProbability(cliffProb)
+		tb.SetDebugMode(true)
+		terr, water := tb.BuildWithLiquid()
+		t.Log(terr, water)
+	}()
+}
+func TestTerrainBuilderBuildLiquid(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing textures.")
+			}
+		}()
+		length := 5
+		width := 5
+		iteration := 10
+		minH := float32(-1.0)
+		maxH := float32(3.0)
+		seed := int64(0)
+		peakProb := 5
+		cliffProb := 5
+		tb := NewTerrainBuilder()
+		tb.SetLength(length)
+		tb.SetWidth(width)
+		tb.SetMinHeight(minH)
+		tb.SetMaxHeight(maxH)
+		tb.SetIterations(iteration)
+		tb.SetSeed(seed)
+		tb.SetPeakProbability(peakProb)
+		tb.SetCliffProbability(cliffProb)
+		tb.SetDebugMode(true)
+		water := tb.buildLiquid()
+		t.Log(water)
+	}()
+}
 func TestTerrainHeightAtPos(t *testing.T) {
 	tb := NewTerrainBuilder()
 	tb.SetScale(mgl32.Vec3{2, 1, 2})
 	tb.SetGlWrapper(wrapperMock)
-	tb.GrassTexture()
+	tb.SurfaceTextureGrass()
 	terrain := tb.Build()
 	terrain.heightMap = [][]float32{
 		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -810,7 +966,7 @@ func TestTerrainCollideTestWithSphere(t *testing.T) {
 	tb := NewTerrainBuilder()
 	tb.SetScale(mgl32.Vec3{2, 1, 2})
 	tb.SetGlWrapper(wrapperMock)
-	tb.GrassTexture()
+	tb.SurfaceTextureGrass()
 	terrain := tb.Build()
 	terrain.heightMap = [][]float32{
 		[]float32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -863,5 +1019,72 @@ func TestTerrainCollideTestWithSphere(t *testing.T) {
 		if result != v.collide {
 			t.Errorf("Invalid collision.\nPosition:\t'%v'\nRadius:\t'%f'\nExpected:\t'%v'", v.position, v.radius, v.collide)
 		}
+	}
+}
+func TestLiquidCollideTestWithSphere(t *testing.T) {
+	tb := NewTerrainBuilder()
+	tb.SetScale(mgl32.Vec3{2, 1, 2})
+	tb.SetGlWrapper(wrapperMock)
+	tb.SurfaceTextureGrass()
+	tb.LiquidTextureWater()
+	_, water := tb.BuildWithLiquid()
+	testData := []struct {
+		position [3]float32
+		radius   float32
+		collide  bool
+	}{
+		{[3]float32{15, 0, 15}, 1, false},
+		{[3]float32{11, 0, 10}, 1, false},
+		{[3]float32{10.2, 0, 10}, 1, false},
+		{[3]float32{10.000002, 0, 10}, 1, false},
+		{[3]float32{2, 2.1, 8}, 1, false},
+		{[3]float32{2, 1.9, 8}, 1, false},
+	}
+	for _, v := range testData {
+		bs := coldet.NewBoundingSphere(v.position, v.radius)
+		result := water.CollideTestWithSphere(bs)
+		if result != v.collide {
+			t.Errorf("Invalid collision.\nPosition:\t'%v'\nRadius:\t'%f'\nExpected:\t'%v'", v.position, v.radius, v.collide)
+		}
+	}
+}
+func TestTerrainBuilderSetLiquidEta(t *testing.T) {
+	eta := float32(1)
+	terr := NewTerrainBuilder()
+	terr.SetLiquidEta(eta)
+	if terr.liquidEta != eta {
+		t.Errorf("Invalid liquid eta. Instead of '%f', we have '%f'.", eta, terr.liquidEta)
+	}
+}
+func TestTerrainBuilderSetLiquidAmplitude(t *testing.T) {
+	ampl := float32(1)
+	terr := NewTerrainBuilder()
+	terr.SetLiquidAmplitude(ampl)
+	if terr.liquidAmplitude != ampl {
+		t.Errorf("Invalid liquid amplitude. Instead of '%f', we have '%f'.", ampl, terr.liquidAmplitude)
+	}
+}
+func TestTerrainBuilderSetLiquidFrequency(t *testing.T) {
+	freq := float32(1)
+	terr := NewTerrainBuilder()
+	terr.SetLiquidFrequency(freq)
+	if terr.liquidFrequency != freq {
+		t.Errorf("Invalid liquid frequency. Instead of '%f', we have '%f'.", freq, terr.liquidFrequency)
+	}
+}
+func TestTerrainBuilderSetLiquidWaterLevel(t *testing.T) {
+	wl := float32(1)
+	terr := NewTerrainBuilder()
+	terr.SetLiquidWaterLevel(wl)
+	if terr.liquidWaterLevel != wl {
+		t.Errorf("Invalid liquid waterlevel. Instead of '%f', we have '%f'.", wl, terr.liquidWaterLevel)
+	}
+}
+func TestTerrainBuilderSetLiquidDetailMultiplier(t *testing.T) {
+	dm := 3
+	terr := NewTerrainBuilder()
+	terr.SetLiquidDetailMultiplier(dm)
+	if terr.liquidDetailMultiplier != dm {
+		t.Errorf("Invalid liquid detail multiplier. Instead of '%d', we have '%d'.", dm, terr.liquidDetailMultiplier)
 	}
 }
