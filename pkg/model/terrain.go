@@ -297,6 +297,30 @@ func (t *TerrainBuilder) initHeightMap(width, length int, defaultHeight float32)
 	return heightMap
 }
 
+// It creates the heightmap for the liquid surface. The height value has to be the difference
+// between the waterlevel and the height of terrain in that position.
+func (t *TerrainBuilder) initHeightMapLiquid(scaleX, scaleZ int, waterLevel float32) [][]float32 {
+	width := t.width * scaleX
+	length := t.length * scaleZ
+	heightMap := make([][]float32, length+1)
+	for l := 0; l <= length; l++ {
+		heightMap[l] = make([]float32, width+1)
+	}
+	for l := 0; l < t.length; l++ {
+		for w := 0; w < t.width; w++ {
+			for sL := 0; sL < scaleZ; sL++ {
+				for sW := 0; sW < scaleX; sW++ {
+					sdZ := float32(sL) * float32(1.0) / float32(scaleZ)
+					sdX := float32(sW) * float32(1.0) / float32(scaleX)
+					height := (t.heightMap[l+1][w]*(1.0-sdX)+t.heightMap[l+1][w+1]*sdX)*sdZ + (t.heightMap[l][w]*(1.0-sdX)+t.heightMap[l][w+1]*sdX)*(1-sdZ)
+					heightMap[l*(scaleZ-1)+sL][w*(scaleX-1)+sW] = waterLevel - height
+				}
+			}
+		}
+	}
+	return heightMap
+}
+
 // buildTerrainHeightMap sets the final values of the height map.
 func (t *TerrainBuilder) buildTerrainHeightMap() {
 	iterationStep := (t.maxH - t.minH) / float32(t.iterations)
@@ -440,7 +464,7 @@ func (t *TerrainBuilder) buildLiquid() *Liquid {
 	waterMultiplier := 10
 	waterWidth := t.width * int(t.scale.X()) * waterMultiplier
 	waterLength := t.length * int(t.scale.Z()) * waterMultiplier
-	waterHeightMap := t.initHeightMap(waterWidth, waterLength, waterTopLevel)
+	waterHeightMap := t.initHeightMapLiquid(int(t.scale.X())*waterMultiplier, int(t.scale.Z())*waterMultiplier, waterTopLevel)
 	if t.debugMode {
 		fmt.Printf("TerrainBuilder.buildLiquid.heightMap after init:\n'%v'\n", waterHeightMap)
 	}
@@ -457,6 +481,7 @@ func (t *TerrainBuilder) buildLiquid() *Liquid {
 	m.SetUniformFloat("Eta", t.liquidEta)
 	m.SetUniformFloat("amplitude", t.liquidAmplitude)
 	m.SetUniformFloat("frequency", t.liquidFrequency)
+	m.SetUniformFloat("waterLevel", waterTopLevel)
 
 	return &Liquid{
 		Model:     *m,

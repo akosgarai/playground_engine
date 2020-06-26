@@ -14,12 +14,14 @@ uniform float time;
 uniform vec3 viewPosition;
 uniform float amplitude;
 uniform float frequency;
+uniform float waterLevel;
 
 const float PI = 3.14159;
 
 void main()
 {
-    FragPos = vec3(model * vec4(vVertex, 1.0));
+    vec3 Surface = vec3(vVertex.x, waterLevel, vVertex.z)
+    FragPos = vec3(model * vec4(Surface, 1.0));
     float distance = length(FragPos);
     float h = amplitude*sin(-PI*distance*frequency+time);
 
