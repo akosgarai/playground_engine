@@ -20,7 +20,7 @@ const float PI = 3.14159;
 
 void main()
 {
-    vec3 Surface = vec3(vVertex.x, waterLevel, vVertex.z)
+    vec3 Surface = vec3(vVertex.x, waterLevel, vVertex.z);
     FragPos = vec3(model * vec4(Surface, 1.0));
     float distance = length(FragPos);
     float h = amplitude*sin(-PI*distance*frequency+time);
