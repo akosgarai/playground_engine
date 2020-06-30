@@ -59,17 +59,7 @@ func (t *Texture) UnBind() {
 
 type Textures []*Texture
 
-func (t *Textures) AddTexture(filePath string, wrapR, wrapS, minificationFilter, magnificationFilter int32, uniformName string, wrapper interfaces.GLWrapper) {
-	img, err := loadImageFromFile(filePath)
-	if err != nil {
-		panic(err)
-	}
-	rgba := image.NewRGBA(img.Bounds())
-	draw.Draw(rgba, rgba.Bounds(), img, image.Pt(0, 0), draw.Src)
-	if rgba.Stride != rgba.Rect.Size().X*4 {
-		panic("not 32 bit color")
-	}
-
+func (t *Textures) AddTextureRGBA(filePath string, rgba *image.RGBA, wrapR, wrapS, minificationFilter, magnificationFilter int32, uniformName string, wrapper interfaces.GLWrapper) {
 	tex := &Texture{
 		TextureName: genTextures(wrapper),
 		TargetId:    glwrapper.TEXTURE_2D,
@@ -92,6 +82,18 @@ func (t *Textures) AddTexture(filePath string, wrapR, wrapS, minificationFilter,
 	tex.Wrapper.GenerateMipmap(tex.TextureName)
 
 	*t = append(*t, tex)
+}
+func (t *Textures) AddTexture(filePath string, wrapR, wrapS, minificationFilter, magnificationFilter int32, uniformName string, wrapper interfaces.GLWrapper) {
+	img, err := loadImageFromFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+	rgba := image.NewRGBA(img.Bounds())
+	draw.Draw(rgba, rgba.Bounds(), img, image.Pt(0, 0), draw.Src)
+	if rgba.Stride != rgba.Rect.Size().X*4 {
+		panic("not 32 bit color")
+	}
+	t.AddTextureRGBA(filePath, rgba, wrapR, wrapS, minificationFilter, magnificationFilter, uniformName, wrapper)
 }
 func (t *Textures) AddCubeMapTexture(directoryPath string, wrapR, wrapS, wrapT, minificationFilter, magnificationFilter int32, uniformName string, wrapper interfaces.GLWrapper) {
 	tex := &Texture{
