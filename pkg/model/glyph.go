@@ -7,8 +7,6 @@ import (
 	"image/draw"
 	"io/ioutil"
 	"os"
-	"path"
-	"runtime"
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
@@ -127,12 +125,7 @@ type Charset struct {
 	surface interfaces.Mesh
 }
 
-func basePath() string {
-	_, filename, _, _ := runtime.Caller(1)
-	return path.Dir(filename)
-}
-func LoadCharsetDebug(fontFile string, low, high rune, scale float64, dpi float64, wrapper interfaces.GLWrapper) (*Charset, error) {
-	filePath := basePath() + fontFile
+func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float64, wrapper interfaces.GLWrapper) (*Charset, error) {
 	fmt.Printf("Opening '%s'.\n", filePath)
 	fd, err := os.Open(filePath)
 	if err != nil {
@@ -159,7 +152,7 @@ func LoadCharsetDebug(fontFile string, low, high rune, scale float64, dpi float6
 			DPI:     dpi,
 			Hinting: font.HintingFull,
 		}
-		err := g.Build(ch, ttf, options, fontFile, wrapper)
+		err := g.Build(ch, ttf, options, filePath, wrapper)
 		if err != nil {
 			continue
 		}
