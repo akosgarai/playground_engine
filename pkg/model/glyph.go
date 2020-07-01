@@ -124,7 +124,7 @@ func (g *Glyph) rgba(bg *image.Uniform) *image.RGBA {
 type Charset struct {
 	*BaseModel
 	fonts   map[rune]*Glyph
-	surface *interfaces.Mesh
+	surface interfaces.Mesh
 }
 
 func basePath() string {
@@ -165,11 +165,15 @@ func LoadCharsetDebug(fontFile string, low, high rune, scale float64, dpi float6
 		}
 		fonts[ch] = g
 	}
-	return &Charset{New(), fonts}, nil
+	m := New()
+	return &Charset{
+		BaseModel: m,
+		fonts:     fonts,
+	}, nil
 }
 
 // SetSurface sets the mesh that we are using for drawing.
-func (c *Charset) SetSurface(mesh *interfaces.Mesh) {
+func (c *Charset) SetSurface(mesh interfaces.Mesh) {
 	c.surface = mesh
 }
 func (c *Charset) Print(text string, x, y, scale float32, wrapper interfaces.GLWrapper) {
