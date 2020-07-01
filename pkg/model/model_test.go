@@ -1088,3 +1088,6 @@ func TestTerrainBuilderSetLiquidDetailMultiplier(t *testing.T) {
 		t.Errorf("Invalid liquid detail multiplier. Instead of '%d', we have '%d'.", dm, terr.liquidDetailMultiplier)
 	}
 }
+func TestCharsetLoad(t *testing.T) {
+	_, _ = LoadCharsetDebug("/assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+}
