@@ -1089,6 +1089,6 @@ func TestTerrainBuilderSetLiquidDetailMultiplier(t *testing.T) {
 	}
 }
 func TestCharsetLoad(t *testing.T) {
-	_, err := LoadCharsetDebug("/assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+	_, err := LoadCharsetDebug("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
 	t.Log(err)
 }

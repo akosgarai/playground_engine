@@ -198,7 +198,7 @@ func (c *Charset) Print(text string, x, y, scale float32, wrapper interfaces.GLW
 		v, i, _ := rect.TexturedColoredMeshInput(cols)
 		position := mgl32.Vec3{x + float32(ch.BearingX+ch.Width/2)*scale, y - float32(ch.BearingY-ch.Height/2)*scale, -0.1}
 		msh := mesh.NewTexturedColoredMesh(v, i, ch.tex, cols, wrapper)
-		msh.SetPosition(position.Mul(scale))
+		msh.SetPosition(position)
 		msh.SetParent(c.surface)
 		mshStore = append(mshStore, msh)
 		fmt.Printf("pos: %#v\nch: %#v\nw: %f, h: %f, xpos: %f, ypos: %f, adv: %f\n\n", position.Mul(scale), ch, w, h, xpos, ypos, float32(ch.Advance)*scale)
