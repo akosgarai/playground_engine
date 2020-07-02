@@ -169,7 +169,7 @@ func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float6
 func (c *Charset) SetSurface(mesh interfaces.Mesh) {
 	c.surface = mesh
 }
-func (c *Charset) Print(text string, x, y, scale float32, wrapper interfaces.GLWrapper) {
+func (c *Charset) Print(text string, x, y, z, scale float32, wrapper interfaces.GLWrapper) {
 	indices := []rune(text)
 	fmt.Printf("The following text will be printed: '%s' as '%v'\n", text, indices)
 	if len(indices) == 0 {
@@ -197,7 +197,7 @@ func (c *Charset) Print(text string, x, y, scale float32, wrapper interfaces.GLW
 		}
 		v, i, _ := rect.TexturedColoredMeshInput(cols)
 		rotTr := c.surface.RotationTransformation()
-		position := mgl32.Vec3{x + float32(ch.BearingX+ch.Width/2)*scale, 0.01, y - float32(ch.BearingY-ch.Height/2)*scale}
+		position := mgl32.Vec3{x + float32(ch.BearingX+ch.Width/2)*scale, z, y - float32(ch.BearingY-ch.Height/2)*scale}
 		msh := mesh.NewTexturedColoredMesh(v, i, ch.tex, cols, wrapper)
 		msh.SetPosition(mgl32.TransformCoordinate(position, rotTr))
 		msh.SetParent(c.surface)
