@@ -300,6 +300,8 @@ func (a *Application) cameraMouseRotation(delta float64) {
 // It also handles the camera movement and rotation, if the camera is set.
 func (a *Application) Update(dt float64) {
 	MousePosX, MousePosY := a.window.GetCursorPos()
+	WindowWidth, WindowHeight := a.window.GetSize()
+	mX, mY := transformations.MouseCoordinates(MousePosX, MousePosY, float64(WindowWidth), float64(WindowHeight))
 	TransformationMatrix := mgl32.Ident4()
 	if a.cameraSet {
 		a.cameraKeyboardMovement("forward", "back", "Walk", dt)
@@ -309,9 +311,9 @@ func (a *Application) Update(dt float64) {
 		if a.rotateOnEdgeDistance > 0.0 {
 			a.cameraMouseRotation(dt)
 		}
-		TransformationMatrix = a.camera.GetProjectionMatrix().Mul4(a.camera.GetViewMatrix()).Inv()
+		TransformationMatrix = (a.camera.GetProjectionMatrix().Mul4(a.camera.GetViewMatrix())).Inv()
 	}
-	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(MousePosX), float32(MousePosY), 0.0}, TransformationMatrix)
+	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(mX), float32(mY), 0.0}, TransformationMatrix)
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
 
