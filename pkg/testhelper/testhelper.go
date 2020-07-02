@@ -145,3 +145,4 @@ func (wm WindowMock) SetMouseButtonCallback(cb glfw.MouseButtonCallback) glfw.Mo
 func (wm WindowMock) ShouldClose() bool   { return false }
 func (wm WindowMock) SwapBuffers()        {}
 func (wm WindowMock) GetSize() (int, int) { return 800, 800 }
+func (wm WindowMock) SetShouldClose(bool) {}
