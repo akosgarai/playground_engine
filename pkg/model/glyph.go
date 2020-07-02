@@ -121,8 +121,7 @@ func (g *Glyph) rgba(bg *image.Uniform) *image.RGBA {
 
 type Charset struct {
 	*BaseModel
-	fonts   map[rune]*Glyph
-	surface interfaces.Mesh
+	fonts map[rune]*Glyph
 }
 
 func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float64, wrapper interfaces.GLWrapper) (*Charset, error) {
@@ -165,11 +164,7 @@ func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float6
 	}, nil
 }
 
-// SetSurface sets the mesh that we are using for drawing.
-func (c *Charset) SetSurface(mesh interfaces.Mesh) {
-	c.surface = mesh
-}
-func (c *Charset) Print(text string, x, y, z, scale float32, wrapper interfaces.GLWrapper) {
+func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interfaces.GLWrapper, surface interfaces.Mesh) {
 	indices := []rune(text)
 	fmt.Printf("The following text will be printed: '%s' as '%v'\n", text, indices)
 	if len(indices) == 0 {
@@ -196,11 +191,11 @@ func (c *Charset) Print(text string, x, y, z, scale float32, wrapper interfaces.
 			mgl32.Vec3{0.0, 1.0, 0.0},
 		}
 		v, i, _ := rect.TexturedColoredMeshInput(cols)
-		rotTr := c.surface.RotationTransformation()
+		rotTr := surface.RotationTransformation()
 		position := mgl32.Vec3{x + float32(ch.BearingX+ch.Width/2)*scale, z, y - float32(ch.BearingY-ch.Height/2)*scale}
 		msh := mesh.NewTexturedColoredMesh(v, i, ch.tex, cols, wrapper)
 		msh.SetPosition(mgl32.TransformCoordinate(position, rotTr))
-		msh.SetParent(c.surface)
+		msh.SetParent(surface)
 		mshStore = append(mshStore, msh)
 		fmt.Printf("pos: %#v\nch: %#v\nw: %f, h: %f, xpos: %f, ypos: %f, adv: %f\n\n", position.Mul(scale), ch, w, h, xpos, ypos, float32(ch.Advance)*scale)
 		x += float32(ch.Advance) * scale
