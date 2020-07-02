@@ -1088,3 +1088,21 @@ func TestTerrainBuilderSetLiquidDetailMultiplier(t *testing.T) {
 		t.Errorf("Invalid liquid detail multiplier. Instead of '%d', we have '%d'.", dm, terr.liquidDetailMultiplier)
 	}
 }
+func TestCharsetLoad(t *testing.T) {
+	_, err := LoadCharsetDebug("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+	if err != nil {
+		t.Errorf("Error during debug load: %s\n", err.Error())
+	}
+	_, err = LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+	if err != nil {
+		t.Errorf("Error during load: %s\n", err.Error())
+	}
+}
+func TestCharsetPrintTo(t *testing.T) {
+	fonts, err := LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+	if err != nil {
+		t.Errorf("Error during load: %s\n", err.Error())
+	}
+	msh := mesh.NewPointMesh(wrapperMock)
+	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh)
+}

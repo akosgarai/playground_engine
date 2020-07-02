@@ -23,31 +23,28 @@ type Rectangle struct {
 // ratio > 1 => width is the longer -> X [-0.5, 0.5], Y [-1/(ratio*2), 1/(ratio*2)].
 // ratio < 1 => length is the longer -> X [-ratio/2, ratio/2], Y [-0.5, 0.5].
 func New(width, height float32) *Rectangle {
-	normal := mgl32.Vec3{0, -1, 0}
 	ratio := width / height
-	var x0, x1, y0, y1 float32
 	if ratio == 1 {
 		return NewSquare()
 	} else if ratio > 1 {
-		x0 = float32(-0.5)
-		x1 = float32(0.5)
-		y0 = float32(-1 / (ratio * 2))
-		y1 = float32(1 / (ratio * 2))
+		return NewExact(1, 1/ratio)
 	} else {
-		y0 = float32(-0.5)
-		y1 = float32(0.5)
-		x0 = float32(-ratio / 2)
-		x1 = float32(ratio / 2)
+		return NewExact(ratio, 1)
 	}
+}
+
+//NewExact works like the New, but without scaling.
+func NewExact(width, height float32) *Rectangle {
+	normal := mgl32.Vec3{0, -1, 0}
 	points := [4]mgl32.Vec3{
-		mgl32.Vec3{x0, 0, y0},
-		mgl32.Vec3{x1, 0, y0},
-		mgl32.Vec3{x1, 0, y1},
-		mgl32.Vec3{x0, 0, y1},
+		mgl32.Vec3{-width / 2, 0, -height / 2},
+		mgl32.Vec3{width / 2, 0, -height / 2},
+		mgl32.Vec3{width / 2, 0, height / 2},
+		mgl32.Vec3{-width / 2, 0, height / 2},
 	}
 	params := make(map[string]float32)
-	params["width"] = x1 - x0
-	params["length"] = y1 - y0
+	params["width"] = width
+	params["length"] = height
 	params["height"] = float32(0.0)
 	return &Rectangle{
 		Points: points,

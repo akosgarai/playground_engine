@@ -63,3 +63,25 @@ Y+
 
 Let heightAtTheGivenPosition = (heightA*(1-wX) + heightB*(wX)) * wZ + (heightD*(1-wX) + heightC*(wX)) * (1-wZ)
 ```
+
+## Charset model
+
+This model is useful for displaying texts on the screen.
+
+### Glyph
+
+The glyph is responsible for holding the parameters for a given glyph.
+
+- Width - the width of the glyph in pixels.
+- Height - the height of the glyph in pixels.
+- BearingX - the offset of the glyph in pixels on the `X` axis from the origin.
+- BearingY - the offset of the glyph in pixels on the `Y` axis from the origin.
+- Advance - the offset of the next origin in pixels on the `X` axis from the current origin.
+- tex - the texture of the glyph.
+- Debug - if it is true, it prints out debug informations.
+
+A glyph could be setup with its `Build` function.
+
+### Charset
+
+The Charset model is responsible for holdinng the glyphs for a given charset. For the file loading and initialization it provides 2 functions. The `LoadCharsetDebug` is for debugging, it prints out a bunch of useful stuff, the `LoadCharset` is for silent load. It has a `PrintTo` function that puts the text to the given surface. For the tests the [`Desyrel`](https://www.dafont.com/desyrel.font) fonts are used.
