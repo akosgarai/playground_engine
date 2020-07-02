@@ -74,8 +74,10 @@ type Application struct {
 	uniformVector map[string]mgl32.Vec3 // map for 3 float32
 
 	// closestMesh the mesh that is closest to the mouse position
+	// closestModel the model of the closestMesh
 	// closestDistance is the distance of the mouse position from the closestMesh
 	closestMesh     interfaces.Mesh
+	closestModel    interfaces.Model
 	closestDistance float32
 }
 
@@ -157,10 +159,10 @@ func (a *Application) AddModelToShader(m interfaces.Model, s interfaces.Shader) 
 	a.shaderMap[s] = append(a.shaderMap[s], m)
 }
 
-// GetClosestMeshWithDistance returns the closest mesh and its distance
+// GetClosestModelMeshDistance returns the closest model, mesh and its distance
 // from the mouse position.
-func (a *Application) GetClosestMeshWithDistance() (interfaces.Mesh, float32) {
-	return a.closestMesh, a.closestDistance
+func (a *Application) GetClosestModelMeshDistance() (interfaces.Model, interfaces.Mesh, float32) {
+	return a.closestModel, a.closestMesh, a.closestDistance
 }
 
 // cameraKeyboardMovement is responsible for handling a movement for a specific direction.
@@ -316,6 +318,7 @@ func (a *Application) Update(dt float64) {
 	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(mX), float32(mY), 0.0}, TransformationMatrix)
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
+	var closestModel interfaces.Model
 
 	for s, _ := range a.shaderMap {
 		for index, _ := range a.shaderMap[s] {
@@ -330,10 +333,12 @@ func (a *Application) Update(dt float64) {
 			if dist < closestDistance {
 				closestDistance = dist
 				closestMesh = msh
+				closestModel = a.shaderMap[s][index]
 			}
 		}
 	}
 	a.closestMesh = closestMesh
+	a.closestModel = closestModel
 	a.closestDistance = closestDistance
 }
 
