@@ -1,6 +1,7 @@
 package model
 
 import (
+	"math"
 	"reflect"
 	"testing"
 	"time"
@@ -304,6 +305,52 @@ func TestSetUniformVector(t *testing.T) {
 			}
 		}
 
+	}()
+}
+func TestClosestMeshTo(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("SetUniformVector shouldn't have panic.")
+			}
+		}()
+		refPoint := mgl32.Vec3{0, 0, 0}
+		model := New()
+		// Get closest mesh without mesh
+		msh, dist := model.ClosestMeshTo(refPoint)
+		if dist != float32(math.MaxFloat32) {
+			t.Errorf("Invalid distance. Instead of maxfloat it is '%f', msh: %#v", dist, msh)
+		}
+		// Get closest mesh with one mesh
+
+		cubeParams := make(map[string]float32)
+		cubeParams["width"] = float32(1.0)
+		cubeParams["height"] = float32(1.0)
+		cubeParams["length"] = float32(1.0)
+		cubeBo := boundingobject.New("AABB", cubeParams)
+		mshOne := mesh.NewPointMesh(wrapperMock)
+		mshOne.SetBoundingObject(cubeBo)
+		mshOne.SetPosition(mgl32.Vec3{0, 1, 0})
+		model.AddMesh(mshOne)
+		msh, dist = model.ClosestMeshTo(refPoint)
+		if dist != float32(0.5) {
+			t.Errorf("Invalid distance. Instead of 0.5 it is '%f', msh: %#v", dist, msh)
+		}
+		// Get closest mesh with multiple mesh
+		cubeParams = make(map[string]float32)
+		cubeParams["width"] = float32(1.0)
+		cubeParams["height"] = float32(1.0)
+		cubeParams["length"] = float32(1.0)
+		cubeBo = boundingobject.New("AABB", cubeParams)
+
+		mshTwo := mesh.NewPointMesh(wrapperMock)
+		mshTwo.SetBoundingObject(cubeBo)
+		mshTwo.SetPosition(mgl32.Vec3{0.75, 0, 0})
+		model.AddMesh(mshTwo)
+		msh, dist = model.ClosestMeshTo(refPoint)
+		if dist != float32(0.25) {
+			t.Errorf("Invalid distance. Instead of 0.5 it is '%f', msh: %#v", dist, msh)
+		}
 	}()
 }
 func TestBug(t *testing.T) {
