@@ -124,6 +124,8 @@ type Charset struct {
 	fonts map[rune]*Glyph
 }
 
+// LoadCharset sets up a Charset based on the input values. On case of error, it returns it with an empty Charset. On case
+// of succes, it returns the initialized Charset and nil.
 func LoadCharset(filePath string, low, high rune, scale float64, dpi float64, wrapper interfaces.GLWrapper) (*Charset, error) {
 	fd, err := os.Open(filePath)
 	if err != nil {
@@ -160,6 +162,9 @@ func LoadCharset(filePath string, low, high rune, scale float64, dpi float64, wr
 		fonts:     fonts,
 	}, nil
 }
+
+// LoadCharsetDebug sets up a Charset based on the input values. On case of error, it returns it with an empty Charset. On case
+// of succes, it returns the initialized Charset and nil. It prints out partial result informations to the console.
 func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float64, wrapper interfaces.GLWrapper) (*Charset, error) {
 	fmt.Printf("Opening '%s'.\n", filePath)
 	fd, err := os.Open(filePath)
@@ -200,6 +205,7 @@ func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float6
 	}, nil
 }
 
+// PrintTo sets up the meshes for displaying text on a given surface.
 func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interfaces.GLWrapper, surface interfaces.Mesh) {
 	indices := []rune(text)
 	fmt.Printf("The following text will be printed: '%s' as '%v'\n", text, indices)
