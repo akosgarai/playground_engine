@@ -1146,10 +1146,11 @@ func TestCharsetLoad(t *testing.T) {
 	}
 }
 func TestCharsetPrintTo(t *testing.T) {
+	cols := []mgl32.Vec3{mgl32.Vec3{0, 0, 1}}
 	fonts, err := LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
 	if err != nil {
 		t.Errorf("Error during load: %s\n", err.Error())
 	}
 	msh := mesh.NewPointMesh(wrapperMock)
-	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh)
+	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh, cols)
 }
