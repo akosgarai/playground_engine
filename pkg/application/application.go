@@ -44,6 +44,7 @@ type Window interface {
 	ShouldClose() bool
 	SwapBuffers()
 	GetSize() (int, int)
+	SetShouldClose(bool)
 }
 
 type Application struct {
