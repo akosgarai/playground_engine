@@ -84,4 +84,4 @@ A glyph could be setup with its `Build` function.
 
 ### Charset
 
-The Charset model is responsible for holdinng the glyphs for a given charset. For the file loading and initialization it provides 2 functions. The `LoadCharsetDebug` is for debugging, it prints out a bunch of useful stuff, the `LoadCharset` is for silent load. It has a `PrintTo` function that puts the text to the given surface.
+The Charset model is responsible for holdinng the glyphs for a given charset. For the file loading and initialization it provides 2 functions. The `LoadCharsetDebug` is for debugging, it prints out a bunch of useful stuff, the `LoadCharset` is for silent load. It has a `PrintTo` function that puts the text to the given surface. For the tests the [`Desyrel`](https://www.dafont.com/desyrel.font) fonts are used.
