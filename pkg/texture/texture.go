@@ -59,6 +59,7 @@ func (t *Texture) UnBind() {
 
 type Textures []*Texture
 
+// AddTextureRGBA gets an RGBA and further necessary parameters, sets up a Texture, and appends it.
 func (t *Textures) AddTextureRGBA(filePath string, rgba *image.RGBA, wrapR, wrapS, minificationFilter, magnificationFilter int32, uniformName string, wrapper interfaces.GLWrapper) {
 	tex := &Texture{
 		TextureName: genTextures(wrapper),
@@ -83,6 +84,9 @@ func (t *Textures) AddTextureRGBA(filePath string, rgba *image.RGBA, wrapR, wrap
 
 	*t = append(*t, tex)
 }
+
+// AddTexture gets a filepath and further necessary parameters, loads the image from the filepath,
+// validates it and sets up the RGBA, and calls AddTextureRGBA function
 func (t *Textures) AddTexture(filePath string, wrapR, wrapS, minificationFilter, magnificationFilter int32, uniformName string, wrapper interfaces.GLWrapper) {
 	img, err := loadImageFromFile(filePath)
 	if err != nil {
