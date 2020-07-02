@@ -2,6 +2,7 @@ package application
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"reflect"
 	"strconv"
@@ -71,6 +72,13 @@ type Application struct {
 	// uniforms, that needs to be set for every shader.
 	uniformFloat  map[string]float32    // map for float32
 	uniformVector map[string]mgl32.Vec3 // map for 3 float32
+
+	// closestMesh the mesh that is closest to the mouse position
+	// closestModel the model of the closestMesh
+	// closestDistance is the distance of the mouse position from the closestMesh
+	closestMesh     interfaces.Mesh
+	closestModel    interfaces.Model
+	closestDistance float32
 }
 
 // New returns an application instance
@@ -87,6 +95,7 @@ func New() *Application {
 		rotateOnEdgeDistance:      0.0,
 		uniformFloat:              make(map[string]float32),
 		uniformVector:             make(map[string]mgl32.Vec3),
+		closestDistance:           math.MaxFloat32,
 	}
 }
 
@@ -148,6 +157,12 @@ func (a *Application) AddShader(s interfaces.Shader) {
 // AddModelToShader attaches the model to a shader.
 func (a *Application) AddModelToShader(m interfaces.Model, s interfaces.Shader) {
 	a.shaderMap[s] = append(a.shaderMap[s], m)
+}
+
+// GetClosestModelMeshDistance returns the closest model, mesh and its distance
+// from the mouse position.
+func (a *Application) GetClosestModelMeshDistance() (interfaces.Model, interfaces.Mesh, float32) {
+	return a.closestModel, a.closestMesh, a.closestDistance
 }
 
 // cameraKeyboardMovement is responsible for handling a movement for a specific direction.
@@ -286,6 +301,10 @@ func (a *Application) cameraMouseRotation(delta float64) {
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (a *Application) Update(dt float64) {
+	MousePosX, MousePosY := a.window.GetCursorPos()
+	WindowWidth, WindowHeight := a.window.GetSize()
+	mX, mY := transformations.MouseCoordinates(MousePosX, MousePosY, float64(WindowWidth), float64(WindowHeight))
+	TransformationMatrix := mgl32.Ident4()
 	if a.cameraSet {
 		a.cameraKeyboardMovement("forward", "back", "Walk", dt)
 		a.cameraKeyboardMovement("right", "left", "Strafe", dt)
@@ -294,7 +313,13 @@ func (a *Application) Update(dt float64) {
 		if a.rotateOnEdgeDistance > 0.0 {
 			a.cameraMouseRotation(dt)
 		}
+		TransformationMatrix = (a.camera.GetProjectionMatrix().Mul4(a.camera.GetViewMatrix())).Inv()
 	}
+	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(mX), float32(mY), 0.0}, TransformationMatrix)
+	closestDistance := float32(math.MaxFloat32)
+	var closestMesh interfaces.Mesh
+	var closestModel interfaces.Model
+
 	for s, _ := range a.shaderMap {
 		for index, _ := range a.shaderMap[s] {
 			// The collision detection between the moving meshes supposed to be implemented somewhere here.
@@ -304,8 +329,17 @@ func (a *Application) Update(dt float64) {
 			// could be applied, otherwise it needs to be skipped. In the future, the collusion effect
 			// also could be handled here.
 			a.shaderMap[s][index].Update(dt)
+			msh, dist := a.shaderMap[s][index].ClosestMeshTo(coords)
+			if dist < closestDistance {
+				closestDistance = dist
+				closestMesh = msh
+				closestModel = a.shaderMap[s][index]
+			}
 		}
 	}
+	a.closestMesh = closestMesh
+	a.closestModel = closestModel
+	a.closestDistance = closestDistance
 }
 
 // Draw calls Draw function in every drawable item. It loops on the shaderMap (shaders).

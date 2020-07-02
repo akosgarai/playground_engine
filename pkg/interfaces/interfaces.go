@@ -116,4 +116,5 @@ type Model interface {
 	Export(string)
 	CollideTestWithSphere(*coldet.Sphere) bool
 	IsTransparent() bool
+	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
 }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/modelexport"
@@ -195,6 +196,39 @@ func (m *Model) customUniforms(s interfaces.Shader) {
 	for name, value := range m.uniformVector {
 		s.SetUniform3f(name, value.X(), value.Y(), value.Z())
 	}
+}
+
+// ClosestMeshTo returns the closest mesh to the given point.
+func (m *Model) ClosestMeshTo(position mgl32.Vec3) (interfaces.Mesh, float32) {
+	closest := float32(math.MaxFloat32)
+	var closestMesh interfaces.Mesh
+	for i, _ := range m.meshes {
+		if m.meshes[i].IsBoundingObjectSet() {
+			meshBo := m.meshes[i].GetBoundingObject()
+			meshInWorld := m.meshes[i].GetPosition()
+			if !m.meshes[i].IsParentMesh() {
+				meshTransTransform := m.meshes[i].GetParentTranslationTransformation()
+				meshInWorld = mgl32.TransformCoordinate(meshInWorld, meshTransTransform)
+			}
+			pos := [3]float32{meshInWorld.X(), meshInWorld.Y(), meshInWorld.Z()}
+			params := meshBo.Params()
+			var distance float32
+			if meshBo.Type() == "AABB" {
+				aabb := coldet.NewBoundingBox(pos, params["width"], params["height"], params["length"])
+				distance = aabb.Distance([3]float32{position.X(), position.Y(), position.Z()})
+
+			} else if meshBo.Type() == "Sphere" {
+				bs := coldet.NewBoundingSphere(pos, params["radius"])
+				distance = bs.Distance([3]float32{position.X(), position.Y(), position.Z()})
+
+			}
+			if distance < closest {
+				closest = distance
+				closestMesh = m.meshes[i]
+			}
+		}
+	}
+	return closestMesh, closest
 }
 
 // CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.
