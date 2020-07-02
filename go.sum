@@ -1,5 +1,5 @@
-github.com/akosgarai/coldet v0.0.0-20200604175126-fcd6fa96faa1 h1:j2S0xdme4ANMJ3Fz8fDvRDKSFMlRwa2xvDLGEqucnsw=
-github.com/akosgarai/coldet v0.0.0-20200604175126-fcd6fa96faa1/go.mod h1:/gfbVgwdUGx9xrHJoUNcz3M8wrpF5tkzs7E/0IRJgLk=
+github.com/akosgarai/coldet v0.0.0-20200702143610-ca4e38941f5b h1:SMV7bL/PVBsa/xZArFW4YhjAK5I6h29WIUJoO+B5TZs=
+github.com/akosgarai/coldet v0.0.0-20200702143610-ca4e38941f5b/go.mod h1:FqGHwfl9mPTGl9gjS9ZkgppWOnPMVoi/aS1gT7YlCco=
 github.com/go-gl/gl v0.0.0-20190320180904-bf2b1f2f34d7 h1:SCYMcCJ89LjRGwEa0tRluNRiMjZHalQZrVrvTbPh+qw=
 github.com/go-gl/gl v0.0.0-20190320180904-bf2b1f2f34d7/go.mod h1:482civXOzJJCPzJ4ZOX/pwvXBWSnzD4OKMdH4ClKGbk=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200420212212-258d9bec320e h1:8ywu4ELC/6owgOZlZx75CyYS5AYwUT2L+hzPModKvag=
