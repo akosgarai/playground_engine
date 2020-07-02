@@ -206,7 +206,7 @@ func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float6
 }
 
 // PrintTo sets up the meshes for displaying text on a given surface.
-func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interfaces.GLWrapper, surface interfaces.Mesh) {
+func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interfaces.GLWrapper, surface interfaces.Mesh, cols []mgl32.Vec3) {
 	indices := []rune(text)
 	fmt.Printf("The following text will be printed: '%s' as '%v'\n", text, indices)
 	if len(indices) == 0 {
@@ -229,9 +229,6 @@ func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interface
 		w := float32(ch.Width) * scale
 		h := float32(ch.Height) * scale
 		rect := rectangle.NewExact(w, h)
-		cols := []mgl32.Vec3{
-			mgl32.Vec3{0.0, 1.0, 0.0},
-		}
 		v, i, _ := rect.TexturedColoredMeshInput(cols)
 		rotTr := surface.RotationTransformation()
 		position := mgl32.Vec3{x + float32(ch.BearingX+ch.Width/2)*scale, z, y - float32(ch.BearingY-ch.Height/2)*scale}
