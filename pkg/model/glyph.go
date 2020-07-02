@@ -124,6 +124,42 @@ type Charset struct {
 	fonts map[rune]*Glyph
 }
 
+func LoadCharset(filePath string, low, high rune, scale float64, dpi float64, wrapper interfaces.GLWrapper) (*Charset, error) {
+	fd, err := os.Open(filePath)
+	if err != nil {
+		return &Charset{}, err
+	}
+	defer fd.Close()
+
+	data, err := ioutil.ReadAll(fd)
+	if err != nil {
+		return &Charset{}, err
+	}
+
+	ttf, err := truetype.Parse(data)
+	if err != nil {
+		return &Charset{}, err
+	}
+	fonts := make(map[rune]*Glyph)
+	for ch := low; ch <= high; ch++ {
+		g := &Glyph{Debug: false}
+		options := &truetype.Options{
+			Size:    scale,
+			DPI:     dpi,
+			Hinting: font.HintingFull,
+		}
+		err := g.Build(ch, ttf, options, filePath, wrapper)
+		if err != nil {
+			continue
+		}
+		fonts[ch] = g
+	}
+	m := New()
+	return &Charset{
+		BaseModel: m,
+		fonts:     fonts,
+	}, nil
+}
 func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float64, wrapper interfaces.GLWrapper) (*Charset, error) {
 	fmt.Printf("Opening '%s'.\n", filePath)
 	fd, err := os.Open(filePath)

@@ -1090,5 +1090,19 @@ func TestTerrainBuilderSetLiquidDetailMultiplier(t *testing.T) {
 }
 func TestCharsetLoad(t *testing.T) {
 	_, err := LoadCharsetDebug("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
-	t.Log(err)
+	if err != nil {
+		t.Errorf("Error during debug load: %s\n", err.Error())
+	}
+	_, err = LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+	if err != nil {
+		t.Errorf("Error during load: %s\n", err.Error())
+	}
+}
+func TestCharsetPrintTo(t *testing.T) {
+	fonts, err := LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+	if err != nil {
+		t.Errorf("Error during load: %s\n", err.Error())
+	}
+	msh := mesh.NewPointMesh(wrapperMock)
+	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh)
 }
