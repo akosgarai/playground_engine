@@ -476,3 +476,6 @@ func TestCameraCollisionTest(t *testing.T) {
 		t.Error("Should collide.")
 	}
 }
+func TestExport(t *testing.T) {
+	t.Skip("Unimplemented")
+}

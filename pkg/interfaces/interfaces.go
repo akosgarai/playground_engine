@@ -134,3 +134,28 @@ type ButtonStore interface {
 type RoButtonStore interface {
 	Get(glfw.MouseButton) bool
 }
+
+type Camera interface {
+	Log() string
+	GetViewMatrix() mgl32.Mat4
+	GetProjectionMatrix() mgl32.Mat4
+	Walk(float32)
+	Strafe(float32)
+	Lift(float32)
+	UpdateDirection(float32, float32)
+	GetPosition() mgl32.Vec3
+	GetVelocity() float32
+	GetRotationStep() float32
+	BoundingObjectAfterWalk(float32) *coldet.Sphere
+	BoundingObjectAfterStrafe(float32) *coldet.Sphere
+	BoundingObjectAfterLift(float32) *coldet.Sphere
+}
+type Screen interface {
+	Draw()
+	Update(float64, float64, float64, RoKeyStore)
+	Export(string)
+	GetCamera() Camera
+	GetClosestModelMeshDistance() (Model, Mesh, float32)
+	SetUniformFloat(string, float32)
+	SetUniformVector(string, mgl32.Vec3)
+}

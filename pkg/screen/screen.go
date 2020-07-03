@@ -3,7 +3,9 @@ package screen
 import (
 	"fmt"
 	"math"
+	"os"
 	"reflect"
+	"strconv"
 
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 
@@ -12,24 +14,8 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-type Camera interface {
-	Log() string
-	GetViewMatrix() mgl32.Mat4
-	GetProjectionMatrix() mgl32.Mat4
-	Walk(float32)
-	Strafe(float32)
-	Lift(float32)
-	UpdateDirection(float32, float32)
-	GetPosition() mgl32.Vec3
-	GetVelocity() float32
-	GetRotationStep() float32
-	BoundingObjectAfterWalk(float32) *coldet.Sphere
-	BoundingObjectAfterStrafe(float32) *coldet.Sphere
-	BoundingObjectAfterLift(float32) *coldet.Sphere
-}
-
 type Screen struct {
-	camera    Camera
+	camera    interfaces.Camera
 	cameraSet bool
 
 	shaderMap map[interfaces.Shader][]interfaces.Model
@@ -105,13 +91,13 @@ func (s *Screen) SetRotateOnEdgeDistance(value float32) {
 }
 
 // SetCamera updates the camera with the new one.
-func (s *Screen) SetCamera(c Camera) {
+func (s *Screen) SetCamera(c interfaces.Camera) {
 	s.cameraSet = true
 	s.camera = c
 }
 
 // GetCamera returns the current camera of the application.
-func (s *Screen) GetCamera() Camera {
+func (s *Screen) GetCamera() interfaces.Camera {
 	return s.camera
 }
 
@@ -530,4 +516,20 @@ func (s *Screen) cameraCollisionTest(boundingSphere *coldet.Sphere) bool {
 		}
 	}
 	return false
+}
+
+// Export creates a directory for the screen and calls Export function on the models.
+func (s *Screen) Export(basePath string) {
+	i := 0
+	for sh, _ := range s.shaderMap {
+		modelDir := strconv.Itoa(i)
+		err := os.Mkdir(basePath+"/"+modelDir, os.ModeDir|os.ModePerm)
+		if err != nil {
+			fmt.Printf("Cannot create model directory. '%s'\n", err.Error())
+		}
+		for index, _ := range s.shaderMap[sh] {
+			s.shaderMap[sh][index].Export(basePath + "/" + modelDir)
+		}
+		i++
+	}
 }
