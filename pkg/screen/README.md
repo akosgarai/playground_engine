@@ -1,11 +1,11 @@
 # Screen package
 
 This package is written for handling different needs in the same application. For example we need a menu screen without camera and a world screen with a camera in the same application. This package provides solution for this need.
-The models and shaders are handled in the shader package also the camera, light, movement maps, closest objects and the screen level uniforms.
+The models and shaders are handled in the screen package also the camera, light, movement maps, closest objects and the screen level uniforms.
 
 It holds:
 - a `camera`, that has to implement the `Camera` interface
-- `shaderMap`, that makes the connection between she models and the shaders
+- `shaderMap`, that makes the connection between the models and the shaders
 - `directionalLightSources`, for storing the directional lights.
 - `pointLightSources`, for storing the point lights.
 - `spotLightSources`, for storing the spot lights.
