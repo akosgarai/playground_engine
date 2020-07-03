@@ -51,13 +51,17 @@ func (g *Glyph) Build(ch rune, ttf *truetype.Font, options *truetype.Options, fi
 	g.Advance = int((gAdv) >> 6)
 	if g.Width == 0 || g.Height == 0 {
 		gBnd = ttf.Bounds(fixed.Int26_6(options.Size))
-		fmt.Printf("\tNull handler (g.Height:%d, g.Width:%d)\n\tSet gBnd value to: %#v\n", g.Height, g.Width, gBnd)
+		if g.Debug {
+			fmt.Printf("\tNull handler (g.Height:%d, g.Width:%d)\n\tSet gBnd value to: %#v\n", g.Height, g.Width, gBnd)
+		}
 		g.Width = int((gBnd.Max.X - gBnd.Min.X) >> 6)
 		g.Height = int((gBnd.Max.Y - gBnd.Min.Y) >> 6)
 
 		//above can sometimes yield 0 for font smaller than 48pt, 1 is minimum
 		if g.Width == 0 || g.Height == 0 {
-			fmt.Printf("\tFallback null handler (g.Height:%d, g.Width:%d)\n", g.Height, g.Width)
+			if g.Debug {
+				fmt.Printf("\tFallback null handler (g.Height:%d, g.Width:%d)\n", g.Height, g.Width)
+			}
 			g.Width = 1
 			g.Height = 1
 		}
@@ -81,7 +85,9 @@ func (g *Glyph) Build(ch rune, ttf *truetype.Font, options *truetype.Options, fi
 	px := 0 - (int(gBnd.Min.X) >> 6)
 	py := (gAscent)
 	pt := freetype.Pt(px, py)
-	fmt.Printf("\t(px, py): (%d, %d)\n\tpt: %#v\n", px, py, pt)
+	if g.Debug {
+		fmt.Printf("\t(px, py): (%d, %d)\n\tpt: %#v\n", px, py, pt)
+	}
 	// Draw the text from mask to image
 	_, err := c.DrawString(string(ch), pt)
 	if err != nil {
@@ -122,6 +128,7 @@ func (g *Glyph) rgba(bg *image.Uniform) *image.RGBA {
 type Charset struct {
 	*BaseModel
 	fonts map[rune]*Glyph
+	Debug bool
 }
 
 // LoadCharset sets up a Charset based on the input values. On case of error, it returns it with an empty Charset. On case
@@ -160,6 +167,7 @@ func LoadCharset(filePath string, low, high rune, scale float64, dpi float64, wr
 	return &Charset{
 		BaseModel: m,
 		fonts:     fonts,
+		Debug:     false,
 	}, nil
 }
 
@@ -202,13 +210,16 @@ func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float6
 	return &Charset{
 		BaseModel: m,
 		fonts:     fonts,
+		Debug:     true,
 	}, nil
 }
 
 // PrintTo sets up the meshes for displaying text on a given surface.
 func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interfaces.GLWrapper, surface interfaces.Mesh, cols []mgl32.Vec3) {
 	indices := []rune(text)
-	fmt.Printf("The following text will be printed: '%s' as '%v'\n", text, indices)
+	if c.Debug {
+		fmt.Printf("The following text will be printed: '%s' as '%v'\n", text, indices)
+	}
 	if len(indices) == 0 {
 		return
 	}
@@ -219,7 +230,9 @@ func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interface
 		runeIndex := indices[i]
 		//skip runes that are not in font chacter range
 		if int(runeIndex)-int(lc) > len(c.fonts) || runeIndex < lc {
-			fmt.Printf("Skipping: %c %d\n", runeIndex, runeIndex)
+			if c.Debug {
+				fmt.Printf("Skipping: %c %d\n", runeIndex, runeIndex)
+			}
 			continue
 		}
 		ch := c.fonts[runeIndex]
@@ -236,7 +249,9 @@ func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interface
 		msh.SetPosition(mgl32.TransformCoordinate(position, rotTr))
 		msh.SetParent(surface)
 		mshStore = append(mshStore, msh)
-		fmt.Printf("pos: %#v\nch: %#v\nw: %f, h: %f, xpos: %f, ypos: %f, adv: %f\n\n", position.Mul(scale), ch, w, h, xpos, ypos, float32(ch.Advance)*scale)
+		if c.Debug {
+			fmt.Printf("pos: %#v\nch: %#v\nw: %f, h: %f, xpos: %f, ypos: %f, adv: %f\n\n", position.Mul(scale), ch, w, h, xpos, ypos, float32(ch.Advance)*scale)
+		}
 		x += float32(ch.Advance) * scale
 	}
 	for i := len(mshStore) - 1; i >= 0; i-- {
