@@ -18,7 +18,7 @@ It holds:
 
 **New**
 
-This function returns an initialized application instance.
+This function returns an initialized screen instance.
 
 **Log**
 
