@@ -1153,4 +1153,6 @@ func TestCharsetPrintTo(t *testing.T) {
 	}
 	msh := mesh.NewPointMesh(wrapperMock)
 	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh, cols)
+	fonts.Debug = true
+	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh, cols)
 }
