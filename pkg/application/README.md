@@ -8,7 +8,7 @@ The common application related stuff goes here. It holds
 - `keyDowns`, that stores the keyboard button states.
 - `screens`, the screens added to this application
 - `activeScreen`, the screen that currently used
-` `menuScreen`, the screen that is connected to the application menu.
+- `menuScreen`, the screen that is connected to the application menu.
 
 ## New
 
