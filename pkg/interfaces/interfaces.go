@@ -6,6 +6,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/primitives/boundingobject"
 
 	"github.com/akosgarai/coldet"
+	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -117,4 +118,19 @@ type Model interface {
 	CollideTestWithSphere(*coldet.Sphere) bool
 	IsTransparent() bool
 	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
+}
+
+type KeyStore interface {
+	Get(glfw.Key) bool
+	Set(glfw.Key, bool)
+}
+type RoKeyStore interface {
+	Get(glfw.Key) bool
+}
+type ButtonStore interface {
+	Get(glfw.MouseButton) bool
+	Set(glfw.MouseButton, bool)
+}
+type RoButtonStore interface {
+	Get(glfw.MouseButton) bool
 }
