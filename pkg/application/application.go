@@ -158,7 +158,7 @@ func (a *Application) SetKeyState(key glfw.Key, action glfw.Action) {
 	a.keyDowns.Set(key, isButtonPressed)
 }
 
-// SetKeyState setups the keyDowns based on the key and action
+// SetButtonState setups the mouseDowns based on the key and action
 func (a *Application) SetButtonState(button glfw.MouseButton, action glfw.Action) {
 	var isButtonPressed bool
 	if action != glfw.Release {

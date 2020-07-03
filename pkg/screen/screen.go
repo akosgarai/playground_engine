@@ -96,7 +96,7 @@ func (s *Screen) SetCamera(c interfaces.Camera) {
 	s.camera = c
 }
 
-// GetCamera returns the current camera of the application.
+// GetCamera returns the current camera of the screen.
 func (s *Screen) GetCamera() interfaces.Camera {
 	return s.camera
 }
@@ -349,6 +349,9 @@ func (s *Screen) Draw() {
 		}
 	}
 }
+
+// Update loops on the shaderMap, and calls Update function on every Model.
+// It also handles the camera movement and rotation, if the camera is set.
 func (s *Screen) Update(dt, posX, posY float64, store interfaces.RoKeyStore) {
 	TransformationMatrix := mgl32.Ident4()
 	if s.cameraSet {
