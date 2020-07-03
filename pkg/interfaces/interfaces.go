@@ -6,6 +6,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/primitives/boundingobject"
 
 	"github.com/akosgarai/coldet"
+	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -117,4 +118,44 @@ type Model interface {
 	CollideTestWithSphere(*coldet.Sphere) bool
 	IsTransparent() bool
 	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
+}
+
+type KeyStore interface {
+	Get(glfw.Key) bool
+	Set(glfw.Key, bool)
+}
+type RoKeyStore interface {
+	Get(glfw.Key) bool
+}
+type ButtonStore interface {
+	Get(glfw.MouseButton) bool
+	Set(glfw.MouseButton, bool)
+}
+type RoButtonStore interface {
+	Get(glfw.MouseButton) bool
+}
+
+type Camera interface {
+	Log() string
+	GetViewMatrix() mgl32.Mat4
+	GetProjectionMatrix() mgl32.Mat4
+	Walk(float32)
+	Strafe(float32)
+	Lift(float32)
+	UpdateDirection(float32, float32)
+	GetPosition() mgl32.Vec3
+	GetVelocity() float32
+	GetRotationStep() float32
+	BoundingObjectAfterWalk(float32) *coldet.Sphere
+	BoundingObjectAfterStrafe(float32) *coldet.Sphere
+	BoundingObjectAfterLift(float32) *coldet.Sphere
+}
+type Screen interface {
+	Draw()
+	Update(float64, float64, float64, RoKeyStore)
+	Export(string)
+	GetCamera() Camera
+	GetClosestModelMeshDistance() (Model, Mesh, float32)
+	SetUniformFloat(string, float32)
+	SetUniformVector(string, mgl32.Vec3)
 }
