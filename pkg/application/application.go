@@ -18,6 +18,7 @@ import (
 const (
 	DEBUG  = glfw.KeyH
 	EXPORT = glfw.KeyP
+	ESCAPE = glfw.KeyEscape
 )
 
 type Camera interface {
@@ -59,6 +60,7 @@ type Application struct {
 	activeScreen interfaces.Screen
 	screens      []interfaces.Screen
 	menuScreen   interfaces.Screen
+	menuSet      bool
 }
 
 // New returns an application instance
@@ -66,6 +68,7 @@ func New() *Application {
 	return &Application{
 		mouseDowns: store.NewGlfwMouseStore(),
 		keyDowns:   store.NewGlfwKeyStore(),
+		menuSet:    false,
 	}
 }
 
@@ -113,14 +116,30 @@ func (a *Application) ActivateScreen(s interfaces.Screen) {
 	a.activeScreen = s
 }
 
+// MenuScreen sets the given screen to menu screen and the menuSet
+// flag true
+func (a *Application) MenuScreen(s interfaces.Screen) {
+	a.menuScreen = s
+	a.menuSet = true
+}
+
 // Draw calls Draw function on the activeScreen.
 func (a *Application) Draw() {
 	a.activeScreen.Draw()
 }
 
 // KeyCallback is responsible for the keyboard event handling.
+// After configuring the keyboard well, the esc character seems to
+// be working well.
 func (a *Application) KeyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
 	switch key {
+	case ESCAPE:
+		if a.menuSet {
+			a.ActivateScreen(a.menuScreen)
+		} else {
+			a.window.SetShouldClose(true)
+		}
+		break
 	case DEBUG:
 		if action != glfw.Release {
 			fmt.Printf("%s\n", a.Log())
