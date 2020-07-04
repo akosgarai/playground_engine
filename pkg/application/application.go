@@ -124,8 +124,8 @@ func (a *Application) MenuScreen(s interfaces.Screen) {
 }
 
 // Draw calls Draw function on the activeScreen.
-func (a *Application) Draw() {
-	a.activeScreen.Draw()
+func (a *Application) Draw(wrapper interfaces.GLWrapper) {
+	a.activeScreen.Draw(wrapper)
 }
 
 // KeyCallback is responsible for the keyboard event handling.

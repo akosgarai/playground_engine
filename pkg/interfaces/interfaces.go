@@ -151,7 +151,7 @@ type Camera interface {
 	BoundingObjectAfterLift(float32) *coldet.Sphere
 }
 type Screen interface {
-	Draw()
+	Draw(GLWrapper)
 	Update(float64, float64, float64, RoKeyStore)
 	Export(string)
 	GetCamera() Camera
