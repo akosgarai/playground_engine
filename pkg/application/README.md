@@ -9,6 +9,7 @@ The common application related stuff goes here. It holds
 - `screens`, the screens added to this application
 - `activeScreen`, the screen that currently used
 - `menuScreen`, the screen that is connected to the application menu.
+- `menuSet`, this flag is true if the menuScreen has been set.
 
 ## New
 
@@ -45,6 +46,10 @@ AddScreen appends a screen to the screens.
 ## ActivateScreen
 
 ActivateScreen sets the given screen to active screen
+
+## MenuScreen
+
+MenuScreen sets the given screen to menu screen. It also sets the menuSet variable to true.
 
 ## Draw
 

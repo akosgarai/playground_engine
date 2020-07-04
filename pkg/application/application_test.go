@@ -225,3 +225,16 @@ func TestGetClosestModelMeshDistanceWithActiveScreen(t *testing.T) {
 		_, _, _ = app.GetClosestModelMeshDistance()
 	}()
 }
+func TestMenuScreen(t *testing.T) {
+	s := screen.New()
+	s.SetCamera(cam)
+	app := New()
+	app.AddScreen(s)
+	app.MenuScreen(s)
+	if app.menuSet != true {
+		t.Error("Invalid set value for menu")
+	}
+	if app.menuScreen != s {
+		t.Error("Invalid menu screen")
+	}
+}
