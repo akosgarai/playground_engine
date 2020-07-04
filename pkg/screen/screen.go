@@ -14,6 +14,8 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+type SetupFunction func(wrapper interfaces.GLWrapper)
+
 type Screen struct {
 	camera    interfaces.Camera
 	cameraSet bool
@@ -41,6 +43,8 @@ type Screen struct {
 	closestMesh     interfaces.Mesh
 	closestModel    interfaces.Model
 	closestDistance float32
+	// Setup function is called right before drawing.
+	setupFunction SetupFunction
 }
 
 // New returns a screen instance
@@ -56,6 +60,7 @@ func New() *Screen {
 		uniformFloat:              make(map[string]float32),
 		uniformVector:             make(map[string]mgl32.Vec3),
 		closestDistance:           math.MaxFloat32,
+		setupFunction:             nil,
 	}
 }
 
@@ -302,10 +307,14 @@ func (s *Screen) customUniforms(sh interfaces.Shader) {
 	}
 }
 
-// Draw calls Draw function in every drawable item. It loops on the shaderMap (shaders).
+// Draw calls Draw function in every drawable item. It calls the setupFunction then
+// it loops on the shaderMap (shaders).
 // For each shader, first set it to used state, setup camera realted uniforms,
 // then setup light related uniformsi and custom uniforms. Then we can pass the shader to the Model for drawing.
-func (s *Screen) Draw() {
+func (s *Screen) Draw(wrapper interfaces.GLWrapper) {
+	if s.setupFunction != nil {
+		s.setupFunction(wrapper)
+	}
 	// Draw the non transparent models first
 	for sh, _ := range s.shaderMap {
 		sh.Use()
@@ -535,4 +544,9 @@ func (s *Screen) Export(basePath string) {
 		}
 		i++
 	}
+}
+
+// Setup function sets the setupFunction to the given one
+func (s *Screen) Setup(f SetupFunction) {
+	s.setupFunction = f
 }

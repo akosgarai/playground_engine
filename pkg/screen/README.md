@@ -13,6 +13,7 @@ It holds:
 - `rotateOnEdgeDistance`, for the mouse rotations.
 - `uniformFloat`, for storing the float uniforms that needs to be set for every shader.
 - `uniformVector`, for storing the vector uniforms that needs to be set for every shader.
+- `setupFunction`, for gl setup, like Enable stuff, setup clear color, etc.
 
 ## Functions
 
@@ -74,7 +75,7 @@ AddSpotLightSource sets up a spot light source. It takes a SpotLight input that 
 
 **Draw**
 
-Draw calls Draw function in every drawable item. It loops on the shaderMap (shaders). For each shader, first set it to used state, setup camera realted uniforms, then setup light related uniformsi and custom uniforms. Then we can pass the shader to the Model for drawing.
+Draw calls Draw function in every drawable item. It calls the setupFunction, then it loops on the shaderMap (shaders). For each shader, first set it to used state, setup camera realted uniforms, then setup light related uniformsi and custom uniforms. Then we can pass the shader to the Model for drawing.
 
 **Update**
 

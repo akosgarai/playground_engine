@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	cam = camera.NewCamera(mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0}, 0, 0)
-	wm  testhelper.WindowMock
+	cam         = camera.NewCamera(mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0}, 0, 0)
+	wm          testhelper.WindowMock
+	wrapperMock testhelper.GLWrapperMock
 )
 
 func TestNew(t *testing.T) {
@@ -194,7 +195,7 @@ func TestDraw(t *testing.T) {
 		s := screen.New()
 		app.AddScreen(s)
 		app.ActivateScreen(s)
-		app.Draw()
+		app.Draw(wrapperMock)
 	}()
 }
 func TestGetClosestModelMeshDistanceWoActiveScreen(t *testing.T) {

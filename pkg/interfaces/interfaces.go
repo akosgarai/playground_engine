@@ -89,6 +89,7 @@ type GLWrapper interface {
 	Enable(cap uint32)
 	DepthFunc(xfunc uint32)
 	Viewport(x int32, y int32, width int32, height int32)
+	BlendFunc(sfactor uint32, dfactor uint32)
 }
 
 type Mesh interface {
@@ -151,7 +152,7 @@ type Camera interface {
 	BoundingObjectAfterLift(float32) *coldet.Sphere
 }
 type Screen interface {
-	Draw()
+	Draw(GLWrapper)
 	Update(float64, float64, float64, RoKeyStore)
 	Export(string)
 	GetCamera() Camera

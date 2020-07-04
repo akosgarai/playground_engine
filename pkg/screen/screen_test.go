@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
+	"github.com/akosgarai/playground_engine/pkg/glwrapper"
+	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/model"
@@ -352,14 +354,17 @@ func TestDraw(t *testing.T) {
 		msh := mesh.NewPointMesh(wrapperMock)
 		mod.AddMesh(msh)
 		// wo camera
-		screen.Draw()
+		screen.Draw(wrapperMock)
 		// with camera
 		screen.SetCamera(cam)
-		screen.Draw()
+		screen.Draw(wrapperMock)
 		// with custom uniforms
 		screen.SetUniformFloat("testFloat", float32(42.0))
 		screen.SetUniformVector("testVector", mgl32.Vec3{1.0, 2.0, 3.0})
-		screen.Draw()
+		screen.Draw(wrapperMock)
+		setupFunc := func(w interfaces.GLWrapper) { w.Enable(glwrapper.DEPTH_TEST) }
+		screen.Setup(setupFunc)
+		screen.Draw(wrapperMock)
 	}()
 }
 func TestUpdate(t *testing.T) {
@@ -478,4 +483,14 @@ func TestCameraCollisionTest(t *testing.T) {
 }
 func TestExport(t *testing.T) {
 	t.Skip("Unimplemented")
+}
+func TestSetup(t *testing.T) {
+	screen := New()
+	setupFunc := func(w interfaces.GLWrapper) { w.Enable(glwrapper.DEPTH_TEST) }
+	screen.Setup(setupFunc)
+
+	if screen.setupFunction == nil {
+		t.Errorf("Invalid function.")
+	}
+
 }

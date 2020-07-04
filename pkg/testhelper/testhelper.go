@@ -117,6 +117,7 @@ func (g GLWrapperMock) Clear(mask uint32)                                       
 func (g GLWrapperMock) Enable(cap uint32)                                                  {}
 func (g GLWrapperMock) DepthFunc(xfunc uint32)                                             {}
 func (g GLWrapperMock) Viewport(x int32, y int32, width int32, height int32)               {}
+func (g GLWrapperMock) BlendFunc(sfactor uint32, dfactor uint32)                           {}
 
 type ShaderMock struct{}
 
