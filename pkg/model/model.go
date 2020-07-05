@@ -231,6 +231,11 @@ func (m *Model) ClosestMeshTo(position mgl32.Vec3) (interfaces.Mesh, float32) {
 	return closestMesh, closest
 }
 
+// Clear function deletes the current meshes.
+func (m *Model) Clear() {
+	m.meshes = []interfaces.Mesh{}
+}
+
 // CollideTestWithSphere is the collision detection function for items in this mesh vs sphere.
 func (m *BaseModel) CollideTestWithSphere(boundingSphere *coldet.Sphere) bool {
 	for i, _ := range m.meshes {

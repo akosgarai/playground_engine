@@ -353,6 +353,15 @@ func TestClosestMeshTo(t *testing.T) {
 		}
 	}()
 }
+func TestClear(t *testing.T) {
+	model := New()
+	mshOne := mesh.NewPointMesh(wrapperMock)
+	model.AddMesh(mshOne)
+	model.Clear()
+	if len(model.meshes) != 0 {
+		t.Errorf("Invalid number of meshes after clear. Instead of 0, we have %d.", len(model.meshes))
+	}
+}
 func TestBug(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
 	bottomPosition := mgl32.Vec3{-1.5, 0.0, 0.0}
