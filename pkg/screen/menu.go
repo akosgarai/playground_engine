@@ -111,6 +111,11 @@ func (m *MenuScreen) BuildScreen(wrapper interfaces.GLWrapper, scale float32) {
 	}
 }
 
+// AddOption appens the new option to the end of the option list.
+func (m *MenuScreen) AddOption(o Option) {
+	m.options = append(m.options, o)
+}
+
 // It returns the options that needs to be displayed in the current state.
 func (m *MenuScreen) getOptionsToDisplay() []Option {
 	var result []Option
