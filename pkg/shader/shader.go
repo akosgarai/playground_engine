@@ -131,6 +131,11 @@ func NewTextureMatShaderBlendingWithFog(wrapper interfaces.GLWrapper) *Shader {
 	return NewShader(baseDirShaders()+"texturemat.vert", baseDirShaders()+"texturemat_blending_with_fog.frag", wrapper)
 }
 
+// NewFontShader returns a Shader, that could be user for rendering fonts.
+func NewFontShader(wrapper interfaces.GLWrapper) *Shader {
+	return NewShader(baseDirShaders()+"font.vert", baseDirShaders()+"font.frag", wrapper)
+}
+
 // Use is a wrapper for gl.UseProgram
 func (s *Shader) Use() {
 	s.wrapper.UseProgram(s.id)

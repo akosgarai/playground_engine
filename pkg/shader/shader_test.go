@@ -604,6 +604,27 @@ func TestNewTextureMatShaderBlendingWithFog(t *testing.T) {
 		}
 	}()
 }
+func TestNewFontShader(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer glfw.Terminate()
+				t.Errorf("NewFontShader shouldn't have panicked!. %v", r)
+			}
+		}()
+		runtime.LockOSThread()
+		InitGlfw()
+		defer glfw.Terminate()
+		realGlWrapper.InitOpenGL()
+		shader := NewFontShader(realGlWrapper)
+		if shader.id == 0 || shader.GetId() == 0 {
+			t.Error("Invalid shader program id")
+		}
+	}()
+}
 func TestUse(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
