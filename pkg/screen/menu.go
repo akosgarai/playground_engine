@@ -45,7 +45,7 @@ func (o *Option) DisplayCondition(state map[string]bool) bool {
 
 type MenuScreen struct {
 	*Screen
-	charset          model.Charset
+	charset          *model.Charset
 	background       interfaces.Model
 	surfaceTexture   texture.Textures
 	defaultMaterial  *material.Material
@@ -59,7 +59,7 @@ type MenuScreen struct {
 }
 
 // NewMenuScreen returns a MenuScreen without options.
-func NewMenuScreen(surface texture.Textures, defaultMat *material.Material, hoverMat *material.Material, charset model.Charset, fontColor mgl32.Vec3, backgroundColor mgl32.Vec3, wrapper interfaces.GLWrapper) *MenuScreen {
+func NewMenuScreen(surface texture.Textures, defaultMat *material.Material, hoverMat *material.Material, charset *model.Charset, fontColor mgl32.Vec3, backgroundColor mgl32.Vec3, wrapper interfaces.GLWrapper) *MenuScreen {
 	s := New()
 	bgShaderApplication := shader.NewMenuBackgroundShader(wrapper)
 	fgShaderApplication := shader.NewFontShader(wrapper)
