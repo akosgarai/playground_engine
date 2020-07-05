@@ -103,7 +103,7 @@ func (m *MenuScreen) BuildScreen(wrapper interfaces.GLWrapper, scale float32) {
 	// MenuSurfaceWidth: 1.0
 	positionY := float32(-0.8)
 	positionX := float32(-0.4)
-	positionZ := float32(-0.01)
+	positionZ := float32(0.01)
 	for i := len(optionsToDisplay) - 1; i >= 0; i-- {
 		optionsToDisplay[i].SetSurface(m.menuSurface(mgl32.Vec3{0.0, positionY, 0.0}, wrapper))
 		m.charset.PrintTo(optionsToDisplay[i].label, positionX, -0.03, positionZ, scale, wrapper, optionsToDisplay[i].surface, m.fontColor)
