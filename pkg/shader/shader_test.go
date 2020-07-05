@@ -625,6 +625,27 @@ func TestNewFontShader(t *testing.T) {
 		}
 	}()
 }
+func TestNewMenuBackgroundShader(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer glfw.Terminate()
+				t.Errorf("NewMenuBackgroundShader shouldn't have panicked!. %v", r)
+			}
+		}()
+		runtime.LockOSThread()
+		InitGlfw()
+		defer glfw.Terminate()
+		realGlWrapper.InitOpenGL()
+		shader := NewMenuBackgroundShader(realGlWrapper)
+		if shader.id == 0 || shader.GetId() == 0 {
+			t.Error("Invalid shader program id")
+		}
+	}()
+}
 func TestUse(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")

@@ -136,6 +136,12 @@ func NewFontShader(wrapper interfaces.GLWrapper) *Shader {
 	return NewShader(baseDirShaders()+"font.vert", baseDirShaders()+"font.frag", wrapper)
 }
 
+// NewMenuBackgroundShader returns a Shader, that could be used for rendering the background
+// for the menu screen.
+func NewMenuBackgroundShader(wrapper interfaces.GLWrapper) *Shader {
+	return NewShader(baseDirShaders()+"menu-background.vert", baseDirShaders()+"menu-background.frag", wrapper)
+}
+
 // Use is a wrapper for gl.UseProgram
 func (s *Shader) Use() {
 	s.wrapper.UseProgram(s.id)
