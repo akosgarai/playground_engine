@@ -84,3 +84,26 @@ Update loops on the shaderMap, and calls Update function on every Model. It also
 **Export**
 
 Export creates a directory for the screen and calls Export function on the models.
+
+## Screens
+
+Some screens are provided by the engine.
+
+### MenuScreen
+
+This screen is for displaying menus. It holds a Charset model, a texture for the menu items, the default and the hover material. It also holds an Options array that contains the displayable items. The options holds conditions for displaying.
+
+```
+ _______________
+ |	    - 0.1
+ | text     - 0.2 - Continue
+ |	    - 0.2
+ | text     - 0.2 - Start / Restart
+ |	    - 0.2
+ | text     - 0.2 - Options
+ |	    - 0.2
+ | text     - 0.2 - Save state
+ |	    - 0.2
+ | text     - 0.2 - Exit
+ |	    - 0.1
+```

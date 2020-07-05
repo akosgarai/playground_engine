@@ -494,3 +494,18 @@ func TestSetup(t *testing.T) {
 	}
 
 }
+func TestNewMenuScreenOption(t *testing.T) {
+	t.Error("Unimplemented")
+}
+func TestOptionSetSurface(t *testing.T) {
+	t.Error("Unimplemented")
+}
+func TestOptionDisplayCondition(t *testing.T) {
+	t.Error("Unimplemented")
+}
+func TestNewMenuScreen(t *testing.T) {
+	t.Error("Unimplemented")
+}
+func TestMenuScreenBuildScreen(t *testing.T) {
+	t.Error("Unimplemented")
+}

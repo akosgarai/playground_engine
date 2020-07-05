@@ -119,6 +119,8 @@ type Model interface {
 	CollideTestWithSphere(*coldet.Sphere) bool
 	IsTransparent() bool
 	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
+	Clear()
+	AddMesh(Mesh)
 }
 
 type KeyStore interface {
