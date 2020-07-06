@@ -155,7 +155,7 @@ type Camera interface {
 }
 type Screen interface {
 	Draw(GLWrapper)
-	Update(float64, float64, float64, RoKeyStore)
+	Update(float64, float64, float64, RoKeyStore, RoButtonStore)
 	Export(string)
 	GetCamera() Camera
 	GetClosestModelMeshDistance() (Model, Mesh, float32)

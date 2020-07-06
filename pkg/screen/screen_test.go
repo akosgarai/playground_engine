@@ -377,21 +377,22 @@ func TestUpdate(t *testing.T) {
 		}()
 		screen := New()
 		// wo everything
-		st := store.NewGlfwKeyStore()
-		screen.Update(10, 0, 0, st)
+		kst := store.NewGlfwKeyStore()
+		bst := store.NewGlfwMouseStore()
+		screen.Update(10, 0, 0, kst, bst)
 		// with camera
 		screen.SetCamera(cam)
-		screen.Update(10, 0, 0, st)
+		screen.Update(10, 0, 0, kst, bst)
 		// with rotate on distance
 		screen.SetRotateOnEdgeDistance(0.1)
-		screen.Update(10, 0, 0, st)
+		screen.Update(10, 0, 0, kst, bst)
 		// with shader & mesh
 		screen.AddShader(sm)
 		mod := model.New()
 		screen.AddModelToShader(mod, sm)
 		msh := mesh.NewPointMesh(wrapperMock)
 		mod.AddMesh(msh)
-		screen.Update(10, 0, 0, st)
+		screen.Update(10, 0, 0, kst, bst)
 	}()
 }
 func TestCameraKeyboardMovement(t *testing.T) {

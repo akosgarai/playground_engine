@@ -103,7 +103,7 @@ func (a *Application) Update(dt float64) {
 	MousePosX, MousePosY := a.window.GetCursorPos()
 	WindowWidth, WindowHeight := a.window.GetSize()
 	mX, mY := transformations.MouseCoordinates(MousePosX, MousePosY, float64(WindowWidth), float64(WindowHeight))
-	a.activeScreen.Update(dt, mX, mY, a.keyDowns)
+	a.activeScreen.Update(dt, mX, mY, a.keyDowns, a.mouseDowns)
 }
 
 // AddScreen appends the screen to screens.

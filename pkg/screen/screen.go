@@ -14,6 +14,10 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+const (
+	LEFT_MOUSE_BUTTON = glfw.MouseButtonLeft
+)
+
 type SetupFunction func(wrapper interfaces.GLWrapper)
 
 type ScreenBase struct {
@@ -372,13 +376,13 @@ func (s *ScreenBase) Draw(wrapper interfaces.GLWrapper) {
 
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
-func (s *Screen) Update(dt, posX, posY float64, store interfaces.RoKeyStore) {
+func (s *Screen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	TransformationMatrix := mgl32.Ident4()
 	if s.cameraSet {
-		s.cameraKeyboardMovement("forward", "back", "Walk", dt, store)
-		s.cameraKeyboardMovement("right", "left", "Strafe", dt, store)
-		s.cameraKeyboardMovement("up", "down", "Lift", dt, store)
-		s.cameraKeyboardRotation(dt, store)
+		s.cameraKeyboardMovement("forward", "back", "Walk", dt, keyStore)
+		s.cameraKeyboardMovement("right", "left", "Strafe", dt, keyStore)
+		s.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
+		s.cameraKeyboardRotation(dt, keyStore)
 		if s.rotateOnEdgeDistance > 0.0 {
 			s.cameraMouseRotation(dt, posX, posY)
 		}

@@ -1,6 +1,8 @@
 package screen
 
 import (
+	"math"
+
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
@@ -44,7 +46,7 @@ func (o *Option) DisplayCondition(state map[string]bool) bool {
 }
 
 type MenuScreen struct {
-	*Screen
+	*ScreenBase
 	charset          *model.Charset
 	background       interfaces.Model
 	surfaceTexture   texture.Textures
@@ -60,7 +62,7 @@ type MenuScreen struct {
 
 // NewMenuScreen returns a MenuScreen without options.
 func NewMenuScreen(surface texture.Textures, defaultMat *material.Material, hoverMat *material.Material, charset *model.Charset, fontColor mgl32.Vec3, backgroundColor mgl32.Vec3, wrapper interfaces.GLWrapper) *MenuScreen {
-	s := New()
+	s := newScreenBase()
 	bgShaderApplication := shader.NewMenuBackgroundShader(wrapper)
 	fgShaderApplication := shader.NewFontShader(wrapper)
 	s.AddShader(bgShaderApplication)
@@ -71,7 +73,7 @@ func NewMenuScreen(surface texture.Textures, defaultMat *material.Material, hove
 	state := make(map[string]bool)
 	state["world-started"] = false
 	menuScreen := &MenuScreen{
-		Screen:           s,
+		ScreenBase:       s,
 		surfaceTexture:   surface,
 		defaultMaterial:  defaultMat,
 		hoverMaterial:    hoverMat,
@@ -147,4 +149,44 @@ func (m *MenuScreen) setupMenu(glWrapper interfaces.GLWrapper) {
 	glWrapper.BlendFunc(glwrapper.SRC_APLHA, glwrapper.ONE_MINUS_SRC_ALPHA)
 	col := m.backgroundColor
 	glWrapper.ClearColor(col.X(), col.Y(), col.Z(), 1.0)
+}
+
+// Update loops on the shaderMap, and calls Update function on every Model.
+// It also handles the camera movement and rotation, if the camera is set.
+func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+	TransformationMatrix := mgl32.Ident4()
+	if s.cameraSet {
+		s.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
+		TransformationMatrix = (s.camera.GetProjectionMatrix().Mul4(s.camera.GetViewMatrix())).Inv()
+	}
+	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)
+	closestDistance := float32(math.MaxFloat32)
+	var closestMesh interfaces.Mesh
+	s.closestModel = s.background
+	// Here we only need to check the background shader, get the closest stuff, and check the distance
+	for index, _ := range s.shaderMap[s.backgroundShader] {
+		s.shaderMap[s.backgroundShader][index].Update(dt)
+		msh, dist := s.shaderMap[s.backgroundShader][index].ClosestMeshTo(coords)
+		if dist < closestDistance {
+			closestDistance = dist
+			closestMesh = msh
+		}
+	}
+	// Update the material in case of hover state.
+	s.closestMesh = closestMesh
+	s.closestDistance = closestDistance
+
+	tmMesh := s.closestMesh.(*mesh.TexturedMaterialMesh)
+	if s.closestDistance < 0.01 {
+		tmMesh.Material = s.hoverMaterial
+		if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+			for i, _ := range s.options {
+				if s.options[i].surface == tmMesh {
+					s.options[i].clickEvent()
+				}
+			}
+		}
+	} else {
+		tmMesh.Material = s.defaultMaterial
+	}
 }
