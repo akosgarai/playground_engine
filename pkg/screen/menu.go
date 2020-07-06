@@ -182,8 +182,9 @@ func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		tmMesh.Material = s.hoverMaterial
 		if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 			for i, _ := range s.options {
-				fmt.Printf("&(s.options[i].surface): %v | &(s.closestMesh): %v | &tmMesh %v\n", &(s.options[i].surface), &(s.closestMesh), &tmMesh)
-				fmt.Printf("s.options[i].surface == s.closestMesh (%v) | s.options[i].surface == tmMesh (%v) | s.closestMesh == tmmesh (%v)", s.options[i].surface == s.closestMesh, s.options[i].surface == tmMesh, s.closestMesh == tmMesh)
+				surfaceCast := s.options[i].surface.(*mesh.TexturedMaterialMesh)
+				fmt.Printf("&(s.options[i].surface): %v | &(s.closestMesh): %v | &tmMesh %v | &surfaceCast: %v\n", &(s.options[i].surface), &(s.closestMesh), &tmMesh, &surfaceCast)
+				fmt.Printf("s.options[i].surface == s.closestMesh (%v) | s.options[i].surface == tmMesh (%v) | s.closestMesh == tmMesh (%v) | surfaceCast == tmMesh (%v)\n", s.options[i].surface == s.closestMesh, s.options[i].surface == tmMesh, s.closestMesh == tmMesh, surfaceCast == tmMesh)
 				if &(s.options[i].surface) == &(s.closestMesh) {
 					fmt.Println("Surface has been found.")
 					s.options[i].clickEvent()
