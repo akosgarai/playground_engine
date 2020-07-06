@@ -182,7 +182,8 @@ func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		tmMesh.Material = s.hoverMaterial
 		if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 			for i, _ := range s.options {
-				if &s.options[i].surface == &s.closestMesh {
+				fmt.Printf("&(s.options[i].surface): %v | &(s.closestMesh): %v\n", &(s.options[i].surface), &(s.closestMesh))
+				if &(s.options[i].surface) == &(s.closestMesh) {
 					fmt.Println("Surface has been found.")
 					s.options[i].clickEvent()
 				}
