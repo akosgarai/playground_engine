@@ -1,6 +1,7 @@
 package screen
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
@@ -180,8 +181,10 @@ func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	if s.closestDistance < 0.01 {
 		tmMesh.Material = s.hoverMaterial
 		if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+			fmt.Println("Button has been triggered.")
 			for i, _ := range s.options {
 				if s.options[i].surface == s.closestMesh {
+					fmt.Println("Surface has been found.")
 					s.options[i].clickEvent()
 				}
 			}
