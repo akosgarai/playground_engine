@@ -16,7 +16,7 @@ import (
 
 type SetupFunction func(wrapper interfaces.GLWrapper)
 
-type Screen struct {
+type ScreenBase struct {
 	camera    interfaces.Camera
 	cameraSet bool
 
@@ -47,9 +47,8 @@ type Screen struct {
 	setupFunction SetupFunction
 }
 
-// New returns a screen instance
-func New() *Screen {
-	return &Screen{
+func newScreenBase() *ScreenBase {
+	return &ScreenBase{
 		cameraSet:                 false,
 		shaderMap:                 make(map[interfaces.Shader][]interfaces.Model),
 		directionalLightSources:   []DirectionalLightSource{},
@@ -64,8 +63,20 @@ func New() *Screen {
 	}
 }
 
+type Screen struct {
+	ScreenBase
+}
+
+// New returns a screen instance
+func New() *Screen {
+	sb := newScreenBase()
+	return &Screen{
+		ScreenBase: *sb,
+	}
+}
+
 // Log returns the string representation of this object.
-func (s *Screen) Log() string {
+func (s *ScreenBase) Log() string {
 	logString := "Screen:\n"
 	if s.cameraSet {
 		logString += " - camera : " + s.camera.Log() + "\n"
@@ -79,14 +90,14 @@ func (s *Screen) Log() string {
 // Currently the following values are supported: 'forward', 'back',
 // 'left', 'right', 'up', 'down', 'rotateLeft', 'rotateRight',
 // 'rotateUp', 'rotateDown'
-func (s *Screen) SetCameraMovementMap(m map[string]glfw.Key) {
+func (s *ScreenBase) SetCameraMovementMap(m map[string]glfw.Key) {
 	s.cameraKeyboardMovementMap = m
 }
 
 // SetRotateOnEdgeDistance updates the rotateOnEdgeDistance variable.
 // The value has to be in the [0-1] interval. If not, a message is printed to the
 // console and the variable update is skipped.
-func (s *Screen) SetRotateOnEdgeDistance(value float32) {
+func (s *ScreenBase) SetRotateOnEdgeDistance(value float32) {
 	// validate value. [0-1]
 	if value < 0 || value > 1 {
 		fmt.Printf("Skipping rotateOnEdgeDistance variable update, value '%f' invalid.\n", value)
@@ -96,41 +107,41 @@ func (s *Screen) SetRotateOnEdgeDistance(value float32) {
 }
 
 // SetCamera updates the camera with the new one.
-func (s *Screen) SetCamera(c interfaces.Camera) {
+func (s *ScreenBase) SetCamera(c interfaces.Camera) {
 	s.cameraSet = true
 	s.camera = c
 }
 
 // GetCamera returns the current camera of the screen.
-func (s *Screen) GetCamera() interfaces.Camera {
+func (s *ScreenBase) GetCamera() interfaces.Camera {
 	return s.camera
 }
 
 // AddShader method inserts the new shader to the shaderMap
-func (s *Screen) AddShader(sh interfaces.Shader) {
+func (s *ScreenBase) AddShader(sh interfaces.Shader) {
 	s.shaderMap[sh] = []interfaces.Model{}
 }
 
 // AddModelToShader attaches the model to a shader.
-func (s *Screen) AddModelToShader(m interfaces.Model, sh interfaces.Shader) {
+func (s *ScreenBase) AddModelToShader(m interfaces.Model, sh interfaces.Shader) {
 	s.shaderMap[sh] = append(s.shaderMap[sh], m)
 }
 
 // GetClosestModelMeshDistance returns the closest model, mesh and its distance
 // from the mouse position.
-func (s *Screen) GetClosestModelMeshDistance() (interfaces.Model, interfaces.Mesh, float32) {
+func (s *ScreenBase) GetClosestModelMeshDistance() (interfaces.Model, interfaces.Mesh, float32) {
 	return s.closestModel, s.closestMesh, s.closestDistance
 }
 
 // SetUniformFloat sets the given float value to the given string key in
 // the uniformFloat map.
-func (s *Screen) SetUniformFloat(key string, value float32) {
+func (s *ScreenBase) SetUniformFloat(key string, value float32) {
 	s.uniformFloat[key] = value
 }
 
 // SetUniformVector sets the given mgl32.Vec3 value to the given string key in
 // the uniformVector map.
-func (s *Screen) SetUniformVector(key string, value mgl32.Vec3) {
+func (s *ScreenBase) SetUniformVector(key string, value mgl32.Vec3) {
 	s.uniformVector[key] = value
 }
 
@@ -139,7 +150,7 @@ func (s *Screen) SetUniformVector(key string, value mgl32.Vec3) {
 // and it also takes a [4]string, with the uniform names that are used in the shader applications
 // the 'DirectionUniformName', 'AmbientUniformName', 'DiffuseUniformName', 'SpecularUniformName'.
 // They has to be in this order.
-func (s *Screen) AddDirectionalLightSource(lightSource interfaces.DirectionalLight, uniformNames [4]string) {
+func (s *ScreenBase) AddDirectionalLightSource(lightSource interfaces.DirectionalLight, uniformNames [4]string) {
 	var dSource DirectionalLightSource
 	dSource.LightSource = lightSource
 	dSource.DirectionUniformName = uniformNames[0]
@@ -154,7 +165,7 @@ func (s *Screen) AddDirectionalLightSource(lightSource interfaces.DirectionalLig
 // input that contains the model related info, and it also containt the uniform names in [7]string format.
 // The order has to be the following: 'PositionUniformName', 'AmbientUniformName', 'DiffuseUniformName',
 // 'SpecularUniformName', 'ConstantTermUniformName', 'LinearTermUniformName', 'QuadraticTermUniformName'.
-func (s *Screen) AddPointLightSource(lightSource interfaces.PointLight, uniformNames [7]string) {
+func (s *ScreenBase) AddPointLightSource(lightSource interfaces.PointLight, uniformNames [7]string) {
 	var pSource PointLightSource
 	pSource.LightSource = lightSource
 	pSource.PositionUniformName = uniformNames[0]
@@ -173,7 +184,7 @@ func (s *Screen) AddPointLightSource(lightSource interfaces.PointLight, uniformN
 // The order has to be the following: 'PositionUniformName', 'DirectionUniformName', 'AmbientUniformName',
 // 'DiffuseUniformName', 'SpecularUniformName', 'ConstantTermUniformName', 'LinearTermUniformName',
 // 'QuadraticTermUniformName', 'CutoffUniformName'.
-func (s *Screen) AddSpotLightSource(lightSource interfaces.SpotLight, uniformNames [10]string) {
+func (s *ScreenBase) AddSpotLightSource(lightSource interfaces.SpotLight, uniformNames [10]string) {
 	var sSource SpotLightSource
 	sSource.LightSource = lightSource
 	sSource.PositionUniformName = uniformNames[0]
@@ -191,7 +202,7 @@ func (s *Screen) AddSpotLightSource(lightSource interfaces.SpotLight, uniformNam
 }
 
 // Setup light related uniforms.
-func (s *Screen) lightHandler(sh interfaces.Shader) {
+func (s *ScreenBase) lightHandler(sh interfaces.Shader) {
 	s.setupDirectionalLightForShader(sh)
 	s.setupPointLightForShader(sh)
 	s.setupSpotLightForShader(sh)
@@ -199,7 +210,7 @@ func (s *Screen) lightHandler(sh interfaces.Shader) {
 
 // Setup directional light related uniforms. It iterates over the directional sources
 // and setups each uniform, where the name is not empty.
-func (s *Screen) setupDirectionalLightForShader(sh interfaces.Shader) {
+func (s *ScreenBase) setupDirectionalLightForShader(sh interfaces.Shader) {
 	for _, source := range s.directionalLightSources {
 		if source.DirectionUniformName != "" {
 			direction := source.LightSource.GetDirection()
@@ -223,7 +234,7 @@ func (s *Screen) setupDirectionalLightForShader(sh interfaces.Shader) {
 
 // Setup point light relates uniforms. It iterates over the point light sources and sets
 // up every uniform, where the name is not empty.
-func (s *Screen) setupPointLightForShader(sh interfaces.Shader) {
+func (s *ScreenBase) setupPointLightForShader(sh interfaces.Shader) {
 	for _, source := range s.pointLightSources {
 		if source.PositionUniformName != "" {
 			position := source.LightSource.GetPosition()
@@ -256,7 +267,7 @@ func (s *Screen) setupPointLightForShader(sh interfaces.Shader) {
 
 // Setup spot light related uniforms. It iterates over the spot light sources and sets up
 // every uniform, where the name is not empty.
-func (s *Screen) setupSpotLightForShader(sh interfaces.Shader) {
+func (s *ScreenBase) setupSpotLightForShader(sh interfaces.Shader) {
 	for _, source := range s.spotLightSources {
 		if source.DirectionUniformName != "" {
 			direction := source.LightSource.GetDirection()
@@ -298,7 +309,7 @@ func (s *Screen) setupSpotLightForShader(sh interfaces.Shader) {
 }
 
 // Setup custom uniforms for the shader application.
-func (s *Screen) customUniforms(sh interfaces.Shader) {
+func (s *ScreenBase) customUniforms(sh interfaces.Shader) {
 	for name, value := range s.uniformFloat {
 		sh.SetUniform1f(name, value)
 	}
@@ -311,7 +322,7 @@ func (s *Screen) customUniforms(sh interfaces.Shader) {
 // it loops on the shaderMap (shaders).
 // For each shader, first set it to used state, setup camera realted uniforms,
 // then setup light related uniformsi and custom uniforms. Then we can pass the shader to the Model for drawing.
-func (s *Screen) Draw(wrapper interfaces.GLWrapper) {
+func (s *ScreenBase) Draw(wrapper interfaces.GLWrapper) {
 	if s.setupFunction != nil {
 		s.setupFunction(wrapper)
 	}
@@ -405,7 +416,7 @@ func (s *Screen) Update(dt, posX, posY float64, store interfaces.RoKeyStore) {
 // as input to be able to call it. For the movement we also need to know the delta time,
 // that is also added as function input. In case of invalid function name,
 // it prints out some message to the console.
-func (s *Screen) cameraKeyboardMovement(directionKey, oppositeKey, handlerName string, delta float64, store interfaces.RoKeyStore) {
+func (s *ScreenBase) cameraKeyboardMovement(directionKey, oppositeKey, handlerName string, delta float64, store interfaces.RoKeyStore) {
 	keyStateDirection := false
 	keyStateOpposite := false
 	if val, ok := s.cameraKeyboardMovementMap[directionKey]; ok {
@@ -451,7 +462,7 @@ func (s *Screen) cameraKeyboardMovement(directionKey, oppositeKey, handlerName s
 
 // cameraKeyboardRotation is responsible for handling the rotation events generated by the keyboard.
 // The rotation(Up|Down|Left|Right) keys are checked from the maps
-func (s *Screen) cameraKeyboardRotation(delta float64, store interfaces.RoKeyStore) {
+func (s *ScreenBase) cameraKeyboardRotation(delta float64, store interfaces.RoKeyStore) {
 	rotateUp := false
 	rotateDown := false
 	rotateLeft := false
@@ -472,7 +483,7 @@ func (s *Screen) cameraKeyboardRotation(delta float64, store interfaces.RoKeySto
 }
 
 // applyMouseRotation calls the camera's UpdateDirection function if necessary.
-func (s *Screen) applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotateDown bool, delta float64) {
+func (s *ScreenBase) applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotateDown bool, delta float64) {
 	dX := float32(0.0)
 	dY := float32(0.0)
 
@@ -493,7 +504,7 @@ func (s *Screen) applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotateDow
 
 // cameraMouseRotation function is responsible for the rotation generated by the mouse
 // position. If it is close to the edges, it triggers movement.
-func (s *Screen) cameraMouseRotation(delta, posX, posY float64) {
+func (s *ScreenBase) cameraMouseRotation(delta, posX, posY float64) {
 	rotateUp := false
 	rotateDown := false
 	rotateLeft := false
@@ -519,7 +530,7 @@ func (s *Screen) cameraMouseRotation(delta, posX, posY float64) {
 // cameraCollisionTest is responsible for the camera movement collision testing. It gets the bounding object for the next step.
 // Under the hood, it iterates over the shaders, and tests collision for every mesh. It stops the test after the fist
 // detected collision and returns true. Without detected collision it returns false.
-func (s *Screen) cameraCollisionTest(boundingSphere *coldet.Sphere) bool {
+func (s *ScreenBase) cameraCollisionTest(boundingSphere *coldet.Sphere) bool {
 	for sh, _ := range s.shaderMap {
 		for index, _ := range s.shaderMap[sh] {
 			if s.shaderMap[sh][index].CollideTestWithSphere(boundingSphere) {
@@ -531,7 +542,7 @@ func (s *Screen) cameraCollisionTest(boundingSphere *coldet.Sphere) bool {
 }
 
 // Export creates a directory for the screen and calls Export function on the models.
-func (s *Screen) Export(basePath string) {
+func (s *ScreenBase) Export(basePath string) {
 	i := 0
 	for sh, _ := range s.shaderMap {
 		modelDir := strconv.Itoa(i)
@@ -547,6 +558,6 @@ func (s *Screen) Export(basePath string) {
 }
 
 // Setup function sets the setupFunction to the given one
-func (s *Screen) Setup(f SetupFunction) {
+func (s *ScreenBase) Setup(f SetupFunction) {
 	s.setupFunction = f
 }
