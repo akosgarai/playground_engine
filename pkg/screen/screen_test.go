@@ -598,6 +598,9 @@ func TestMenuScreenBuildScreen(t *testing.T) {
 	}()
 }
 func TestMenuScreenAddOption(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	runtime.LockOSThread()
 	menu := NewTestMenuScreen(t)
 	defer testhelper.GlfwTerminate()
