@@ -3,7 +3,6 @@ package screen
 import (
 	"fmt"
 	"math"
-	"reflect"
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
@@ -60,6 +59,7 @@ type MenuScreen struct {
 	fontColor        []mgl32.Vec3
 	backgroundColor  mgl32.Vec3
 	state            map[string]bool
+	surfaceToOption  map[interfaces.Mesh]Option
 }
 
 // NewMenuScreen returns a MenuScreen without options.
@@ -87,6 +87,7 @@ func NewMenuScreen(surface texture.Textures, defaultMat *material.Material, hove
 		fontColor:        []mgl32.Vec3{fontColor},
 		backgroundColor:  backgroundColor,
 		state:            state,
+		surfaceToOption:  make(map[interfaces.Mesh]Option),
 	}
 	s.Setup(menuScreen.setupMenu)
 	return menuScreen
@@ -108,11 +109,15 @@ func (m *MenuScreen) BuildScreen(wrapper interfaces.GLWrapper, scale float32) {
 	positionY := float32(-0.8)
 	positionX := float32(-0.4)
 	positionZ := float32(0.01)
+	surfaceToOption := make(map[interfaces.Mesh]Option)
 	for i := len(optionsToDisplay) - 1; i >= 0; i-- {
-		optionsToDisplay[i].SetSurface(m.menuSurface(mgl32.Vec3{0.0, positionY, 0.0}, wrapper))
+		surface := m.menuSurface(mgl32.Vec3{0.0, positionY, 0.0}, wrapper)
+		optionsToDisplay[i].SetSurface(surface)
+		surfaceToOption[surface] = optionsToDisplay[i]
 		m.charset.PrintTo(optionsToDisplay[i].label, positionX, -0.03, positionZ, scale, wrapper, optionsToDisplay[i].surface, m.fontColor)
 		positionY += float32(0.4)
 	}
+	m.surfaceToOption = surfaceToOption
 }
 
 // AddOption appens the new option to the end of the option list.
@@ -182,14 +187,18 @@ func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	if s.closestDistance < 0.01 {
 		tmMesh.Material = s.hoverMaterial
 		if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-			for i, _ := range s.options {
-				fmt.Printf("&(s.options[i].surface): %v | &(s.closestMesh): %v | &tmMesh %v\n", &(s.options[i].surface), &(s.closestMesh), &tmMesh)
-				fmt.Printf("s.options[i].surface == s.closestMesh (%v) | s.options[i].surface == tmMesh (%v) | s.closestMesh == tmMesh (%v) | reflect.DeepEqual(s.options[i].surface, tmMesh) (%v)\n", s.options[i].surface == s.closestMesh, s.options[i].surface == tmMesh, s.closestMesh == tmMesh, reflect.DeepEqual(s.options[i].surface, tmMesh))
-				if &(s.options[i].surface) == &(s.closestMesh) {
-					fmt.Println("Surface has been found.")
-					s.options[i].clickEvent()
+			option := s.surfaceToOption[s.closestMesh]
+			fmt.Printf("Option: %#v\n", option)
+			/*
+				for i, _ := range s.options {
+					fmt.Printf("&(s.options[i].surface): %v | &(s.closestMesh): %v | &tmMesh %v\n", &(s.options[i].surface), &(s.closestMesh), &tmMesh)
+					fmt.Printf("s.options[i].surface == s.closestMesh (%v) | s.options[i].surface == tmMesh (%v) | s.closestMesh == tmMesh (%v) | reflect.DeepEqual(s.options[i].surface, tmMesh) (%v)\n", s.options[i].surface == s.closestMesh, s.options[i].surface == tmMesh, s.closestMesh == tmMesh, reflect.DeepEqual(s.options[i].surface, tmMesh))
+					if &(s.options[i].surface) == &(s.closestMesh) {
+						fmt.Println("Surface has been found.")
+						s.options[i].clickEvent()
+					}
 				}
-			}
+			*/
 		}
 	} else {
 		tmMesh.Material = s.defaultMaterial
