@@ -2,17 +2,20 @@ package screen
 
 import (
 	"reflect"
+	"runtime"
 	"testing"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
+	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/model"
 	"github.com/akosgarai/playground_engine/pkg/primitives/boundingobject"
 	"github.com/akosgarai/playground_engine/pkg/store"
 	"github.com/akosgarai/playground_engine/pkg/testhelper"
+	"github.com/akosgarai/playground_engine/pkg/texture"
 
 	"github.com/akosgarai/coldet"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -24,6 +27,7 @@ var (
 
 	sm          testhelper.ShaderMock
 	wrapperMock testhelper.GLWrapperMock
+	wrapperReal glwrapper.Wrapper
 )
 
 func TestNew(t *testing.T) {
@@ -534,18 +538,99 @@ func TestOptionDisplayCondition(t *testing.T) {
 		t.Error("Invalid display condition result")
 	}
 }
+func NewTestMenuScreen(t *testing.T) *MenuScreen {
+	testhelper.GlfwInit()
+	var tex texture.Textures
+	wrapperReal.InitOpenGL()
+	charset, err := model.LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40.0, 72, wrapperReal)
+	if err != nil {
+		t.Errorf("Error during load charset: %#v.", err)
+	}
+	dMat := material.Jade
+	hMat := material.Ruby
+	fontColor := mgl32.Vec3{0, 0, 0}
+	bgColor := mgl32.Vec3{1, 1, 1}
+	menu := NewMenuScreen(tex, dMat, hMat, charset, fontColor, bgColor, wrapperReal)
+
+	if menu.defaultMaterial != dMat {
+		t.Errorf("Invalid default material. Instead of '%#v', we have '%#v'.", dMat, menu.defaultMaterial)
+	}
+	if menu.hoverMaterial != hMat {
+		t.Errorf("Invalid hover material. Instead of '%#v', we have '%#v'.", hMat, menu.hoverMaterial)
+	}
+	if menu.charset != charset {
+		t.Error("Invalid charset")
+	}
+	if menu.fontColor[0] != fontColor {
+		t.Error("Invalid font color")
+	}
+	if menu.backgroundColor != bgColor {
+		t.Error("Invalid background color")
+	}
+	return menu
+}
 func TestNewMenuScreen(t *testing.T) {
-	t.Error("Unimplemented")
+	runtime.LockOSThread()
+	_ = NewTestMenuScreen(t)
+	defer testhelper.GlfwTerminate()
 }
 func TestMenuScreenBuildScreen(t *testing.T) {
-	t.Error("Unimplemented")
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		runtime.LockOSThread()
+		menu := NewTestMenuScreen(t)
+		defer testhelper.GlfwTerminate()
+		menu.BuildScreen(wrapperReal, 1.0)
+		option := NewTestOption(t)
+		menu.AddOption(*option)
+		menu.BuildScreen(wrapperReal, 1.0)
+	}()
 }
 func TestMenuScreenAddOption(t *testing.T) {
-	t.Error("Unimplemented")
+	runtime.LockOSThread()
+	menu := NewTestMenuScreen(t)
+	if len(menu.options) != 0 {
+		t.Error("Invalid initial option")
+	}
+	var option Option
+	menu.AddOption(option)
+	if len(menu.options) != 1 {
+		t.Errorf("Invalid number of options (%d)", len(menu.options))
+	}
 }
 func TestMenuScreenUpdate(t *testing.T) {
-	t.Error("Unimplemented")
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		runtime.LockOSThread()
+		menu := NewTestMenuScreen(t)
+		defer testhelper.GlfwTerminate()
+		menu.BuildScreen(wrapperReal, 1.0)
+		option := NewTestOption(t)
+		menu.AddOption(*option)
+		menu.BuildScreen(wrapperReal, 1.0)
+		ks := store.NewGlfwKeyStore()
+		ms := store.NewGlfwMouseStore()
+		menu.Update(10, 0, 0, ks, ms)
+	}()
 }
 func TestMenuSetState(t *testing.T) {
-	t.Error("Unimplemented")
+	runtime.LockOSThread()
+	menu := NewTestMenuScreen(t)
+	if menu.state["world-started"] != false {
+		t.Error("Invalid initial state")
+	}
+	menu.SetState("world-started", true)
+	if menu.state["world-started"] != true {
+		t.Error("Invalid state")
+	}
 }
