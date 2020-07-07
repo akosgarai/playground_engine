@@ -92,6 +92,11 @@ func NewMenuScreen(surface texture.Textures, defaultMat *material.Material, hove
 	return menuScreen
 }
 
+// SetState is the state maintainer function
+func (m *MenuScreen) SetState(key string, value bool) {
+	m.state[key] = value
+}
+
 // BuildScreen function sets the screen up based on the option conditions.
 func (m *MenuScreen) BuildScreen(wrapper interfaces.GLWrapper, scale float32) {
 	// clear prev. screen

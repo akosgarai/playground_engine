@@ -516,3 +516,6 @@ func TestMenuScreenAddOption(t *testing.T) {
 func TestMenuScreenUpdate(t *testing.T) {
 	t.Error("Unimplemented")
 }
+func TestMenuSetState(t *testing.T) {
+	t.Error("Unimplemented")
+}
