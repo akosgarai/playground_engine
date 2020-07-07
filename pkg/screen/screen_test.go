@@ -495,14 +495,44 @@ func TestSetup(t *testing.T) {
 	}
 
 }
+func NewTestOption(t *testing.T) *Option {
+	dcb := func(m map[string]bool) bool { return true }
+	ecb := func() {}
+	label := "option-label"
+	opt := NewMenuScreenOption(label, dcb, ecb)
+	if opt.label != label {
+		t.Errorf("Invalid label. Instead of '%s', we have '%s'.", label, opt.label)
+	}
+	return opt
+}
 func TestNewMenuScreenOption(t *testing.T) {
-	t.Error("Unimplemented")
+	_ = NewTestOption(t)
 }
 func TestOptionSetSurface(t *testing.T) {
-	t.Error("Unimplemented")
+	opt := NewTestOption(t)
+	var msh interfaces.Mesh
+	opt.SetSurface(msh)
+	if opt.surface != msh {
+		t.Error("Invalid surface")
+	}
 }
 func TestOptionDisplayCondition(t *testing.T) {
-	t.Error("Unimplemented")
+	dcb := func(m map[string]bool) bool { return m["test"] }
+	ecb := func() {}
+	label := "option-label"
+	opt := NewMenuScreenOption(label, dcb, ecb)
+	mp := make(map[string]bool)
+	if opt.DisplayCondition(mp) != false {
+		t.Error("Invalid display condition result")
+	}
+	mp["test"] = true
+	if opt.DisplayCondition(mp) != true {
+		t.Error("Invalid display condition result")
+	}
+	mp["test"] = false
+	if opt.DisplayCondition(mp) != false {
+		t.Error("Invalid display condition result")
+	}
 }
 func TestNewMenuScreen(t *testing.T) {
 	t.Error("Unimplemented")
