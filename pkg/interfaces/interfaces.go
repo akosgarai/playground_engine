@@ -119,6 +119,8 @@ type Model interface {
 	CollideTestWithSphere(*coldet.Sphere) bool
 	IsTransparent() bool
 	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
+	Clear()
+	AddMesh(Mesh)
 }
 
 type KeyStore interface {
@@ -153,7 +155,7 @@ type Camera interface {
 }
 type Screen interface {
 	Draw(GLWrapper)
-	Update(float64, float64, float64, RoKeyStore)
+	Update(float64, float64, float64, RoKeyStore, RoButtonStore)
 	Export(string)
 	GetCamera() Camera
 	GetClosestModelMeshDistance() (Model, Mesh, float32)
