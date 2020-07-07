@@ -570,11 +570,17 @@ func NewTestMenuScreen(t *testing.T) *MenuScreen {
 	return menu
 }
 func TestNewMenuScreen(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	runtime.LockOSThread()
 	_ = NewTestMenuScreen(t)
 	defer testhelper.GlfwTerminate()
 }
 func TestMenuScreenBuildScreen(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -594,6 +600,7 @@ func TestMenuScreenBuildScreen(t *testing.T) {
 func TestMenuScreenAddOption(t *testing.T) {
 	runtime.LockOSThread()
 	menu := NewTestMenuScreen(t)
+	defer testhelper.GlfwTerminate()
 	if len(menu.options) != 0 {
 		t.Error("Invalid initial option")
 	}
@@ -604,6 +611,9 @@ func TestMenuScreenAddOption(t *testing.T) {
 	}
 }
 func TestMenuScreenUpdate(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -624,7 +634,11 @@ func TestMenuScreenUpdate(t *testing.T) {
 	}()
 }
 func TestMenuSetState(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	runtime.LockOSThread()
+	defer testhelper.GlfwTerminate()
 	menu := NewTestMenuScreen(t)
 	if menu.state["world-started"] != false {
 		t.Error("Invalid initial state")
