@@ -52,7 +52,7 @@ func charset(wrapper interfaces.GLWrapper) *model.Charset {
 
 // It creates a new camera with the necessary setup
 func createCamera(ratio float32) *camera.Camera {
-	camera := camera.NewCamera(mgl32.Vec3{0, 0, -2.0}, mgl32.Vec3{0, -1, 0}, -90.0, 0.0)
+	camera := camera.NewCamera(mgl32.Vec3{0, 0, -2.0}, mgl32.Vec3{0, -1, 0}, 0.0, 0.0)
 	camera.SetupProjection(45, ratio, 0.001, 10.0)
 	return camera
 }
