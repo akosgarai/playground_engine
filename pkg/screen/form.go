@@ -1,19 +1,29 @@
 package screen
 
 import (
+	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
+	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/model"
 	"github.com/akosgarai/playground_engine/pkg/primitives/rectangle"
 	"github.com/akosgarai/playground_engine/pkg/shader"
 
+	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
 const (
 	frameWidth = float32(0.02)
 	FontFile   = "/assets/fonts/Frijole/Frijole-Regular.ttf"
+)
+
+var (
+	DirectionalLightDirection = (mgl32.Vec3{0.0, 0.0, -1.0}).Normalize()
+	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
+	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
+	DirectionalLightSpecular  = mgl32.Vec3{0.5, 0.5, 0.5}
 )
 
 type FormScreen struct {
@@ -39,13 +49,38 @@ func charset(wrapper interfaces.GLWrapper) *model.Charset {
 	return cs
 }
 
+// It creates a new camera with the necessary setup
+func createCamera(ratio float32) *camera.Camera {
+	camera := camera.NewCamera(mgl32.Vec3{0, 0, -2.0}, mgl32.Vec3{0, -1, 0}, -90.0, 0.0)
+	camera.SetupProjection(45, ratio, 0.001, 10.0)
+	return camera
+}
+
+// Setup keymap for the camera movement
+func cameraMovementMap() map[string]glfw.Key {
+	cm := make(map[string]glfw.Key)
+	cm["up"] = glfw.KeyQ
+	cm["down"] = glfw.KeyE
+	return cm
+}
+
 // NewFormScreen returns a FormScreen. The screen contains a material Frame.
-func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GLWrapper) *FormScreen {
+func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GLWrapper, whRatio float32) *FormScreen {
 	s := newScreenBase()
-	bgShaderApplication := shader.NewMenuBackgroundShader(wrapper)
+	s.SetCamera(createCamera(whRatio))
+	s.SetCameraMovementMap(cameraMovementMap())
+	bgShaderApplication := shader.NewMaterialShader(wrapper)
 	fgShaderApplication := shader.NewFontShader(wrapper)
 	s.AddShader(bgShaderApplication)
 	s.AddShader(fgShaderApplication)
+	LightSource := light.NewDirectionalLight([4]mgl32.Vec3{
+		DirectionalLightDirection,
+		DirectionalLightAmbient,
+		DirectionalLightDiffuse,
+		DirectionalLightSpecular,
+	})
+	s.AddDirectionalLightSource(LightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
+
 	charset := charset(wrapper)
 	s.AddModelToShader(charset, fgShaderApplication)
 	background := model.New()
