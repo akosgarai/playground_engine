@@ -92,7 +92,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	s.AddModelToShader(charset, fgShaderApplication)
 	background := model.New()
 	// create frame here.
-	bottomFrame := frameRectangle(2.0, frameWidth, mgl32.Vec3{0.0, -0.99, 0.0}, material.Chrome, wrapper)
+	bottomFrame := frameRectangle(2.0, frameWidth, mgl32.Vec3{0.0, 0.0, 0.0}, material.Chrome, wrapper)
 	background.AddMesh(bottomFrame)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
