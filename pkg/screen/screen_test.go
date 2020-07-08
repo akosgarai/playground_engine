@@ -651,3 +651,9 @@ func TestMenuSetState(t *testing.T) {
 		t.Error("Invalid state")
 	}
 }
+func TestNewFormScreen(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestFormScreenUpdate(t *testing.T) {
+	t.Skip("Unimplemented")
+}

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path"
 	"reflect"
+	"runtime"
 	"strconv"
 
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
@@ -17,6 +19,11 @@ import (
 const (
 	LEFT_MOUSE_BUTTON = glfw.MouseButtonLeft
 )
+
+func baseDirScreen() string {
+	_, filename, _, _ := runtime.Caller(1)
+	return path.Dir(filename)
+}
 
 type SetupFunction func(wrapper interfaces.GLWrapper)
 

@@ -107,3 +107,7 @@ This screen is for displaying menus. It holds a Charset model, a texture for the
  | text     - 0.2 - Exit
  |	    - 0.1
 ```
+
+### FormScreen
+
+This screen is for displaying forms, like a settings page.
