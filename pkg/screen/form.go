@@ -2,6 +2,7 @@ package screen
 
 import (
 	"github.com/akosgarai/playground_engine/pkg/camera"
+	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/material"
@@ -63,12 +64,18 @@ func cameraMovementMap() map[string]glfw.Key {
 	cm["down"] = glfw.KeyE
 	return cm
 }
+func setup(wrapper interfaces.GLWrapper) {
+	glWrapper.ClearColor(1.0, 1.0, 1.0, 1.0)
+	glWrapper.Enable(glwrapper.DEPTH_TEST)
+	glWrapper.DepthFunc(glwrapper.LESS)
+}
 
 // NewFormScreen returns a FormScreen. The screen contains a material Frame.
 func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GLWrapper, whRatio float32) *FormScreen {
 	s := newScreenBase()
 	s.SetCamera(createCamera(whRatio))
 	s.SetCameraMovementMap(cameraMovementMap())
+	s.Setup(setup)
 	bgShaderApplication := shader.NewMaterialShader(wrapper)
 	fgShaderApplication := shader.NewFontShader(wrapper)
 	s.AddShader(bgShaderApplication)
