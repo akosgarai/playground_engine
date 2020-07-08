@@ -154,6 +154,7 @@ type Camera interface {
 	BoundingObjectAfterLift(float32) *coldet.Sphere
 }
 type Screen interface {
+	Log() string
 	Draw(GLWrapper)
 	Update(float64, float64, float64, RoKeyStore, RoButtonStore)
 	Export(string)
