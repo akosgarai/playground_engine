@@ -75,9 +75,9 @@ func New() *Application {
 // Log returns the string representation of this object.
 func (a *Application) Log() string {
 	logString := "Application:\n"
-	logString += fmt.Sprintf("\tKeyDowns: %#v\n",a.keyDowns)
-	logString += fmt.Sprintf("\tMouseDowns: %#v\n",a.mouseDowns)
-	logString += fmt.Sprintf("\tactiveScreen: %s\n"a.activeScreen.Log())
+	logString += fmt.Sprintf("\tKeyDowns: %#v\n", a.keyDowns)
+	logString += fmt.Sprintf("\tMouseDowns: %#v\n", a.mouseDowns)
+	logString += fmt.Sprintf("\tactiveScreen: %s\n", a.activeScreen.Log())
 	return logString
 }
 
