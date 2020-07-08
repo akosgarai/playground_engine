@@ -65,9 +65,9 @@ func cameraMovementMap() map[string]glfw.Key {
 	return cm
 }
 func setup(wrapper interfaces.GLWrapper) {
-	glWrapper.ClearColor(1.0, 1.0, 1.0, 1.0)
-	glWrapper.Enable(glwrapper.DEPTH_TEST)
-	glWrapper.DepthFunc(glwrapper.LESS)
+	wrapper.ClearColor(1.0, 1.0, 1.0, 1.0)
+	wrapper.Enable(glwrapper.DEPTH_TEST)
+	wrapper.DepthFunc(glwrapper.LESS)
 }
 
 // NewFormScreen returns a FormScreen. The screen contains a material Frame.
