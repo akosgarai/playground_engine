@@ -1165,3 +1165,27 @@ func TestCharsetPrintTo(t *testing.T) {
 	fonts.Debug = true
 	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh, cols)
 }
+func TestCharsetTextWidth(t *testing.T) {
+	fonts, err := LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+	if err != nil {
+		t.Errorf("Error during load: %s\n", err.Error())
+	}
+	testData := []struct {
+		text  string
+		scale float32
+		width float32
+	}{
+		{"a", 1, 25},
+		{"a", 2, 50},
+		{"a", 0.5, 12.5},
+		{"b", 1, 22},
+		{"1", 1, 15},
+		{"b1", 1, 37},
+	}
+	for _, tt := range testData {
+		width := fonts.TextWidth(tt.text, tt.scale)
+		if width != tt.width {
+			t.Errorf("Invalid text width for '%s'. Instead of '%f', we have '%f'.", tt.text, tt.width, width)
+		}
+	}
+}

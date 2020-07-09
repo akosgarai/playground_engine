@@ -214,6 +214,27 @@ func LoadCharsetDebug(filePath string, low, high rune, scale float64, dpi float6
 	}, nil
 }
 
+// TextLength returns the width of the given text.
+func (c *Charset) TextWidth(text string, scale float32) float32 {
+	x := float32(0.0)
+	indices := []rune(text)
+	if len(indices) == 0 {
+		return x
+	}
+	// the low rune value from the LoadCharset function.
+	lc := rune(32)
+	for i := range indices {
+		runeIndex := indices[i]
+		//skip runes that are not in font chacter range
+		if int(runeIndex)-int(lc) > len(c.fonts) || runeIndex < lc {
+			continue
+		}
+		ch := c.fonts[runeIndex]
+		x += float32(ch.Advance) * scale
+	}
+	return x
+}
+
 // PrintTo sets up the meshes for displaying text on a given surface.
 func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interfaces.GLWrapper, surface interfaces.Mesh, cols []mgl32.Vec3) {
 	indices := []rune(text)
