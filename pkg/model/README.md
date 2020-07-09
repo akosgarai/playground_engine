@@ -86,3 +86,11 @@ A glyph could be setup with its `Build` function.
 ### Charset
 
 The Charset model is responsible for holdinng the glyphs for a given charset. For the file loading and initialization it provides 2 functions. The `LoadCharsetDebug` is for debugging, it prints out a bunch of useful stuff, the `LoadCharset` is for silent load. It has a `PrintTo` function that puts the text to the given surface. For the tests the [`Desyrel`](https://www.dafont.com/desyrel.font) fonts are used.
+
+## Form items
+
+For the form screen, we need a couple of models.
+
+### Form item bool
+
+This model represent a form item for maintaining a bool value. The texture was downloaded from [here](https://pixabay.com/hu/vectors/lekerek%C3%ADtett-v%C3%B6r%C3%B6s-t%C3%BCnetek-vezetett-26377/).
