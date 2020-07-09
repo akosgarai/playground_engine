@@ -101,12 +101,12 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	chars := charset(wrapper)
 	s.AddModelToShader(chars, fgShaderApplication)
 	background := model.New()
-	// create frame here.
+	// create frame.
 	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, material.Chrome, wrapper)
 	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, material.Chrome, wrapper)
 	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, material.Chrome, wrapper)
 	textWidth := chars.TextWidth("Settings", 3.0/wW)
-	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{0, 0, 0}, material.Chrome, wrapper)
+	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{-0.9 + textwidth/2, 0.925, 0}, material.Chrome, wrapper)
 	textContainer.RotateX(-180)
 	textContainer.RotateY(180)
 	chars.PrintTo("Settings", -textWidth/2, -0.05, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
