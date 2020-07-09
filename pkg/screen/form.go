@@ -1,6 +1,7 @@
 package screen
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
@@ -174,6 +175,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 		tmMesh.Material = material.Whiteplastic
 		minDiff := transformations.Float32Abs(f.GetCamera().GetPosition().Z())
+		fmt.Printf("minDiff: %f, CurrentDiff: %f, position: %#v\n", minDiff, closestDistance, f.GetCamera().GetPosition())
 		if closestDistance <= minDiff+0.01 {
 			tmMesh.Material = material.Ruby
 		}
