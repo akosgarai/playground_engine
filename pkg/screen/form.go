@@ -21,6 +21,7 @@ const (
 	BottomFrameLength = float32(0.02)
 	SideFrameLength   = float32(1.98)
 	SideFrameWidth    = float32(0.02)
+	TopLeftFrameWidth = float32(0.1)
 	CameraMoveSpeed   = 0.005
 )
 
@@ -105,14 +106,18 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, material.Chrome, wrapper)
 	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, material.Chrome, wrapper)
 	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, material.Chrome, wrapper)
+	topLeftFrame := frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{-0.95, 0.99, 0.0}, material.Chrome, wrapper)
 	textWidth := chars.TextWidth("Settings", 3.0/wW)
-	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{-0.9 + textwidth/2, 0.925, 0}, material.Chrome, wrapper)
+	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{-0.9 + textWidth/2, 0.925, 0}, WhiteMaterial, wrapper)
 	textContainer.RotateX(-180)
 	textContainer.RotateY(180)
+	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, 0.0}, material.Chrome, wrapper)
 	chars.PrintTo("Settings", -textWidth/2, -0.05, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	background.AddMesh(bottomFrame)
 	background.AddMesh(leftFrame)
 	background.AddMesh(rightFrame)
+	background.AddMesh(topLeftFrame)
+	background.AddMesh(topRightFrame)
 	background.AddMesh(textContainer)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
