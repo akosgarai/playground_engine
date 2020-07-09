@@ -30,11 +30,7 @@ var (
 	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
-	WhiteMaterial             = material.New(
-		mgl32.Vec3{1, 1, 1},
-		mgl32.Vec3{1, 1, 1},
-		mgl32.Vec3{1, 1, 1},
-		128.0)
+	WhiteMaterial             = material.Whiteplastic
 )
 
 type FormScreen struct {
@@ -76,9 +72,11 @@ func cameraMovementMap() map[string]glfw.Key {
 	return cm
 }
 func setup(wrapper interfaces.GLWrapper) {
-	wrapper.ClearColor(1.0, 1.0, 1.0, 1.0)
+	wrapper.ClearColor(0.7, 0.7, 0.7, 1.0)
 	wrapper.Enable(glwrapper.DEPTH_TEST)
 	wrapper.DepthFunc(glwrapper.LESS)
+	wrapper.Enable(glwrapper.BLEND)
+	wrapper.BlendFunc(glwrapper.SRC_APLHA, glwrapper.ONE_MINUS_SRC_ALPHA)
 }
 
 // NewFormScreen returns a FormScreen. The screen contains a material Frame.
