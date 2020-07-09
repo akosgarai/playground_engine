@@ -109,7 +109,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{0, 0, 0}, material.Chrome, wrapper)
 	textContainer.RotateX(-180)
 	textContainer.RotateY(180)
-	chars.PrintTo("Settings", -textWidth/2, -0.03, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	chars.PrintTo("Settings", -textWidth/2, -0.1, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	background.AddMesh(bottomFrame)
 	background.AddMesh(leftFrame)
 	background.AddMesh(rightFrame)
