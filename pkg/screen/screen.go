@@ -572,3 +572,13 @@ func (s *ScreenBase) Export(basePath string) {
 func (s *ScreenBase) Setup(f SetupFunction) {
 	s.setupFunction = f
 }
+
+// CleanSpotLightSources function makes the spotLightSources empty.
+func (s *ScreenBase) CleanSpotLightSources() {
+	s.spotLightSources = []SpotLightSource{}
+}
+
+// CleanPointLightSources function makes the pointLightSources empty.
+func (s *ScreenBase) CleanPointLightSources() {
+	s.pointLightSources = []PointLightSource{}
+}

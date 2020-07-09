@@ -20,13 +20,16 @@ import (
 )
 
 const (
-	FontFile          = "/assets/fonts/Frijole/Frijole-Regular.ttf"
-	BottomFrameWidth  = float32(2.0)
-	BottomFrameLength = float32(0.02)
-	SideFrameLength   = float32(1.98)
-	SideFrameWidth    = float32(0.02)
-	TopLeftFrameWidth = float32(0.1)
-	CameraMoveSpeed   = 0.005
+	FontFile           = "/assets/fonts/Frijole/Frijole-Regular.ttf"
+	BottomFrameWidth   = float32(2.0)
+	BottomFrameLength  = float32(0.02)
+	SideFrameLength    = float32(1.98)
+	SideFrameWidth     = float32(0.02)
+	TopLeftFrameWidth  = float32(0.1)
+	CameraMoveSpeed    = 0.005
+	LightConstantTerm  = float32(1.0)
+	LightLinearTerm    = float32(0.14)
+	LightQuadraticTerm = float32(0.07)
 )
 
 var (
@@ -36,6 +39,12 @@ var (
 	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
 
 	DefaultFormItemMaterial = material.Whiteplastic
+	SpotLightAmbient        = mgl32.Vec3{1, 1, 1}
+	SpotLightDiffuse        = mgl32.Vec3{1, 1, 1}
+	SpotLightSpecular       = mgl32.Vec3{1, 1, 1}
+	SpotLightDirection      = (mgl32.Vec3{0, 0, -1}).Normalize()
+	SpotLightCutoff         = float32(0.05)
+	SpotLightOuterCutoff    = float32(0.07)
 )
 
 type FormScreen struct {
@@ -158,6 +167,30 @@ func (f *FormScreen) defaultMaterialForTheFormItems() {
 	}
 }
 
+// This function marks the true items with a spot light.
+func (f *FormScreen) addSpotLightSourcesToTrueFormItems() {
+	for s, _ := range f.shaderMap {
+		for index, _ := range f.shaderMap[s] {
+			switch f.shaderMap[s][index].(type) {
+			case *model.FormItemBool:
+				fi := f.shaderMap[s][index].(*model.FormItemBool)
+				if fi.GetValue() {
+					// Create a spot ligth source here and add it to the screen.
+					SpotLightSource := light.NewSpotLight([5]mgl32.Vec3{
+						fi.GetLight().GetPosition(),
+						SpotLightDirection,
+						SpotLightAmbient,
+						SpotLightDiffuse,
+						SpotLightSpecular},
+						[5]float32{LightConstantTerm, LightLinearTerm, LightQuadraticTerm, SpotLightCutoff, SpotLightOuterCutoff})
+					f.AddSpotLightSource(SpotLightSource, [10]string{"spotLight[0].position", "spotLight[0].direction", "spotLight[0].ambient", "spotLight[0].diffuse", "spotLight[0].specular", "spotLight[0].constant", "spotLight[0].linear", "spotLight[0].quadratic", "spotLight[0].cutOff", "spotLight[0].outerCutOff"})
+				}
+				break
+			}
+		}
+	}
+}
+
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
@@ -190,6 +223,8 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	f.closestModel = closestModel
 
 	f.defaultMaterialForTheFormItems()
+	f.CleanSpotLightSources()
+	f.addSpotLightSourcesToTrueFormItems()
 	switch f.closestModel.(type) {
 	case *model.FormItemBool:
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
