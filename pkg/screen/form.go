@@ -151,6 +151,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	}
 
 	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)
+	coords = mgl32.Vec3{coords.X(), coords.Y(), 0.0}
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
 	var closestModel interfaces.Model
