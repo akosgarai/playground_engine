@@ -61,11 +61,11 @@ func (t *Texture) UnBind() {
 type Textures []*Texture
 
 // TransparentTexture creates a transparent surface with the given dimensions and returns the transparent texture.
-func (t *Textures) TransparentTexture(width, height int, uniformName string, wrapper interfaces.GLWrapper) {
+func (t *Textures) TransparentTexture(width, height int, alpha uint8, uniformName string, wrapper interfaces.GLWrapper) {
 	upLeft := image.Point{0, 0}
 	bottomRight := image.Point{width, height}
 	rgba := image.NewRGBA(image.Rectangle{upLeft, bottomRight})
-	rgba.Set(0, 0, color.RGBA{255, 255, 255, 0})
+	rgba.Set(0, 0, color.RGBA{255, 255, 255, alpha})
 
 	t.AddTextureRGBA("transparent-gen", rgba, glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, uniformName, wrapper)
 }
