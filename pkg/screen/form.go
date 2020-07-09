@@ -1,6 +1,8 @@
 package screen
 
 import (
+	"math"
+
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
@@ -159,15 +161,15 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		}
 	}
 	// Update the material in case of hover state.
-	s.closestMesh = closestMesh
-	s.closestDistance = closestDistance
-	s.closestModel = closestModel
+	f.closestMesh = closestMesh
+	f.closestDistance = closestDistance
+	f.closestModel = closestModel
 
-	switch s.closestModel.(type) {
+	switch f.closestModel.(type) {
 	case *model.FormItemBool:
-		tmMesh := s.closestMesh.(*mesh.TexturedMaterialMesh)
+		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 		tmMesh.Material = material.Whiteplastic
-		minDiff := s.GetCamera().GetPosition().Z()
+		minDiff := f.GetCamera().GetPosition().Z()
 		if closestDistance <= minDiff+0.01 {
 			tmMesh.Material = material.Ruby
 		}
