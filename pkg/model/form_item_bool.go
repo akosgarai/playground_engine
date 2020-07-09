@@ -43,8 +43,8 @@ func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, 
 	m := New()
 	m.AddMesh(formItemMesh)
 	var ledTexture texture.Textures
-	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", wrapper)
-	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", wrapper)
+	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", wrapper)
+	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", wrapper)
 	ledPrimitive := rectangle.NewExact(0.2, 0.1)
 	v, i, bo = ledPrimitive.MeshInput()
 	ledMesh := mesh.NewTexturedMesh(v, i, ledTexture, wrapper)
