@@ -153,8 +153,8 @@ func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrap
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
 	fi := model.NewFormItemBool(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
-	fi.RotateX(-180)
-	fi.RotateY(180)
+	//fi.RotateX(-180)
+	//fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.49, 0.0, -0.01, 2.0/wW, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
