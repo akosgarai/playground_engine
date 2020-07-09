@@ -21,6 +21,7 @@ const (
 	BottomFrameLength = float32(0.02)
 	SideFrameLength   = float32(1.98)
 	SideFrameWidth    = float32(0.02)
+	CameraMoveSpeed   = 0.005
 )
 
 var (
@@ -57,6 +58,7 @@ func charset(wrapper interfaces.GLWrapper) *model.Charset {
 func createCamera(ratio float32) *camera.Camera {
 	camera := camera.NewCamera(mgl32.Vec3{0, 0, -2.0}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
 	camera.SetupProjection(45, ratio, 0.001, 10.0)
+	camera.SetVelocity(CameraMoveSpeed)
 	return camera
 }
 
