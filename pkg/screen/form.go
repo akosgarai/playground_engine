@@ -143,7 +143,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
-	cursorX := float32(posX)
+	cursorX := float32(-posX)
 	cursorY := float32(posY)
 	if f.cameraSet {
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
