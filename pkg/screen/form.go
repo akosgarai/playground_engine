@@ -197,6 +197,10 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		if closestDistance <= minDiff+0.01 {
 			fmt.Printf("closestDistance: %f, coords: %#v\n", closestDistance, coords)
 			tmMesh.Material = material.Ruby
+			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel := f.closestModel.(*model.FormItemBool)
+				formModel.SetValue(formModel.GetValue())
+			}
 		}
 		break
 	}
