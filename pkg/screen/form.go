@@ -34,9 +34,12 @@ var (
 
 type FormScreen struct {
 	*ScreenBase
-	charset *model.Charset
-	frame   *material.Material
-	header  string
+	charset    *model.Charset
+	background *model.BaseModel
+	frame      *material.Material
+	header     string
+	formItems  []*model.FormItemBool
+	bgShader   *shader.Shader
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.MaterialMesh {
@@ -120,6 +123,8 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	return &FormScreen{
 		ScreenBase: s,
 		charset:    chars,
+		background: background,
+		bgShader:   bgShaderApplication,
 		frame:      frame,
 		header:     label,
 	}
@@ -131,4 +136,24 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	if f.cameraSet {
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
 	}
+}
+
+// AddFormItemBool is for adding a bool form item to the form.
+func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, wW float32) {
+	// calculate the position of the option:
+	// - bottom of the header: 0.85
+	// - formItem: 0.1
+	// - first form item Y: 0.80
+	// - left col X: 0.49
+	// - right col X: -0.49
+	lenItems := len(f.formItems)
+	posX := float32(0.49)
+	if lenItems%2 == 1 {
+		posX = float32(-0.49)
+	}
+	posY := 0.80 - float32((lenItems/2))*0.1
+	fi := model.NewFormItemBool(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	f.AddModelToShader(fi, f.bgShader)
+	f.charset.PrintTo(fi.GetLabel(), -0.49, 0.0, -0.01, 2.0/wW, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.formItems = append(f.formItems, fi)
 }

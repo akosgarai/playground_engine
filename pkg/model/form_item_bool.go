@@ -57,3 +57,8 @@ func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, 
 		label:     label,
 	}
 }
+
+// GetSurface returns the formItemMesh
+func (fi *FormItemBool) GetSurface() interfaces.Mesh {
+	return fi.meshes[0]
+}
