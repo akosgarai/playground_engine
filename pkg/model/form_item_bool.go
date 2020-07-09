@@ -37,7 +37,10 @@ func (fi *FormItemBool) GetLabel() string {
 func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemBool {
 	labelPrimitive := rectangle.NewExact(width, length)
 	v, i, bo := labelPrimitive.MeshInput()
-	formItemMesh := mesh.NewMaterialMesh(v, i, mat, wrapper)
+	var tex texture.Textures
+	tex.TransparentTexture(1, 1, "tex.diffuse", wrapper)
+	tex.TransparentTexture(1, 1, "tex.specular", wrapper)
+	formItemMesh := mesh.NewTexturedMaterialMesh(v, i, tex, mat, wrapper)
 	formItemMesh.SetBoundingObject(bo)
 	formItemMesh.SetPosition(position)
 	m := New()
