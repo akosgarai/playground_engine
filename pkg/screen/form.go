@@ -34,6 +34,8 @@ var (
 	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
+
+	DefaultFormItemMaterial = material.Whiteplastic
 )
 
 type FormScreen struct {
@@ -140,6 +142,22 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	}
 }
 
+// defaultMaterialForTheFormItems sets the material to the default of the form items.
+// It could be used un the update loop to make all of them to default state.
+func (f *FormScreen) defaultMaterialForTheFormItems() {
+	for s, _ := range f.shaderMap {
+		for index, _ := range f.shaderMap[s] {
+			switch f.shaderMap[s][index].(type) {
+			case *model.FormItemBool:
+				fi := f.shaderMap[s][index].(*model.FormItemBool).GetSurface()
+				tmMesh := fi.(*mesh.TexturedMaterialMesh)
+				tmMesh.Material = DefaultFormItemMaterial
+				break
+			}
+		}
+	}
+}
+
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
@@ -171,10 +189,10 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	f.closestDistance = closestDistance
 	f.closestModel = closestModel
 
+	f.defaultMaterialForTheFormItems()
 	switch f.closestModel.(type) {
 	case *model.FormItemBool:
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-		tmMesh.Material = material.Whiteplastic
 		minDiff := float32(0.0)
 		if closestDistance <= minDiff+0.01 {
 			fmt.Printf("closestDistance: %f, coords: %#v\n", closestDistance, coords)
