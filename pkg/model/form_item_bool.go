@@ -53,7 +53,7 @@ func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, 
 	ledMesh := mesh.NewTexturedMaterialMesh(v, i, ledTexture, mat, wrapper)
 	ledMesh.SetBoundingObject(bo)
 	ledMesh.SetParent(formItemMesh)
-	ledMesh.SetPosition(mgl32.Vec3{0.29, 0.01, 0.0})
+	ledMesh.SetPosition(mgl32.Vec3{0.29, -0.01, 0.0})
 	m.AddMesh(ledMesh)
 	return &FormItemBool{
 		BaseModel: m,
