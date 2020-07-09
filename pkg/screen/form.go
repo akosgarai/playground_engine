@@ -29,12 +29,12 @@ var (
 	DirectionalLightDirection = (mgl32.Vec3{0.0, 0.0, -1.0}).Normalize()
 	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
-	DirectionalLightSpecular  = mgl32.Vec3{0.5, 0.5, 0.5}
+	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
 	WhiteMaterial             = material.New(
 		mgl32.Vec3{1, 1, 1},
 		mgl32.Vec3{1, 1, 1},
 		mgl32.Vec3{1, 1, 1},
-		64.0)
+		128.0)
 )
 
 type FormScreen struct {
