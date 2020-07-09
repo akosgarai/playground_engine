@@ -26,7 +26,7 @@ const (
 )
 
 var (
-	DirectionalLightDirection = (mgl32.Vec3{0.0, 0.0, -1.0}).Normalize()
+	DirectionalLightDirection = (mgl32.Vec3{0.0, 0.0, 1.0}).Normalize()
 	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
