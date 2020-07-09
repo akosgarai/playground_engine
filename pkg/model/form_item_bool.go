@@ -15,10 +15,10 @@ import (
 )
 
 const (
-	width     = float32(0.98)
-	length    = float32(0.1)
-	ledWidth  = float32(0.2)
-	ledHeight = float32(0.09)
+	FormItemWidth  = float32(0.98)
+	FormItemLength = float32(0.1)
+	ledWidth       = float32(0.2)
+	ledHeight      = float32(0.09)
 )
 
 func baseDirModel() string {
@@ -37,7 +37,7 @@ func (fi *FormItemBool) GetLabel() string {
 }
 
 func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemBool {
-	labelPrimitive := rectangle.NewExact(width, length)
+	labelPrimitive := rectangle.NewExact(FormItemWidth, FormItemLength)
 	v, i, bo := labelPrimitive.MeshInput()
 	var tex texture.Textures
 	tex.TransparentTexture(1, 1, "tex.diffuse", wrapper)
@@ -51,9 +51,8 @@ func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, 
 	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.diffuse", wrapper)
 	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.specular", wrapper)
 	ledPrimitive := rectangle.NewExact(ledWidth, ledHeight)
-	v, i, bo = ledPrimitive.MeshInput()
+	v, i, _ = ledPrimitive.MeshInput()
 	ledMesh := mesh.NewTexturedMaterialMesh(v, i, ledTexture, mat, wrapper)
-	ledMesh.SetBoundingObject(bo)
 	ledMesh.SetParent(formItemMesh)
 	ledMesh.SetPosition(mgl32.Vec3{0.29, -0.01, 0.0})
 	m.AddMesh(ledMesh)

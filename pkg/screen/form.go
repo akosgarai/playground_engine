@@ -137,8 +137,41 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+	TransformationMatrix := mgl32.Ident4()
 	if f.cameraSet {
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
+		TransformationMatrix = (f.camera.GetProjectionMatrix().Mul4(f.camera.GetViewMatrix())).Inv()
+	}
+
+	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)
+	closestDistance := float32(math.MaxFloat32)
+	var closestMesh interfaces.Mesh
+	var closestModel interfaces.Model
+	for s, _ := range f.shaderMap {
+		for index, _ := range f.shaderMap[s] {
+			f.shaderMap[s][index].Update(dt)
+			msh, dist := f.shaderMap[s][index].ClosestMeshTo(coords)
+			if dist < closestDistance {
+				closestDistance = dist
+				closestMesh = msh
+				closestModel = f.shaderMap[s][index]
+			}
+		}
+	}
+	// Update the material in case of hover state.
+	s.closestMesh = closestMesh
+	s.closestDistance = closestDistance
+	s.closestModel = closestModel
+
+	switch s.closestModel.(type) {
+	case *model.FormItemBool:
+		tmMesh := s.closestMesh.(*mesh.TexturedMaterialMesh)
+		tmMesh.Material = material.Whiteplastic
+		minDiff := s.GetCamera().GetPosition().Z()
+		if closestDistance <= minDiff+0.01 {
+			tmMesh.Material = material.Ruby
+		}
+		break
 	}
 }
 
@@ -151,9 +184,9 @@ func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrap
 	// - left col X: 0.49
 	// - right col X: -0.49
 	lenItems := len(f.formItems)
-	posX := float32(0.49)
+	posX := model.FormItemWidth / 2
 	if lenItems%2 == 1 {
-		posX = float32(-0.49)
+		posX = -1.0 * posX
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
 	fi := model.NewFormItemBool(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
