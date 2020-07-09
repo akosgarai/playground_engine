@@ -29,6 +29,11 @@ var (
 	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightSpecular  = mgl32.Vec3{0.5, 0.5, 0.5}
+	WhiteMaterial             = material.New(
+		mgl32.Vec3{1, 1, 1},
+		mgl32.Vec3{1, 1, 1},
+		mgl32.Vec3{1, 1, 1},
+		36)
 )
 
 type FormScreen struct {
@@ -76,9 +81,9 @@ func setup(wrapper interfaces.GLWrapper) {
 }
 
 // NewFormScreen returns a FormScreen. The screen contains a material Frame.
-func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GLWrapper, whRatio float32) *FormScreen {
+func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GLWrapper, wW, wH float32) *FormScreen {
 	s := newScreenBase()
-	s.SetCamera(createCamera(whRatio))
+	s.SetCamera(createCamera(wW / wH))
 	s.SetCameraMovementMap(cameraMovementMap())
 	s.Setup(setup)
 	bgShaderApplication := shader.NewMaterialShader(wrapper)
@@ -93,20 +98,22 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	})
 	s.AddDirectionalLightSource(LightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
 
-	charset := charset(wrapper)
-	s.AddModelToShader(charset, fgShaderApplication)
+	chars := charset(wrapper)
+	s.AddModelToShader(chars, fgShaderApplication)
 	background := model.New()
 	// create frame here.
 	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, material.Chrome, wrapper)
 	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, material.Chrome, wrapper)
 	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, material.Chrome, wrapper)
+	textContainer := frameRectangle(chars.TextWidth("Options", 3.0/wW), 0.2, mgl32.Vec3{0, 0, 0}, material.Chrome, wrapper)
 	background.AddMesh(bottomFrame)
 	background.AddMesh(leftFrame)
 	background.AddMesh(rightFrame)
+	background.AddMesh(textContainer)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
 		ScreenBase: s,
-		charset:    charset,
+		charset:    chars,
 		frame:      frame,
 		header:     label,
 	}
