@@ -69,6 +69,6 @@ func (fi *FormItemBool) GetSurface() interfaces.Mesh {
 }
 
 // GetLight returns the ledMesh
-func (fi *FormItemBool) GetLight() *interfaces.Mesh {
+func (fi *FormItemBool) GetLight() interfaces.Mesh {
 	return fi.meshes[1]
 }
