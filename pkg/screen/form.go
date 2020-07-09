@@ -176,8 +176,8 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 		tmMesh.Material = material.Whiteplastic
 		minDiff := float32(0.0)
-		fmt.Printf("minDiff: %f, CurrentDiff: %f, position: %#v, coords: %#v\n", minDiff+0.01, closestDistance, f.GetCamera().GetPosition(), coords)
 		if closestDistance <= minDiff+0.01 {
+			fmt.Printf("closestDistance: %f, coords: %#v\n", closestDistance, coords)
 			tmMesh.Material = material.Ruby
 		}
 		break
