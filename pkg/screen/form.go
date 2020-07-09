@@ -65,6 +65,8 @@ func cameraMovementMap() map[string]glfw.Key {
 	cm := make(map[string]glfw.Key)
 	cm["up"] = glfw.KeyQ
 	cm["down"] = glfw.KeyE
+	cm["forward"] = glfw.KeyW
+	cm["back"] = glfw.KeyS
 	return cm
 }
 func setup(wrapper interfaces.GLWrapper) {
@@ -115,5 +117,6 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	if f.cameraSet {
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
+		s.cameraKeyboardMovement("forward", "back", "Walk", dt, keyStore)
 	}
 }
