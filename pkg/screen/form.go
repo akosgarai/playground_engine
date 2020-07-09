@@ -10,6 +10,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/model"
 	"github.com/akosgarai/playground_engine/pkg/primitives/rectangle"
 	"github.com/akosgarai/playground_engine/pkg/shader"
+	"github.com/akosgarai/playground_engine/pkg/texture"
 
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
@@ -42,9 +43,12 @@ type FormScreen struct {
 	bgShader   *shader.Shader
 }
 
-func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.MaterialMesh {
+func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
 	v, i, _ := rectangle.NewExact(width, length).MeshInput()
-	frameMesh := mesh.NewMaterialMesh(v, i, mat, wrapper)
+	var tex texture.Textures
+	tex.TransparentTexture(1, 1, "tex.diffuse", wrapper)
+	tex.TransparentTexture(1, 1, "tex.specular", wrapper)
+	frameMesh := mesh.NewTexturedMaterialMesh(v, i, tex, mat, wrapper)
 	frameMesh.RotateX(90)
 	frameMesh.SetPosition(position)
 	return frameMesh
@@ -87,7 +91,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	s.SetCamera(createCamera(wW / wH))
 	s.SetCameraMovementMap(cameraMovementMap())
 	s.Setup(setup)
-	bgShaderApplication := shader.NewMaterialShader(wrapper)
+	bgShaderApplication := shader.NewTextureMatShaderBlending(wrapper)
 	fgShaderApplication := shader.NewFontShader(wrapper)
 	s.AddShader(bgShaderApplication)
 	s.AddShader(fgShaderApplication)
