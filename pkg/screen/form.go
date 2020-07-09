@@ -95,9 +95,11 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	s.SetCameraMovementMap(cameraMovementMap())
 	s.Setup(setup)
 	bgShaderApplication := shader.NewTextureMatShaderBlending(wrapper)
+	frameShaderApplication := shader.NewMaterialShader(wrapper)
 	fgShaderApplication := shader.NewFontShader(wrapper)
 	s.AddShader(bgShaderApplication)
 	s.AddShader(fgShaderApplication)
+	s.AddShader(frameShaderApplication)
 	LightSource := light.NewDirectionalLight([4]mgl32.Vec3{
 		DirectionalLightDirection,
 		DirectionalLightAmbient,
@@ -109,6 +111,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	chars := charset(wrapper)
 	s.AddModelToShader(chars, fgShaderApplication)
 	background := model.New()
+	frameModel := model.New()
 	// create frame.
 	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, frame, wrapper)
 	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, frame, wrapper)
@@ -120,12 +123,12 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	textContainer.RotateY(180)
 	chars.PrintTo("Settings", -textWidth/2, -0.05, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, 0.0}, frame, wrapper)
-	background.AddMesh(bottomFrame)
-	background.AddMesh(leftFrame)
-	background.AddMesh(rightFrame)
-	background.AddMesh(topLeftFrame)
-	background.AddMesh(topRightFrame)
-	//background.AddMesh(textContainer)
+	frameModel.AddMesh(bottomFrame)
+	frameModel.AddMesh(leftFrame)
+	frameModel.AddMesh(rightFrame)
+	frameModel.AddMesh(topLeftFrame)
+	frameModel.AddMesh(topRightFrame)
+	s.AddModelToShader(frameModel, frameShaderApplication)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
 		ScreenBase: s,
