@@ -49,8 +49,8 @@ type FormScreen struct {
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
 	v, i, _ := rectangle.NewExact(width, length).MeshInput()
 	var tex texture.Textures
-	tex.TransparentTexture(1, 1, "tex.diffuse", wrapper)
-	tex.TransparentTexture(1, 1, "tex.specular", wrapper)
+	tex.TransparentTexture(1, 1, 128, "tex.diffuse", wrapper)
+	tex.TransparentTexture(1, 1, 128, "tex.specular", wrapper)
 	frameMesh := mesh.NewTexturedMaterialMesh(v, i, tex, mat, wrapper)
 	frameMesh.RotateX(90)
 	frameMesh.SetPosition(position)
