@@ -29,11 +29,22 @@ func baseDirModel() string {
 type FormItemBool struct {
 	*BaseModel
 	label string
+	value bool
 }
 
 // GetLabel returns the label string of the item.
 func (fi *FormItemBool) GetLabel() string {
 	return fi.label
+}
+
+// GetValue returns the value of the form item.
+func (fi *FormItemBool) GetValue() bool {
+	return fi.value
+}
+
+// SetValue returns the value of the form item.
+func (fi *FormItemBool) SetValue(v bool) {
+	fi.value = v
 }
 
 func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemBool {
@@ -59,6 +70,7 @@ func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, 
 	return &FormItemBool{
 		BaseModel: m,
 		label:     label,
+		value:     false,
 	}
 }
 
