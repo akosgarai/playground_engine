@@ -96,8 +96,8 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	background := model.New()
 	// create frame here.
 	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, material.Chrome, wrapper)
-	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, metal.Chrome, wrapper)
-	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, metal.Chrome, wrapper)
+	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, material.Chrome, wrapper)
+	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, material.Chrome, wrapper)
 	background.AddMesh(bottomFrame)
 	background.AddMesh(leftFrame)
 	background.AddMesh(rightFrame)
