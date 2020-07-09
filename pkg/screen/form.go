@@ -16,8 +16,11 @@ import (
 )
 
 const (
-	frameWidth = float32(0.02)
-	FontFile   = "/assets/fonts/Frijole/Frijole-Regular.ttf"
+	FontFile          = "/assets/fonts/Frijole/Frijole-Regular.ttf"
+	BottomFrameWidth  = float32(2.0)
+	BottomFrameLength = float32(0.02)
+	SideFrameLength   = float32(1.98)
+	SideFrameWidth    = float32(0.02)
 )
 
 var (
@@ -92,8 +95,12 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	s.AddModelToShader(charset, fgShaderApplication)
 	background := model.New()
 	// create frame here.
-	bottomFrame := frameRectangle(2.0, frameWidth, mgl32.Vec3{0.0, 0.0, 0.0}, material.Chrome, wrapper)
+	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, material.Chrome, wrapper)
+	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, metal.Chrome, wrapper)
+	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, metal.Chrome, wrapper)
 	background.AddMesh(bottomFrame)
+	background.AddMesh(leftFrame)
+	background.AddMesh(rightFrame)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
 		ScreenBase: s,
