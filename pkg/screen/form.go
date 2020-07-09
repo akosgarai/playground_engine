@@ -34,7 +34,7 @@ var (
 		mgl32.Vec3{1, 1, 1},
 		mgl32.Vec3{1, 1, 1},
 		mgl32.Vec3{1, 1, 1},
-		36)
+		64.0)
 )
 
 type FormScreen struct {
