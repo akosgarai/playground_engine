@@ -18,7 +18,7 @@ const (
 	width     = float32(0.98)
 	length    = float32(0.1)
 	ledWidth  = float32(0.2)
-	ledHeight = float32(0.90)
+	ledHeight = float32(0.09)
 )
 
 func baseDirModel() string {
