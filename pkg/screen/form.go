@@ -30,7 +30,6 @@ var (
 	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
-	WhiteMaterial             = material.Whiteplastic
 )
 
 type FormScreen struct {
@@ -101,22 +100,22 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	s.AddModelToShader(chars, fgShaderApplication)
 	background := model.New()
 	// create frame.
-	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, WhiteMaterial, wrapper)
-	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, WhiteMaterial, wrapper)
-	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, WhiteMaterial, wrapper)
-	topLeftFrame := frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, 0.0}, WhiteMaterial, wrapper)
+	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, frame, wrapper)
+	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, frame, wrapper)
+	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, frame, wrapper)
+	topLeftFrame := frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, 0.0}, frame, wrapper)
 	textWidth := chars.TextWidth("Settings", 3.0/wW)
-	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{1 - TopLeftFrameWidth - textWidth/2, 0.925, 0}, WhiteMaterial, wrapper)
+	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{1 - TopLeftFrameWidth - textWidth/2, 0.925, 0}, frame, wrapper)
 	textContainer.RotateX(-180)
 	textContainer.RotateY(180)
 	chars.PrintTo("Settings", -textWidth/2, -0.05, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, 0.0}, WhiteMaterial, wrapper)
+	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, 0.0}, frame, wrapper)
 	background.AddMesh(bottomFrame)
 	background.AddMesh(leftFrame)
 	background.AddMesh(rightFrame)
 	background.AddMesh(topLeftFrame)
 	background.AddMesh(topRightFrame)
-	background.AddMesh(textContainer)
+	//background.AddMesh(textContainer)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
 		ScreenBase: s,
