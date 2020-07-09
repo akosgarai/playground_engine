@@ -1,7 +1,6 @@
 package screen
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
@@ -230,11 +229,10 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 		minDiff := float32(0.0)
 		if closestDistance <= minDiff+0.01 {
-			fmt.Printf("closestDistance: %f, coords: %#v\n", closestDistance, coords)
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 				formModel := f.closestModel.(*model.FormItemBool)
-				formModel.SetValue(formModel.GetValue())
+				formModel.SetValue(!formModel.GetValue())
 			}
 		}
 		break
