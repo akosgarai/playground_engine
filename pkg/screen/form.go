@@ -144,14 +144,15 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
-	TransformationMatrix := mgl32.Ident4()
+	cursorX := float32(posX)
+	cursorY := float32(posY)
 	if f.cameraSet {
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
-		TransformationMatrix = (f.camera.GetProjectionMatrix().Mul4(f.camera.GetViewMatrix())).Inv()
+		cursorX = cursorX + f.GetCamera().GetPosition().X()
+		cursorY = cursorY + f.GetCamera().GetPosition().Y()
 	}
 
-	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)
-	coords = mgl32.Vec3{coords.X(), coords.Y(), 0.0}
+	coords := mgl32.Vec3{cursorX, cursorY, 0.0}
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
 	var closestModel interfaces.Model
