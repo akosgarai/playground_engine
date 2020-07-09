@@ -56,7 +56,7 @@ func charset(wrapper interfaces.GLWrapper) *model.Charset {
 
 // It creates a new camera with the necessary setup
 func createCamera(ratio float32) *camera.Camera {
-	camera := camera.NewCamera(mgl32.Vec3{0, 0, -2.0}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
+	camera := camera.NewCamera(mgl32.Vec3{0, 0, -1.8}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
 	camera.SetupProjection(45, ratio, 0.001, 10.0)
 	camera.SetVelocity(CameraMoveSpeed)
 	return camera
@@ -65,10 +65,8 @@ func createCamera(ratio float32) *camera.Camera {
 // Setup keymap for the camera movement
 func cameraMovementMap() map[string]glfw.Key {
 	cm := make(map[string]glfw.Key)
-	cm["up"] = glfw.KeyQ
-	cm["down"] = glfw.KeyE
-	cm["forward"] = glfw.KeyW
-	cm["back"] = glfw.KeyS
+	cm["up"] = glfw.KeyUp
+	cm["down"] = glfw.KeyDown
 	return cm
 }
 func setup(wrapper interfaces.GLWrapper) {
@@ -119,6 +117,5 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	if f.cameraSet {
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
-		f.cameraKeyboardMovement("forward", "back", "Walk", dt, keyStore)
 	}
 }
