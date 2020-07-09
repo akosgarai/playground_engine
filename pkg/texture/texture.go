@@ -2,6 +2,7 @@ package texture
 
 import (
 	"image"
+	"image/color"
 	"image/draw"
 	_ "image/jpeg"
 	_ "image/png"
@@ -64,6 +65,7 @@ func (t *Textures) TransparentTexture(width, height int, uniformName string, wra
 	upLeft := image.Point{0, 0}
 	bottomRight := image.Point{width, height}
 	rgba := image.NewRGBA(image.Rectangle{upLeft, bottomRight})
+	rgba.Set(0, 0, color.RGBA{255, 255, 255, 0})
 
 	t.AddTextureRGBA("transparent-gen", rgba, glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, uniformName, wrapper)
 }
