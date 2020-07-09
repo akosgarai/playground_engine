@@ -34,16 +34,17 @@ func (fi *FormItemBool) GetLabel() string {
 	return fi.label
 }
 
-func NewFormItemBool(label string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBool {
+func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemBool {
 	labelPrimitive := rectangle.NewExact(width, length)
 	v, i, bo := labelPrimitive.MeshInput()
 	formItemMesh := mesh.NewMaterialMesh(v, i, mat, wrapper)
 	formItemMesh.SetBoundingObject(bo)
+	formItemMesh.SetPosition(position)
 	m := New()
 	m.AddMesh(formItemMesh)
 	var ledTexture texture.Textures
-	ledTexture.AddTexture(baseDirModel()+"/assets/concrete-wall.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", wrapper)
-	ledTexture.AddTexture(baseDirModel()+"/assets/concrete-wall.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", wrapper)
+	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", wrapper)
+	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", wrapper)
 	ledPrimitive := rectangle.NewExact(0.2, 0.1)
 	v, i, bo = ledPrimitive.MeshInput()
 	ledMesh := mesh.NewTexturedMesh(v, i, ledTexture, wrapper)
