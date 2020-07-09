@@ -15,8 +15,10 @@ import (
 )
 
 const (
-	width  = float32(0.98)
-	length = float32(0.1)
+	width     = float32(0.98)
+	length    = float32(0.1)
+	ledWidth  = float32(0.2)
+	ledHeight = float32(0.90)
 )
 
 func baseDirModel() string {
@@ -48,7 +50,7 @@ func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, 
 	var ledTexture texture.Textures
 	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.diffuse", wrapper)
 	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.specular", wrapper)
-	ledPrimitive := rectangle.NewExact(0.2, 0.1)
+	ledPrimitive := rectangle.NewExact(ledWidth, ledHeight)
 	v, i, bo = ledPrimitive.MeshInput()
 	ledMesh := mesh.NewTexturedMaterialMesh(v, i, ledTexture, mat, wrapper)
 	ledMesh.SetBoundingObject(bo)
@@ -64,4 +66,9 @@ func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, 
 // GetSurface returns the formItemMesh
 func (fi *FormItemBool) GetSurface() interfaces.Mesh {
 	return fi.meshes[0]
+}
+
+// GetLight returns the ledMesh
+func (fi *FormItemBool) GetLight() *interfaces.Mesh {
+	return fi.meshes[1]
 }
