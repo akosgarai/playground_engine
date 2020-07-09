@@ -117,6 +117,6 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	if f.cameraSet {
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
-		s.cameraKeyboardMovement("forward", "back", "Walk", dt, keyStore)
+		f.cameraKeyboardMovement("forward", "back", "Walk", dt, keyStore)
 	}
 }
