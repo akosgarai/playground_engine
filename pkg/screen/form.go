@@ -13,6 +13,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/primitives/rectangle"
 	"github.com/akosgarai/playground_engine/pkg/shader"
 	"github.com/akosgarai/playground_engine/pkg/texture"
+	"github.com/akosgarai/playground_engine/pkg/transformations"
 
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
@@ -169,7 +170,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	case *model.FormItemBool:
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 		tmMesh.Material = material.Whiteplastic
-		minDiff := f.GetCamera().GetPosition().Z()
+		minDiff := transformations.Float32Abs(f.GetCamera().GetPosition().Z())
 		if closestDistance <= minDiff+0.01 {
 			tmMesh.Material = material.Ruby
 		}
