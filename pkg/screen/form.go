@@ -174,9 +174,10 @@ func (f *FormScreen) addSpotLightSourcesToTrueFormItems() {
 			case *model.FormItemBool:
 				fi := f.shaderMap[s][index].(*model.FormItemBool)
 				if fi.GetValue() {
+					lightPos := mgl32.TransformCoordinate(fi.GetLight().GetPosition(), fi.GetLight().GetParentTranslationTransformation())
 					// Create a spot ligth source here and add it to the screen.
 					SpotLightSource := light.NewSpotLight([5]mgl32.Vec3{
-						fi.GetLight().GetPosition(),
+						lightPos,
 						SpotLightDirection,
 						SpotLightAmbient,
 						SpotLightDiffuse,
