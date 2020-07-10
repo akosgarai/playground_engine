@@ -159,6 +159,11 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 	for s, _ := range f.shaderMap {
 		for index, _ := range f.shaderMap[s] {
 			switch f.shaderMap[s][index].(type) {
+			case *model.FormItemInt:
+				fi := f.shaderMap[s][index].(*model.FormItemInt)
+				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
+				surfaceMesh.Material = DefaultFormItemMaterial
+				break
 			case *model.FormItemBool:
 				fi := f.shaderMap[s][index].(*model.FormItemBool)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
