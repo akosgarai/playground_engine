@@ -16,7 +16,7 @@ const (
 	writableHeight = float32(0.09)
 
 	cursorHeight = float32(0.08)
-	cursorWidth  = float32(0.045)
+	cursorWidth  = float32(0.015)
 )
 
 type FormItemInt struct {
@@ -66,7 +66,7 @@ func NewFormItemInt(label string, mat *material.Material, position mgl32.Vec3, w
 	ctex.TransparentTexture(1, 1, 255, "tex.diffuse", wrapper)
 	ctex.TransparentTexture(1, 1, 255, "tex.specular", wrapper)
 	v, i, _ = cursorPrimitive.MeshInput()
-	cursor := mesh.NewTexturedMaterialMesh(v, i, ctex, material.Chrome, wrapper)
+	cursor := mesh.NewTexturedMaterialMesh(v, i, ctex, material.Greenplastic, wrapper)
 	cursor.SetPosition(mgl32.Vec3{0.165, 0.0, -0.01})
 	cursor.SetParent(writableMesh)
 	return &FormItemInt{
