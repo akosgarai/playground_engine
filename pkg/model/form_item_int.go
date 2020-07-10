@@ -14,12 +14,16 @@ import (
 const (
 	writableWidth  = float32(0.40)
 	writableHeight = float32(0.09)
+
+	cursorHeight = float32(0.09)
+	cursorWidth  = float32(0.01)
 )
 
 type FormItemInt struct {
 	*BaseModel
-	label string
-	value int
+	cursor interfaces.Mesh
+	label  string
+	value  int
 }
 
 // GetLabel returns the label string of the item.
@@ -57,9 +61,14 @@ func NewFormItemInt(label string, mat *material.Material, position mgl32.Vec3, w
 	writableMesh.SetPosition(mgl32.Vec3{0.24, -0.01, 0.0})
 	writableMesh.SetBoundingObject(bo)
 	m.AddMesh(writableMesh)
+	cursorPrimitive := rectangle.NewExact(cursorWidth, cursorHeight)
+	v, i, _ = cursorPrimitive.MeshInput()
+	cursor := mesh.NewTexturedMaterialMesh(v, i, tex, material.Chrome, wrapper)
+	cursor.SetPosition(mgl32.Vec3{0.23, -0.02, 0.0})
 	return &FormItemInt{
 		BaseModel: m,
 		label:     label,
+		cursor:    cursor,
 		value:     0,
 	}
 }
@@ -69,7 +78,17 @@ func (fi *FormItemInt) GetSurface() interfaces.Mesh {
 	return fi.meshes[0]
 }
 
-// GetTarget returns the ledMesh
+// GetTarget returns the input target Mesh
 func (fi *FormItemInt) GetTarget() interfaces.Mesh {
 	return fi.meshes[1]
+}
+
+// AddCursor displays a cursor on the target surface.
+func (fi *FormItemInt) AddCursor() {
+	fi.AddMesh(fi.cursor)
+}
+func (fi *FormItemInt) DeleteCursor() {
+	if len(fi.meshes) == 3 {
+		fi.meshes = fi.meshes[:len(fi.meshes)-1]
+	}
 }
