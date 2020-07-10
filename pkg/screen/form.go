@@ -180,6 +180,20 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 	}
 }
 
+// deleteCursors removes the cursor from the text form inputs.
+func (f *FormScreen) deleteCursors() {
+	for s, _ := range f.shaderMap {
+		for index, _ := range f.shaderMap[s] {
+			switch f.shaderMap[s][index].(type) {
+			case *model.FormItemInt:
+				fi := f.shaderMap[s][index].(*model.FormItemInt)
+				fi.DeleteCursor()
+				break
+			}
+		}
+	}
+}
+
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
@@ -220,6 +234,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		if closestDistance <= minDiff+0.01 {
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				f.deleteCursors()
 				formModel := f.closestModel.(*model.FormItemBool)
 				if f.sinceLastClick > ClickEventEpsilon {
 					formModel.SetValue(!formModel.GetValue())
@@ -234,6 +249,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		if closestDistance <= minDiff+0.01 {
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				f.deleteCursors()
 				formModel := f.closestModel.(*model.FormItemInt)
 				if f.sinceLastClick > ClickEventEpsilon {
 					formModel.AddCursor()
