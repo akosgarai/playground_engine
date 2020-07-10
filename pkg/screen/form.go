@@ -152,40 +152,21 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	}
 }
 
-// defaultMaterialForTheFormItems sets the material to the default of the form items.
+// initMaterialForTheFormItems sets the material to the default of the form items.
 // It could be used un the update loop to make all of them to default state.
-func (f *FormScreen) defaultMaterialForTheFormItems() {
-	for s, _ := range f.shaderMap {
-		for index, _ := range f.shaderMap[s] {
-			switch f.shaderMap[s][index].(type) {
-			case *model.FormItemBool:
-				fi := f.shaderMap[s][index].(*model.FormItemBool).GetSurface()
-				tmMesh := fi.(*mesh.TexturedMaterialMesh)
-				tmMesh.Material = DefaultFormItemMaterial
-				break
-			}
-		}
-	}
-}
-
-// This function marks the true items with a spot light.
-func (f *FormScreen) addSpotLightSourcesToTrueFormItems() {
+func (f *FormScreen) initMaterialForTheFormItems() {
 	for s, _ := range f.shaderMap {
 		for index, _ := range f.shaderMap[s] {
 			switch f.shaderMap[s][index].(type) {
 			case *model.FormItemBool:
 				fi := f.shaderMap[s][index].(*model.FormItemBool)
+				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
+				surfaceMesh.Material = DefaultFormItemMaterial
+				lightMesh := fi.GetLight().(*mesh.TexturedMaterialMesh)
 				if fi.GetValue() {
-					lightPos := mgl32.TransformCoordinate(fi.GetLight().GetPosition(), fi.GetLight().GetParentTranslationTransformation())
-					// Create a spot ligth source here and add it to the screen.
-					SpotLightSource := light.NewSpotLight([5]mgl32.Vec3{
-						lightPos,
-						SpotLightDirection,
-						SpotLightAmbient,
-						SpotLightDiffuse,
-						SpotLightSpecular},
-						[5]float32{LightConstantTerm, LightLinearTerm, LightQuadraticTerm, SpotLightCutoff, SpotLightOuterCutoff})
-					f.AddSpotLightSource(SpotLightSource, [10]string{"spotLight[0].position", "spotLight[0].direction", "spotLight[0].ambient", "spotLight[0].diffuse", "spotLight[0].specular", "spotLight[0].constant", "spotLight[0].linear", "spotLight[0].quadratic", "spotLight[0].cutOff", "spotLight[0].outerCutOff"})
+					lightMesh.Material = material.Ruby
+				} else {
+					lightMesh.Material = material.Whiteplastic
 				}
 				break
 			}
@@ -225,9 +206,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	f.closestDistance = closestDistance
 	f.closestModel = closestModel
 
-	f.defaultMaterialForTheFormItems()
-	f.CleanSpotLightSources()
-	f.addSpotLightSourcesToTrueFormItems()
+	f.initMaterialForTheFormItems()
 	switch f.closestModel.(type) {
 	case *model.FormItemBool:
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
