@@ -29,7 +29,7 @@ const (
 	LightConstantTerm  = float32(1.0)
 	LightLinearTerm    = float32(0.14)
 	LightQuadraticTerm = float32(0.07)
-	ClickEventEpsilon  = 100
+	ClickEventEpsilon  = 200
 )
 
 var (
@@ -233,6 +233,13 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		minDiff := float32(0.0)
 		if closestDistance <= minDiff+0.01 {
 			tmMesh.Material = material.Ruby
+			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel := f.closestModel.(*model.FormItemInt)
+				if f.sinceLastClick > ClickEventEpsilon {
+					formModel.AddCursor()
+					f.sinceLastClick = 0
+				}
+			}
 		}
 		break
 	}
