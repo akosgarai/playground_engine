@@ -53,7 +53,7 @@ type FormScreen struct {
 	background     *model.BaseModel
 	frame          *material.Material
 	header         string
-	formItems      []*model.FormItemBool
+	formItems      []interfaces.FormItem
 	bgShader       *shader.Shader
 	sinceLastClick float64
 }
@@ -223,6 +223,13 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			}
 		}
 		break
+	case *model.FormItemInt:
+		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
+		minDiff := float32(0.0)
+		if closestDistance <= minDiff+0.01 {
+			tmMesh.Material = material.Ruby
+		}
+		break
 	}
 }
 
@@ -241,6 +248,22 @@ func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrap
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
 	fi := model.NewFormItemBool(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi.RotateX(-90)
+	fi.RotateY(180)
+	f.AddModelToShader(fi, f.bgShader)
+	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/wW, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.formItems = append(f.formItems, fi)
+}
+
+// AddFormItemInt is for adding an integer form item to the form.
+func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper, wW float32) {
+	lenItems := len(f.formItems)
+	posX := model.FormItemWidth / 2
+	if lenItems%2 == 1 {
+		posX = -1.0 * posX
+	}
+	posY := 0.80 - float32((lenItems/2))*0.1
+	fi := model.NewFormItemInt(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)

@@ -122,6 +122,10 @@ type Model interface {
 	Clear()
 	AddMesh(Mesh)
 }
+type FormItem interface {
+	Model
+	GetLabel() string
+}
 
 type KeyStore interface {
 	Get(glfw.Key) bool
