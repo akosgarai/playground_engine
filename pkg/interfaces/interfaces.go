@@ -166,4 +166,5 @@ type Screen interface {
 	GetClosestModelMeshDistance() (Model, Mesh, float32)
 	SetUniformFloat(string, float32)
 	SetUniformVector(string, mgl32.Vec3)
+	CharCallback(rune)
 }

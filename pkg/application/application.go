@@ -170,6 +170,11 @@ func (a *Application) MouseButtonCallback(w *glfw.Window, button glfw.MouseButto
 		break
 	}
 }
+func (a *Application) CharCallback(w *glfw.Window, char rune) {
+	if a.activeScreen != nil {
+		a.activeScreen.CharCallback(char)
+	}
+}
 
 // SetKeyState setups the keyDowns based on the key and action
 func (a *Application) SetKeyState(key glfw.Key, action glfw.Action) {
