@@ -279,3 +279,15 @@ func (c *Charset) PrintTo(text string, x, y, z, scale float32, wrapper interface
 		c.Model.AddMesh(mshStore[i])
 	}
 }
+
+// CleanSurface deletes those printed texts where the parent mesh is the given surface
+func (c *Charset) CleanSurface(msh interfaces.Mesh) {
+	var meshes []interfaces.Mesh
+	for i, _ := range c.meshes {
+		parent := c.meshes[i].GetParent()
+		if parent != msh {
+			meshes = append(meshes, parent)
+		}
+	}
+	c.meshes = meshes
+}

@@ -1167,6 +1167,22 @@ func TestCharsetPrintTo(t *testing.T) {
 	fonts.Debug = true
 	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh, cols)
 }
+func TestCharsetCleanSurface(t *testing.T) {
+	cols := []mgl32.Vec3{mgl32.Vec3{0, 0, 1}}
+	fonts, err := LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
+	if err != nil {
+		t.Errorf("Error during load: %s\n", err.Error())
+	}
+	msh := mesh.NewPointMesh(wrapperMock)
+	fonts.PrintTo("Hello", 0, 0, 0.0, 1.0, wrapperMock, msh, cols)
+	if len(fonts.meshes) != 5 {
+		t.Errorf("Invalid number of meshes. Instead of '%d', we have '%d'.", 5, len(fonts.meshes))
+	}
+	fonts.CleanSurface(msh)
+	if len(fonts.meshes) != 0 {
+		t.Errorf("Invalid number of meshes. Instead of '%d', we have '%d'.", 0, len(fonts.meshes))
+	}
+}
 func TestCharsetTextWidth(t *testing.T) {
 	fonts, err := LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40, 72, wrapperMock)
 	if err != nil {
