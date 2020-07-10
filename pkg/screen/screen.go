@@ -423,7 +423,7 @@ func (s *Screen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, 
 }
 
 // CharCallback is the character stream input handler
-func (s *Screen) CharCallback(char rune) {
+func (s *Screen) CharCallback(char rune, w interfaces.GLWrapper, wW float32) {
 }
 
 // cameraKeyboardMovement is responsible for handling a movement for a specific direction.

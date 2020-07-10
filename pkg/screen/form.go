@@ -1,8 +1,8 @@
 package screen
 
 import (
-	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
@@ -300,6 +300,15 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 }
 
 // CharCallback is the character stream input handler
-func (f *FormScreen) CharCallback(char rune) {
-	fmt.Printf("%c, %v\n", char, char)
+func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper, wW float32) {
+	if f.underEdit != nil {
+		switch f.underEdit.(type) {
+		case *model.FormItemInt:
+			fi := f.underEdit.(*model.FormItemInt)
+			fi.CharCallback(char)
+			f.charset.CleanSurface(fi.GetTarget())
+			f.charset.PrintTo(strconv.Itoa(fi.GetValue()), model.CursorInitX, 0.0, -0.01, 1.0/wW, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{1, 1, 0}})
+			break
+		}
+	}
 }
