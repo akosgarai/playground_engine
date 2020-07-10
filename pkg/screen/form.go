@@ -48,12 +48,13 @@ var (
 
 type FormScreen struct {
 	*ScreenBase
-	charset    *model.Charset
-	background *model.BaseModel
-	frame      *material.Material
-	header     string
-	formItems  []*model.FormItemBool
-	bgShader   *shader.Shader
+	charset        *model.Charset
+	background     *model.BaseModel
+	frame          *material.Material
+	header         string
+	formItems      []*model.FormItemBool
+	bgShader       *shader.Shader
+	sinceLastClick float64
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
@@ -141,12 +142,13 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	s.AddModelToShader(frameModel, frameShaderApplication)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
-		ScreenBase: s,
-		charset:    chars,
-		background: background,
-		bgShader:   bgShaderApplication,
-		frame:      frame,
-		header:     label,
+		ScreenBase:     s,
+		charset:        chars,
+		background:     background,
+		bgShader:       bgShaderApplication,
+		frame:          frame,
+		header:         label,
+		sinceLastClick: 0,
 	}
 }
 
@@ -233,7 +235,11 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 				formModel := f.closestModel.(*model.FormItemBool)
-				formModel.SetValue(!formModel.GetValue())
+				f.sinceLastClick = f.sinceLastClick + dt
+				if f.sinceLastClick > 1000 {
+					formModel.SetValue(!formModel.GetValue())
+					f.sinceLastClick = 0
+				}
 			}
 		}
 		break
