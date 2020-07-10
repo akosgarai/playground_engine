@@ -286,7 +286,7 @@ func (c *Charset) CleanSurface(msh interfaces.Mesh) {
 	for i, _ := range c.meshes {
 		parent := c.meshes[i].GetParent()
 		if parent != msh {
-			meshes = append(meshes, parent)
+			meshes = append(meshes, c.meshes[i])
 		}
 	}
 	c.meshes = meshes
