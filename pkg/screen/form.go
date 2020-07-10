@@ -56,6 +56,7 @@ type FormScreen struct {
 	formItems      []interfaces.FormItem
 	bgShader       *shader.Shader
 	sinceLastClick float64
+	underEdit      interfaces.FormItem
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
@@ -180,17 +181,14 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 	}
 }
 
-// deleteCursors removes the cursor from the text form inputs.
-func (f *FormScreen) deleteCursors() {
-	for s, _ := range f.shaderMap {
-		for index, _ := range f.shaderMap[s] {
-			switch f.shaderMap[s][index].(type) {
-			case *model.FormItemInt:
-				fi := f.shaderMap[s][index].(*model.FormItemInt)
-				fi.DeleteCursor()
-				break
-			}
-		}
+// deleteCursor removes the cursor from the text form inputs.
+func (f *FormScreen) deleteCursor() {
+	switch f.underEdit.(type) {
+	case *model.FormItemInt:
+		fi := f.underEdit.(*model.FormItemInt)
+		fi.DeleteCursor()
+		f.underEdit = nil
+		break
 	}
 }
 
@@ -236,7 +234,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 				formModel := f.closestModel.(*model.FormItemBool)
 				if f.sinceLastClick > ClickEventEpsilon {
-					f.deleteCursors()
+					f.deleteCursor()
 					formModel.SetValue(!formModel.GetValue())
 					f.sinceLastClick = 0
 				}
@@ -251,9 +249,10 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 				formModel := f.closestModel.(*model.FormItemInt)
 				if f.sinceLastClick > ClickEventEpsilon {
-					f.deleteCursors()
+					f.deleteCursor()
 					formModel.AddCursor()
 					f.sinceLastClick = 0
+					f.underEdit = formModel
 				}
 			}
 		}
