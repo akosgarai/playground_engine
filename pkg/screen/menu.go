@@ -199,5 +199,5 @@ func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 }
 
 // CharCallback is the character stream input handler
-func (s *Screen) CharCallback(char rune, w interfaces.GLWrapper, wW float32) {
+func (s *MenuScreen) CharCallback(char rune, w interfaces.GLWrapper, wW float32) {
 }
