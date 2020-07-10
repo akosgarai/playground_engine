@@ -196,6 +196,7 @@ func (f *FormScreen) addSpotLightSourcesToTrueFormItems() {
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+	f.sinceLastClick = f.sinceLastClick + dt
 	cursorX := float32(-posX)
 	cursorY := float32(posY)
 	if f.cameraSet {
@@ -235,7 +236,6 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 				formModel := f.closestModel.(*model.FormItemBool)
-				f.sinceLastClick = f.sinceLastClick + dt
 				if f.sinceLastClick > 1000 {
 					formModel.SetValue(!formModel.GetValue())
 					f.sinceLastClick = 0
