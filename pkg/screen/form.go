@@ -29,7 +29,7 @@ const (
 	LightConstantTerm  = float32(1.0)
 	LightLinearTerm    = float32(0.14)
 	LightQuadraticTerm = float32(0.07)
-	ClickEventEpsilon  = 500
+	ClickEventEpsilon  = 100
 )
 
 var (

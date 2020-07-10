@@ -54,7 +54,7 @@ func NewFormItemInt(label string, mat *material.Material, position mgl32.Vec3, w
 	v, i, bo = writablePrimitive.MeshInput()
 	writableMesh := mesh.NewTexturedMaterialMesh(v, i, writableTexture, mat, wrapper)
 	writableMesh.SetParent(formItemMesh)
-	writableMesh.SetPosition(mgl32.Vec3{0.29, -0.01, 0.0})
+	writableMesh.SetPosition(mgl32.Vec3{0.24, -0.01, 0.0})
 	writableMesh.SetBoundingObject(bo)
 	m.AddMesh(writableMesh)
 	return &FormItemInt{
