@@ -62,8 +62,11 @@ func NewFormItemInt(label string, mat *material.Material, position mgl32.Vec3, w
 	writableMesh.SetBoundingObject(bo)
 	m.AddMesh(writableMesh)
 	cursorPrimitive := rectangle.NewExact(cursorWidth, cursorHeight)
+	var ctex texture.Textures
+	ctex.TransparentTexture(1, 1, 255, "tex.diffuse", wrapper)
+	ctex.TransparentTexture(1, 1, 255, "tex.specular", wrapper)
 	v, i, _ = cursorPrimitive.MeshInput()
-	cursor := mesh.NewTexturedMaterialMesh(v, i, tex, material.Chrome, wrapper)
+	cursor := mesh.NewTexturedMaterialMesh(v, i, ctex, material.Chrome, wrapper)
 	cursor.SetPosition(mgl32.Vec3{0.23, -0.02, 0.0})
 	return &FormItemInt{
 		BaseModel: m,
