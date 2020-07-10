@@ -197,3 +197,7 @@ func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		tmMesh.Material = s.defaultMaterial
 	}
 }
+
+// CharCallback is the character stream input handler
+func (s *MenuScreen) CharCallback(char rune) {
+}

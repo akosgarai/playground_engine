@@ -1,6 +1,7 @@
 package screen
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
@@ -296,4 +297,9 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/wW, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
+}
+
+// CharCallback is the character stream input handler
+func (f *FormScreen) CharCallback(char rune) {
+	fmt.Printf("%c, %v\n", char, char)
 }

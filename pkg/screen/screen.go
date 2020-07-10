@@ -422,6 +422,10 @@ func (s *Screen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, 
 	s.closestDistance = closestDistance
 }
 
+// CharCallback is the character stream input handler
+func (s *Screen) CharCallback(char rune) {
+}
+
 // cameraKeyboardMovement is responsible for handling a movement for a specific direction.
 // The direction is described by the key strings. The handler function name is also added
 // as input to be able to call it. For the movement we also need to know the delta time,
