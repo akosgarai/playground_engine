@@ -3,6 +3,8 @@ package model
 import (
 	"fmt"
 	"math"
+	"path"
+	"runtime"
 
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/modelexport"
@@ -10,6 +12,11 @@ import (
 	"github.com/akosgarai/coldet"
 	"github.com/go-gl/mathgl/mgl32"
 )
+
+func baseDirModel() string {
+	_, filename, _, _ := runtime.Caller(1)
+	return path.Dir(filename)
+}
 
 type Model struct {
 	meshes      []interfaces.Mesh

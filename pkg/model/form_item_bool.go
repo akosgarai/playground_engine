@@ -1,9 +1,6 @@
 package model
 
 import (
-	"path"
-	"runtime"
-
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
@@ -20,11 +17,6 @@ const (
 	ledWidth       = float32(0.2)
 	ledHeight      = float32(0.09)
 )
-
-func baseDirModel() string {
-	_, filename, _, _ := runtime.Caller(1)
-	return path.Dir(filename)
-}
 
 type FormItemBool struct {
 	*BaseModel

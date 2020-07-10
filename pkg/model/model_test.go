@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/primitives/boundingobject"
 	"github.com/akosgarai/playground_engine/pkg/testhelper"
@@ -15,8 +16,9 @@ import (
 )
 
 const (
-	InvalidFilename = "not-existing-file.obj"
-	ValidFilename   = "testdata/test_cube.obj"
+	InvalidFilename      = "not-existing-file.obj"
+	ValidFilename        = "testdata/test_cube.obj"
+	DefaultFormItemLabel = "form item label"
 )
 
 var (
@@ -1187,5 +1189,54 @@ func TestCharsetTextWidth(t *testing.T) {
 		if width != tt.width {
 			t.Errorf("Invalid text width for '%s'. Instead of '%f', we have '%f'.", tt.text, tt.width, width)
 		}
+	}
+}
+func testFormItemBool(t *testing.T) *FormItemBool {
+	mat := material.Chrome
+	pos := mgl32.Vec3{0, 0, 0}
+	fi := NewFormItemBool(DefaultFormItemLabel, mat, pos, wrapperMock)
+
+	if fi.label != DefaultFormItemLabel {
+		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	return fi
+}
+func TestNewFormItemBool(t *testing.T) {
+	_ = testFormItemBool(t)
+}
+func TestFormItemBoolGetLabel(t *testing.T) {
+	fi := testFormItemBool(t)
+	if fi.GetLabel() != DefaultFormItemLabel {
+		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
+	}
+
+}
+func TestFormItemBoolGetValue(t *testing.T) {
+	fi := testFormItemBool(t)
+	val := true
+	fi.value = val
+	if fi.GetValue() != val {
+		t.Errorf("Invalid form item value. Instead of '%v', it is '%v'.", val, fi.GetValue())
+	}
+}
+func TestFormItemBoolSetValue(t *testing.T) {
+	fi := testFormItemBool(t)
+	val := true
+	fi.value = val
+	fi.SetValue(!val)
+	if fi.GetValue() != !val {
+		t.Errorf("Invalid form item value. Instead of '%v', it is '%v'.", !val, fi.GetValue())
+	}
+}
+func TestFormItemBoolGetSurface(t *testing.T) {
+	fi := testFormItemBool(t)
+	if fi.GetSurface() != fi.meshes[0] {
+		t.Error("Invalid surface mesh")
+	}
+}
+func TestFormItemBoolGetLight(t *testing.T) {
+	fi := testFormItemBool(t)
+	if fi.GetLight() != fi.meshes[1] {
+		t.Error("Invalid light mesh")
 	}
 }
