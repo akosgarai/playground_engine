@@ -114,6 +114,17 @@ func TestSetParent(t *testing.T) {
 		t.Error("The parent supposed to be the same")
 	}
 }
+func TestGetParent(t *testing.T) {
+	var m Mesh
+	if m.GetParent() != nil {
+		t.Error("Parent supposed to be nil by default.")
+	}
+	var parent interfaces.Mesh
+	m.SetParent(parent)
+	if m.GetParent() != parent {
+		t.Error("The parent supposed to be the same")
+	}
+}
 func TestIsParentMesh(t *testing.T) {
 	var m Mesh
 	var parent interfaces.Mesh

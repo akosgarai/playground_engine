@@ -111,6 +111,7 @@ type Mesh interface {
 	RotatePosition(float32, mgl32.Vec3)
 	IsBoundingObjectSet() bool
 	GetBoundingObject() *boundingobject.BoundingObject
+	GetParent() Mesh
 }
 type Model interface {
 	Draw(Shader)

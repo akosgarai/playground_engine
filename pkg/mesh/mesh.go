@@ -212,6 +212,11 @@ func (m *Mesh) IsParentMesh() bool {
 	return !m.parentSet
 }
 
+// GetParent returns the parent mesh of this mesh
+func (m *Mesh) GetParent() interfaces.Mesh {
+	return m.parent
+}
+
 // IsBoundingObjectSet returns true, if the bounding object is set to this mesh.
 func (m *Mesh) IsBoundingObjectSet() bool {
 	return m.boundingObjectSet
