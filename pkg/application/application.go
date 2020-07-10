@@ -62,6 +62,9 @@ type Application struct {
 	screens      []interfaces.Screen
 	menuScreen   interfaces.Screen
 	menuSet      bool
+
+	// wrapper for char callback
+	wrapper interfaces.GLWrapper
 }
 
 // New returns an application instance
@@ -82,6 +85,16 @@ func (a *Application) Log() string {
 		logString += fmt.Sprintf("\tactiveScreen: %s\n", a.activeScreen.Log())
 	}
 	return logString
+}
+
+// SetWrapper updates the wrapper with the new one.
+func (a *Application) SetWrapper(w interfaces.GLWrapper) {
+	a.wrapper = w
+}
+
+// GetWrapper returns the current wrapper of the application.
+func (a *Application) GetWrapper() interfaces.GLWrapper {
+	return a.wrapper
 }
 
 // SetWindow updates the window with the new one.
@@ -173,7 +186,8 @@ func (a *Application) MouseButtonCallback(w *glfw.Window, button glfw.MouseButto
 }
 func (a *Application) CharCallback(w *glfw.Window, char rune) {
 	if a.activeScreen != nil {
-		a.activeScreen.CharCallback(char)
+		WindowWidth, _ := a.window.GetSize()
+		a.activeScreen.CharCallback(char, a.wrapper, float32(WindowWidth))
 	}
 }
 
