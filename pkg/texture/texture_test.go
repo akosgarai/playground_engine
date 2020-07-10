@@ -74,3 +74,10 @@ func TestAddCubeMapTextureWrongDir(t *testing.T) {
 		textures.AddCubeMapTexture("wrongDir", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", testGlWrapper)
 	}()
 }
+func TestTransparentTexture(t *testing.T) {
+	var textures Textures
+	textures.TransparentTexture(1, 1, 128, "material.diffuse", testGlWrapper)
+	if len(textures) != 1 {
+		t.Error("TransparentTexture should be successful")
+	}
+}
