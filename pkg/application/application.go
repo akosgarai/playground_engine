@@ -41,6 +41,7 @@ type Window interface {
 	GetCursorPos() (float64, float64)
 	SetKeyCallback(glfw.KeyCallback) glfw.KeyCallback
 	SetMouseButtonCallback(glfw.MouseButtonCallback) glfw.MouseButtonCallback
+	SetCharCallback(glfw.CharCallback) glfw.CharCallback
 	ShouldClose() bool
 	SwapBuffers()
 	GetSize() (int, int)
