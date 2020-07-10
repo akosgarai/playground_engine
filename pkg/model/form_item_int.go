@@ -15,8 +15,8 @@ const (
 	writableWidth  = float32(0.40)
 	writableHeight = float32(0.09)
 
-	cursorHeight = float32(0.8)
-	cursorWidth  = float32(0.045)
+	cursorHeight = float32(0.08)
+	cursorWidth  = float32(0.035)
 )
 
 type FormItemInt struct {
