@@ -1240,3 +1240,52 @@ func TestFormItemBoolGetLight(t *testing.T) {
 		t.Error("Invalid light mesh")
 	}
 }
+func testFormItemInt(t *testing.T) *FormItemInt {
+	mat := material.Chrome
+	pos := mgl32.Vec3{0, 0, 0}
+	fi := NewFormItemInt(DefaultFormItemLabel, mat, pos, wrapperMock)
+
+	if fi.label != DefaultFormItemLabel {
+		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	return fi
+}
+func TestNewFormItemInt(t *testing.T) {
+	_ = testFormItemInt(t)
+}
+func TestFormItemIntGetLabel(t *testing.T) {
+	fi := testFormItemInt(t)
+	if fi.GetLabel() != DefaultFormItemLabel {
+		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
+	}
+
+}
+func TestFormItemIntGetValue(t *testing.T) {
+	fi := testFormItemInt(t)
+	val := 3
+	fi.value = val
+	if fi.GetValue() != val {
+		t.Errorf("Invalid form item value. Instead of '%d', it is '%d'.", val, fi.GetValue())
+	}
+}
+func TestFormItemIntSetValue(t *testing.T) {
+	fi := testFormItemInt(t)
+	val := 3
+	fi.value = val
+	fi.SetValue(2 * val)
+	if fi.GetValue() != 2*val {
+		t.Errorf("Invalid form item value. Instead of '%d', it is '%d'.", 2*val, fi.GetValue())
+	}
+}
+func TestFormItemIntGetSurface(t *testing.T) {
+	fi := testFormItemInt(t)
+	if fi.GetSurface() != fi.meshes[0] {
+		t.Error("Invalid surface mesh")
+	}
+}
+func TestFormItemIntGetTarget(t *testing.T) {
+	fi := testFormItemInt(t)
+	if fi.GetTarget() != fi.meshes[1] {
+		t.Error("Invalid target mesh")
+	}
+}
