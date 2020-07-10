@@ -234,9 +234,9 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		if closestDistance <= minDiff+0.01 {
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-				f.deleteCursors()
 				formModel := f.closestModel.(*model.FormItemBool)
 				if f.sinceLastClick > ClickEventEpsilon {
+					f.deleteCursors()
 					formModel.SetValue(!formModel.GetValue())
 					f.sinceLastClick = 0
 				}
@@ -249,9 +249,9 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		if closestDistance <= minDiff+0.01 {
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-				f.deleteCursors()
 				formModel := f.closestModel.(*model.FormItemInt)
 				if f.sinceLastClick > ClickEventEpsilon {
+					f.deleteCursors()
 					formModel.AddCursor()
 					f.sinceLastClick = 0
 				}

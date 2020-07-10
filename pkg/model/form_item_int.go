@@ -15,7 +15,7 @@ const (
 	writableWidth  = float32(0.40)
 	writableHeight = float32(0.09)
 
-	cursorHeight = float32(0.7)
+	cursorHeight = float32(0.07)
 	cursorWidth  = float32(0.015)
 )
 
