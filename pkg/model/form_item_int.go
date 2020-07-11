@@ -103,6 +103,7 @@ func (fi *FormItemInt) DeleteCursor() {
 	}
 }
 func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
+	// if the first character is '-', mark the form item as negative.
 	if fi.value == 0 && r == rune('-') {
 		fi.isNegative = true
 		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
@@ -121,6 +122,10 @@ func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 }
 func (fi *FormItemInt) validRune(r rune) bool {
+	// integer number isn't allowed to start with 0.
+	if fi.value == 0 && r == rune('0') {
+		return false
+	}
 	validRunes := []rune("0123456789")
 	for _, v := range validRunes {
 		if v == r {
