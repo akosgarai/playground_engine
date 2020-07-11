@@ -161,12 +161,12 @@ func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
 		return
 	}
 	val := int(r - '0')
-	if fi.isNegative {
-		val = -val
-	}
 	if fi.floatPosition > -1 {
 		fi.valueFloat = fi.valueFloat*10 + val
 	} else {
+		if fi.isNegative {
+			val = -val
+		}
 		fi.valueInt = fi.valueInt*10 + val
 	}
 	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
