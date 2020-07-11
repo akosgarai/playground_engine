@@ -127,6 +127,10 @@ type FormItem interface {
 	Model
 	GetLabel() string
 }
+type CharFormItem interface {
+	FormItem
+	ValueToString() string
+}
 
 type KeyStore interface {
 	Get(glfw.Key) bool

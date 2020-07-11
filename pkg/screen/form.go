@@ -2,7 +2,6 @@ package screen
 
 import (
 	"math"
-	"strconv"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
@@ -57,7 +56,7 @@ type FormScreen struct {
 	formItems      []interfaces.FormItem
 	bgShader       *shader.Shader
 	sinceLastClick float64
-	underEdit      interfaces.FormItem
+	underEdit      interfaces.CharFormItem
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
@@ -309,7 +308,7 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper, wW fl
 			offsetX := f.charset.TextWidth(string(char), 1.0/wW)
 			fi.CharCallback(char, offsetX)
 			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(strconv.Itoa(fi.GetValue()), -model.CursorInitX, -0.015, -0.01, 1.0/wW, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/wW, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
 		}
 	}
