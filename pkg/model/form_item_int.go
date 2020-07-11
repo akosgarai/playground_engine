@@ -1,6 +1,8 @@
 package model
 
 import (
+	"strconv"
+
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
@@ -133,4 +135,12 @@ func (fi *FormItemInt) validRune(r rune) bool {
 		}
 	}
 	return false
+}
+
+// ValueToString returns the string representation of the value of the form item.
+func (fi *FormItemInt) ValueToString() string {
+	if fi.isNegative && fi.value == 0 {
+		return "-"
+	}
+	return strconv.Itoa(fi.value)
 }
