@@ -93,4 +93,8 @@ For the form screen, we need a couple of models.
 
 ### Form item bool
 
-This model represent a form item for maintaining a bool value. The texture was downloaded from [here](https://pixabay.com/hu/vectors/lekerek%C3%ADtett-v%C3%B6r%C3%B6s-t%C3%BCnetek-vezetett-26377/).
+This model represents a form item for maintaining a bool value. The texture was downloaded from [here](https://pixabay.com/hu/vectors/lekerek%C3%ADtett-v%C3%B6r%C3%B6s-t%C3%BCnetek-vezetett-26377/).
+
+### Form item int
+
+This model represents a form item for maintaining integer values.
