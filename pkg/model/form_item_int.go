@@ -26,6 +26,7 @@ type FormItemInt struct {
 	cursorOffsetX float32
 	label         string
 	value         int
+	isNegative    bool
 }
 
 // GetLabel returns the label string of the item.
@@ -77,6 +78,7 @@ func NewFormItemInt(label string, mat *material.Material, position mgl32.Vec3, w
 		cursor:        cursor,
 		cursorOffsetX: 0.0,
 		value:         0,
+		isNegative:    false,
 	}
 }
 
@@ -101,10 +103,17 @@ func (fi *FormItemInt) DeleteCursor() {
 	}
 }
 func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
+	if fi.value == 0 && r == rune("-") {
+		fi.isNegative = true
+		return
+	}
 	if !fi.validRune(r) {
 		return
 	}
 	val := int(r - '0')
+	if fi.isNegative {
+		val = -val
+	}
 	fi.value = fi.value*10 + val
 	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
 	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
