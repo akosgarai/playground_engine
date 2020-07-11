@@ -177,7 +177,7 @@ func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
 		if fi.valueInt == 0 && fi.cursorOffsetX > 0 {
 			if val == 0 {
 				doAppend = false
-			} else if fi.valueInt != 0 {
+			} else {
 				fi.DeleteLastCharacter()
 			}
 		}
