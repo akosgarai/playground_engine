@@ -1305,3 +1305,112 @@ func TestFormItemIntGetTarget(t *testing.T) {
 		t.Error("Invalid target mesh")
 	}
 }
+func TestFormItemIntAddCursor(t *testing.T) {
+	fi := testFormItemInt(t)
+	if len(fi.meshes) != 2 {
+		t.Error("Invalid number of target mesh")
+	}
+	fi.AddCursor()
+	if len(fi.meshes) != 3 {
+		t.Error("Invalid number of target mesh")
+	}
+}
+func TestFormItemIntDeleteCursor(t *testing.T) {
+	fi := testFormItemInt(t)
+	fi.AddCursor()
+	if len(fi.meshes) != 3 {
+		t.Error("Invalid number of target mesh")
+	}
+	fi.DeleteCursor()
+	if len(fi.meshes) != 2 {
+		t.Error("Invalid number of target mesh")
+	}
+}
+func TestFormItemIntCharCallback(t *testing.T) {
+	fi := testFormItemInt(t)
+	fi.AddCursor()
+	fi.CharCallback('b', 0.1)
+	if fi.value != 0 {
+		t.Errorf("Invalid value. Instead of '0', we have '%d'.", fi.value)
+	}
+	fi.CharCallback('0', 0.1)
+	if fi.value != 0 {
+		t.Errorf("Invalid value. Instead of '0', we have '%d'.", fi.value)
+	}
+	fi.CharCallback('-', 0.1)
+	if fi.value != 0 {
+		t.Errorf("Invalid value. Instead of '0', we have '%d'.", fi.value)
+	}
+	if fi.isNegative != true {
+		t.Errorf("Invalid negative flag")
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != -1 {
+		t.Errorf("Invalid value. Instead of '-1', we have '%d'.", fi.value)
+	}
+	fi = testFormItemInt(t)
+	fi.AddCursor()
+	fi.CharCallback('1', 0.1)
+	if fi.value != 1 {
+		t.Errorf("Invalid value. Instead of '1', we have '%d'.", fi.value)
+	}
+	fi.value = math.MaxInt32 - 10
+	fi.CharCallback('1', 0.1)
+	if fi.value != math.MaxInt32-10 {
+		t.Errorf("Invalid value. Instead of '%d', we have '%d'.", math.MaxInt32-10, fi.value)
+	}
+}
+func TestFormItemIntValueToString(t *testing.T) {
+	fi := testFormItemInt(t)
+	val := fi.ValueToString()
+	if val != "0" {
+		t.Errorf("Invalid value. Instead of '0', we have '%s'.", val)
+	}
+	fi.isNegative = true
+	val = fi.ValueToString()
+	if val != "-" {
+		t.Errorf("Invalid value. Instead of '-', we have '%s'.", val)
+	}
+	fi.value = -3
+	val = fi.ValueToString()
+	if val != "-3" {
+		t.Errorf("Invalid value. Instead of '-3', we have '%s'.", val)
+	}
+	fi.isNegative = false
+	fi.value = 3
+	val = fi.ValueToString()
+	if val != "3" {
+		t.Errorf("Invalid value. Instead of '3', we have '%s'.", val)
+	}
+}
+func TestFormItemIntDeleteLastCharacter(t *testing.T) {
+	fi := testFormItemInt(t)
+	fi.value = 12345
+	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
+	fi.cursorOffsetX = float32(0.5)
+	fi.DeleteLastCharacter()
+	if fi.value != 1234 {
+		t.Errorf("Invalid value. Instead of '1234', we have '%d'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	if fi.value != 123 {
+		t.Errorf("Invalid value. Instead of '123', we have '%d'.", fi.value)
+	}
+	fi.isNegative = true
+	fi.value = -2
+	fi.DeleteLastCharacter()
+	if fi.value != 0 {
+		t.Errorf("Invalid value. Instead of '0', we have '%d'.", fi.value)
+	}
+	if fi.isNegative != true {
+		t.Error("Invalid isNegative flag")
+	}
+	fi.DeleteLastCharacter()
+	if fi.isNegative != false {
+		t.Error("Invalid isNegative flag")
+	}
+	fi.DeleteLastCharacter()
+	if fi.isNegative != false {
+		t.Error("Invalid isNegative flag")
+	}
+}
