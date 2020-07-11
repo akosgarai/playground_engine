@@ -22,9 +22,10 @@ const (
 
 type FormItemInt struct {
 	*BaseModel
-	cursor interfaces.Mesh
-	label  string
-	value  int
+	cursor        interfaces.Mesh
+	cursorOffsetX float32
+	label         string
+	value         int
 }
 
 // GetLabel returns the label string of the item.
@@ -71,10 +72,11 @@ func NewFormItemInt(label string, mat *material.Material, position mgl32.Vec3, w
 	cursor.SetPosition(mgl32.Vec3{CursorInitX, 0.0, -0.01})
 	cursor.SetParent(writableMesh)
 	return &FormItemInt{
-		BaseModel: m,
-		label:     label,
-		cursor:    cursor,
-		value:     0,
+		BaseModel:     m,
+		label:         label,
+		cursor:        cursor,
+		cursorOffsetX: 0.0,
+		value:         0,
 	}
 }
 
@@ -91,18 +93,21 @@ func (fi *FormItemInt) GetTarget() interfaces.Mesh {
 // AddCursor displays a cursor on the target surface.
 func (fi *FormItemInt) AddCursor() {
 	fi.AddMesh(fi.cursor)
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 }
 func (fi *FormItemInt) DeleteCursor() {
 	if len(fi.meshes) == 3 {
 		fi.meshes = fi.meshes[:len(fi.meshes)-1]
 	}
 }
-func (fi *FormItemInt) CharCallback(r rune) {
+func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 	if !fi.validRune(r) {
 		return
 	}
 	val := int(r - '0')
 	fi.value = fi.value*10 + val
+	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 }
 func (fi *FormItemInt) validRune(r rune) bool {
 	validRunes := []rune("0123456789")
