@@ -1,6 +1,7 @@
 package model
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
@@ -126,6 +127,11 @@ func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 func (fi *FormItemInt) validRune(r rune) bool {
 	// integer number isn't allowed to start with 0.
 	if fi.value == 0 && r == rune('0') {
+		return false
+	}
+	// if the next iteration the value will be grater than max or less than min
+	// return false
+	if fi.value > math.MaxInt32/10 || fi.value < math.MinInt32/10 {
 		return false
 	}
 	validRunes := []rune("0123456789")
