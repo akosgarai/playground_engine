@@ -169,6 +169,11 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
 				surfaceMesh.Material = DefaultFormItemMaterial
 				break
+			case *model.FormItemFloat:
+				fi := f.shaderMap[s][index].(*model.FormItemFloat)
+				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
+				surfaceMesh.Material = DefaultFormItemMaterial
+				break
 			case *model.FormItemBool:
 				fi := f.shaderMap[s][index].(*model.FormItemBool)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
@@ -349,6 +354,14 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 		switch f.underEdit.(type) {
 		case *model.FormItemInt:
 			fi := f.underEdit.(*model.FormItemInt)
+			// offset for the current character has to be calculated.
+			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
+			fi.CharCallback(char, offsetX)
+			f.charset.CleanSurface(fi.GetTarget())
+			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			break
+		case *model.FormItemFloat:
+			fi := f.underEdit.(*model.FormItemFloat)
 			// offset for the current character has to be calculated.
 			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
 			fi.CharCallback(char, offsetX)
