@@ -151,7 +151,7 @@ func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
 	}
 	// handle '.' here
 	if r == rune('.') {
-		fi.floatPosition = len(fmt.Sprintf("%d", fi.valueInt)) + 1
+		fi.floatPosition = len(fmt.Sprintf("%d", fi.valueInt))
 		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
 		fi.charOffsets = append(fi.charOffsets, offsetX)
 		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
