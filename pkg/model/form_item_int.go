@@ -105,6 +105,8 @@ func (fi *FormItemInt) DeleteCursor() {
 func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 	if fi.value == 0 && r == rune('-') {
 		fi.isNegative = true
+		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 		return
 	}
 	if !fi.validRune(r) {
