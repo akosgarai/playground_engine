@@ -703,8 +703,19 @@ func TestFormScreenUpdate(t *testing.T) {
 		ms := store.NewGlfwMouseStore()
 		form.Update(10, 0.5, 0.5, ks, ms)
 		// add option
-		form.AddFormItemBool("label", wrapperReal)
+		form.AddFormItemBool("label bool", wrapperReal)
 		form.Update(10, -0.4, 0.79, ks, ms)
+		form.AddFormItemInt("label int", wrapperReal)
+		form.Update(10, -0.4, 0.79, ks, ms)
+		ms.Set(LEFT_MOUSE_BUTTON, true)
+		form.sinceLastClick = 201
+		form.Update(10, -0.4, 0.79, ks, ms)
+		form.sinceLastClick = 201
+		form.Update(10, 0.4, 0.79, ks, ms)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		ks.Set(BACK_SPACE, true)
+		form.Update(10, 0.4, 0.79, ks, ms)
 	}()
 }
 func TestFormScreenAddFormItemBool(t *testing.T) {
@@ -763,5 +774,36 @@ func TestFormScreenAddFormItemInt(t *testing.T) {
 				t.Error("Invalid number of form items.")
 			}
 		}
+	}()
+}
+func TestFormScreenCharCallback(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		labels := []string{"label1", "label2", "label3", "label4"}
+		for i := 0; i < len(labels); i++ {
+			form.AddFormItemInt(labels[i], wrapperReal)
+			if len(form.formItems) != i+1 {
+				t.Error("Invalid number of form items.")
+			}
+		}
+		form.underEdit = form.formItems[0].(*model.FormItemInt)
+		form.CharCallback('1', wrapperReal)
 	}()
 }
