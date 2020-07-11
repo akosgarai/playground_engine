@@ -1414,3 +1414,335 @@ func TestFormItemIntDeleteLastCharacter(t *testing.T) {
 		t.Error("Invalid isNegative flag")
 	}
 }
+func testFormItemFloat(t *testing.T) *FormItemFloat {
+	mat := material.Chrome
+	pos := mgl32.Vec3{0, 0, 0}
+	fi := NewFormItemFloat(DefaultFormItemLabel, mat, pos, wrapperMock)
+
+	if fi.label != DefaultFormItemLabel {
+		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	return fi
+}
+func TestNewFormItemFloat(t *testing.T) {
+	_ = testFormItemFloat(t)
+}
+func TestFormItemFloatGetLabel(t *testing.T) {
+	fi := testFormItemFloat(t)
+	if fi.GetLabel() != DefaultFormItemLabel {
+		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
+	}
+
+}
+func TestFormItemFloatGetValue(t *testing.T) {
+	fi := testFormItemFloat(t)
+	valI := 3
+	valF := 2
+	valFLong := 00000
+	fi.valueInt = valI
+	if fi.GetValue() != float32(valI) {
+		t.Errorf("Invalid form item value. Instead of '%d', it is '%f'.", valI, fi.GetValue())
+	}
+	fi.valueFloat = valF
+	if fi.GetValue() != 3.2 {
+		t.Errorf("Invalid form item value. Instead of '%d.%d', it is '%f'.", valI, valF, fi.GetValue())
+	}
+	fi.valueFloat = valFLong
+	if fi.GetValue() != 3.0 {
+		t.Errorf("Invalid form item value. Instead of '%d.%d', it is '%f'.", valI, valF, fi.GetValue())
+	}
+
+}
+func TestFormItemFloatSetValue(t *testing.T) {
+	fi := testFormItemFloat(t)
+	fi.SetValue(3.3)
+	if fi.GetValue() != 3.3 {
+		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 3.3, fi.GetValue())
+	}
+	if fi.floatPosition != 1 {
+		t.Errorf("Invalid floatposition. Instead of '1', it is '%d'.", fi.floatPosition)
+	}
+	fi.SetValue(float32(3.000))
+	if fi.GetValue() != 3.0 {
+		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 3.0, fi.GetValue())
+	}
+	if fi.floatPosition != 1 {
+		t.Errorf("Invalid floatposition. Instead of '1', it is '%d'.", fi.floatPosition)
+	}
+	fi.SetValue(float32(1234567890.000))
+	if fi.GetValue() != 3.0 {
+		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 3.0, fi.GetValue())
+	}
+	if fi.floatPosition != 1 {
+		t.Errorf("Invalid floatposition. Instead of '1', it is '%d'.", fi.floatPosition)
+	}
+	val := 12.3456700001
+	fi.SetValue(float32(val))
+	if fi.GetValue() != 12.345670 {
+		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 12.345670, fi.GetValue())
+	}
+	if fi.floatPosition != 2 {
+		t.Errorf("Invalid floatposition. Instead of '2', it is '%d'.", fi.floatPosition)
+	}
+	fi.SetValue(float32(10000000.5752))
+	if fi.GetValue() != 12.345670 {
+		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 12.345670, fi.GetValue())
+	}
+	if fi.floatPosition != 2 {
+		t.Errorf("Invalid floatposition. Instead of '2', it is '%d'.", fi.floatPosition)
+	}
+}
+func TestFormItemFloatGetSurface(t *testing.T) {
+	fi := testFormItemFloat(t)
+	if fi.GetSurface() != fi.meshes[0] {
+		t.Error("Invalid surface mesh")
+	}
+}
+func TestFormItemFloatGetTarget(t *testing.T) {
+	fi := testFormItemFloat(t)
+	if fi.GetTarget() != fi.meshes[1] {
+		t.Error("Invalid target mesh")
+	}
+}
+func TestFormItemFloatAddCursor(t *testing.T) {
+	fi := testFormItemFloat(t)
+	if len(fi.meshes) != 2 {
+		t.Error("Invalid number of target mesh")
+	}
+	fi.AddCursor()
+	if len(fi.meshes) != 3 {
+		t.Error("Invalid number of target mesh")
+	}
+}
+func TestFormItemFloatDeleteCursor(t *testing.T) {
+	fi := testFormItemFloat(t)
+	fi.AddCursor()
+	if len(fi.meshes) != 3 {
+		t.Error("Invalid number of target mesh")
+	}
+	fi.DeleteCursor()
+	if len(fi.meshes) != 2 {
+		t.Error("Invalid number of target mesh")
+	}
+}
+func TestFormItemFloatCharCallback(t *testing.T) {
+	fi := testFormItemFloat(t)
+	fi.AddCursor()
+	// start with 0
+	fi.CharCallback('0', 0.1)
+	if fi.valueInt != 0 {
+		t.Errorf("Invalid int value. Instead of '0', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.valueInt != 1 {
+		t.Errorf("Invalid int value. Instead of '1', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	fi.CharCallback('2', 0.1)
+	if fi.valueInt != 12 {
+		t.Errorf("Invalid int value. Instead of '12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	fi.CharCallback('.', 0.1)
+	if fi.valueInt != 12 {
+		t.Errorf("Invalid int value. Instead of '12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != 2 {
+		t.Errorf("Invalid float position. Instead of '2', we have '%d'.", fi.floatPosition)
+	}
+	fi.CharCallback('8', 0.1)
+	if fi.valueInt != 12 {
+		t.Errorf("Invalid int value. Instead of '12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 8 {
+		t.Errorf("Invalid float value. Instead of '8', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != 2 {
+		t.Errorf("Invalid float position. Instead of '2', we have '%d'.", fi.floatPosition)
+	}
+	// start with .
+	fi = testFormItemFloat(t)
+	fi.AddCursor()
+	fi.CharCallback('.', 0.1)
+	if fi.valueInt != 0 {
+		t.Errorf("Invalid int value. Instead of '0', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.valueInt != 1 {
+		t.Errorf("Invalid int value. Instead of '1', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	fi.CharCallback('2', 0.1)
+	if fi.valueInt != 12 {
+		t.Errorf("Invalid int value. Instead of '12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	fi.CharCallback('.', 0.1)
+	if fi.valueInt != 12 {
+		t.Errorf("Invalid int value. Instead of '12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != 2 {
+		t.Errorf("Invalid float position. Instead of '2', we have '%d'.", fi.floatPosition)
+	}
+	fi.CharCallback('8', 0.1)
+	if fi.valueInt != 12 {
+		t.Errorf("Invalid int value. Instead of '12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 8 {
+		t.Errorf("Invalid float value. Instead of '8', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != 2 {
+		t.Errorf("Invalid float position. Instead of '2', we have '%d'.", fi.floatPosition)
+	}
+	// start with -
+	fi = testFormItemFloat(t)
+	fi.AddCursor()
+	fi.CharCallback('-', 0.1)
+	if fi.valueInt != 0 {
+		t.Errorf("Invalid int value. Instead of '0', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	if fi.isNegative != true {
+		t.Error("Invalid negative flag.")
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.valueInt != -1 {
+		t.Errorf("Invalid int value. Instead of '-1', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	if fi.isNegative != true {
+		t.Error("Invalid negative flag.")
+	}
+	fi.CharCallback('2', 0.1)
+	if fi.valueInt != -12 {
+		t.Errorf("Invalid int value. Instead of '-12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != -1 {
+		t.Errorf("Invalid float position. Instead of '-1', we have '%d'.", fi.floatPosition)
+	}
+	if fi.isNegative != true {
+		t.Error("Invalid negative flag.")
+	}
+	fi.CharCallback('.', 0.1)
+	if fi.valueInt != -12 {
+		t.Errorf("Invalid int value. Instead of '-12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 0 {
+		t.Errorf("Invalid float value. Instead of '0', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != 3 {
+		t.Errorf("Invalid float position. Instead of '3', we have '%d'.", fi.floatPosition)
+	}
+	if fi.isNegative != true {
+		t.Error("Invalid negative flag.")
+	}
+	fi.CharCallback('8', 0.1)
+	if fi.valueInt != -12 {
+		t.Errorf("Invalid int value. Instead of '-12', we have '%d'.", fi.valueInt)
+	}
+	if fi.valueFloat != 8 {
+		t.Errorf("Invalid float value. Instead of '8', we have '%d'.", fi.valueFloat)
+	}
+	if fi.floatPosition != 3 {
+		t.Errorf("Invalid float position. Instead of '3', we have '%d'.", fi.floatPosition)
+	}
+}
+func TestFormItemFloatValueToString(t *testing.T) {
+	fi := testFormItemFloat(t)
+	fi.AddCursor()
+	fi.isNegative = true
+	if fi.ValueToString() != "-" {
+		t.Errorf("Invalid valuestring. instead of '-', we have '%s'.", fi.ValueToString())
+	}
+	fi.valueInt = -3
+	if fi.ValueToString() != "-3" {
+		t.Errorf("Invalid valuestring. instead of '-3', we have '%s'.", fi.ValueToString())
+	}
+	fi.floatPosition = 2
+	if fi.ValueToString() != "-3." {
+		t.Errorf("Invalid valuestring. instead of '-3.', we have '%s'.", fi.ValueToString())
+	}
+	fi.valueFloat = 3
+	if fi.ValueToString() != "-3.3" {
+		t.Errorf("Invalid valuestring. instead of '-3.3', we have '%s'.", fi.ValueToString())
+	}
+
+}
+func TestFormItemFloatDeleteLastCharacter(t *testing.T) {
+	fi := testFormItemFloat(t)
+	fi.AddCursor()
+	fi.isNegative = true
+	fi.valueInt = -3
+	fi.floatPosition = 2
+	fi.valueFloat = 3
+	if fi.ValueToString() != "-3.3" {
+		t.Errorf("Invalid valuestring. instead of '-3.3', we have '%s'.", fi.ValueToString())
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "-3." {
+		t.Errorf("Invalid valuestring. instead of '-3.', we have '%s'.", fi.ValueToString())
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "-3" {
+		t.Errorf("Invalid valuestring. instead of '-3', we have '%s'.", fi.ValueToString())
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "-" {
+		t.Errorf("Invalid valuestring. instead of '-', we have '%s'.", fi.ValueToString())
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "0" {
+		t.Errorf("Invalid valuestring. instead of '0', we have '%s'.", fi.ValueToString())
+	}
+}

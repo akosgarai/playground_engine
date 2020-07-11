@@ -66,14 +66,17 @@ func (fi *FormItemFloat) SetValue(v float32) {
 		fmt.Printf("Can't set this precision, int part length '%d' + 1 + '%d' > 9\n", len(parts[0]), int(math.Min(1, float64(len(partFloatString)))))
 		return
 	}
-	fi.valueInt = partInt
-	fi.floatPosition = len(parts[0])
 	to := 9 - (len(parts[0]) + 1)
+	if to > len(partFloatString) {
+		to = len(partFloatString)
+	}
 	partFloat, err := strconv.Atoi(partFloatString[0:to])
 	if err != nil {
 		fmt.Printf("Can't format to int: '%s' (orig: '%s'), err: '%s'\n", partFloatString[0:to], parts[1], err.Error())
 		return
 	}
+	fi.floatPosition = len(parts[0])
+	fi.valueInt = partInt
 	fi.valueFloat = partFloat
 }
 func NewFormItemFloat(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemFloat {
@@ -149,8 +152,8 @@ func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
 		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 		return
 	}
-	// handle '.' here
-	if r == rune('.') && fi.floatPosition == -1 {
+	// handle '.' here: if it is not handled before, and we have offset (inserted character).
+	if r == rune('.') && fi.floatPosition == -1 && fi.cursorOffsetX > 0 {
 		fi.floatPosition = len(fmt.Sprintf("%d", fi.valueInt))
 		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
 		fi.charOffsets = append(fi.charOffsets, offsetX)
@@ -161,23 +164,32 @@ func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
 		return
 	}
 	val := int(r - '0')
+	doAppend := true
 	if fi.floatPosition > -1 {
 		fi.valueFloat = fi.valueFloat*10 + val
 	} else {
 		if fi.isNegative {
 			val = -val
 		}
+		// offset change has to be skipped, if we handle multiple 0-s in the integer part.
+		// if the start value is 0, and the new value also 0, and the offset is > 0,
+		// offset increment not allowed.
+		if fi.valueInt == 0 && fi.cursorOffsetX > 0 {
+			if val == 0 {
+				doAppend = false
+			} else {
+				fi.DeleteLastCharacter()
+			}
+		}
 		fi.valueInt = fi.valueInt*10 + val
 	}
-	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-	fi.charOffsets = append(fi.charOffsets, offsetX)
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	if doAppend {
+		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+		fi.charOffsets = append(fi.charOffsets, offsetX)
+		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	}
 }
 func (fi *FormItemFloat) validRune(r rune) bool {
-	// integer number isn't allowed to start with 0.
-	if fi.valueInt == 0 && fi.floatPosition == -1 && r == rune('0') {
-		return false
-	}
 	// if the next iteration the value will be grater than max or less than min
 	// return false
 	if fi.floatPosition == -1 {
@@ -206,16 +218,17 @@ func (fi *FormItemFloat) ValueToString() string {
 	if fi.valueFloat > 0 {
 		return fmt.Sprintf("%d.%d", fi.valueInt, fi.valueFloat)
 	}
+	if fi.floatPosition > -1 {
+		return fmt.Sprintf("%d.", fi.valueInt)
+	}
 	return fmt.Sprintf("%d", fi.valueInt)
 }
 
 // ValueToString returns the string representation of the value of the form item.
 func (fi *FormItemFloat) DeleteLastCharacter() {
 	if fi.valueInt == 0 && fi.valueFloat == 0 {
-		if fi.isNegative {
+		if fi.isNegative && fi.cursorOffsetX == 0 {
 			fi.isNegative = false
-		} else {
-			return
 		}
 	} else {
 		if fi.valueFloat > 0 {
@@ -228,8 +241,10 @@ func (fi *FormItemFloat) DeleteLastCharacter() {
 			fi.valueInt = (fi.valueInt - mod) / 10
 		}
 	}
-	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
-	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
-	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+	if len(fi.charOffsets) > 0 {
+		offsetX := fi.charOffsets[len(fi.charOffsets)-1]
+		fi.cursorOffsetX = fi.cursorOffsetX - offsetX
+		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+		fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+	}
 }
