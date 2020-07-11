@@ -103,7 +103,7 @@ func (fi *FormItemInt) DeleteCursor() {
 	}
 }
 func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
-	if fi.value == 0 && r == rune("-") {
+	if fi.value == 0 && r == rune('-') {
 		fi.isNegative = true
 		return
 	}
