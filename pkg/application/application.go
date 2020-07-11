@@ -68,11 +68,12 @@ type Application struct {
 }
 
 // New returns an application instance
-func New() *Application {
+func New(wrapper interfaces.GLWrapper) *Application {
 	return &Application{
 		mouseDowns: store.NewGlfwMouseStore(),
 		keyDowns:   store.NewGlfwKeyStore(),
 		menuSet:    false,
+		wrapper:    wrapper,
 	}
 }
 
@@ -130,6 +131,7 @@ func (a *Application) AddScreen(s interfaces.Screen) {
 	if a.window != nil {
 		WindowWidth, WindowHeight := a.window.GetSize()
 		s.SetWindowSize(float32(WindowWidth), float32(WindowHeight))
+		s.SetWrapper(a.wrapper)
 	}
 	a.screens = append(a.screens, s)
 }

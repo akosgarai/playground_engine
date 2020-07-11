@@ -10,10 +10,11 @@ The common application related stuff goes here. It holds
 - `activeScreen`, the screen that currently used
 - `menuScreen`, the screen that is connected to the application menu.
 - `menuSet`, this flag is true if the menuScreen has been set.
+- `wrapper`, the interface for calling gl commands.
 
 ## New
 
-This function returns an initialized application instance.
+This function returns an initialized application instance. It's only input is the wrapper.
 
 ## Log
 

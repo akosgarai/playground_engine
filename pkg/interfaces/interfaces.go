@@ -174,4 +174,5 @@ type Screen interface {
 	SetUniformVector(string, mgl32.Vec3)
 	CharCallback(rune, GLWrapper, float32)
 	SetWindowSize(float32, float32)
+	SetWrapper(GLWrapper)
 }

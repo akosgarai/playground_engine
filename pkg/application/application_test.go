@@ -18,20 +18,20 @@ var (
 )
 
 func TestNew(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	if len(app.screens) != 0 {
 		t.Error("Invalid application - screens should be empty")
 	}
 }
 func TestLog(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	log := app.Log()
 	if len(log) < 10 {
 		t.Error("Log too short.")
 	}
 }
 func TestSetWindow(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	app.SetWindow(wm)
 
 	if app.window != wm {
@@ -39,7 +39,7 @@ func TestSetWindow(t *testing.T) {
 	}
 }
 func TestGetWindow(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	app.SetWindow(wm)
 
 	if app.GetWindow() != wm {
@@ -49,7 +49,7 @@ func TestGetWindow(t *testing.T) {
 func TestGetCamera(t *testing.T) {
 	s := screen.New()
 	s.SetCamera(cam)
-	app := New()
+	app := New(wrapperMock)
 	app.AddScreen(s)
 	app.ActivateScreen(s)
 	if app.GetCamera() != cam {
@@ -57,7 +57,7 @@ func TestGetCamera(t *testing.T) {
 	}
 }
 func TestSetKeyState(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	app.SetKeyState(glfw.KeyW, glfw.Press)
 	if !app.keyDowns.Get(glfw.KeyW) {
 		t.Error("W should be pressed")
@@ -68,7 +68,7 @@ func TestSetKeyState(t *testing.T) {
 	}
 }
 func TestSetButtonState(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	app.SetButtonState(glfw.MouseButtonLeft, glfw.Press)
 	if !app.mouseDowns.Get(glfw.MouseButtonLeft) {
 		t.Error("LMB should be pressed")
@@ -79,7 +79,7 @@ func TestSetButtonState(t *testing.T) {
 	}
 }
 func TestGetMouseButtonState(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	app.SetButtonState(glfw.MouseButtonLeft, glfw.Press)
 	if !app.GetMouseButtonState(glfw.MouseButtonLeft) {
 		t.Error("LMB should be pressed")
@@ -90,7 +90,7 @@ func TestGetMouseButtonState(t *testing.T) {
 	}
 }
 func TestGetKeyState(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	app.SetKeyState(glfw.KeyW, glfw.Press)
 	if !app.GetKeyState(glfw.KeyW) {
 		t.Error("W should be pressed")
@@ -101,7 +101,7 @@ func TestGetKeyState(t *testing.T) {
 	}
 }
 func TestAddScreen(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	s := screen.New()
 	app.AddScreen(s)
 
@@ -110,7 +110,7 @@ func TestAddScreen(t *testing.T) {
 	}
 }
 func TestActiveScreen(t *testing.T) {
-	app := New()
+	app := New(wrapperMock)
 	s := screen.New()
 	app.AddScreen(s)
 	app.ActivateScreen(s)
@@ -126,7 +126,7 @@ func TestUpdateWoScreen(t *testing.T) {
 				t.Error("Should have panic due to the missing activeScreen.")
 			}
 		}()
-		app := New()
+		app := New(wrapperMock)
 		app.SetWindow(wm)
 		// wo everything
 		app.Update(10)
@@ -139,7 +139,7 @@ func TestUpdateWithScreen(t *testing.T) {
 				t.Error("Shouldn't have panic.")
 			}
 		}()
-		app := New()
+		app := New(wrapperMock)
 		app.SetWindow(wm)
 		s := screen.New()
 		app.AddScreen(s)
@@ -156,7 +156,7 @@ func TestSetUniformFloat(t *testing.T) {
 				t.Log(r)
 			}
 		}()
-		app := New()
+		app := New(wrapperMock)
 		s := screen.New()
 		app.AddScreen(s)
 		key := "testname"
@@ -172,7 +172,7 @@ func TestSetUniformVector(t *testing.T) {
 				t.Log(r)
 			}
 		}()
-		app := New()
+		app := New(wrapperMock)
 		s := screen.New()
 		app.AddScreen(s)
 		key := "testname"
@@ -188,7 +188,7 @@ func TestDraw(t *testing.T) {
 				t.Log(r)
 			}
 		}()
-		app := New()
+		app := New(wrapperMock)
 		app.SetWindow(wm)
 		app.SetUniformFloat("testFloat", float32(42.0))
 		app.SetUniformVector("testVector", mgl32.Vec3{1.0, 2.0, 3.0})
@@ -205,7 +205,7 @@ func TestGetClosestModelMeshDistanceWoActiveScreen(t *testing.T) {
 				t.Error("Should have panic.")
 			}
 		}()
-		app := New()
+		app := New(wrapperMock)
 		s := screen.New()
 		app.AddScreen(s)
 		_, _, _ = app.GetClosestModelMeshDistance()
@@ -219,7 +219,7 @@ func TestGetClosestModelMeshDistanceWithActiveScreen(t *testing.T) {
 				t.Log(r)
 			}
 		}()
-		app := New()
+		app := New(wrapperMock)
 		s := screen.New()
 		app.AddScreen(s)
 		app.ActivateScreen(s)
@@ -229,7 +229,7 @@ func TestGetClosestModelMeshDistanceWithActiveScreen(t *testing.T) {
 func TestMenuScreen(t *testing.T) {
 	s := screen.New()
 	s.SetCamera(cam)
-	app := New()
+	app := New(wrapperMock)
 	app.AddScreen(s)
 	app.MenuScreen(s)
 	if app.menuSet != true {
