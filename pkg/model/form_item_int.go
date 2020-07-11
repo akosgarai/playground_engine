@@ -160,6 +160,8 @@ func (fi *FormItemInt) DeleteLastCharacter() {
 	if fi.value == 0 {
 		if fi.isNegative {
 			fi.isNegative = false
+			offsetX := fi.charOffsets[len(fi.charOffsets)-1]
+			fi.cursorOffsetX = fi.cursorOffsetX - offsetX
 			fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
 		}
 		return
