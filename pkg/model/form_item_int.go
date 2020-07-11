@@ -101,7 +101,7 @@ func (fi *FormItemInt) CharCallback(r rune) {
 	if !fi.validRune(r) {
 		return
 	}
-	val := int(r)
+	val := int(r - '0')
 	fi.value = fi.value*10 + val
 }
 func (fi *FormItemInt) validRune(r rune) bool {
