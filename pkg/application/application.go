@@ -192,8 +192,7 @@ func (a *Application) MouseButtonCallback(w *glfw.Window, button glfw.MouseButto
 }
 func (a *Application) CharCallback(w *glfw.Window, char rune) {
 	if a.activeScreen != nil {
-		WindowWidth, _ := a.window.GetSize()
-		a.activeScreen.CharCallback(char, a.wrapper, float32(WindowWidth))
+		a.activeScreen.CharCallback(char, a.wrapper)
 	}
 }
 
