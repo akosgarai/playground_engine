@@ -109,6 +109,8 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	s.SetCamera(createCamera(wW / wH))
 	s.SetCameraMovementMap(cameraMovementMap())
 	s.Setup(setup)
+	s.SetWindowSize(wW, wH)
+	s.SetWrapper(wrapper)
 	bgShaderApplication := shader.NewTextureMatShaderBlending(wrapper)
 	frameShaderApplication := shader.NewMaterialShader(wrapper)
 	fgShaderApplication := shader.NewFontShader(wrapper)
@@ -265,12 +267,14 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		if f.sinceLastDelete > EventEpsilon {
 			f.underEdit.DeleteLastCharacter()
 			f.sinceLastDelete = 0
+			f.charset.CleanSurface(f.underEdit.GetTarget())
+			f.charset.PrintTo(f.underEdit.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 		}
 	}
 }
 
 // AddFormItemBool is for adding a bool form item to the form.
-func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, wW float32) {
+func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper) {
 	// calculate the position of the option:
 	// - bottom of the header: 0.85
 	// - formItem: 0.1
@@ -287,12 +291,12 @@ func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrap
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/wW, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
 }
 
 // AddFormItemInt is for adding an integer form item to the form.
-func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper, wW float32) {
+func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper) {
 	lenItems := len(f.formItems)
 	posX := model.FormItemWidth / 2
 	if lenItems%2 == 1 {
@@ -303,21 +307,21 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/wW, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
 }
 
 // CharCallback is the character stream input handler
-func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper, wW float32) {
+func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 	if f.underEdit != nil {
 		switch f.underEdit.(type) {
 		case *model.FormItemInt:
 			fi := f.underEdit.(*model.FormItemInt)
 			// offset for the current character has to be calculated.
-			offsetX := f.charset.TextWidth(string(char), 1.0/wW)
+			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
 			fi.CharCallback(char, offsetX)
 			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/wW, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
 		}
 	}

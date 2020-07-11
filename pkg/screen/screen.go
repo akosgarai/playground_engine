@@ -59,6 +59,8 @@ type ScreenBase struct {
 	// window size mostly used for text printing.
 	windowWindth float32
 	windowHeight float32
+	// wrapper is mostly used for the text printing.
+	wrapper interfaces.GLWrapper
 }
 
 func newScreenBase() *ScreenBase {
@@ -596,4 +598,14 @@ func (s *ScreenBase) CleanPointLightSources() {
 func (s *ScreenBase) SetWindowSize(wW, wH float32) {
 	s.windowWindth = wW
 	s.windowHeight = wH
+}
+
+// SetWrapper updates the wrapper with the new one.
+func (s *ScreenBase) SetWrapper(w interfaces.GLWrapper) {
+	s.wrapper = w
+}
+
+// GetWrapper returns the current wrapper of the application.
+func (s *ScreenBase) GetWrapper() interfaces.GLWrapper {
+	return s.wrapper
 }

@@ -703,7 +703,7 @@ func TestFormScreenUpdate(t *testing.T) {
 		ms := store.NewGlfwMouseStore()
 		form.Update(10, 0.5, 0.5, ks, ms)
 		// add option
-		form.AddFormItemBool("label", wrapperReal, wW)
+		form.AddFormItemBool("label", wrapperReal)
 		form.Update(10, -0.4, 0.79, ks, ms)
 	}()
 }
@@ -729,7 +729,7 @@ func TestFormScreenAddFormItemBool(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			form.AddFormItemBool(labels[i], wrapperReal, wW)
+			form.AddFormItemBool(labels[i], wrapperReal)
 			if len(form.formItems) != i+1 {
 				t.Error("Invalid number of form items.")
 			}
@@ -758,7 +758,7 @@ func TestFormScreenAddFormItemInt(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			form.AddFormItemInt(labels[i], wrapperReal, wW)
+			form.AddFormItemInt(labels[i], wrapperReal)
 			if len(form.formItems) != i+1 {
 				t.Error("Invalid number of form items.")
 			}

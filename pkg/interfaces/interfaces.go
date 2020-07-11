@@ -131,6 +131,7 @@ type CharFormItem interface {
 	FormItem
 	ValueToString() string
 	DeleteLastCharacter()
+	GetTarget() Mesh
 }
 
 type KeyStore interface {
