@@ -311,6 +311,22 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 	f.formItems = append(f.formItems, fi)
 }
 
+// AddFormItemFloat is for adding a float form item to the form.
+func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWrapper) {
+	lenItems := len(f.formItems)
+	posX := model.FormItemWidth / 2
+	if lenItems%2 == 1 {
+		posX = -1.0 * posX
+	}
+	posY := 0.80 - float32((lenItems/2))*0.1
+	fi := model.NewFormItemFloat(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi.RotateX(-90)
+	fi.RotateY(180)
+	f.AddModelToShader(fi, f.bgShader)
+	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.formItems = append(f.formItems, fi)
+}
+
 // CharCallback is the character stream input handler
 func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 	if f.underEdit != nil {
