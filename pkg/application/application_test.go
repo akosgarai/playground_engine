@@ -239,3 +239,17 @@ func TestMenuScreen(t *testing.T) {
 		t.Error("Invalid menu screen")
 	}
 }
+func TestSetWrapper(t *testing.T) {
+	app := New(wrapperMock)
+	app.SetWrapper(wrapperMock)
+	if app.wrapper != wrapperMock {
+		t.Error("Invalid wrapper mock")
+	}
+}
+func TestGetWrapper(t *testing.T) {
+	app := New(wrapperMock)
+	app.SetWrapper(wrapperMock)
+	if app.GetWrapper() != wrapperMock {
+		t.Error("Invalid wrapper mock")
+	}
+}
