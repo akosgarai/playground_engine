@@ -262,6 +262,22 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			}
 		}
 		break
+	case *model.FormItemFloat:
+		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
+		minDiff := float32(0.0)
+		if closestDistance <= minDiff+0.01 {
+			tmMesh.Material = material.Ruby
+			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel := f.closestModel.(*model.FormItemFloat)
+				if f.sinceLastClick > EventEpsilon {
+					f.deleteCursor()
+					formModel.AddCursor()
+					f.sinceLastClick = 0
+					f.underEdit = formModel
+				}
+			}
+		}
+		break
 	}
 	if keyStore.Get(BACK_SPACE) {
 		if f.sinceLastDelete > EventEpsilon {
