@@ -160,14 +160,13 @@ func (fi *FormItemInt) DeleteLastCharacter() {
 	if fi.value == 0 {
 		if fi.isNegative {
 			fi.isNegative = false
-			offsetX := fi.charOffsets[len(fi.charOffsets)-1]
-			fi.cursorOffsetX = fi.cursorOffsetX - offsetX
-			fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+		} else {
+			return
 		}
-		return
+	} else {
+		mod := fi.value % 10
+		fi.value = (fi.value - mod) / 10
 	}
-	mod := fi.value % 10
-	fi.value = (fi.value - mod) / 10
 	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
 	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
 	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
