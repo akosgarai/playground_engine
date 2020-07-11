@@ -93,7 +93,7 @@ func (fi *FormItemInt) GetTarget() interfaces.Mesh {
 // AddCursor displays a cursor on the target surface.
 func (fi *FormItemInt) AddCursor() {
 	fi.AddMesh(fi.cursor)
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX + fi.cursorOffsetX, 0.0, -0.01})
 }
 func (fi *FormItemInt) DeleteCursor() {
 	if len(fi.meshes) == 3 {
@@ -107,7 +107,7 @@ func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 	val := int(r - '0')
 	fi.value = fi.value*10 + val
 	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX + fi.cursorOffsetX, 0.0, -0.01})
 }
 func (fi *FormItemInt) validRune(r rune) bool {
 	validRunes := []rune("0123456789")
