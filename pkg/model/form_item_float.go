@@ -150,7 +150,7 @@ func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
 		return
 	}
 	// handle '.' here
-	if r == rune('.') {
+	if r == rune('.') && fi.floatPosition == -1 {
 		fi.floatPosition = len(fmt.Sprintf("%d", fi.valueInt))
 		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
 		fi.charOffsets = append(fi.charOffsets, offsetX)
