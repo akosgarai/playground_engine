@@ -127,6 +127,10 @@ func (a *Application) Update(dt float64) {
 
 // AddScreen appends the screen to screens.
 func (a *Application) AddScreen(s interfaces.Screen) {
+	if a.window != nil {
+		WindowWidth, WindowHeight := a.window.GetSize()
+		s.SetWindowSize(float32(WindowWidth), float32(WindowHeight))
+	}
 	a.screens = append(a.screens, s)
 }
 
