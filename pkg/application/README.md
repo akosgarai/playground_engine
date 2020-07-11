@@ -64,6 +64,10 @@ KeyCallback is responsible for the keyboard event handling.
 
 MouseButtonCallback is responsible for the mouse button event handling.
 
+## CharCallback
+
+CharCallback is responsible for the character stream input (typing on keyboard)
+
 ## SetKeyState
 
 SetKeyState setups the keyDowns based on the key and action
@@ -84,6 +88,14 @@ GetKeyState returns the state of the given key
 
 SetUniformFloat sets the given float value to the given string key in the uniformFloat map.
 
-# SetUniformVector
+## SetUniformVector
 
 SetUniformVector sets the given mgl32.Vec3 value to the given string key in the uniformVector map.
+
+## SetWrapper
+
+SetWrapper updates the wrapper with the new one.
+
+## GetWrapper
+
+GetWrapper returns the current wrapper of the application.

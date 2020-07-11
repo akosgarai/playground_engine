@@ -190,6 +190,8 @@ func (a *Application) MouseButtonCallback(w *glfw.Window, button glfw.MouseButto
 		break
 	}
 }
+
+// CharCallback is responsible for the character stream input (typing on keyboard)
 func (a *Application) CharCallback(w *glfw.Window, char rune) {
 	if a.activeScreen != nil {
 		a.activeScreen.CharCallback(char, a.wrapper)
