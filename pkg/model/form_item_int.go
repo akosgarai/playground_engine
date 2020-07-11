@@ -150,3 +150,13 @@ func (fi *FormItemInt) ValueToString() string {
 	}
 	return strconv.Itoa(fi.value)
 }
+
+// ValueToString returns the string representation of the value of the form item.
+func (fi *FormItemInt) DeleteLastCharacter() {
+	if fi.value == 0 && fi.isNegative {
+		fi.isNegative = false
+		return
+	}
+	mod := fi.value % 10
+	fi.value = (fi.value - mod) / 10
+}
