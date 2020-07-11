@@ -130,6 +130,7 @@ type FormItem interface {
 type CharFormItem interface {
 	FormItem
 	ValueToString() string
+	DeleteLastCharacter()
 }
 
 type KeyStore interface {

@@ -29,7 +29,8 @@ const (
 	LightConstantTerm  = float32(1.0)
 	LightLinearTerm    = float32(0.14)
 	LightQuadraticTerm = float32(0.07)
-	ClickEventEpsilon  = 200
+	EventEpsilon       = 200
+	BACK_SPACE         = glfw.KeyBackspace
 )
 
 var (
@@ -49,14 +50,15 @@ var (
 
 type FormScreen struct {
 	*ScreenBase
-	charset        *model.Charset
-	background     *model.BaseModel
-	frame          *material.Material
-	header         string
-	formItems      []interfaces.FormItem
-	bgShader       *shader.Shader
-	sinceLastClick float64
-	underEdit      interfaces.CharFormItem
+	charset         *model.Charset
+	background      *model.BaseModel
+	frame           *material.Material
+	header          string
+	formItems       []interfaces.FormItem
+	bgShader        *shader.Shader
+	sinceLastClick  float64
+	sinceLastDelete float64
+	underEdit       interfaces.CharFormItem
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
@@ -196,6 +198,7 @@ func (f *FormScreen) deleteCursor() {
 // It also handles the camera movement and rotation, if the camera is set.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	f.sinceLastClick = f.sinceLastClick + dt
+	f.sinceLastDelete = f.sinceLastDelete + dt
 	cursorX := float32(-posX)
 	cursorY := float32(posY)
 	if f.cameraSet {
@@ -233,7 +236,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 				formModel := f.closestModel.(*model.FormItemBool)
-				if f.sinceLastClick > ClickEventEpsilon {
+				if f.sinceLastClick > EventEpsilon {
 					f.deleteCursor()
 					formModel.SetValue(!formModel.GetValue())
 					f.sinceLastClick = 0
@@ -248,7 +251,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			tmMesh.Material = material.Ruby
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 				formModel := f.closestModel.(*model.FormItemInt)
-				if f.sinceLastClick > ClickEventEpsilon {
+				if f.sinceLastClick > EventEpsilon {
 					f.deleteCursor()
 					formModel.AddCursor()
 					f.sinceLastClick = 0
@@ -257,6 +260,12 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			}
 		}
 		break
+	}
+	if keyStore.Get(BACK_SPACE) {
+		if f.sinceLastDelete > EventEpsilon {
+			f.underEdit.DeleteLastCharacter()
+			f.sinceLastDelete = 0
+		}
 	}
 }
 
