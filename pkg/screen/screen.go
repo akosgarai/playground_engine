@@ -56,6 +56,9 @@ type ScreenBase struct {
 	closestDistance float32
 	// Setup function is called right before drawing.
 	setupFunction SetupFunction
+	// window size mostly used for text printing.
+	windowWindth float32
+	windowHeight float32
 }
 
 func newScreenBase() *ScreenBase {
@@ -71,6 +74,8 @@ func newScreenBase() *ScreenBase {
 		uniformVector:             make(map[string]mgl32.Vec3),
 		closestDistance:           math.MaxFloat32,
 		setupFunction:             nil,
+		windowWindth:              0.0,
+		windowHeight:              0.0,
 	}
 }
 
@@ -585,4 +590,10 @@ func (s *ScreenBase) CleanSpotLightSources() {
 // CleanPointLightSources function makes the pointLightSources empty.
 func (s *ScreenBase) CleanPointLightSources() {
 	s.pointLightSources = []PointLightSource{}
+}
+
+// SetWindowSize function sets the windowWindth, windowHeight variables.
+func (s *ScreenBase) SetWindowSize(wW, wH float32) {
+	s.windowWindth = wW
+	s.windowHeight = wH
 }
