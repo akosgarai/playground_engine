@@ -27,6 +27,7 @@ type FormItemInt struct {
 	*BaseModel
 	cursor        interfaces.Mesh
 	cursorOffsetX float32
+	charOffsets   []float32
 	label         string
 	value         int
 	isNegative    bool
@@ -80,6 +81,7 @@ func NewFormItemInt(label string, mat *material.Material, position mgl32.Vec3, w
 		label:         label,
 		cursor:        cursor,
 		cursorOffsetX: 0.0,
+		charOffsets:   []float32{},
 		value:         0,
 		isNegative:    false,
 	}
@@ -110,6 +112,7 @@ func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 	if fi.value == 0 && r == rune('-') {
 		fi.isNegative = true
 		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+		fi.charOffsets = append(fi.charOffsets, offsetX)
 		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 		return
 	}
@@ -122,6 +125,7 @@ func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 	}
 	fi.value = fi.value*10 + val
 	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+	fi.charOffsets = append(fi.charOffsets, offsetX)
 	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 }
 func (fi *FormItemInt) validRune(r rune) bool {
@@ -153,10 +157,17 @@ func (fi *FormItemInt) ValueToString() string {
 
 // ValueToString returns the string representation of the value of the form item.
 func (fi *FormItemInt) DeleteLastCharacter() {
-	if fi.value == 0 && fi.isNegative {
-		fi.isNegative = false
+	if fi.value == 0 {
+		if fi.isNegative {
+			fi.isNegative = false
+			fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+		}
 		return
 	}
 	mod := fi.value % 10
 	fi.value = (fi.value - mod) / 10
+	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
+	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
 }
