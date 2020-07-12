@@ -98,3 +98,20 @@ func (fi *FormItemCharBase) DeleteCursor() {
 		fi.meshes = fi.meshes[:len(fi.meshes)-1]
 	}
 }
+
+// MoveCursorWithOffset moves to cursor with the offset.
+// It adds the new offset to the offsets, increments the sum offset
+// and sets the cursor position.
+func (fi *FormItemCharBase) MoveCursorWithOffset(offsetX float32) {
+	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+	fi.charOffsets = append(fi.charOffsets, offsetX)
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+}
+
+// StepBackCursor moves the cursor back after a character deletion.
+func (fi *FormItemCharBase) StepBackCursor() {
+	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
+	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+}

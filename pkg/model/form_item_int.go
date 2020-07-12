@@ -96,9 +96,7 @@ func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 		return
 	}
 	fi.value = fi.value + string(r)
-	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-	fi.charOffsets = append(fi.charOffsets, offsetX)
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.MoveCursorWithOffset(offsetX)
 	fi.pushState(r)
 }
 
@@ -108,10 +106,7 @@ func (fi *FormItemInt) DeleteLastCharacter() {
 		return
 	}
 	fi.value = fi.value[:len(fi.value)-1]
-	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
-	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
-	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+	fi.StepBackCursor()
 	if len(fi.value) > 0 {
 		fi.popState(rune(fi.value[len(fi.value)-1]))
 	} else {
