@@ -1825,3 +1825,134 @@ func TestFormItemFloatDeleteLastCharacter(t *testing.T) {
 		t.Errorf("Invalid typeState. Instead of 'P', we have '%s'.", fi.typeState)
 	}
 }
+func testFormItemText(t *testing.T) *FormItemText {
+	mat := material.Chrome
+	pos := mgl32.Vec3{0, 0, 0}
+	fi := NewFormItemText(DefaultFormItemLabel, mat, pos, wrapperMock)
+
+	if fi.label != DefaultFormItemLabel {
+		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	return fi
+}
+func TestNewFormItemText(t *testing.T) {
+	_ = testFormItemText(t)
+}
+func TestFormItemTextGetLabel(t *testing.T) {
+	fi := testFormItemText(t)
+	if fi.GetLabel() != DefaultFormItemLabel {
+		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
+	}
+
+}
+func TestFormItemTextGetValue(t *testing.T) {
+	fi := testFormItemText(t)
+	val := "test value"
+	fi.value = val
+	if fi.GetValue() != val {
+		t.Errorf("Invalid form item value. Instead of '%s', it is '%s'.", val, fi.GetValue())
+	}
+}
+func TestFormItemTextSetValue(t *testing.T) {
+	fi := testFormItemText(t)
+	val := "test value"
+	fi.SetValue(val)
+	if fi.GetValue() != val {
+		t.Errorf("Invalid form item value. Instead of '%s', it is '%s'.", val, fi.GetValue())
+	}
+}
+func TestFormItemTextGetSurface(t *testing.T) {
+	fi := testFormItemText(t)
+	if fi.GetSurface() != fi.meshes[0] {
+		t.Error("Invalid surface mesh")
+	}
+}
+func TestFormItemTextGetTarget(t *testing.T) {
+	fi := testFormItemText(t)
+	if fi.GetTarget() != fi.meshes[1] {
+		t.Error("Invalid target mesh")
+	}
+}
+func TestFormItemTextAddCursor(t *testing.T) {
+	fi := testFormItemText(t)
+	if len(fi.meshes) != 2 {
+		t.Error("Invalid number of target mesh")
+	}
+	fi.AddCursor()
+	if len(fi.meshes) != 3 {
+		t.Error("Invalid number of target mesh")
+	}
+}
+func TestFormItemTextDeleteCursor(t *testing.T) {
+	fi := testFormItemText(t)
+	fi.AddCursor()
+	if len(fi.meshes) != 3 {
+		t.Error("Invalid number of target mesh")
+	}
+	fi.DeleteCursor()
+	if len(fi.meshes) != 2 {
+		t.Error("Invalid number of target mesh")
+	}
+}
+func TestFormItemTextCharCallback(t *testing.T) {
+	fi := testFormItemText(t)
+	fi.AddCursor()
+	fi.CharCallback('b', 0.1)
+	if fi.value != "b" {
+		t.Errorf("Invalid value. Instead of 'b', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('a', 0.1)
+	if fi.value != "ba" {
+		t.Errorf("Invalid value. Instead of 'ba', we have '%s'.", fi.value)
+	}
+	fi.CharCallback(' ', 0.1)
+	if fi.value != "ba " {
+		t.Errorf("Invalid value. Instead of 'ba ', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('b', 0.1)
+	if fi.value != "ba b" {
+		t.Errorf("Invalid value. Instead of 'ba b', we have '%s'.", fi.value)
+	}
+}
+func TestFormItemTextValueToString(t *testing.T) {
+	fi := testFormItemText(t)
+	val := fi.ValueToString()
+	if val != "" {
+		t.Errorf("Invalid value. Instead of '', we have '%s'.", val)
+	}
+	fi.value = "test value"
+	val = fi.ValueToString()
+	if val != "test value" {
+		t.Errorf("Invalid value. Instead of 'test value', we have '%s'.", val)
+	}
+}
+func TestFormItemTextDeleteLastCharacter(t *testing.T) {
+	fi := testFormItemText(t)
+	fi.value = "12345"
+	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
+	fi.cursorOffsetX = float32(0.5)
+	fi.DeleteLastCharacter()
+	if fi.value != "1234" {
+		t.Errorf("Invalid value. Instead of '1234', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	if fi.value != "123" {
+		t.Errorf("Invalid value. Instead of '123', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	if fi.value != "12" {
+		t.Errorf("Invalid value. Instead of '12', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	if fi.value != "1" {
+		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	if fi.value != "" {
+		t.Errorf("Invalid value. Instead of '', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	if fi.value != "" {
+		t.Errorf("Invalid value. Instead of '', we have '%s'.", fi.value)
+	}
+}

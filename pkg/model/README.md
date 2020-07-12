@@ -135,3 +135,8 @@ NI      --(.)-->    N.
 N.      -(i/0)->    NF
 NF      -(i/0)->    NF
 ```
+
+### Form item text
+
+This model represents a form item for maintaining text values.
+
