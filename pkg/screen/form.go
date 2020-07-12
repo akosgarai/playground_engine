@@ -198,6 +198,11 @@ func (f *FormScreen) deleteCursor() {
 		fi.DeleteCursor()
 		f.underEdit = nil
 		break
+	case *model.FormItemFloat:
+		fi := f.underEdit.(*model.FormItemFloat)
+		fi.DeleteCursor()
+		f.underEdit = nil
+		break
 	}
 }
 
