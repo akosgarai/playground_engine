@@ -98,3 +98,40 @@ This model represents a form item for maintaining a bool value. The texture was 
 ### Form item int
 
 This model represents a form item for maintaining integer values.
+
+### Form item float
+
+This model represents a form item for maintaining float values. The input is handled with different states.
+
+- Positive state (**P**) - The input field is empty. (valueInt = 0, valueFloat = 0, floatPosition = -1, isNegative = false)
+- Positive zero state (**P0**) - The input field contains a '0' value the only valid token after this state is the '.'
+- Positive integer state (**PI**) - The input field contains positive integer value.
+- Positive dot state (**P.**) - the '.' character is pressed from a negative state.
+- Positive float state (**PF**) - the next state after the dot.
+- Negative state (**N**) - The input field contains the '-' token.
+- Negative zero state (**N0**) - The input field contains the '-0' tokens. the only valid token after this is the '.'
+- Negative integer state (**NI**) - The input field contains negativ integer value.
+- Negative dot state (**N.**) - the '.' character is pressed from a negative state.
+- Negative float state (**NF**) - the next state after the dot.
+
+**Transitions**
+
+current state -next token-> next state
+
+```
+P       --(0)-->    P0
+P       --(i)-->    PI
+P0      --(.)-->    P.
+PI      -(i/0)->    PI
+PI      --(.)-->    P.
+P.      -(i/0)->    PF
+PF      -(i/0)->    PF
+P       --(-)-->    N
+N       --(0)-->    N0
+N       --(i)-->    NI
+N0      --(.)-->    N.
+NI      -(i/0)->    NI
+NI      --(.)-->    N.
+N.      -(i/0)->    NF
+NF      -(i/0)->    NF
+```

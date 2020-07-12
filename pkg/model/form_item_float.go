@@ -22,10 +22,8 @@ type FormItemFloat struct {
 	cursorOffsetX float32
 	charOffsets   []float32
 	label         string
-	valueInt      int
-	valueFloat    int
-	floatPosition int
-	isNegative    bool
+	value         string
+	typeState     string
 }
 
 // GetLabel returns the label string of the item.
@@ -35,16 +33,15 @@ func (fi *FormItemFloat) GetLabel() string {
 
 // GetValue returns the value of the form item.
 func (fi *FormItemFloat) GetValue() float32 {
-	valueString := fmt.Sprintf("%d.%d", fi.valueInt, fi.valueFloat)
-	valueFloat, err := strconv.ParseFloat(valueString, 32)
+	valueFloat, err := strconv.ParseFloat(fi.value, 32)
 	if err != nil {
-		fmt.Printf("Can't format to float: '%s', err: '%s'\n", valueString, err.Error())
+		fmt.Printf("Can't format to float: '%s', err: '%s'\n", fi.value, err.Error())
 		return 0.0
 	}
 	return float32(valueFloat)
 }
 
-// SetValue returns the value of the form item.
+// SetValue sets the value of the form item.
 func (fi *FormItemFloat) SetValue(v float32) {
 	valueString := fmt.Sprintf("%f", v)
 	parts := strings.Split(valueString, ".")
@@ -53,8 +50,8 @@ func (fi *FormItemFloat) SetValue(v float32) {
 		fmt.Printf("Can't format to int: '%s', err: '%s'\n", parts[0], err.Error())
 		return
 	}
-	partFloatString := strings.TrimSuffix(parts[1], "0")
-	if partFloatString == "" {
+	partFloatString := strings.TrimSuffix("."+parts[1], "0")
+	if partFloatString == "." {
 		partFloatString = "0"
 	}
 	// further validation: max 9 char included the '.'
@@ -70,14 +67,12 @@ func (fi *FormItemFloat) SetValue(v float32) {
 	if to > len(partFloatString) {
 		to = len(partFloatString)
 	}
-	partFloat, err := strconv.Atoi(partFloatString[0:to])
+	partFloat, err := strconv.Atoi(partFloatString[1:to])
 	if err != nil {
 		fmt.Printf("Can't format to int: '%s' (orig: '%s'), err: '%s'\n", partFloatString[0:to], parts[1], err.Error())
 		return
 	}
-	fi.floatPosition = len(parts[0])
-	fi.valueInt = partInt
-	fi.valueFloat = partFloat
+	fi.value = fmt.Sprintf("%d.%d", partInt, partFloat)
 }
 func NewFormItemFloat(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemFloat {
 	labelPrimitive := rectangle.NewExact(FormItemWidth, FormItemLength)
@@ -114,10 +109,8 @@ func NewFormItemFloat(label string, mat *material.Material, position mgl32.Vec3,
 		cursor:        cursor,
 		cursorOffsetX: 0.0,
 		charOffsets:   []float32{},
-		valueInt:      0,
-		valueFloat:    0,
-		floatPosition: -1,
-		isNegative:    false,
+		value:         "",
+		typeState:     "P",
 	}
 }
 
@@ -144,64 +137,120 @@ func (fi *FormItemFloat) DeleteCursor() {
 	}
 }
 func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
-	// if the first character is '-', mark the form item as negative.
-	if fi.valueInt == 0 && fi.floatPosition == -1 && r == rune('-') {
-		fi.isNegative = true
-		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-		fi.charOffsets = append(fi.charOffsets, offsetX)
-		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
-		return
-	}
-	// handle '.' here: if it is not handled before, and we have offset (inserted character).
-	if r == rune('.') && fi.floatPosition == -1 && fi.cursorOffsetX > 0 {
-		fi.floatPosition = len(fmt.Sprintf("%d", fi.valueInt))
-		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-		fi.charOffsets = append(fi.charOffsets, offsetX)
-		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
-		return
-	}
 	if !fi.validRune(r) {
 		return
 	}
-	val := int(r - '0')
-	doAppend := true
-	if fi.floatPosition > -1 {
-		fi.valueFloat = fi.valueFloat*10 + val
-	} else {
-		if fi.isNegative {
-			val = -val
+	fi.value = fi.value + string(r)
+	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+	fi.charOffsets = append(fi.charOffsets, offsetX)
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.pushState(r)
+}
+func (fi *FormItemFloat) pushState(r rune) {
+	switch fi.typeState {
+	case "P":
+		if r == rune('-') {
+			fi.typeState = "N"
+		} else if r == rune('0') {
+			fi.typeState = "P0"
+		} else {
+			fi.typeState = "PI"
 		}
-		// offset change has to be skipped, if we handle multiple 0-s in the integer part.
-		// if the start value is 0, and the new value also 0, and the offset is > 0,
-		// offset increment not allowed.
-		if fi.valueInt == 0 && fi.cursorOffsetX > 0 {
-			if val == 0 {
-				doAppend = false
-			} else {
-				fi.DeleteLastCharacter()
-			}
+		break
+	case "P0":
+		fi.typeState = "P."
+		break
+	case "P.":
+		fi.typeState = "PF"
+		break
+	case "PI":
+		if r == rune('.') {
+			fi.typeState = "P."
 		}
-		fi.valueInt = fi.valueInt*10 + val
+		break
+	case "N":
+		if r == rune('0') {
+			fi.typeState = "N0"
+		} else {
+			fi.typeState = "NI"
+		}
+		break
+	case "N0":
+		fi.typeState = "N."
+		break
+	case "N.":
+		fi.typeState = "NF"
+		break
+	case "NI":
+		if r == rune('.') {
+			fi.typeState = "N."
+		}
+		break
 	}
-	if doAppend {
-		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-		fi.charOffsets = append(fi.charOffsets, offsetX)
-		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+}
+func (fi *FormItemFloat) popState(r rune) {
+	switch fi.typeState {
+	case "NF":
+		if r == rune('.') {
+			fi.typeState = "N."
+		}
+		break
+	case "N.":
+		if len(fi.value) == 2 && fi.value[1] == '0' {
+			fi.typeState = "N0"
+		} else {
+			fi.typeState = "NI"
+		}
+		break
+	case "N0":
+		fi.typeState = "N"
+		break
+	case "NI":
+		if len(fi.value) == 1 {
+			fi.typeState = "N"
+		}
+		break
+	case "N":
+		fi.typeState = "P"
+		break
+	case "PF":
+		if r == rune('.') {
+			fi.typeState = "P."
+		}
+		break
+	case "P.":
+		if len(fi.value) == 2 && fi.value[1] == '0' {
+			fi.typeState = "P0"
+		} else {
+			fi.typeState = "PI"
+		}
+		break
+	case "P0":
+		fi.typeState = "P"
+		break
+	case "PI":
+		if len(fi.value) == 0 {
+			fi.typeState = "P"
+		}
+		break
 	}
 }
 func (fi *FormItemFloat) validRune(r rune) bool {
-	// if the next iteration the value will be grater than max or less than min
-	// return false
-	if fi.floatPosition == -1 {
-		if fi.valueInt > math.MaxInt32/10 || fi.valueInt < math.MinInt32/10 {
-			return false
-		}
-	} else {
-		if fi.valueFloat > math.MaxInt32/10 || fi.valueFloat < math.MinInt32/10 {
-			return false
-		}
+	var validRunes []rune
+	switch fi.typeState {
+	case "P":
+		validRunes = []rune("0123456789-")
+		break
+	case "P0", "N0":
+		validRunes = []rune(".")
+		break
+	case "P.", "N.", "PF", "N", "NF":
+		validRunes = []rune("0123456789")
+		break
+	case "PI", "NI":
+		validRunes = []rune("0123456789.")
+		break
 	}
-	validRunes := []rune("0123456789")
 	for _, v := range validRunes {
 		if v == r {
 			return true
@@ -212,39 +261,19 @@ func (fi *FormItemFloat) validRune(r rune) bool {
 
 // ValueToString returns the string representation of the value of the form item.
 func (fi *FormItemFloat) ValueToString() string {
-	if fi.isNegative && fi.valueInt == 0 && fi.valueFloat == 0 {
-		return "-"
-	}
-	if fi.valueFloat > 0 {
-		return fmt.Sprintf("%d.%d", fi.valueInt, fi.valueFloat)
-	}
-	if fi.floatPosition > -1 {
-		return fmt.Sprintf("%d.", fi.valueInt)
-	}
-	return fmt.Sprintf("%d", fi.valueInt)
+	return fi.value
 }
 
 // ValueToString returns the string representation of the value of the form item.
 func (fi *FormItemFloat) DeleteLastCharacter() {
-	if fi.valueInt == 0 && fi.valueFloat == 0 {
-		if fi.isNegative && fi.cursorOffsetX == 0 {
-			fi.isNegative = false
-		}
-	} else {
-		if fi.valueFloat > 0 {
-			mod := fi.valueFloat % 10
-			fi.valueFloat = (fi.valueFloat - mod) / 10
-		} else if fi.floatPosition > -1 {
-			fi.floatPosition = -1
-		} else {
-			mod := fi.valueInt % 10
-			fi.valueInt = (fi.valueInt - mod) / 10
-		}
+	if len(fi.charOffsets) == 0 {
+		return
 	}
-	if len(fi.charOffsets) > 0 {
-		offsetX := fi.charOffsets[len(fi.charOffsets)-1]
-		fi.cursorOffsetX = fi.cursorOffsetX - offsetX
-		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
-		fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
-	}
+	lastChar := fi.value[len(fi.value)-1]
+	fi.value = fi.value[:len(fi.value)-1]
+	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
+	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+	fi.popState(rune(lastChar))
 }
