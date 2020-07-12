@@ -140,3 +140,6 @@ NF      -(i/0)->    NF
 
 This model represents a form item for maintaining text values.
 
+### Form item int64
+
+This model represents a form item for maintaining int64 values.
