@@ -26,8 +26,11 @@ type FormItemCharBase struct {
 	cursorOffsetX float32
 	charOffsets   []float32
 	label         string
+	value         string
+	maxLen        int
 }
 
+// NewFormItemCharBase returns a FormItemCharBase that could be the base of text based form items.
 func NewFormItemCharBase(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemCharBase {
 	labelPrimitive := rectangle.NewExact(FormItemWidth, FormItemLength)
 	v, i, bo := labelPrimitive.MeshInput()
@@ -63,6 +66,8 @@ func NewFormItemCharBase(label string, mat *material.Material, position mgl32.Ve
 		cursor:        cursor,
 		cursorOffsetX: 0.0,
 		charOffsets:   []float32{},
+		value:         "",
+		maxLen:        9,
 	}
 }
 
@@ -86,6 +91,8 @@ func (fi *FormItemCharBase) AddCursor() {
 	fi.AddMesh(fi.cursor)
 	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 }
+
+// DeleteCursor removes the cursor from the meshes.
 func (fi *FormItemCharBase) DeleteCursor() {
 	if len(fi.meshes) == 3 {
 		fi.meshes = fi.meshes[:len(fi.meshes)-1]

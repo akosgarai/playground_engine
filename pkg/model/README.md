@@ -97,7 +97,24 @@ This model represents a form item for maintaining a bool value. The texture was 
 
 ### Form item int
 
-This model represents a form item for maintaining integer values.
+This model represents a form item for maintaining integer values. The input is handled with different states.
+
+- Positive state (**P**) - The input field is empty.
+- Positive integer state (**PI**) - The input field contains positive integer value.
+- Negative state (**N**) - The input field contains the '-' token.
+- Negative integer state (**NI**) - The input field contains negativ integer value.
+
+**Transitions**
+
+current state -next token-> next state
+
+```
+P       --(i)-->    PI
+P       --(-)-->    N
+PI      -(i/0)->    PI
+N       --(i)-->    NI
+NI      -(i/0)->    NI
+```
 
 ### Form item float
 
@@ -142,4 +159,21 @@ This model represents a form item for maintaining text values.
 
 ### Form item int64
 
-This model represents a form item for maintaining int64 values.
+This model represents a form item for maintaining int64 values. The input is handled with different states.
+
+- Positive state (**P**) - The input field is empty.
+- Positive integer state (**PI**) - The input field contains positive integer value.
+- Negative state (**N**) - The input field contains the '-' token.
+- Negative integer state (**NI**) - The input field contains negativ integer value.
+
+**Transitions**
+
+current state -next token-> next state
+
+```
+P       --(i)-->    PI
+P       --(-)-->    N
+PI      -(i/0)->    PI
+N       --(i)-->    NI
+NI      -(i/0)->    NI
+```

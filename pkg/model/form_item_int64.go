@@ -1,7 +1,6 @@
 package model
 
 import (
-	"math"
 	"strconv"
 
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
@@ -12,60 +11,41 @@ import (
 
 type FormItemInt64 struct {
 	*FormItemCharBase
-	value      int64
-	isNegative bool
+	typeState string
 }
 
 // GetValue returns the value of the form item.
 func (fi *FormItemInt64) GetValue() int64 {
-	return fi.value
+	val, _ := strconv.Atoi(fi.value)
+	return int64(val)
 }
 
 // SetValue returns the value of the form item.
 func (fi *FormItemInt64) SetValue(v int64) {
-	fi.value = v
+	fi.value = strconv.Itoa(int(v))
 }
 func NewFormItemInt64(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemInt64 {
 	base := NewFormItemCharBase(label, mat, position, wrapper)
 	return &FormItemInt64{
 		FormItemCharBase: base,
-		value:            0,
-		isNegative:       false,
+		typeState:        "P",
 	}
 }
 
-func (fi *FormItemInt64) CharCallback(r rune, offsetX float32) {
-	// if the first character is '-', mark the form item as negative.
-	if fi.value == 0 && r == rune('-') {
-		fi.isNegative = true
-		fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-		fi.charOffsets = append(fi.charOffsets, offsetX)
-		fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
-		return
-	}
-	if !fi.validRune(r) {
-		return
-	}
-	val := int(r - '0')
-	if fi.isNegative {
-		val = -val
-	}
-	fi.value = fi.value*10 + int64(val)
-	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-	fi.charOffsets = append(fi.charOffsets, offsetX)
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
-}
 func (fi *FormItemInt64) validRune(r rune) bool {
-	// integer number isn't allowed to start with 0.
-	if fi.value == 0 && r == rune('0') {
-		return false
+	var validRunes []rune
+	switch fi.typeState {
+	case "P":
+		validRunes = []rune("123456789-")
+		break
+
+	case "N":
+		validRunes = []rune("123456789")
+		break
+	case "PI", "NI":
+		validRunes = []rune("0123456789")
+		break
 	}
-	// if the next iteration the value will be grater than max or less than min
-	// return false
-	if fi.value > math.MaxInt64/10 || fi.value < math.MinInt64/10 {
-		return false
-	}
-	validRunes := []rune("0123456789")
 	for _, v := range validRunes {
 		if v == r {
 			return true
@@ -73,29 +53,69 @@ func (fi *FormItemInt64) validRune(r rune) bool {
 	}
 	return false
 }
-
-// ValueToString returns the string representation of the value of the form item.
-func (fi *FormItemInt64) ValueToString() string {
-	if fi.isNegative && fi.value == 0 {
-		return "-"
+func (fi *FormItemInt64) popState(r rune) {
+	switch fi.typeState {
+	case "N":
+		fi.typeState = "P"
+		break
+	case "NI":
+		if len(fi.value) == 1 {
+			fi.typeState = "N"
+		}
+		break
+	case "PI":
+		if len(fi.value) == 0 {
+			fi.typeState = "P"
+		}
+		break
 	}
-	return strconv.FormatInt(fi.value, 10)
+}
+func (fi *FormItemInt64) pushState(r rune) {
+	switch fi.typeState {
+	case "P":
+		if r == rune('-') {
+			fi.typeState = "N"
+		} else {
+			fi.typeState = "PI"
+		}
+		break
+	case "N":
+		fi.typeState = "NI"
+		break
+	}
 }
 
 // ValueToString returns the string representation of the value of the form item.
-func (fi *FormItemInt64) DeleteLastCharacter() {
-	if fi.value == 0 {
-		if fi.isNegative {
-			fi.isNegative = false
-		} else {
-			return
-		}
-	} else {
-		mod := fi.value % 10
-		fi.value = (fi.value - mod) / 10
+func (fi *FormItemInt64) ValueToString() string {
+	return fi.value
+}
+
+// CharCallback validates the input character and appends it to the value if valid.
+func (fi *FormItemInt64) CharCallback(r rune, offsetX float32) {
+	if !fi.validRune(r) || len(fi.value) > fi.maxLen {
+		return
 	}
+	fi.value = fi.value + string(r)
+	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+	fi.charOffsets = append(fi.charOffsets, offsetX)
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.pushState(r)
+}
+
+// DeleteLastCharacter removes the last typed character from the form item.
+func (fi *FormItemInt64) DeleteLastCharacter() {
+	if len(fi.charOffsets) == 0 {
+		return
+	}
+	fi.value = fi.value[:len(fi.value)-1]
 	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
 	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
 	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+	if len(fi.value) > 0 {
+		fi.popState(rune(fi.value[len(fi.value)-1]))
+	} else {
+		// dummy value for pop state.
+		fi.popState('.')
+	}
 }

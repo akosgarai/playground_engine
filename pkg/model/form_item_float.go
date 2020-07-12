@@ -14,7 +14,6 @@ import (
 
 type FormItemFloat struct {
 	*FormItemCharBase
-	value     string
 	typeState string
 }
 
@@ -65,21 +64,10 @@ func NewFormItemFloat(label string, mat *material.Material, position mgl32.Vec3,
 	base := NewFormItemCharBase(label, mat, position, wrapper)
 	return &FormItemFloat{
 		FormItemCharBase: base,
-		value:            "",
 		typeState:        "P",
 	}
 }
 
-func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
-	if !fi.validRune(r) || len(fi.value) > 9 {
-		return
-	}
-	fi.value = fi.value + string(r)
-	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-	fi.charOffsets = append(fi.charOffsets, offsetX)
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
-	fi.pushState(r)
-}
 func (fi *FormItemFloat) pushState(r rune) {
 	switch fi.typeState {
 	case "P":
@@ -196,6 +184,18 @@ func (fi *FormItemFloat) validRune(r rune) bool {
 // ValueToString returns the string representation of the value of the form item.
 func (fi *FormItemFloat) ValueToString() string {
 	return fi.value
+}
+
+// CharCallback validates the input character and appends it to the value if valid.
+func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
+	if !fi.validRune(r) || len(fi.value) > fi.maxLen {
+		return
+	}
+	fi.value = fi.value + string(r)
+	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+	fi.charOffsets = append(fi.charOffsets, offsetX)
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+	fi.pushState(r)
 }
 
 // DeleteLastCharacter removes the last typed character from the form item.

@@ -1,6 +1,8 @@
 package model
 
 import (
+	"strings"
+
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
 
@@ -9,7 +11,6 @@ import (
 
 type FormItemText struct {
 	*FormItemCharBase
-	value string
 }
 
 // GetValue returns the value of the form item.
@@ -25,17 +26,7 @@ func NewFormItemText(label string, mat *material.Material, position mgl32.Vec3, 
 	base := NewFormItemCharBase(label, mat, position, wrapper)
 	return &FormItemText{
 		FormItemCharBase: base,
-		value:            "",
 	}
-}
-func (fi *FormItemText) CharCallback(r rune, offsetX float32) {
-	if !fi.validRune(r) {
-		return
-	}
-	fi.value = fi.value + string(r)
-	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
-	fi.charOffsets = append(fi.charOffsets, offsetX)
-	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 }
 func (fi *FormItemText) validRune(r rune) bool {
 	return true
@@ -46,7 +37,18 @@ func (fi *FormItemText) ValueToString() string {
 	return fi.value
 }
 
-// ValueToString returns the string representation of the value of the form item.
+// CharCallback validates the input character and appends it to the value if valid.
+func (fi *FormItemText) CharCallback(r rune, offsetX float32) {
+	if !fi.validRune(r) || len(fi.value)+strings.Count(fi.value, " ") > fi.maxLen {
+		return
+	}
+	fi.value = fi.value + string(r)
+	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
+	fi.charOffsets = append(fi.charOffsets, offsetX)
+	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
+}
+
+// DeleteLastCharacter removes the last typed character from the form item.
 func (fi *FormItemText) DeleteLastCharacter() {
 	if len(fi.charOffsets) == 0 {
 		return
