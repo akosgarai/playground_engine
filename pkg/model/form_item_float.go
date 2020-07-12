@@ -137,7 +137,7 @@ func (fi *FormItemFloat) DeleteCursor() {
 	}
 }
 func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
-	if !fi.validRune(r) {
+	if !fi.validRune(r) || len(fi.value) > 9 {
 		return
 	}
 	fi.value = fi.value + string(r)
