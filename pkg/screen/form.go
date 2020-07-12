@@ -190,6 +190,11 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 					lightMesh.Material = material.Whiteplastic
 				}
 				break
+			case *model.FormItemInt64:
+				fi := f.shaderMap[s][index].(*model.FormItemInt64)
+				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
+				surfaceMesh.Material = DefaultFormItemMaterial
+				break
 			}
 		}
 	}
@@ -210,6 +215,11 @@ func (f *FormScreen) deleteCursor() {
 		break
 	case *model.FormItemText:
 		fi := f.underEdit.(*model.FormItemText)
+		fi.DeleteCursor()
+		f.underEdit = nil
+		break
+	case *model.FormItemInt64:
+		fi := f.underEdit.(*model.FormItemInt64)
 		fi.DeleteCursor()
 		f.underEdit = nil
 		break
@@ -314,6 +324,22 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			}
 		}
 		break
+	case *model.FormItemInt64:
+		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
+		minDiff := float32(0.0)
+		if closestDistance <= minDiff+0.01 {
+			tmMesh.Material = material.Ruby
+			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel := f.closestModel.(*model.FormItemInt64)
+				if f.sinceLastClick > EventEpsilon {
+					f.deleteCursor()
+					formModel.AddCursor()
+					f.sinceLastClick = 0
+					f.underEdit = formModel
+				}
+			}
+		}
+		break
 	}
 	if keyStore.Get(BACK_SPACE) {
 		if f.sinceLastDelete > EventEpsilon {
@@ -395,6 +421,22 @@ func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrap
 	f.formItems = append(f.formItems, fi)
 }
 
+// AddFormItemInt64 is for adding an int64 form item to the form.
+func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper) {
+	lenItems := len(f.formItems)
+	posX := model.FormItemWidth / 2
+	if lenItems%2 == 1 {
+		posX = -1.0 * posX
+	}
+	posY := 0.80 - float32((lenItems/2))*0.1
+	fi := model.NewFormItemInt64(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi.RotateX(-90)
+	fi.RotateY(180)
+	f.AddModelToShader(fi, f.bgShader)
+	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.formItems = append(f.formItems, fi)
+}
+
 // CharCallback is the character stream input handler
 func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 	if f.underEdit != nil {
@@ -417,6 +459,14 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 			break
 		case *model.FormItemText:
 			fi := f.underEdit.(*model.FormItemText)
+			// offset for the current character has to be calculated.
+			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
+			fi.CharCallback(char, offsetX)
+			f.charset.CleanSurface(fi.GetTarget())
+			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			break
+		case *model.FormItemInt64:
+			fi := f.underEdit.(*model.FormItemInt64)
 			// offset for the current character has to be calculated.
 			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
 			fi.CharCallback(char, offsetX)
