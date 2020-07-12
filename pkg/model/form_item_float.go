@@ -264,16 +264,20 @@ func (fi *FormItemFloat) ValueToString() string {
 	return fi.value
 }
 
-// ValueToString returns the string representation of the value of the form item.
+// DeleteLastCharacter removes the last typed character from the form item.
 func (fi *FormItemFloat) DeleteLastCharacter() {
 	if len(fi.charOffsets) == 0 {
 		return
 	}
-	lastChar := fi.value[len(fi.value)-1]
 	fi.value = fi.value[:len(fi.value)-1]
 	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
 	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
 	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
-	fi.popState(rune(lastChar))
+	if len(fi.value) > 0 {
+		fi.popState(rune(fi.value[len(fi.value)-1]))
+	} else {
+		// dummy value for pop state.
+		fi.popState('.')
+	}
 }

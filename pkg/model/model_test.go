@@ -1657,20 +1657,35 @@ func TestFormItemFloatDeleteLastCharacter(t *testing.T) {
 	if fi.ValueToString() != "-3.3" {
 		t.Errorf("Invalid valuestring. instead of '-3.3', we have '%s'.", fi.ValueToString())
 	}
+	if fi.typeState != "NF" {
+		t.Errorf("Invalid typeState. Instead of 'NF', we have '%s'.", fi.typeState)
+	}
 	fi.DeleteLastCharacter()
 	if fi.ValueToString() != "-3." {
 		t.Errorf("Invalid valuestring. instead of '-3.', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "N." {
+		t.Errorf("Invalid typeState. Instead of 'N.', we have '%s'.", fi.typeState)
 	}
 	fi.DeleteLastCharacter()
 	if fi.ValueToString() != "-3" {
 		t.Errorf("Invalid valuestring. instead of '-3', we have '%s'.", fi.ValueToString())
 	}
+	if fi.typeState != "NI" {
+		t.Errorf("Invalid typeState. Instead of 'NI', we have '%s'.", fi.typeState)
+	}
 	fi.DeleteLastCharacter()
 	if fi.ValueToString() != "-" {
 		t.Errorf("Invalid valuestring. instead of '-', we have '%s'.", fi.ValueToString())
 	}
+	if fi.typeState != "N" {
+		t.Errorf("Invalid typeState. Instead of 'N', we have '%s'.", fi.typeState)
+	}
 	fi.DeleteLastCharacter()
 	if fi.ValueToString() != "" {
 		t.Errorf("Invalid valuestring. instead of '', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "P" {
+		t.Errorf("Invalid typeState. Instead of 'P', we have '%s'.", fi.typeState)
 	}
 }
