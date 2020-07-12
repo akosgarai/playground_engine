@@ -103,7 +103,7 @@ This model represents a form item for maintaining integer values.
 
 This model represents a form item for maintaining float values. The input is handled with different states.
 
-- Positive state (**P**) - The input field is empty. (valueInt = 0, valueFloat = 0, floatPosition = -1, isNegative = false)
+- Positive state (**P**) - The input field is empty.
 - Positive zero state (**P0**) - The input field contains a '0' value the only valid token after this state is the '.'
 - Positive integer state (**PI**) - The input field contains positive integer value.
 - Positive dot state (**P.**) - the '.' character is pressed from a negative state.
