@@ -415,6 +415,14 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 			f.charset.CleanSurface(fi.GetTarget())
 			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
+		case *model.FormItemText:
+			fi := f.underEdit.(*model.FormItemText)
+			// offset for the current character has to be calculated.
+			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
+			fi.CharCallback(char, offsetX)
+			f.charset.CleanSurface(fi.GetTarget())
+			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			break
 		}
 	}
 }
