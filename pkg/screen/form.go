@@ -174,6 +174,11 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
 				surfaceMesh.Material = DefaultFormItemMaterial
 				break
+			case *model.FormItemText:
+				fi := f.shaderMap[s][index].(*model.FormItemText)
+				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
+				surfaceMesh.Material = DefaultFormItemMaterial
+				break
 			case *model.FormItemBool:
 				fi := f.shaderMap[s][index].(*model.FormItemBool)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
@@ -200,6 +205,11 @@ func (f *FormScreen) deleteCursor() {
 		break
 	case *model.FormItemFloat:
 		fi := f.underEdit.(*model.FormItemFloat)
+		fi.DeleteCursor()
+		f.underEdit = nil
+		break
+	case *model.FormItemText:
+		fi := f.underEdit.(*model.FormItemText)
 		fi.DeleteCursor()
 		f.underEdit = nil
 		break
@@ -288,6 +298,22 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			}
 		}
 		break
+	case *model.FormItemText:
+		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
+		minDiff := float32(0.0)
+		if closestDistance <= minDiff+0.01 {
+			tmMesh.Material = material.Ruby
+			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel := f.closestModel.(*model.FormItemText)
+				if f.sinceLastClick > EventEpsilon {
+					f.deleteCursor()
+					formModel.AddCursor()
+					f.sinceLastClick = 0
+					f.underEdit = formModel
+				}
+			}
+		}
+		break
 	}
 	if keyStore.Get(BACK_SPACE) {
 		if f.sinceLastDelete > EventEpsilon {
@@ -346,6 +372,22 @@ func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWra
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
 	fi := model.NewFormItemFloat(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi.RotateX(-90)
+	fi.RotateY(180)
+	f.AddModelToShader(fi, f.bgShader)
+	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.formItems = append(f.formItems, fi)
+}
+
+// AddFormItemText is for adding a text form item to the form.
+func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrapper) {
+	lenItems := len(f.formItems)
+	posX := model.FormItemWidth / 2
+	if lenItems%2 == 1 {
+		posX = -1.0 * posX
+	}
+	posY := 0.80 - float32((lenItems/2))*0.1
+	fi := model.NewFormItemText(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
