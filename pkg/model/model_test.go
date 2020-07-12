@@ -1625,6 +1625,37 @@ func TestFormItemFloatCharCallback(t *testing.T) {
 	if fi.typeState != "NF" {
 		t.Errorf("Invalid typeState. Instead of 'NF', we have '%s'.", fi.typeState)
 	}
+	// start with -0.
+	fi = testFormItemFloat(t)
+	fi.AddCursor()
+	fi.CharCallback('-', 0.1)
+	if fi.value != "-" {
+		t.Errorf("Invalid value. Instead of '-', we have '%s'.", fi.value)
+	}
+	if fi.typeState != "N" {
+		t.Errorf("Invalid typeState. Instead of 'N', we have '%s'.", fi.typeState)
+	}
+	fi.CharCallback('0', 0.1)
+	if fi.value != "-0" {
+		t.Errorf("Invalid value. Instead of '-0', we have '%s'.", fi.value)
+	}
+	if fi.typeState != "N0" {
+		t.Errorf("Invalid typeState. Instead of 'N0', we have '%s'.", fi.typeState)
+	}
+	fi.CharCallback('.', 0.1)
+	if fi.value != "-0." {
+		t.Errorf("Invalid value. Instead of '-0.', we have '%s'.", fi.value)
+	}
+	if fi.typeState != "N." {
+		t.Errorf("Invalid typeState. Instead of 'N.', we have '%s'.", fi.typeState)
+	}
+	fi.CharCallback('8', 0.1)
+	if fi.value != "-0.8" {
+		t.Errorf("Invalid value. Instead of '-0.8', we have '%s'.", fi.value)
+	}
+	if fi.typeState != "NF" {
+		t.Errorf("Invalid typeState. Instead of 'NF', we have '%s'.", fi.typeState)
+	}
 }
 func TestFormItemFloatValueToString(t *testing.T) {
 	fi := testFormItemFloat(t)
@@ -1680,6 +1711,111 @@ func TestFormItemFloatDeleteLastCharacter(t *testing.T) {
 	}
 	if fi.typeState != "N" {
 		t.Errorf("Invalid typeState. Instead of 'N', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "" {
+		t.Errorf("Invalid valuestring. instead of '', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "P" {
+		t.Errorf("Invalid typeState. Instead of 'P', we have '%s'.", fi.typeState)
+	}
+	fi.CharCallback('-', 0.1)
+	fi.CharCallback('0', 0.1)
+	fi.CharCallback('.', 0.1)
+	fi.CharCallback('2', 0.1)
+	if fi.ValueToString() != "-0.2" {
+		t.Errorf("Invalid valuestring. instead of '-0.2', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "NF" {
+		t.Errorf("Invalid typeState. Instead of 'NF', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "-0." {
+		t.Errorf("Invalid valuestring. instead of '-0.', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "N." {
+		t.Errorf("Invalid typeState. Instead of 'N.', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "-0" {
+		t.Errorf("Invalid valuestring. instead of '-0', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "N0" {
+		t.Errorf("Invalid typeState. Instead of 'N0', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "-" {
+		t.Errorf("Invalid valuestring. instead of '-', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "N" {
+		t.Errorf("Invalid typeState. Instead of 'N', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "" {
+		t.Errorf("Invalid valuestring. instead of '', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "P" {
+		t.Errorf("Invalid typeState. Instead of 'P', we have '%s'.", fi.typeState)
+	}
+	fi.CharCallback('3', 0.1)
+	fi.CharCallback('.', 0.1)
+	fi.CharCallback('3', 0.1)
+	if fi.ValueToString() != "3.3" {
+		t.Errorf("Invalid valuestring. instead of '3.3', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "PF" {
+		t.Errorf("Invalid typeState. Instead of 'PF', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "3." {
+		t.Errorf("Invalid valuestring. instead of '3.', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "P." {
+		t.Errorf("Invalid typeState. Instead of 'P.', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "3" {
+		t.Errorf("Invalid valuestring. instead of '3', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "PI" {
+		t.Errorf("Invalid typeState. Instead of 'PI', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "" {
+		t.Errorf("Invalid valuestring. instead of '', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "P" {
+		t.Errorf("Invalid typeState. Instead of 'P', we have '%s'.", fi.typeState)
+	}
+	fi.CharCallback('0', 0.1)
+	fi.CharCallback('.', 0.1)
+	fi.CharCallback('3', 0.1)
+	if fi.ValueToString() != "0.3" {
+		t.Errorf("Invalid valuestring. instead of '0.3', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "PF" {
+		t.Errorf("Invalid typeState. Instead of 'PF', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "0." {
+		t.Errorf("Invalid valuestring. instead of '0.', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "P." {
+		t.Errorf("Invalid typeState. Instead of 'P.', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "0" {
+		t.Errorf("Invalid valuestring. instead of '0', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "P0" {
+		t.Errorf("Invalid typeState. Instead of 'P0', we have '%s'.", fi.typeState)
+	}
+	fi.DeleteLastCharacter()
+	if fi.ValueToString() != "" {
+		t.Errorf("Invalid valuestring. instead of '', we have '%s'.", fi.ValueToString())
+	}
+	if fi.typeState != "P" {
+		t.Errorf("Invalid typeState. Instead of 'P', we have '%s'.", fi.typeState)
 	}
 	fi.DeleteLastCharacter()
 	if fi.ValueToString() != "" {

@@ -219,7 +219,7 @@ func (fi *FormItemFloat) popState(r rune) {
 		}
 		break
 	case "P.":
-		if len(fi.value) == 2 && fi.value[1] == '0' {
+		if len(fi.value) == 1 && fi.value[0] == '0' {
 			fi.typeState = "P0"
 		} else {
 			fi.typeState = "PI"
