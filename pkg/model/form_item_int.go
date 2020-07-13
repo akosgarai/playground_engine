@@ -24,6 +24,8 @@ func (fi *FormItemInt) GetValue() int {
 func (fi *FormItemInt) SetValue(v int) {
 	fi.value = strconv.Itoa(v)
 }
+
+// NewFormItemInt returns a form item that maintains an integer value.
 func NewFormItemInt(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemInt {
 	base := NewFormItemCharBase(label, mat, position, wrapper)
 	return &FormItemInt{
