@@ -17,7 +17,8 @@ type FormItemFloat struct {
 	typeState string
 }
 
-// GetValue returns the value of the form item.
+// GetValue returns the value of the form item. If the value can't parse as float32,
+// some error message is printed out to the console, and the returned value is 0.0
 func (fi *FormItemFloat) GetValue() float32 {
 	valueFloat, err := strconv.ParseFloat(fi.value, 32)
 	if err != nil {
@@ -27,7 +28,8 @@ func (fi *FormItemFloat) GetValue() float32 {
 	return float32(valueFloat)
 }
 
-// SetValue sets the value of the form item.
+// SetValue sets the value of the form item. If the given float value fails on the validation
+// the new value will not be set.
 func (fi *FormItemFloat) SetValue(v float32) {
 	valueString := fmt.Sprintf("%f", v)
 	parts := strings.Split(valueString, ".")
@@ -38,7 +40,7 @@ func (fi *FormItemFloat) SetValue(v float32) {
 	}
 	partFloatString := strings.TrimSuffix("."+parts[1], "0")
 	if partFloatString == "." {
-		partFloatString = "0"
+		partFloatString = ".0"
 	}
 	// further validation: max 9 char included the '.'
 	if len(parts[0]) > 9 {
@@ -60,6 +62,8 @@ func (fi *FormItemFloat) SetValue(v float32) {
 	}
 	fi.value = fmt.Sprintf("%d.%d", partInt, partFloat)
 }
+
+// NewFormItemFloat returns a form item that maintains a float32 value.
 func NewFormItemFloat(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemFloat {
 	base := NewFormItemCharBase(label, mat, position, wrapper)
 	return &FormItemFloat{
