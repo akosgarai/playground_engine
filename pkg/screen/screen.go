@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"path"
 	"reflect"
+	"runtime"
 	"strconv"
 
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
@@ -17,6 +19,11 @@ import (
 const (
 	LEFT_MOUSE_BUTTON = glfw.MouseButtonLeft
 )
+
+func baseDirScreen() string {
+	_, filename, _, _ := runtime.Caller(1)
+	return path.Dir(filename)
+}
 
 type SetupFunction func(wrapper interfaces.GLWrapper)
 
@@ -49,6 +56,11 @@ type ScreenBase struct {
 	closestDistance float32
 	// Setup function is called right before drawing.
 	setupFunction SetupFunction
+	// window size mostly used for text printing.
+	windowWindth float32
+	windowHeight float32
+	// wrapper is mostly used for the text printing.
+	wrapper interfaces.GLWrapper
 }
 
 func newScreenBase() *ScreenBase {
@@ -64,6 +76,8 @@ func newScreenBase() *ScreenBase {
 		uniformVector:             make(map[string]mgl32.Vec3),
 		closestDistance:           math.MaxFloat32,
 		setupFunction:             nil,
+		windowWindth:              0.0,
+		windowHeight:              0.0,
 	}
 }
 
@@ -415,6 +429,10 @@ func (s *Screen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, 
 	s.closestDistance = closestDistance
 }
 
+// CharCallback is the character stream input handler
+func (s *Screen) CharCallback(char rune, w interfaces.GLWrapper) {
+}
+
 // cameraKeyboardMovement is responsible for handling a movement for a specific direction.
 // The direction is described by the key strings. The handler function name is also added
 // as input to be able to call it. For the movement we also need to know the delta time,
@@ -564,4 +582,30 @@ func (s *ScreenBase) Export(basePath string) {
 // Setup function sets the setupFunction to the given one
 func (s *ScreenBase) Setup(f SetupFunction) {
 	s.setupFunction = f
+}
+
+// CleanSpotLightSources function makes the spotLightSources empty.
+func (s *ScreenBase) CleanSpotLightSources() {
+	s.spotLightSources = []SpotLightSource{}
+}
+
+// CleanPointLightSources function makes the pointLightSources empty.
+func (s *ScreenBase) CleanPointLightSources() {
+	s.pointLightSources = []PointLightSource{}
+}
+
+// SetWindowSize function sets the windowWindth, windowHeight variables.
+func (s *ScreenBase) SetWindowSize(wW, wH float32) {
+	s.windowWindth = wW
+	s.windowHeight = wH
+}
+
+// SetWrapper updates the wrapper with the new one.
+func (s *ScreenBase) SetWrapper(w interfaces.GLWrapper) {
+	s.wrapper = w
+}
+
+// GetWrapper returns the current wrapper of the application.
+func (s *ScreenBase) GetWrapper() interfaces.GLWrapper {
+	return s.wrapper
 }

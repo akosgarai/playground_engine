@@ -41,6 +41,7 @@ type Window interface {
 	GetCursorPos() (float64, float64)
 	SetKeyCallback(glfw.KeyCallback) glfw.KeyCallback
 	SetMouseButtonCallback(glfw.MouseButtonCallback) glfw.MouseButtonCallback
+	SetCharCallback(glfw.CharCallback) glfw.CharCallback
 	ShouldClose() bool
 	SwapBuffers()
 	GetSize() (int, int)
@@ -61,21 +62,40 @@ type Application struct {
 	screens      []interfaces.Screen
 	menuScreen   interfaces.Screen
 	menuSet      bool
+
+	// wrapper for char callback
+	wrapper interfaces.GLWrapper
 }
 
 // New returns an application instance
-func New() *Application {
+func New(wrapper interfaces.GLWrapper) *Application {
 	return &Application{
 		mouseDowns: store.NewGlfwMouseStore(),
 		keyDowns:   store.NewGlfwKeyStore(),
 		menuSet:    false,
+		wrapper:    wrapper,
 	}
 }
 
 // Log returns the string representation of this object.
 func (a *Application) Log() string {
 	logString := "Application:\n"
+	logString += fmt.Sprintf("\tKeyDowns: %#v\n", a.keyDowns)
+	logString += fmt.Sprintf("\tMouseDowns: %#v\n", a.mouseDowns)
+	if a.activeScreen != nil {
+		logString += fmt.Sprintf("\tactiveScreen: %s\n", a.activeScreen.Log())
+	}
 	return logString
+}
+
+// SetWrapper updates the wrapper with the new one.
+func (a *Application) SetWrapper(w interfaces.GLWrapper) {
+	a.wrapper = w
+}
+
+// GetWrapper returns the current wrapper of the application.
+func (a *Application) GetWrapper() interfaces.GLWrapper {
+	return a.wrapper
 }
 
 // SetWindow updates the window with the new one.
@@ -108,6 +128,11 @@ func (a *Application) Update(dt float64) {
 
 // AddScreen appends the screen to screens.
 func (a *Application) AddScreen(s interfaces.Screen) {
+	if a.window != nil {
+		WindowWidth, WindowHeight := a.window.GetSize()
+		s.SetWindowSize(float32(WindowWidth), float32(WindowHeight))
+		s.SetWrapper(a.wrapper)
+	}
 	a.screens = append(a.screens, s)
 }
 
@@ -163,6 +188,13 @@ func (a *Application) MouseButtonCallback(w *glfw.Window, button glfw.MouseButto
 	default:
 		a.SetButtonState(button, action)
 		break
+	}
+}
+
+// CharCallback is responsible for the character stream input (typing on keyboard)
+func (a *Application) CharCallback(w *glfw.Window, char rune) {
+	if a.activeScreen != nil {
+		a.activeScreen.CharCallback(char, a.wrapper)
 	}
 }
 

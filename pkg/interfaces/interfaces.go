@@ -111,6 +111,7 @@ type Mesh interface {
 	RotatePosition(float32, mgl32.Vec3)
 	IsBoundingObjectSet() bool
 	GetBoundingObject() *boundingobject.BoundingObject
+	GetParent() Mesh
 }
 type Model interface {
 	Draw(Shader)
@@ -121,6 +122,16 @@ type Model interface {
 	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
 	Clear()
 	AddMesh(Mesh)
+}
+type FormItem interface {
+	Model
+	GetLabel() string
+}
+type CharFormItem interface {
+	FormItem
+	ValueToString() string
+	DeleteLastCharacter()
+	GetTarget() Mesh
 }
 
 type KeyStore interface {
@@ -154,6 +165,7 @@ type Camera interface {
 	BoundingObjectAfterLift(float32) *coldet.Sphere
 }
 type Screen interface {
+	Log() string
 	Draw(GLWrapper)
 	Update(float64, float64, float64, RoKeyStore, RoButtonStore)
 	Export(string)
@@ -161,4 +173,7 @@ type Screen interface {
 	GetClosestModelMeshDistance() (Model, Mesh, float32)
 	SetUniformFloat(string, float32)
 	SetUniformVector(string, mgl32.Vec3)
+	CharCallback(rune, GLWrapper)
+	SetWindowSize(float32, float32)
+	SetWrapper(GLWrapper)
 }

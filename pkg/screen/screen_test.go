@@ -651,3 +651,294 @@ func TestMenuSetState(t *testing.T) {
 		t.Error("Invalid state")
 	}
 }
+func TestNewFormScreen(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		if form.header != screenLabel {
+			t.Errorf("Invalid header. Instead of '%s', we have '%s'.", screenLabel, form.header)
+		}
+		if form.frame != frameMat {
+			t.Error("Invalid material.")
+		}
+	}()
+}
+func TestFormScreenUpdate(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		ks := store.NewGlfwKeyStore()
+		ms := store.NewGlfwMouseStore()
+		form.Update(10, 0.5, 0.5, ks, ms)
+		// add option
+		form.AddFormItemBool("label bool", wrapperReal)
+		form.Update(10, -0.4, 0.79, ks, ms)
+		form.AddFormItemInt("label int", wrapperReal)
+		form.Update(10, -0.4, 0.79, ks, ms)
+		ms.Set(LEFT_MOUSE_BUTTON, true)
+		form.sinceLastClick = 201
+		form.Update(10, -0.4, 0.79, ks, ms)
+		form.sinceLastClick = 201
+		form.Update(10, 0.4, 0.79, ks, ms)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		ks.Set(BACK_SPACE, true)
+		form.Update(10, 0.4, 0.79, ks, ms)
+		// further options
+		form.AddFormItemInt64("label int64", wrapperReal)
+		form.AddFormItemFloat("label float", wrapperReal)
+		form.AddFormItemText("label text", wrapperReal)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		form.Update(10, 0.4, 0.69, ks, ms)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		form.Update(10, -0.4, 0.69, ks, ms)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		form.Update(10, -0.4, 0.59, ks, ms)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		form.Update(10, -0.4, 0.69, ks, ms)
+	}()
+}
+func TestFormScreenAddFormItemBool(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		labels := []string{"label1", "label2", "label3", "label4"}
+		for i := 0; i < len(labels); i++ {
+			form.AddFormItemBool(labels[i], wrapperReal)
+			if len(form.formItems) != i+1 {
+				t.Error("Invalid number of form items.")
+			}
+		}
+	}()
+}
+func TestFormScreenAddFormItemInt(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		labels := []string{"label1", "label2", "label3", "label4"}
+		for i := 0; i < len(labels); i++ {
+			form.AddFormItemInt(labels[i], wrapperReal)
+			if len(form.formItems) != i+1 {
+				t.Error("Invalid number of form items.")
+			}
+		}
+	}()
+}
+func TestFormScreenAddFormItemFloat(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		labels := []string{"label1", "label2", "label3", "label4"}
+		for i := 0; i < len(labels); i++ {
+			form.AddFormItemFloat(labels[i], wrapperReal)
+			if len(form.formItems) != i+1 {
+				t.Error("Invalid number of form items.")
+			}
+		}
+	}()
+}
+func TestFormScreenAddFormItemInt64(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		labels := []string{"label1", "label2", "label3", "label4"}
+		for i := 0; i < len(labels); i++ {
+			form.AddFormItemInt64(labels[i], wrapperReal)
+			if len(form.formItems) != i+1 {
+				t.Error("Invalid number of form items.")
+			}
+		}
+	}()
+}
+func TestFormScreenAddFormItemText(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		labels := []string{"label1", "label2", "label3", "label4"}
+		for i := 0; i < len(labels); i++ {
+			form.AddFormItemText(labels[i], wrapperReal)
+			if len(form.formItems) != i+1 {
+				t.Error("Invalid number of form items.")
+			}
+		}
+	}()
+}
+func TestFormScreenCharCallback(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		form.AddFormItemText("text", wrapperReal)
+		form.AddFormItemInt("int", wrapperReal)
+		form.AddFormItemInt64("int64", wrapperReal)
+		form.AddFormItemFloat("float", wrapperReal)
+		form.underEdit = form.formItems[0].(*model.FormItemText)
+		form.CharCallback('1', wrapperReal)
+		if form.underEdit.ValueToString() != "1" {
+			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
+		}
+		form.underEdit = form.formItems[1].(*model.FormItemInt)
+		form.CharCallback('1', wrapperReal)
+		if form.underEdit.ValueToString() != "1" {
+			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
+		}
+		form.underEdit = form.formItems[2].(*model.FormItemInt64)
+		form.CharCallback('1', wrapperReal)
+		if form.underEdit.ValueToString() != "1" {
+			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
+		}
+		form.underEdit = form.formItems[3].(*model.FormItemFloat)
+		form.CharCallback('1', wrapperReal)
+		if form.underEdit.ValueToString() != "1" {
+			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
+		}
+	}()
+}
+func TestFormScreenSetup(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		setup(wrapperReal)
+	}()
+}
