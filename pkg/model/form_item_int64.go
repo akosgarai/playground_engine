@@ -24,6 +24,8 @@ func (fi *FormItemInt64) GetValue() int64 {
 func (fi *FormItemInt64) SetValue(v int64) {
 	fi.value = strconv.Itoa(int(v))
 }
+
+// NewFormItemInt64 returns a form item that maintains an int64 value.
 func NewFormItemInt64(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemInt64 {
 	base := NewFormItemCharBase(label, mat, position, wrapper)
 	return &FormItemInt64{
