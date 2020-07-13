@@ -486,3 +486,12 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 		}
 	}
 }
+
+// GetFormItem gets an index as input, and returns formItem[index] form item.
+// In case of invalid index, it panics.
+func (f *FormScreen) GetFormItem(index int) interfaces.FormItem {
+	if index > len(f.formItems) {
+		panic("Invalid form item index.")
+	}
+	return f.formItems[index]
+}
