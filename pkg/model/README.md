@@ -100,6 +100,7 @@ This model represents a form item for maintaining a bool value. The texture was 
 This model represents a form item for maintaining integer values. The input is handled with different states.
 
 - Positive state (**P**) - The input field is empty.
+- Positive state (**P0**) - The input field contains 0 as input value.
 - Positive integer state (**PI**) - The input field contains positive integer value.
 - Negative state (**N**) - The input field contains the '-' token.
 - Negative integer state (**NI**) - The input field contains negativ integer value.
@@ -110,6 +111,7 @@ current state -next token-> next state
 
 ```
 P       --(i)-->    PI
+P       --(0)-->    P0
 P       --(-)-->    N
 PI      -(i/0)->    PI
 N       --(i)-->    NI

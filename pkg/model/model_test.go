@@ -1339,14 +1339,16 @@ func TestFormItemIntDeleteCursor(t *testing.T) {
 func TestFormItemIntCharCallback(t *testing.T) {
 	fi := testFormItemInt(t)
 	fi.AddCursor()
+	fi.DeleteLastCharacter()
 	fi.CharCallback('b', 0.1)
 	if fi.value != "" {
 		t.Errorf("Invalid value. Instead of '', we have '%s'.", fi.value)
 	}
 	fi.CharCallback('0', 0.1)
-	if fi.value != "" {
-		t.Errorf("Invalid value. Instead of '', we have '%s'.", fi.value)
+	if fi.value != "0" {
+		t.Errorf("Invalid value. Instead of '0', we have '%s'.", fi.value)
 	}
+	fi.DeleteLastCharacter()
 	fi.CharCallback('-', 0.1)
 	if fi.value != "-" {
 		t.Errorf("Invalid value. Instead of '-', we have '%s'.", fi.value)
@@ -2075,14 +2077,19 @@ func TestFormItemInt64DeleteCursor(t *testing.T) {
 func TestFormItemInt64CharCallback(t *testing.T) {
 	fi := testFormItemInt64(t)
 	fi.AddCursor()
+	fi.DeleteLastCharacter()
+	if fi.value != "" {
+		t.Errorf("Invalid value. Instead of '', we have '%s'.", fi.value)
+	}
 	fi.CharCallback('b', 0.1)
 	if fi.value != "" {
 		t.Errorf("Invalid value. Instead of '', we have '%s'.", fi.value)
 	}
 	fi.CharCallback('0', 0.1)
-	if fi.value != "" {
-		t.Errorf("Invalid value. Instead of '', we have '%s'.", fi.value)
+	if fi.value != "0" {
+		t.Errorf("Invalid value. Instead of '0', we have '%s'.", fi.value)
 	}
+	fi.DeleteLastCharacter()
 	fi.CharCallback('-', 0.1)
 	if fi.value != "-" {
 		t.Errorf("Invalid value. Instead of '-', we have '%s'.", fi.value)
