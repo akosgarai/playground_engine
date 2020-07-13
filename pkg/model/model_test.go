@@ -1257,6 +1257,16 @@ func TestFormItemBoolGetLight(t *testing.T) {
 		t.Error("Invalid light mesh")
 	}
 }
+func TestFormItemBoolValueToString(t *testing.T) {
+	fi := testFormItemBool(t)
+	if fi.ValueToString() != "false" {
+		t.Error("Invalid value string.")
+	}
+	fi.SetValue(true)
+	if fi.ValueToString() != "true" {
+		t.Error("Invalid value string.")
+	}
+}
 func testFormItemInt(t *testing.T) *FormItemInt {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}

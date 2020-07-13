@@ -756,7 +756,10 @@ func TestFormScreenAddFormItemBool(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			form.AddFormItemBool(labels[i], wrapperReal)
+			index := form.AddFormItemBool(labels[i], wrapperReal)
+			if index != i {
+				t.Error("Invalid index.")
+			}
 			if len(form.formItems) != i+1 {
 				t.Error("Invalid number of form items.")
 			}
@@ -785,7 +788,10 @@ func TestFormScreenAddFormItemInt(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			form.AddFormItemInt(labels[i], wrapperReal)
+			index := form.AddFormItemInt(labels[i], wrapperReal)
+			if index != i {
+				t.Error("Invalid index.")
+			}
 			if len(form.formItems) != i+1 {
 				t.Error("Invalid number of form items.")
 			}
@@ -814,7 +820,10 @@ func TestFormScreenAddFormItemFloat(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			form.AddFormItemFloat(labels[i], wrapperReal)
+			index := form.AddFormItemFloat(labels[i], wrapperReal)
+			if index != i {
+				t.Error("Invalid index.")
+			}
 			if len(form.formItems) != i+1 {
 				t.Error("Invalid number of form items.")
 			}
@@ -843,7 +852,10 @@ func TestFormScreenAddFormItemInt64(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			form.AddFormItemInt64(labels[i], wrapperReal)
+			index := form.AddFormItemInt64(labels[i], wrapperReal)
+			if index != i {
+				t.Error("Invalid index.")
+			}
 			if len(form.formItems) != i+1 {
 				t.Error("Invalid number of form items.")
 			}
@@ -872,7 +884,10 @@ func TestFormScreenAddFormItemText(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			form.AddFormItemText(labels[i], wrapperReal)
+			index := form.AddFormItemText(labels[i], wrapperReal)
+			if index != i {
+				t.Error("Invalid index.")
+			}
 			if len(form.formItems) != i+1 {
 				t.Error("Invalid number of form items.")
 			}
@@ -940,5 +955,76 @@ func TestFormScreenSetup(t *testing.T) {
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
 		setup(wrapperReal)
+	}()
+}
+func TestFormGetFormItemValidIndex(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		index := form.AddFormItemText("text", wrapperReal)
+		fi := form.GetFormItem(index)
+		if fi.ValueToString() != "" {
+			t.Error("Invalid form item initial value")
+		}
+		index = form.AddFormItemInt("int", wrapperReal)
+		fi = form.GetFormItem(index)
+		if fi.ValueToString() != "" {
+			t.Error("Invalid form item initial value")
+		}
+		index = form.AddFormItemInt64("int64", wrapperReal)
+		fi = form.GetFormItem(index)
+		if fi.ValueToString() != "" {
+			t.Error("Invalid form item initial value")
+		}
+		index = form.AddFormItemFloat("float", wrapperReal)
+		fi = form.GetFormItem(index)
+		if fi.ValueToString() != "" {
+			t.Error("Invalid form item initial value")
+		}
+		index = form.AddFormItemBool("bool", wrapperReal)
+		fi = form.GetFormItem(index)
+		if fi.ValueToString() != "false" {
+			t.Error("Invalid form item initial value")
+		}
+	}()
+}
+func TestFormGetFormItemInvalidIndex(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				defer testhelper.GlfwTerminate()
+				t.Error("Should have panic.")
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		defer testhelper.GlfwTerminate()
+		index := form.AddFormItemText("text", wrapperReal)
+		_ = form.GetFormItem(index + 2)
 	}()
 }

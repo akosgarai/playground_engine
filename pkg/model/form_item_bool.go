@@ -75,3 +75,11 @@ func (fi *FormItemBool) GetSurface() interfaces.Mesh {
 func (fi *FormItemBool) GetLight() interfaces.Mesh {
 	return fi.meshes[1]
 }
+
+// ValueToString returns the string representation of the value of the form item.
+func (fi *FormItemBool) ValueToString() string {
+	if fi.value {
+		return "true"
+	}
+	return "false"
+}

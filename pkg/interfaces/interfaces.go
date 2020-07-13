@@ -126,10 +126,10 @@ type Model interface {
 type FormItem interface {
 	Model
 	GetLabel() string
+	ValueToString() string
 }
 type CharFormItem interface {
 	FormItem
-	ValueToString() string
 	DeleteLastCharacter()
 	GetTarget() Mesh
 }
