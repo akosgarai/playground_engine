@@ -87,11 +87,6 @@ func (fi *FormItemInt64) pushState(r rune) {
 	}
 }
 
-// ValueToString returns the string representation of the value of the form item.
-func (fi *FormItemInt64) ValueToString() string {
-	return fi.value
-}
-
 // CharCallback validates the input character and appends it to the value if valid.
 func (fi *FormItemInt64) CharCallback(r rune, offsetX float32) {
 	if !fi.validRune(r) || len(fi.value) > fi.maxLen {

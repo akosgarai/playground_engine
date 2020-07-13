@@ -115,3 +115,8 @@ func (fi *FormItemCharBase) StepBackCursor() {
 	fi.cursor.SetPosition(mgl32.Vec3{CursorInitX - fi.cursorOffsetX, 0.0, -0.01})
 	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
 }
+
+// ValueToString returns the string representation of the value of the form item.
+func (fi *FormItemCharBase) ValueToString() string {
+	return fi.value
+}

@@ -34,11 +34,6 @@ func (fi *FormItemText) validRune(r rune) bool {
 	return true
 }
 
-// ValueToString returns the string representation of the value of the form item.
-func (fi *FormItemText) ValueToString() string {
-	return fi.value
-}
-
 // CharCallback validates the input character and appends it to the value if valid.
 func (fi *FormItemText) CharCallback(r rune, offsetX float32) {
 	if !fi.validRune(r) || len(fi.value)+strings.Count(fi.value, " ") > fi.maxLen {
