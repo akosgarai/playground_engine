@@ -38,7 +38,7 @@ func (fi *FormItemInt64) validRune(r rune) bool {
 	var validRunes []rune
 	switch fi.typeState {
 	case "P":
-		validRunes = []rune("123456789-")
+		validRunes = []rune("0123456789-")
 		break
 
 	case "N":
@@ -70,6 +70,9 @@ func (fi *FormItemInt64) popState(r rune) {
 			fi.typeState = "P"
 		}
 		break
+	case "P0":
+		fi.typeState = "P"
+		break
 	}
 }
 func (fi *FormItemInt64) pushState(r rune) {
@@ -77,6 +80,8 @@ func (fi *FormItemInt64) pushState(r rune) {
 	case "P":
 		if r == rune('-') {
 			fi.typeState = "N"
+		} else if r == rune('0') {
+			fi.typeState = "P0"
 		} else {
 			fi.typeState = "PI"
 		}

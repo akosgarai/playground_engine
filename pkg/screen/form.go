@@ -353,7 +353,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 
 // AddFormItemBool is for adding a bool form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper) int {
+func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, defaultValue bool) int {
 	// calculate the position of the option:
 	// - bottom of the header: 0.85
 	// - formItem: 0.1
@@ -367,6 +367,7 @@ func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrap
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
 	fi := model.NewFormItemBool(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi.SetValue(defaultValue)
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
@@ -377,7 +378,7 @@ func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrap
 
 // AddFormItemInt is for adding an integer form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper) int {
+func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
 	lenItems := len(f.formItems)
 	posX := model.FormItemWidth / 2
 	if lenItems%2 == 1 {
@@ -390,12 +391,14 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
+	f.underEdit = fi
+	f.setDefaultValueChar(defaultValue, wrapper)
 	return len(f.formItems) - 1
 }
 
 // AddFormItemFloat is for adding a float form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWrapper) int {
+func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
 	lenItems := len(f.formItems)
 	posX := model.FormItemWidth / 2
 	if lenItems%2 == 1 {
@@ -408,12 +411,14 @@ func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWra
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
+	f.underEdit = fi
+	f.setDefaultValueChar(defaultValue, wrapper)
 	return len(f.formItems) - 1
 }
 
 // AddFormItemText is for adding a text form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrapper) int {
+func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
 	lenItems := len(f.formItems)
 	posX := model.FormItemWidth / 2
 	if lenItems%2 == 1 {
@@ -426,12 +431,14 @@ func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrap
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
+	f.underEdit = fi
+	f.setDefaultValueChar(defaultValue, wrapper)
 	return len(f.formItems) - 1
 }
 
 // AddFormItemInt64 is for adding an int64 form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper) int {
+func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
 	lenItems := len(f.formItems)
 	posX := model.FormItemWidth / 2
 	if lenItems%2 == 1 {
@@ -444,7 +451,15 @@ func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWra
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
+	f.underEdit = fi
+	f.setDefaultValueChar(defaultValue, wrapper)
 	return len(f.formItems) - 1
+}
+func (f *FormScreen) setDefaultValueChar(input string, wrapper interfaces.GLWrapper) {
+	chars := []rune(input)
+	for i := 0; i < len(chars); i++ {
+		f.CharCallback(chars[i], wrapper)
+	}
 }
 
 // CharCallback is the character stream input handler
