@@ -716,6 +716,22 @@ func TestFormScreenUpdate(t *testing.T) {
 		form.sinceLastDelete = 201
 		ks.Set(BACK_SPACE, true)
 		form.Update(10, 0.4, 0.79, ks, ms)
+		// further options
+		form.AddFormItemInt64("label int64", wrapperReal)
+		form.AddFormItemFloat("label float", wrapperReal)
+		form.AddFormItemText("label text", wrapperReal)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		form.Update(10, 0.4, 0.69, ks, ms)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		form.Update(10, -0.4, 0.69, ks, ms)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		form.Update(10, -0.4, 0.59, ks, ms)
+		form.sinceLastClick = 201
+		form.sinceLastDelete = 201
+		form.Update(10, -0.4, 0.69, ks, ms)
 	}()
 }
 func TestFormScreenAddFormItemBool(t *testing.T) {
@@ -883,14 +899,46 @@ func TestFormScreenCharCallback(t *testing.T) {
 		wrapperReal.InitOpenGL()
 		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
-		labels := []string{"label1", "label2", "label3", "label4"}
-		for i := 0; i < len(labels); i++ {
-			form.AddFormItemInt(labels[i], wrapperReal)
-			if len(form.formItems) != i+1 {
-				t.Error("Invalid number of form items.")
-			}
-		}
-		form.underEdit = form.formItems[0].(*model.FormItemInt)
+		form.AddFormItemText("text", wrapperReal)
+		form.AddFormItemInt("int", wrapperReal)
+		form.AddFormItemInt64("int64", wrapperReal)
+		form.AddFormItemFloat("float", wrapperReal)
+		form.underEdit = form.formItems[0].(*model.FormItemText)
 		form.CharCallback('1', wrapperReal)
+		if form.underEdit.ValueToString() != "1" {
+			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
+		}
+		form.underEdit = form.formItems[1].(*model.FormItemInt)
+		form.CharCallback('1', wrapperReal)
+		if form.underEdit.ValueToString() != "1" {
+			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
+		}
+		form.underEdit = form.formItems[2].(*model.FormItemInt64)
+		form.CharCallback('1', wrapperReal)
+		if form.underEdit.ValueToString() != "1" {
+			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
+		}
+		form.underEdit = form.formItems[3].(*model.FormItemFloat)
+		form.CharCallback('1', wrapperReal)
+		if form.underEdit.ValueToString() != "1" {
+			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
+		}
+	}()
+}
+func TestFormScreenSetup(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		setup(wrapperReal)
 	}()
 }
