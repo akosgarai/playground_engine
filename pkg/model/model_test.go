@@ -1295,14 +1295,6 @@ func TestFormItemIntGetValue(t *testing.T) {
 		t.Errorf("Invalid form item value. Instead of '%d', it is '%d'.", val, fi.GetValue())
 	}
 }
-func TestFormItemIntSetValue(t *testing.T) {
-	fi := testFormItemInt(t)
-	val := 3
-	fi.SetValue(val)
-	if fi.GetValue() != val {
-		t.Errorf("Invalid form item value. Instead of '%d', it is '%d'.", val, fi.GetValue())
-	}
-}
 func TestFormItemIntGetSurface(t *testing.T) {
 	fi := testFormItemInt(t)
 	if fi.GetSurface() != fi.meshes[0] {
@@ -1363,7 +1355,7 @@ func TestFormItemIntCharCallback(t *testing.T) {
 	if fi.value != "1" {
 		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
 	}
-	fi.SetValue(math.MaxInt32 - 10)
+	fi.value = strconv.Itoa(math.MaxInt32 - 10)
 	fi.CharCallback('1', 0.1)
 	if fi.value != strconv.Itoa(math.MaxInt32-10) {
 		t.Errorf("Invalid value. Instead of '%d', we have '%s'.", math.MaxInt32-10, fi.value)
@@ -1375,7 +1367,7 @@ func TestFormItemIntValueToString(t *testing.T) {
 	if val != "" {
 		t.Errorf("Invalid value. Instead of '', we have '%s'.", val)
 	}
-	fi.SetValue(3)
+	fi.value = strconv.Itoa(3)
 	val = fi.ValueToString()
 	if val != "3" {
 		t.Errorf("Invalid value. Instead of '3', we have '%s'.", val)
@@ -1466,30 +1458,6 @@ func TestFormItemFloatGetValue(t *testing.T) {
 	fi.value = "3.2"
 	if fi.GetValue() != 3.2 {
 		t.Errorf("Invalid form item value. Instead of '3.2', it is '%f'.", fi.GetValue())
-	}
-}
-func TestFormItemFloatSetValue(t *testing.T) {
-	fi := testFormItemFloat(t)
-	fi.SetValue(3.3)
-	if fi.GetValue() != 3.3 {
-		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 3.3, fi.GetValue())
-	}
-	fi.SetValue(float32(3.000))
-	if fi.GetValue() != 3.0 {
-		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 3.0, fi.GetValue())
-	}
-	fi.SetValue(float32(1234567890.000))
-	if fi.GetValue() != 3.0 {
-		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 3.0, fi.GetValue())
-	}
-	val := 12.3456700001
-	fi.SetValue(float32(val))
-	if fi.GetValue() != 12.345670 {
-		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 12.345670, fi.GetValue())
-	}
-	fi.SetValue(float32(10000000.5752))
-	if fi.GetValue() != 12.345670 {
-		t.Errorf("Invalid form item value. Instead of '%f', it is '%f'.", 12.345670, fi.GetValue())
 	}
 }
 func TestFormItemFloatGetSurface(t *testing.T) {
@@ -1875,14 +1843,6 @@ func TestFormItemTextGetValue(t *testing.T) {
 		t.Errorf("Invalid form item value. Instead of '%s', it is '%s'.", val, fi.GetValue())
 	}
 }
-func TestFormItemTextSetValue(t *testing.T) {
-	fi := testFormItemText(t)
-	val := "test value"
-	fi.SetValue(val)
-	if fi.GetValue() != val {
-		t.Errorf("Invalid form item value. Instead of '%s', it is '%s'.", val, fi.GetValue())
-	}
-}
 func TestFormItemTextGetSurface(t *testing.T) {
 	fi := testFormItemText(t)
 	if fi.GetSurface() != fi.meshes[0] {
@@ -2033,14 +1993,6 @@ func TestFormItemInt64GetValue(t *testing.T) {
 		t.Errorf("Invalid form item value. Instead of '%d', it is '%d'.", val, fi.GetValue())
 	}
 }
-func TestFormItemInt64SetValue(t *testing.T) {
-	fi := testFormItemInt64(t)
-	val := int64(3)
-	fi.SetValue(2 * val)
-	if fi.GetValue() != 2*val {
-		t.Errorf("Invalid form item value. Instead of '%d', it is '%d'.", 2*val, fi.GetValue())
-	}
-}
 func TestFormItemInt64GetSurface(t *testing.T) {
 	fi := testFormItemInt64(t)
 	if fi.GetSurface() != fi.meshes[0] {
@@ -2104,7 +2056,7 @@ func TestFormItemInt64CharCallback(t *testing.T) {
 	if fi.value != "1" {
 		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
 	}
-	fi.SetValue(math.MaxInt64 - 10)
+	fi.value = strconv.Itoa(math.MaxInt64 - 10)
 	fi.CharCallback('1', 0.1)
 	if fi.value != strconv.Itoa(math.MaxInt64-10) {
 		t.Errorf("Invalid value. Instead of '%d', we have '%s'.", math.MaxInt64-10, fi.value)
