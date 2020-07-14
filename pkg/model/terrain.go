@@ -215,9 +215,10 @@ func (t *TerrainBuilder) SetSeed(seed int64) {
 	t.seed = seed
 }
 
-// RandomSeeds sets up a random seed value.
-func (t *TerrainBuilder) RandomSeed() {
+// RandomSeeds sets up a random seed value. It returns the generated seed.
+func (t *TerrainBuilder) RandomSeed() int64 {
 	t.seed = time.Now().UnixNano()
+	return t.seed
 }
 
 // SetPeakProbability sets the peakProbability value.
