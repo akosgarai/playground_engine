@@ -2,6 +2,7 @@ package screen
 
 import (
 	"math"
+	"strings"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
@@ -509,28 +510,48 @@ func (f *FormScreen) GetFormItem(index int) interfaces.FormItem {
 
 // SetFormItemValue gets an index, a value and and a wrapper and sets the form
 // item value of the formItem[index].
-func (f *FormScreen) SetFormItemValue(index int, value interface{}, wrapper interfaces.GLWrapper) {
+func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper interfaces.GLWrapper) {
 	item := f.GetFormItem(index)
 	switch item.(type) {
 	case *model.FormItemInt:
 		f.underEdit = item.(*model.FormItemInt)
-		f.setDefaultValueChar(value.(string), wrapper)
+		value := f.underEdit.ValueToString()
+		valueLength := len(value) + strings.Count(value, " ")
+		for i := 0; i < valueLength; i++ {
+			f.underEdit.DeleteLastCharacter()
+		}
+		f.setDefaultValueChar(valueNew.(string), wrapper)
 		break
 	case *model.FormItemFloat:
 		f.underEdit = item.(*model.FormItemFloat)
-		f.setDefaultValueChar(value.(string), wrapper)
+		value := f.underEdit.ValueToString()
+		valueLength := len(value) + strings.Count(value, " ")
+		for i := 0; i < valueLength; i++ {
+			f.underEdit.DeleteLastCharacter()
+		}
+		f.setDefaultValueChar(valueNew.(string), wrapper)
 		break
 	case *model.FormItemText:
 		f.underEdit = item.(*model.FormItemText)
-		f.setDefaultValueChar(value.(string), wrapper)
+		value := f.underEdit.ValueToString()
+		valueLength := len(value) + strings.Count(value, " ")
+		for i := 0; i < valueLength; i++ {
+			f.underEdit.DeleteLastCharacter()
+		}
+		f.setDefaultValueChar(valueNew.(string), wrapper)
 		break
 	case *model.FormItemInt64:
 		f.underEdit = item.(*model.FormItemInt64)
-		f.setDefaultValueChar(value.(string), wrapper)
+		value := f.underEdit.ValueToString()
+		valueLength := len(value) + strings.Count(value, " ")
+		for i := 0; i < valueLength; i++ {
+			f.underEdit.DeleteLastCharacter()
+		}
+		f.setDefaultValueChar(valueNew.(string), wrapper)
 		break
 	case *model.FormItemBool:
 		fi := item.(*model.FormItemBool)
-		fi.SetValue(value.(bool))
+		fi.SetValue(valueNew.(bool))
 		break
 	}
 }
