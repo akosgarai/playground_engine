@@ -236,6 +236,9 @@ func (a *Application) SetUniformFloat(key string, value float32) {
 	for i, _ := range a.screens {
 		a.screens[i].SetUniformFloat(key, value)
 	}
+	if a.activeScreen != nil {
+		a.activeScreen.SetUniformFloat(key, value)
+	}
 }
 
 // SetUniformVector loops on screens and sets the given mgl32.Vec3 value to the given string key in
@@ -243,6 +246,9 @@ func (a *Application) SetUniformFloat(key string, value float32) {
 func (a *Application) SetUniformVector(key string, value mgl32.Vec3) {
 	for i, _ := range a.screens {
 		a.screens[i].SetUniformVector(key, value)
+	}
+	if a.activeScreen != nil {
+		a.activeScreen.SetUniformVector(key, value)
 	}
 }
 

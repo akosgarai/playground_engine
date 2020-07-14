@@ -162,6 +162,8 @@ func TestSetUniformFloat(t *testing.T) {
 		key := "testname"
 		value := float32(2.2)
 		app.SetUniformFloat(key, value)
+		app.ActivateScreen(s)
+		app.SetUniformFloat(key, value)
 	}()
 }
 func TestSetUniformVector(t *testing.T) {
@@ -177,6 +179,8 @@ func TestSetUniformVector(t *testing.T) {
 		app.AddScreen(s)
 		key := "testname"
 		value := mgl32.Vec3{42.0, 0.0, 0.0}
+		app.SetUniformVector(key, value)
+		app.ActivateScreen(s)
 		app.SetUniformVector(key, value)
 	}()
 }
