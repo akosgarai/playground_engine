@@ -652,9 +652,9 @@ func TestTerrainBuilderSetPosition(t *testing.T) {
 func TestTerrainBuilderRandomSeed(t *testing.T) {
 	before := time.Now().UnixNano()
 	terr := NewTerrainBuilder()
-	terr.RandomSeed()
+	seed := terr.RandomSeed()
 	after := time.Now().UnixNano()
-	if terr.seed < before || terr.seed > after {
+	if seed < before || seed > after || seed != terr.seed {
 		t.Errorf("Invalid random seed '%d'. It supposed to be beetween '%d' and '%d'.", terr.seed, before, after)
 	}
 }
