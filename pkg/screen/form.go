@@ -391,8 +391,7 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
-	f.underEdit = fi
-	f.setDefaultValueChar(defaultValue, wrapper)
+	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
 	return len(f.formItems) - 1
 }
 
@@ -411,8 +410,7 @@ func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWra
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
-	f.underEdit = fi
-	f.setDefaultValueChar(defaultValue, wrapper)
+	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
 	return len(f.formItems) - 1
 }
 
@@ -431,8 +429,7 @@ func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrap
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
-	f.underEdit = fi
-	f.setDefaultValueChar(defaultValue, wrapper)
+	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
 	return len(f.formItems) - 1
 }
 
@@ -451,8 +448,7 @@ func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWra
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
-	f.underEdit = fi
-	f.setDefaultValueChar(defaultValue, wrapper)
+	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
 	return len(f.formItems) - 1
 }
 func (f *FormScreen) setDefaultValueChar(input string, wrapper interfaces.GLWrapper) {
@@ -509,4 +505,32 @@ func (f *FormScreen) GetFormItem(index int) interfaces.FormItem {
 		panic("Invalid form item index.")
 	}
 	return f.formItems[index]
+}
+
+// SetFormItemValue gets an index, a value and and a wrapper and sets the form
+// item value of the formItem[index].
+func (f *FormScreen) SetFormItemValue(index int, value interface{}, wrapper interfaces.GLWrapper) {
+	item := f.GetFormItem(index)
+	switch item.(type) {
+	case *model.FormItemInt:
+		f.underEdit = item.(*model.FormItemInt)
+		f.setDefaultValueChar(value.(string), wrapper)
+		break
+	case *model.FormItemFloat:
+		f.underEdit = item.(*model.FormItemFloat)
+		f.setDefaultValueChar(value.(string), wrapper)
+		break
+	case *model.FormItemText:
+		f.underEdit = item.(*model.FormItemText)
+		f.setDefaultValueChar(value.(string), wrapper)
+		break
+	case *model.FormItemInt64:
+		f.underEdit = item.(*model.FormItemInt64)
+		f.setDefaultValueChar(value.(string), wrapper)
+		break
+	case *model.FormItemBool:
+		fi := item.(*model.FormItemBool)
+		fi.SetValue(value.(bool))
+		break
+	}
 }
