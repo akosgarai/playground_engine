@@ -18,11 +18,6 @@ func (fi *FormItemText) GetValue() string {
 	return fi.value
 }
 
-// SetValue returns the value of the form item.
-func (fi *FormItemText) SetValue(v string) {
-	fi.value = v
-}
-
 // NewFormItemText returns a form item that maintains a string value.
 func NewFormItemText(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemText {
 	base := NewFormItemCharBase(label, mat, position, wrapper)

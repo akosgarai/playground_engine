@@ -2,9 +2,7 @@ package model
 
 import (
 	"fmt"
-	"math"
 	"strconv"
-	"strings"
 
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
@@ -26,41 +24,6 @@ func (fi *FormItemFloat) GetValue() float32 {
 		return 0.0
 	}
 	return float32(valueFloat)
-}
-
-// SetValue sets the value of the form item. If the given float value fails on the validation
-// the new value will not be set.
-func (fi *FormItemFloat) SetValue(v float32) {
-	valueString := fmt.Sprintf("%f", v)
-	parts := strings.Split(valueString, ".")
-	partInt, err := strconv.Atoi(parts[0])
-	if err != nil {
-		fmt.Printf("Can't format to int: '%s', err: '%s'\n", parts[0], err.Error())
-		return
-	}
-	partFloatString := strings.TrimSuffix("."+parts[1], "0")
-	if partFloatString == "." {
-		partFloatString = ".0"
-	}
-	// further validation: max 9 char included the '.'
-	if len(parts[0]) > 9 {
-		fmt.Printf("Can't set value, int part length '%d' > 9\n", len(parts[0]))
-		return
-	}
-	if len(parts[0])+1+int(math.Min(1, float64(len(partFloatString)))) > 9 {
-		fmt.Printf("Can't set this precision, int part length '%d' + 1 + '%d' > 9\n", len(parts[0]), int(math.Min(1, float64(len(partFloatString)))))
-		return
-	}
-	to := 9 - (len(parts[0]) + 1)
-	if to > len(partFloatString) {
-		to = len(partFloatString)
-	}
-	partFloat, err := strconv.Atoi(partFloatString[1:to])
-	if err != nil {
-		fmt.Printf("Can't format to int: '%s' (orig: '%s'), err: '%s'\n", partFloatString[0:to], parts[1], err.Error())
-		return
-	}
-	fi.value = fmt.Sprintf("%d.%d", partInt, partFloat)
 }
 
 // NewFormItemFloat returns a form item that maintains a float32 value.
