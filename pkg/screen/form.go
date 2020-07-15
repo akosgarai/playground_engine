@@ -369,7 +369,7 @@ func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrap
 		posX = -1.0 * posX
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemBool(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi := model.NewFormItemBool(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
 	fi.SetValue(defaultValue)
 	fi.RotateX(-90)
 	fi.RotateY(180)
@@ -388,7 +388,7 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 		posX = -1.0 * posX
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemInt(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi := model.NewFormItemInt(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
@@ -407,7 +407,7 @@ func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWra
 		posX = -1.0 * posX
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemFloat(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi := model.NewFormItemFloat(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
@@ -426,7 +426,7 @@ func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrap
 		posX = -1.0 * posX
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemText(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi := model.NewFormItemText(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
@@ -445,7 +445,7 @@ func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWra
 		posX = -1.0 * posX
 	}
 	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemInt64(formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
+	fi := model.NewFormItemInt64(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
