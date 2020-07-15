@@ -18,40 +18,24 @@ const (
 	ITEM_WIDTH_SHORT = float32(1.0 / 3.0)
 )
 
-var (
-	formItemEnums = []string{"Full", "Half", "Long", "Short"}
-)
-
-func validFormItemEnum(name string) bool {
-	for _, i := range formItemEnums {
-		if i == name {
-			return true
-		}
-	}
-	return false
-}
-
 type FormItemBase struct {
 	*BaseModel
-	width    float32
-	sizeEnum string
-	label    string
+	width float32
+	size  float32
+	label string
 }
 
 // NewFormItemBase returns a FormItemBase. Its input is the width of the screen,
-// the size enum of the item, (Possible values: 'Full', 'Half', 'Long', 'Short')
+// the size (scale) of the item, (some constants are provided)
 // the label, the material of the surface and a gl wrapper.
 // In case of invalid input enum, it panics.
 // It creates the surface mesh.
-func NewFormItemBase(w float32, sizeEnum, label string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
-	if !validFormItemEnum(sizeEnum) {
-		panic("Invalid size enum.")
-	}
+func NewFormItemBase(w, size float32, label string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
 	m := New()
 	fi := &FormItemBase{
 		BaseModel: m,
 		width:     w,
-		sizeEnum:  sizeEnum,
+		size:      size,
 		label:     label,
 	}
 	labelPrimitive := rectangle.NewExact(fi.GetFormItemWidth(), fi.GetFormItemHeight())
@@ -65,22 +49,7 @@ func NewFormItemBase(w float32, sizeEnum, label string, mat *material.Material, 
 	return fi
 }
 func (fi *FormItemBase) widthMultiplier() float32 {
-	var result float32
-	switch fi.sizeEnum {
-	case "Full":
-		result = 1.0
-		break
-	case "Half":
-		result = 0.5
-		break
-	case "Long":
-		result = 2.0 / 3.0
-		break
-	case "Short":
-		result = 1.0 / 3.0
-		break
-	}
-	return result
+	return fi.size
 }
 func (fi *FormItemBase) heightMultiplier() float32 {
 	return 1.0 / 1.96
@@ -160,7 +129,7 @@ type FormItemCharBase struct {
 
 // NewFormItemCharBase returns a FormItemCharBase that could be the base of text based form items.
 func NewFormItemCharBase(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemCharBase {
-	m := NewFormItemBase(1.96, "Half", label, mat, wrapper)
+	m := NewFormItemBase(1.96, ITEM_WIDTH_HALF, label, mat, wrapper)
 	m.GetSurface().SetPosition(position)
 	var writableTexture texture.Textures
 	writableTexture.AddTexture(baseDirModel()+"/assets/paper.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.diffuse", wrapper)
