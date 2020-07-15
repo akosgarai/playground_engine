@@ -52,7 +52,7 @@ func (fi *FormItemBase) widthMultiplier() float32 {
 	return fi.size
 }
 func (fi *FormItemBase) heightMultiplier() float32 {
-	return 1.0 / 1.96
+	return 0.1 / 1.96
 }
 
 // It returns the width of the form item.
