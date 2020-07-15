@@ -131,6 +131,7 @@ type FormItem interface {
 type CharFormItem interface {
 	FormItem
 	DeleteLastCharacter()
+	GetCursorInitialPosition() mgl32.Vec3
 	GetTarget() Mesh
 }
 

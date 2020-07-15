@@ -344,10 +344,12 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	}
 	if keyStore.Get(BACK_SPACE) {
 		if f.sinceLastDelete > EventEpsilon {
-			f.underEdit.DeleteLastCharacter()
 			f.sinceLastDelete = 0
-			f.charset.CleanSurface(f.underEdit.GetTarget())
-			f.charset.PrintTo(f.underEdit.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			if f.underEdit != nil {
+				f.underEdit.DeleteLastCharacter()
+				f.charset.CleanSurface(f.underEdit.GetTarget())
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 1.0/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			}
 		}
 	}
 }
@@ -469,7 +471,7 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
 			fi.CharCallback(char, offsetX)
 			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(fi.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
 		case *model.FormItemFloat:
 			fi := f.underEdit.(*model.FormItemFloat)
@@ -477,7 +479,7 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
 			fi.CharCallback(char, offsetX)
 			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(fi.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
 		case *model.FormItemText:
 			fi := f.underEdit.(*model.FormItemText)
@@ -485,7 +487,7 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
 			fi.CharCallback(char, offsetX)
 			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(fi.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
 		case *model.FormItemInt64:
 			fi := f.underEdit.(*model.FormItemInt64)
@@ -493,7 +495,7 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
 			fi.CharCallback(char, offsetX)
 			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -model.CursorInitX, -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(fi.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 1.0/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
 		}
 	}
