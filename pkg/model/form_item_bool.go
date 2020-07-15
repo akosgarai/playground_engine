@@ -31,8 +31,8 @@ func (fi *FormItemBool) SetValue(v bool) {
 	fi.value = v
 }
 
-func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemBool {
-	m := NewFormItemBase(1.96, ITEM_WIDTH_HALF, label, mat, wrapper)
+func NewFormItemBool(maxWidth float32, label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemBool {
+	m := NewFormItemBase(maxWidth, ITEM_WIDTH_HALF, label, mat, wrapper)
 	m.GetSurface().SetPosition(position)
 	var ledTexture texture.Textures
 	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.diffuse", wrapper)

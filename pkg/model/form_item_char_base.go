@@ -126,8 +126,8 @@ type FormItemCharBase struct {
 }
 
 // NewFormItemCharBase returns a FormItemCharBase that could be the base of text based form items.
-func NewFormItemCharBase(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemCharBase {
-	m := NewFormItemBase(1.96, ITEM_WIDTH_HALF, label, mat, wrapper)
+func NewFormItemCharBase(maxWidth, widthRatio float32, label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemCharBase {
+	m := NewFormItemBase(maxWidth, widthRatio, label, mat, wrapper)
 	m.GetSurface().SetPosition(position)
 	var writableTexture texture.Textures
 	writableTexture.AddTexture(baseDirModel()+"/assets/paper.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.diffuse", wrapper)
