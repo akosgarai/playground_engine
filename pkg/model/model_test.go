@@ -1212,7 +1212,7 @@ func TestCharsetTextWidth(t *testing.T) {
 func testFormItemBool(t *testing.T) *FormItemBool {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemBool(DefaultMaxWidth, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemBool(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -1271,7 +1271,7 @@ func TestFormItemBoolValueToString(t *testing.T) {
 func testFormItemInt(t *testing.T) *FormItemInt {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemInt(DefaultMaxWidth, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemInt(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -1432,7 +1432,7 @@ func TestFormItemIntDeleteLastCharacter(t *testing.T) {
 func testFormItemFloat(t *testing.T) *FormItemFloat {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemFloat(DefaultMaxWidth, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemFloat(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -1819,7 +1819,7 @@ func TestFormItemFloatDeleteLastCharacter(t *testing.T) {
 func testFormItemText(t *testing.T) *FormItemText {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemText(DefaultMaxWidth, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemText(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -1969,7 +1969,7 @@ func TestFormItemTextDeleteLastCharacter(t *testing.T) {
 func testFormItemInt64(t *testing.T) *FormItemInt64 {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemInt64(DefaultMaxWidth, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemInt64(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
