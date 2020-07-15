@@ -89,7 +89,40 @@ The Charset model is responsible for holdinng the glyphs for a given charset. Fo
 
 ## Form items
 
-For the form screen, we need a couple of models.
+For the form screen, we need a couple of models. The form items provide 4 kind of width sizes.
+
+- `Full` - It is the longest width. It fits to the screens full width.
+- `Half` - Half width. It fits to the screens half width.
+- `Long` - 2/3 width. It fits to the screens 2/3 width.
+- `Short` - 1/3 width. It fits to the screens 1/3 width.
+
+```
+---------
+|       | - full width
+---------
+|   |   | - half - half width
+---------
+|  |    | - short - long width
+---------
+|    |  | - long - short width
+---------
+|   ||  | - half - short width
+---------
+|  ||   | - short - half width
+---------
+```
+
+**Sizes**
+
+The full width is given as input. The height (or length, if we talk about the xz plane) of the input boxes is calculated with the following function:
+
+```
+height = full / 1.96
+```
+
+### Form base
+
+This is the base model of the form items. It calculates the sizes of the items. The calculation is based on the width of the drawable screen. It also create the surface mesh.
 
 ### Form item bool
 

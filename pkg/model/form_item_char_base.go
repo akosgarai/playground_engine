@@ -20,8 +20,89 @@ const (
 	CursorInitX  = float32(0.155)
 )
 
-type FormItemCharBase struct {
+var (
+	formItemEnums = []string{"Full", "Half", "Long", "Short"}
+)
+
+func validFormItemEnum(name string) bool {
+	for _, i := range formItemEnums {
+		if i == name {
+			return true
+		}
+	}
+	return false
+}
+
+type FormItemBase struct {
 	*BaseModel
+	width    float32
+	sizeEnum string
+}
+
+// NewFormItemBase returns a FormItemBase. Its input is the width of the screen,
+// the size enum of the item. Possible values: 'Full', 'Half', 'Long', 'Short'
+// the material of the surface and a gl wrapper.
+// In case of invalid input enum, it panics.
+// It creates the surface mesh.
+func NewFormItemBase(w float32, sizeEnum string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
+	if !validFormItemEnum(sizeEnum) {
+		panic("Invalid size enum.")
+	}
+	m := New()
+	fi := &FormItemBase{
+		BaseModel: m,
+		width:     w,
+		sizeEnum:  sizeEnum,
+	}
+	labelPrimitive := rectangle.NewExact(fi.GetFormItemWidth(), fi.GetFormItemHeight())
+	v, i, bo := labelPrimitive.MeshInput()
+	var tex texture.Textures
+	tex.TransparentTexture(1, 1, 128, "tex.diffuse", wrapper)
+	tex.TransparentTexture(1, 1, 128, "tex.specular", wrapper)
+	formItemMesh := mesh.NewTexturedMaterialMesh(v, i, tex, mat, wrapper)
+	formItemMesh.SetBoundingObject(bo)
+	m.AddMesh(formItemMesh)
+	return fi
+}
+func (fi *FormItemBase) widthMultiplier() float32 {
+	var result float32
+	switch fi.sizeEnum {
+	case "Full":
+		result = 1.0
+		break
+	case "Half":
+		result = 0.5
+		break
+	case "Long":
+		result = 2.0 / 3.0
+		break
+	case "Short":
+		result = 1.0 / 3.0
+		break
+	}
+	return result
+}
+func (fi *FormItemBase) heightMultiplier() float32 {
+	return 1.0 / 1.96
+}
+
+// It returns the width of the form item.
+func (fi *FormItemBase) GetFormItemWidth() float32 {
+	return fi.width * fi.widthMultiplier()
+}
+
+// It returns the height of the form item.
+func (fi *FormItemBase) GetFormItemHeight() float32 {
+	return fi.width * fi.heightMultiplier()
+}
+
+// GetSurface returns the formItemMesh
+func (fi *FormItemBase) GetSurface() interfaces.Mesh {
+	return fi.meshes[0]
+}
+
+type FormItemCharBase struct {
+	*FormItemBase
 	cursor        interfaces.Mesh
 	cursorOffsetX float32
 	charOffsets   []float32
@@ -32,23 +113,15 @@ type FormItemCharBase struct {
 
 // NewFormItemCharBase returns a FormItemCharBase that could be the base of text based form items.
 func NewFormItemCharBase(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemCharBase {
-	labelPrimitive := rectangle.NewExact(FormItemWidth, FormItemLength)
-	v, i, bo := labelPrimitive.MeshInput()
-	var tex texture.Textures
-	tex.TransparentTexture(1, 1, 128, "tex.diffuse", wrapper)
-	tex.TransparentTexture(1, 1, 128, "tex.specular", wrapper)
-	formItemMesh := mesh.NewTexturedMaterialMesh(v, i, tex, mat, wrapper)
-	formItemMesh.SetBoundingObject(bo)
-	formItemMesh.SetPosition(position)
-	m := New()
-	m.AddMesh(formItemMesh)
+	m := NewFormItemBase(1.96, "Half", mat, wrapper)
+	m.GetSurface().SetPosition(position)
 	var writableTexture texture.Textures
 	writableTexture.AddTexture(baseDirModel()+"/assets/paper.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.diffuse", wrapper)
 	writableTexture.AddTexture(baseDirModel()+"/assets/paper.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.specular", wrapper)
 	writablePrimitive := rectangle.NewExact(writableWidth, writableHeight)
-	v, i, bo = writablePrimitive.MeshInput()
+	v, i, bo := writablePrimitive.MeshInput()
 	writableMesh := mesh.NewTexturedMaterialMesh(v, i, writableTexture, mat, wrapper)
-	writableMesh.SetParent(formItemMesh)
+	writableMesh.SetParent(m.GetSurface())
 	writableMesh.SetPosition(mgl32.Vec3{0.24, -0.01, 0.0})
 	writableMesh.SetBoundingObject(bo)
 	m.AddMesh(writableMesh)
@@ -61,7 +134,7 @@ func NewFormItemCharBase(label string, mat *material.Material, position mgl32.Ve
 	cursor.SetPosition(mgl32.Vec3{CursorInitX, 0.0, -0.01})
 	cursor.SetParent(writableMesh)
 	return &FormItemCharBase{
-		BaseModel:     m,
+		FormItemBase:  m,
 		label:         label,
 		cursor:        cursor,
 		cursorOffsetX: 0.0,
@@ -74,11 +147,6 @@ func NewFormItemCharBase(label string, mat *material.Material, position mgl32.Ve
 // GetLabel returns the label string of the item.
 func (fi *FormItemCharBase) GetLabel() string {
 	return fi.label
-}
-
-// GetSurface returns the formItemMesh
-func (fi *FormItemCharBase) GetSurface() interfaces.Mesh {
-	return fi.meshes[0]
 }
 
 // GetTarget returns the input target Mesh

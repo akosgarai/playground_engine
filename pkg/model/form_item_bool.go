@@ -19,7 +19,7 @@ const (
 )
 
 type FormItemBool struct {
-	*BaseModel
+	*FormItemBase
 	label string
 	value bool
 }
@@ -40,35 +40,22 @@ func (fi *FormItemBool) SetValue(v bool) {
 }
 
 func NewFormItemBool(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemBool {
-	labelPrimitive := rectangle.NewExact(FormItemWidth, FormItemLength)
-	v, i, bo := labelPrimitive.MeshInput()
-	var tex texture.Textures
-	tex.TransparentTexture(1, 1, 128, "tex.diffuse", wrapper)
-	tex.TransparentTexture(1, 1, 128, "tex.specular", wrapper)
-	formItemMesh := mesh.NewTexturedMaterialMesh(v, i, tex, mat, wrapper)
-	formItemMesh.SetBoundingObject(bo)
-	formItemMesh.SetPosition(position)
-	m := New()
-	m.AddMesh(formItemMesh)
+	m := NewFormItemBase(1.96, "Half", mat, wrapper)
+	m.GetSurface().SetPosition(position)
 	var ledTexture texture.Textures
 	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.diffuse", wrapper)
 	ledTexture.AddTexture(baseDirModel()+"/assets/led-button.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.specular", wrapper)
 	ledPrimitive := rectangle.NewExact(ledWidth, ledHeight)
-	v, i, _ = ledPrimitive.MeshInput()
+	v, i, _ := ledPrimitive.MeshInput()
 	ledMesh := mesh.NewTexturedMaterialMesh(v, i, ledTexture, mat, wrapper)
-	ledMesh.SetParent(formItemMesh)
+	ledMesh.SetParent(m.GetSurface())
 	ledMesh.SetPosition(mgl32.Vec3{0.29, -0.01, 0.0})
 	m.AddMesh(ledMesh)
 	return &FormItemBool{
-		BaseModel: m,
-		label:     label,
-		value:     false,
+		FormItemBase: m,
+		label:        label,
+		value:        false,
 	}
-}
-
-// GetSurface returns the formItemMesh
-func (fi *FormItemBool) GetSurface() interfaces.Mesh {
-	return fi.meshes[0]
 }
 
 // GetLight returns the ledMesh
