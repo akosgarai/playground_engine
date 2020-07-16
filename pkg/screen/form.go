@@ -34,7 +34,7 @@ const (
 	EventEpsilon       = 200
 	BACK_SPACE         = glfw.KeyBackspace
 	LabelFontScale     = float32(1.0)
-	InputTextFontScale = float32(0.90)
+	InputTextFontScale = float32(0.85)
 )
 
 var (
