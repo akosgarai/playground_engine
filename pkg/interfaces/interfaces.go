@@ -122,15 +122,23 @@ type Model interface {
 	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
 	Clear()
 	AddMesh(Mesh)
+	RotateX(float32)
+	RotateY(float32)
 }
 type FormItem interface {
 	Model
 	GetLabel() string
+	GetSurface() Mesh
 	ValueToString() string
+	GetLabelAreaWidth() float32
+	GetFormItemWidth() float32
 }
 type CharFormItem interface {
 	FormItem
 	DeleteLastCharacter()
+	DeleteCursor()
+	GetCursorInitialPosition() mgl32.Vec3
+	CharCallback(rune, float32)
 	GetTarget() Mesh
 }
 

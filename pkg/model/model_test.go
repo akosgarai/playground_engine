@@ -20,6 +20,7 @@ const (
 	InvalidFilename      = "not-existing-file.obj"
 	ValidFilename        = "testdata/test_cube.obj"
 	DefaultFormItemLabel = "form item label"
+	DefaultMaxWidth      = float32(1.96)
 )
 
 var (
@@ -1211,7 +1212,7 @@ func TestCharsetTextWidth(t *testing.T) {
 func testFormItemBool(t *testing.T) *FormItemBool {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemBool(DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemBool(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -1270,7 +1271,7 @@ func TestFormItemBoolValueToString(t *testing.T) {
 func testFormItemInt(t *testing.T) *FormItemInt {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemInt(DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemInt(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -1378,7 +1379,6 @@ func TestFormItemIntDeleteLastCharacter(t *testing.T) {
 	fi.value = "12345"
 	fi.typeState = "PI"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.5)
 	fi.DeleteLastCharacter()
 	if fi.value != "1234" {
 		t.Errorf("Invalid value. Instead of '1234', we have '%s'.", fi.value)
@@ -1402,7 +1402,6 @@ func TestFormItemIntDeleteLastCharacter(t *testing.T) {
 	fi.value = "-1234"
 	fi.typeState = "NI"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.5)
 	fi.DeleteLastCharacter()
 	if fi.value != "-123" {
 		t.Errorf("Invalid value. Instead of '-123', we have '%s'.", fi.value)
@@ -1431,7 +1430,7 @@ func TestFormItemIntDeleteLastCharacter(t *testing.T) {
 func testFormItemFloat(t *testing.T) *FormItemFloat {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemFloat(DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemFloat(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -1818,7 +1817,7 @@ func TestFormItemFloatDeleteLastCharacter(t *testing.T) {
 func testFormItemText(t *testing.T) *FormItemText {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemText(DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemText(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -1915,12 +1914,19 @@ func TestFormItemTextCharCallback(t *testing.T) {
 	if fi.value != "ba bbbbbb" {
 		t.Errorf("Invalid value. Instead of 'ba bbbbbb', we have '%s'.", fi.value)
 	}
-	fi.CharCallback('b', 0.1)
-	if fi.value != "ba bbbbbb" {
-		t.Log(len(fi.value))
-		t.Log(fi.value)
-		t.Log(fi.maxLen)
-		t.Errorf("Invalid value. Instead of 'ba bbbbbb', we have '%s'.", fi.value)
+	valueBase := "ba bbbbbb"
+	for i := 0; i < 25; i++ {
+		valueBase = valueBase + "b"
+		fi.CharCallback('b', 0.1)
+		if fi.value != valueBase {
+			t.Errorf("Invalid value (%d). Instead of '%s', we have '%s'.", i, valueBase, fi.value)
+		}
+	}
+	for i := 0; i < 10; i++ {
+		fi.CharCallback('b', 0.1)
+		if fi.value != valueBase {
+			t.Errorf("Invalid value (%d). Instead of '%s', we have '%s'.", i, valueBase, fi.value)
+		}
 	}
 }
 func TestFormItemTextValueToString(t *testing.T) {
@@ -1939,7 +1945,6 @@ func TestFormItemTextDeleteLastCharacter(t *testing.T) {
 	fi := testFormItemText(t)
 	fi.value = "12345"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.5)
 	fi.DeleteLastCharacter()
 	if fi.value != "1234" {
 		t.Errorf("Invalid value. Instead of '1234', we have '%s'.", fi.value)
@@ -1968,7 +1973,7 @@ func TestFormItemTextDeleteLastCharacter(t *testing.T) {
 func testFormItemInt64(t *testing.T) *FormItemInt64 {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemInt64(DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemInt64(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
@@ -2057,9 +2062,14 @@ func TestFormItemInt64CharCallback(t *testing.T) {
 		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
 	}
 	fi.value = strconv.Itoa(math.MaxInt64 - 10)
+	maxVal := strconv.Itoa(math.MaxInt64-10) + "1"
 	fi.CharCallback('1', 0.1)
-	if fi.value != strconv.Itoa(math.MaxInt64-10) {
-		t.Errorf("Invalid value. Instead of '%d', we have '%s'.", math.MaxInt64-10, fi.value)
+	if fi.value != maxVal {
+		t.Errorf("Invalid value. Instead of '%s', we have '%s'.", maxVal, fi.value)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != maxVal {
+		t.Errorf("Invalid value. Instead of '%s', we have '%s'.", maxVal, fi.value)
 	}
 }
 func TestFormItemInt64ValueToString(t *testing.T) {
@@ -2079,7 +2089,6 @@ func TestFormItemInt64DeleteLastCharacter(t *testing.T) {
 	fi.value = "12345"
 	fi.typeState = "PI"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.5)
 	fi.DeleteLastCharacter()
 	if fi.value != "1234" {
 		t.Errorf("Invalid value. Instead of '1234', we have '%s'.", fi.value)
@@ -2103,7 +2112,6 @@ func TestFormItemInt64DeleteLastCharacter(t *testing.T) {
 	fi.value = "-12"
 	fi.typeState = "NI"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.3)
 	fi.DeleteLastCharacter()
 	if fi.value != "-1" {
 		t.Errorf("Invalid value. Instead of '-1', we have '%s'.", fi.value)

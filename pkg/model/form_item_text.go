@@ -19,8 +19,8 @@ func (fi *FormItemText) GetValue() string {
 }
 
 // NewFormItemText returns a form item that maintains a string value.
-func NewFormItemText(label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemText {
-	base := NewFormItemCharBase(label, mat, position, wrapper)
+func NewFormItemText(maxWidth, itemWidth float32, label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemText {
+	base := NewFormItemCharBase(maxWidth, itemWidth, label, CHAR_NUM_TEXT, mat, position, wrapper)
 	return &FormItemText{
 		FormItemCharBase: base,
 	}
@@ -31,7 +31,7 @@ func (fi *FormItemText) validRune(r rune) bool {
 
 // CharCallback validates the input character and appends it to the value if valid.
 func (fi *FormItemText) CharCallback(r rune, offsetX float32) {
-	if !fi.validRune(r) || len(fi.value)+strings.Count(fi.value, " ") > fi.maxLen {
+	if !fi.validRune(r) || len(fi.value)+strings.Count(fi.value, " ") >= fi.maxLen {
 		return
 	}
 	fi.value = fi.value + string(r)
