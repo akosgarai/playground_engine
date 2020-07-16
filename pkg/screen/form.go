@@ -381,8 +381,8 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWr
 // AddFormItemBool is for adding a bool form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, defaultValue bool) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	pos := f.itemPosition(model.ITEM_WIDTH_SHORT, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, formLabel, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
 
@@ -405,16 +405,16 @@ func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWra
 // AddFormItemText is for adding a text form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, formLabel, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
 
 // AddFormItemInt64 is for adding an int64 form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	pos := f.itemPosition(model.ITEM_WIDTH_LONG, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, formLabel, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
 func (f *FormScreen) setDefaultValueChar(input string, wrapper interfaces.GLWrapper) {
