@@ -11,11 +11,6 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
-const (
-	FormItemWidth  = float32(0.98)
-	FormItemLength = float32(0.1)
-)
-
 type FormItemBool struct {
 	*FormItemBase
 	value bool

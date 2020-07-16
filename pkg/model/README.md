@@ -112,7 +112,7 @@ For the form screen, we need a couple of models. The form items provide 4 kind o
 ---------
 ```
 
-**Sizes**
+**Height**
 
 The full width is given as input. The height (or length, if we talk about the xz plane) of the input boxes is calculated with the following function:
 

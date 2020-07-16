@@ -26,21 +26,13 @@ const (
 	SideFrameLength    = float32(1.98)
 	SideFrameWidth     = float32(0.02) // the width of the border frames.
 	TopLeftFrameWidth  = float32(0.1)
-	FullWidth          = BottomFrameWidth - 2*SideFrameWidth
+	FullWidth          = BottomFrameWidth - 2*SideFrameWidth // The full width of the usable area
 	CameraMoveSpeed    = 0.005
 	LightConstantTerm  = float32(1.0)
 	LightLinearTerm    = float32(0.14)
 	LightQuadraticTerm = float32(0.07)
 	EventEpsilon       = 200
 	BACK_SPACE         = glfw.KeyBackspace
-
-	FullX       = 0
-	HalfLeftX   = 0.4
-	HalfRigthX  = -0.4
-	LongLeftX   = 0.4
-	LongRightX  = -0.4
-	ShortLeftX  = 0.4
-	ShortRightX = 0.4
 )
 
 var (
