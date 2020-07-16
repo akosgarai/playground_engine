@@ -20,7 +20,9 @@ jobs:
       id: go
 
     - name: Install ubuntu dependencies.
-      run: sudo apt-get -o Acquire::Retries=3 install libgl1-mesa-dev xorg-dev
+      run: |
+          sudo apt-get update
+          sudo apt-get -o Acquire::Retries=3 install libgl1-mesa-dev xorg-dev
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
