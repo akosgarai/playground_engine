@@ -245,95 +245,47 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	f.closestModel = closestModel
 
 	f.initMaterialForTheFormItems()
-	switch f.closestModel.(type) {
-	case *model.FormItemBool:
+	minDiff := float32(0.0)
+	if closestDistance <= minDiff+0.01 {
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-		minDiff := float32(0.0)
-		if closestDistance <= minDiff+0.01 {
-			tmMesh.Material = material.Ruby
-			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+		tmMesh.Material = material.Ruby
+		f.deleteCursor()
+		f.sinceLastClick = 0
+		if buttonStore.Get(LEFT_MOUSE_BUTTON) && f.sinceLastClick > EventEpsilon {
+			switch f.closestModel.(type) {
+			case *model.FormItemBool:
 				formModel := f.closestModel.(*model.FormItemBool)
-				if f.sinceLastClick > EventEpsilon {
-					f.deleteCursor()
-					formModel.SetValue(!formModel.GetValue())
-					f.sinceLastClick = 0
-				}
-			}
-		}
-		break
-	case *model.FormItemInt:
-		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-		minDiff := float32(0.0)
-		if closestDistance <= minDiff+0.01 {
-			tmMesh.Material = material.Ruby
-			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel.SetValue(!formModel.GetValue())
+				break
+			case *model.FormItemInt:
 				formModel := f.closestModel.(*model.FormItemInt)
-				if f.sinceLastClick > EventEpsilon {
-					f.deleteCursor()
-					formModel.AddCursor()
-					f.sinceLastClick = 0
-					f.underEdit = formModel
-				}
-			}
-		}
-		break
-	case *model.FormItemFloat:
-		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-		minDiff := float32(0.0)
-		if closestDistance <= minDiff+0.01 {
-			tmMesh.Material = material.Ruby
-			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel.AddCursor()
+				f.underEdit = formModel
+				break
+			case *model.FormItemFloat:
 				formModel := f.closestModel.(*model.FormItemFloat)
-				if f.sinceLastClick > EventEpsilon {
-					f.deleteCursor()
-					formModel.AddCursor()
-					f.sinceLastClick = 0
-					f.underEdit = formModel
-				}
-			}
-		}
-		break
-	case *model.FormItemText:
-		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-		minDiff := float32(0.0)
-		if closestDistance <= minDiff+0.01 {
-			tmMesh.Material = material.Ruby
-			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel.AddCursor()
+				f.underEdit = formModel
+				break
+			case *model.FormItemText:
 				formModel := f.closestModel.(*model.FormItemText)
-				if f.sinceLastClick > EventEpsilon {
-					f.deleteCursor()
-					formModel.AddCursor()
-					f.sinceLastClick = 0
-					f.underEdit = formModel
-				}
-			}
-		}
-		break
-	case *model.FormItemInt64:
-		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-		minDiff := float32(0.0)
-		if closestDistance <= minDiff+0.01 {
-			tmMesh.Material = material.Ruby
-			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				formModel.AddCursor()
+				f.underEdit = formModel
+				break
+			case *model.FormItemInt64:
 				formModel := f.closestModel.(*model.FormItemInt64)
-				if f.sinceLastClick > EventEpsilon {
-					f.deleteCursor()
-					formModel.AddCursor()
-					f.sinceLastClick = 0
-					f.underEdit = formModel
-				}
+				formModel.AddCursor()
+				f.underEdit = formModel
+				break
 			}
 		}
-		break
 	}
-	if keyStore.Get(BACK_SPACE) {
-		if f.sinceLastDelete > EventEpsilon {
-			f.sinceLastDelete = 0
-			if f.underEdit != nil {
-				f.underEdit.DeleteLastCharacter()
-				f.charset.CleanSurface(f.underEdit.GetTarget())
-				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
-			}
+	if keyStore.Get(BACK_SPACE) && f.sinceLastDelete > EventEpsilon {
+		f.sinceLastDelete = 0
+		if f.underEdit != nil {
+			f.underEdit.DeleteLastCharacter()
+			f.charset.CleanSurface(f.underEdit.GetTarget())
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 		}
 	}
 }
