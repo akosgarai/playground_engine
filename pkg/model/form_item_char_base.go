@@ -13,11 +13,10 @@ import (
 
 type FormItemCharBase struct {
 	*FormItemBase
-	cursor        interfaces.Mesh
-	cursorOffsetX float32
-	charOffsets   []float32
-	value         string
-	maxLen        int
+	cursor      interfaces.Mesh
+	charOffsets []float32
+	value       string
+	maxLen      int
 }
 
 // NewFormItemCharBase returns a FormItemCharBase that could be the base of text based form items.
@@ -43,13 +42,21 @@ func NewFormItemCharBase(maxWidth, widthRatio float32, label string, mat *materi
 	cursor.SetPosition(m.GetCursorInitialPosition())
 	cursor.SetParent(writableMesh)
 	return &FormItemCharBase{
-		FormItemBase:  m,
-		cursor:        cursor,
-		cursorOffsetX: 0.0,
-		charOffsets:   []float32{},
-		value:         "",
-		maxLen:        9,
+		FormItemBase: m,
+		cursor:       cursor,
+		charOffsets:  []float32{},
+		value:        "",
+		maxLen:       9,
 	}
+}
+func (fi *FormItemCharBase) cursorOffsetX() float32 {
+	result := float32(0.0)
+	if len(fi.charOffsets) > 0 {
+		for i := 0; i < len(fi.charOffsets); i++ {
+			result = result + fi.charOffsets[i]
+		}
+	}
+	return result
 }
 
 // GetTarget returns the input target Mesh
@@ -60,7 +67,7 @@ func (fi *FormItemCharBase) GetTarget() interfaces.Mesh {
 // AddCursor displays a cursor on the target surface.
 func (fi *FormItemCharBase) AddCursor() {
 	fi.AddMesh(fi.cursor)
-	fi.cursor.SetPosition(mgl32.Vec3{fi.GetCursorInitialPosition().X() - fi.cursorOffsetX, 0.0, -0.01})
+	fi.cursor.SetPosition(mgl32.Vec3{fi.GetCursorInitialPosition().X() - fi.cursorOffsetX(), 0.0, -0.01})
 }
 
 // DeleteCursor removes the cursor from the meshes.
@@ -74,17 +81,14 @@ func (fi *FormItemCharBase) DeleteCursor() {
 // It adds the new offset to the offsets, increments the sum offset
 // and sets the cursor position.
 func (fi *FormItemCharBase) MoveCursorWithOffset(offsetX float32) {
-	fi.cursorOffsetX = fi.cursorOffsetX + offsetX
 	fi.charOffsets = append(fi.charOffsets, offsetX)
-	fi.cursor.SetPosition(mgl32.Vec3{fi.GetCursorInitialPosition().X() - fi.cursorOffsetX, 0.0, -0.01})
+	fi.cursor.SetPosition(mgl32.Vec3{fi.GetCursorInitialPosition().X() - fi.cursorOffsetX(), 0.0, -0.01})
 }
 
 // StepBackCursor moves the cursor back after a character deletion.
 func (fi *FormItemCharBase) StepBackCursor() {
-	offsetX := fi.charOffsets[len(fi.charOffsets)-1]
-	fi.cursorOffsetX = fi.cursorOffsetX - offsetX
-	fi.cursor.SetPosition(mgl32.Vec3{fi.GetCursorInitialPosition().X() - fi.cursorOffsetX, 0.0, -0.01})
 	fi.charOffsets = fi.charOffsets[:len(fi.charOffsets)-1]
+	fi.cursor.SetPosition(mgl32.Vec3{fi.GetCursorInitialPosition().X() - fi.cursorOffsetX(), 0.0, -0.01})
 }
 
 // ValueToString returns the string representation of the value of the form item.

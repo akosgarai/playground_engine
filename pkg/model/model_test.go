@@ -1379,7 +1379,6 @@ func TestFormItemIntDeleteLastCharacter(t *testing.T) {
 	fi.value = "12345"
 	fi.typeState = "PI"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.5)
 	fi.DeleteLastCharacter()
 	if fi.value != "1234" {
 		t.Errorf("Invalid value. Instead of '1234', we have '%s'.", fi.value)
@@ -1403,7 +1402,6 @@ func TestFormItemIntDeleteLastCharacter(t *testing.T) {
 	fi.value = "-1234"
 	fi.typeState = "NI"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.5)
 	fi.DeleteLastCharacter()
 	if fi.value != "-123" {
 		t.Errorf("Invalid value. Instead of '-123', we have '%s'.", fi.value)
@@ -1940,7 +1938,6 @@ func TestFormItemTextDeleteLastCharacter(t *testing.T) {
 	fi := testFormItemText(t)
 	fi.value = "12345"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.5)
 	fi.DeleteLastCharacter()
 	if fi.value != "1234" {
 		t.Errorf("Invalid value. Instead of '1234', we have '%s'.", fi.value)
@@ -2080,7 +2077,6 @@ func TestFormItemInt64DeleteLastCharacter(t *testing.T) {
 	fi.value = "12345"
 	fi.typeState = "PI"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.5)
 	fi.DeleteLastCharacter()
 	if fi.value != "1234" {
 		t.Errorf("Invalid value. Instead of '1234', we have '%s'.", fi.value)
@@ -2104,7 +2100,6 @@ func TestFormItemInt64DeleteLastCharacter(t *testing.T) {
 	fi.value = "-12"
 	fi.typeState = "NI"
 	fi.charOffsets = []float32{0.1, 0.1, 0.1}
-	fi.cursorOffsetX = float32(0.3)
 	fi.DeleteLastCharacter()
 	if fi.value != "-1" {
 		t.Errorf("Invalid value. Instead of '-1', we have '%s'.", fi.value)
