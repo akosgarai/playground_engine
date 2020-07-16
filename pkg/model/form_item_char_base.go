@@ -87,7 +87,7 @@ func (fi *FormItemBase) GetTargetHeight() float32 {
 // GetTargetWidth returns the width size of the target mesh
 // (text area, button)
 func (fi *FormItemBase) GetTargetWidth() float32 {
-	return fi.getWidthWithoutLabel()
+	return fi.getWidthWithoutLabel() * 0.9
 }
 func (fi *FormItemBase) getWidthWithoutLabel() float32 {
 	return fi.GetFormItemWidth() - fi.GetLabelAreaWidth()
@@ -111,7 +111,7 @@ func (fi *FormItemBase) GetCursorWidth() float32 {
 
 // GetCursorInitialPosition returns the initial position vector of the cursor.
 func (fi *FormItemBase) GetCursorInitialPosition() mgl32.Vec3 {
-	return mgl32.Vec3{(fi.GetTargetWidth()-fi.GetCursorWidth())/2 - 0.03, -0.01, 0.0}
+	return mgl32.Vec3{(fi.GetTargetWidth() - fi.GetCursorWidth()) * 0.9 / 2, -0.01, 0.0}
 }
 
 type FormItemCharBase struct {
