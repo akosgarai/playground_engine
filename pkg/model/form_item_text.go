@@ -27,6 +27,11 @@ func NewFormItemText(maxWidth, itemWidth float32, label string, mat *material.Ma
 		validator:        nil,
 	}
 }
+
+// SetValidator sets the validator function
+func (fi *FormItemText) SetValidator(validator StringValidator) {
+	fi.validator = validator
+}
 func (fi *FormItemText) validRune(r rune) bool {
 	return true
 }

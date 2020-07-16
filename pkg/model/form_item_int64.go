@@ -31,6 +31,11 @@ func NewFormItemInt64(maxWidth, itemWidth float32, label string, mat *material.M
 	}
 }
 
+// SetValidator sets the validator function
+func (fi *FormItemInt64) SetValidator(validator Int64Validator) {
+	fi.validator = validator
+}
+
 func (fi *FormItemInt64) validRune(r rune) bool {
 	var validRunes []rune
 	switch fi.typeState {

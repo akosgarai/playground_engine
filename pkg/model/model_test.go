@@ -1361,6 +1361,43 @@ func TestFormItemIntCharCallback(t *testing.T) {
 	if fi.value != strconv.Itoa(math.MaxInt32-10) {
 		t.Errorf("Invalid value. Instead of '%d', we have '%s'.", math.MaxInt32-10, fi.value)
 	}
+	fi = testFormItemInt(t)
+	fi.AddCursor()
+	validator := func(i int) bool {
+		return i <= 100 && i >= -10
+	}
+	fi.SetValidator(validator)
+	fi.CharCallback('1', 0.1)
+	if fi.value != "1" {
+		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != "11" {
+		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != "11" {
+		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	fi.DeleteLastCharacter()
+	fi.CharCallback('-', 0.1)
+	fi.CharCallback('1', 0.1)
+	if fi.value != "-1" {
+		t.Errorf("Invalid value. Instead of '-1', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != "-1" {
+		t.Errorf("Invalid value. Instead of '-1', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('0', 0.1)
+	if fi.value != "-10" {
+		t.Errorf("Invalid value. Instead of '-10', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('0', 0.1)
+	if fi.value != "-10" {
+		t.Errorf("Invalid value. Instead of '-10', we have '%s'.", fi.value)
+	}
 }
 func TestFormItemIntValueToString(t *testing.T) {
 	fi := testFormItemInt(t)
@@ -1645,6 +1682,48 @@ func TestFormItemFloatCharCallback(t *testing.T) {
 	if fi.typeState != "NF" {
 		t.Errorf("Invalid typeState. Instead of 'NF', we have '%s'.", fi.typeState)
 	}
+	// validator
+	fi = testFormItemFloat(t)
+	fi.AddCursor()
+	validator := func(i float32) bool {
+		return i <= 1.0 && i >= 0.0
+	}
+	fi.SetValidator(validator)
+	fi.CharCallback('-', 0.1)
+	if fi.value != "-" {
+		t.Errorf("Invalid value. Instead of '-', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('0', 0.1)
+	if fi.value != "-0" {
+		t.Errorf("Invalid value. Instead of '-0', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('.', 0.1)
+	if fi.value != "-0." {
+		t.Errorf("Invalid value. Instead of '-0.', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('3', 0.1)
+	if fi.value != "-0." {
+		t.Errorf("Invalid value. Instead of '-0.', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	fi.DeleteLastCharacter()
+	fi.DeleteLastCharacter()
+	fi.CharCallback('1', 0.1)
+	if fi.value != "1" {
+		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('.', 0.1)
+	if fi.value != "1." {
+		t.Errorf("Invalid value. Instead of '1.', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('3', 0.1)
+	if fi.value != "1." {
+		t.Errorf("Invalid value. Instead of '1.', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('0', 0.1)
+	if fi.value != "1.0" {
+		t.Errorf("Invalid value. Instead of '1.0', we have '%s'.", fi.value)
+	}
 }
 func TestFormItemFloatValueToString(t *testing.T) {
 	fi := testFormItemFloat(t)
@@ -1928,6 +2007,28 @@ func TestFormItemTextCharCallback(t *testing.T) {
 			t.Errorf("Invalid value (%d). Instead of '%s', we have '%s'.", i, valueBase, fi.value)
 		}
 	}
+	fi = testFormItemText(t)
+	fi.AddCursor()
+	validator := func(s string) bool {
+		return s != "not"
+	}
+	fi.SetValidator(validator)
+	fi.CharCallback('n', 0.1)
+	if fi.value != "n" {
+		t.Errorf("Invalid value. Instead of 'n', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('o', 0.1)
+	if fi.value != "no" {
+		t.Errorf("Invalid value. Instead of 'no', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('t', 0.1)
+	if fi.value != "no" {
+		t.Errorf("Invalid value. Instead of 'no', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('r', 0.1)
+	if fi.value != "nor" {
+		t.Errorf("Invalid value. Instead of 'nor', we have '%s'.", fi.value)
+	}
 }
 func TestFormItemTextValueToString(t *testing.T) {
 	fi := testFormItemText(t)
@@ -2070,6 +2171,53 @@ func TestFormItemInt64CharCallback(t *testing.T) {
 	fi.CharCallback('1', 0.1)
 	if fi.value != maxVal {
 		t.Errorf("Invalid value. Instead of '%s', we have '%s'.", maxVal, fi.value)
+	}
+	fi = testFormItemInt64(t)
+	fi.AddCursor()
+	validator := func(i int64) bool {
+		return i >= -300 && i <= 200
+	}
+	fi.SetValidator(validator)
+	fi.CharCallback('1', 0.1)
+	if fi.value != "1" {
+		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != "11" {
+		t.Errorf("Invalid value. Instead of '11', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != "111" {
+		t.Errorf("Invalid value. Instead of '111', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != "111" {
+		t.Errorf("Invalid value. Instead of '111', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	fi.DeleteLastCharacter()
+	fi.DeleteLastCharacter()
+	fi.CharCallback('-', 0.1)
+	fi.CharCallback('3', 0.1)
+	if fi.value != "-3" {
+		t.Errorf("Invalid value. Instead of '-3', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('3', 0.1)
+	if fi.value != "-33" {
+		t.Errorf("Invalid value. Instead of '-33', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('3', 0.1)
+	if fi.value != "-33" {
+		t.Errorf("Invalid value. Instead of '-33', we have '%s'.", fi.value)
+	}
+	fi.DeleteLastCharacter()
+	fi.CharCallback('0', 0.1)
+	if fi.value != "-30" {
+		t.Errorf("Invalid value. Instead of '-30', we have '%s'.", fi.value)
+	}
+	fi.CharCallback('0', 0.1)
+	if fi.value != "-300" {
+		t.Errorf("Invalid value. Instead of '-300', we have '%s'.", fi.value)
 	}
 }
 func TestFormItemInt64ValueToString(t *testing.T) {
