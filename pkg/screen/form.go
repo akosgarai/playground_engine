@@ -33,6 +33,8 @@ const (
 	LightQuadraticTerm = float32(0.07)
 	EventEpsilon       = 200
 	BACK_SPACE         = glfw.KeyBackspace
+	LabelFontScale     = float32(1.0)
+	InputTextFontScale = float32(0.90)
 )
 
 var (
@@ -42,12 +44,6 @@ var (
 	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
 
 	DefaultFormItemMaterial = material.Whiteplastic
-	SpotLightAmbient        = mgl32.Vec3{1, 1, 1}
-	SpotLightDiffuse        = mgl32.Vec3{1, 1, 1}
-	SpotLightSpecular       = mgl32.Vec3{1, 1, 1}
-	SpotLightDirection      = (mgl32.Vec3{0, 0, -1}).Normalize()
-	SpotLightCutoff         = float32(0.05)
-	SpotLightOuterCutoff    = float32(0.07)
 )
 
 type FormScreen struct {
@@ -209,27 +205,9 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 
 // deleteCursor removes the cursor from the text form inputs.
 func (f *FormScreen) deleteCursor() {
-	switch f.underEdit.(type) {
-	case *model.FormItemInt:
-		fi := f.underEdit.(*model.FormItemInt)
-		fi.DeleteCursor()
+	if f.underEdit != nil {
+		f.underEdit.DeleteCursor()
 		f.underEdit = nil
-		break
-	case *model.FormItemFloat:
-		fi := f.underEdit.(*model.FormItemFloat)
-		fi.DeleteCursor()
-		f.underEdit = nil
-		break
-	case *model.FormItemText:
-		fi := f.underEdit.(*model.FormItemText)
-		fi.DeleteCursor()
-		f.underEdit = nil
-		break
-	case *model.FormItemInt64:
-		fi := f.underEdit.(*model.FormItemInt64)
-		fi.DeleteCursor()
-		f.underEdit = nil
-		break
 	}
 }
 
@@ -354,7 +332,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			if f.underEdit != nil {
 				f.underEdit.DeleteLastCharacter()
 				f.charset.CleanSurface(f.underEdit.GetTarget())
-				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 1.0/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			}
 		}
 	}
@@ -364,7 +342,7 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWr
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, -0.01, LabelFontScale/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
 	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
 	return len(f.formItems) - 1
@@ -419,40 +397,10 @@ func (f *FormScreen) setDefaultValueChar(input string, wrapper interfaces.GLWrap
 // CharCallback is the character stream input handler
 func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 	if f.underEdit != nil {
-		switch f.underEdit.(type) {
-		case *model.FormItemInt:
-			fi := f.underEdit.(*model.FormItemInt)
-			// offset for the current character has to be calculated.
-			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
-			fi.CharCallback(char, offsetX)
-			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 0.90/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
-			break
-		case *model.FormItemFloat:
-			fi := f.underEdit.(*model.FormItemFloat)
-			// offset for the current character has to be calculated.
-			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
-			fi.CharCallback(char, offsetX)
-			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 0.90/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
-			break
-		case *model.FormItemText:
-			fi := f.underEdit.(*model.FormItemText)
-			// offset for the current character has to be calculated.
-			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
-			fi.CharCallback(char, offsetX)
-			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 0.90/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
-			break
-		case *model.FormItemInt64:
-			fi := f.underEdit.(*model.FormItemInt64)
-			// offset for the current character has to be calculated.
-			offsetX := f.charset.TextWidth(string(char), 1.0/f.windowWindth)
-			fi.CharCallback(char, offsetX)
-			f.charset.CleanSurface(fi.GetTarget())
-			f.charset.PrintTo(fi.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, 0.90/f.windowWindth, wrapper, fi.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
-			break
-		}
+		offsetX := f.charset.TextWidth(string(char), InputTextFontScale/f.windowWindth)
+		f.underEdit.CharCallback(char, offsetX)
+		f.charset.CleanSurface(f.underEdit.GetTarget())
+		f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 	}
 }
 
