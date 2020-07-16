@@ -130,6 +130,7 @@ type FormItem interface {
 	GetLabel() string
 	GetSurface() Mesh
 	ValueToString() string
+	GetLabelAreaWidth() float32
 }
 type CharFormItem interface {
 	FormItem
