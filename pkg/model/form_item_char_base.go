@@ -111,7 +111,7 @@ func (fi *FormItemBase) GetCursorWidth() float32 {
 
 // GetCursorInitialPosition returns the initial position vector of the cursor.
 func (fi *FormItemBase) GetCursorInitialPosition() mgl32.Vec3 {
-	return mgl32.Vec3{(fi.GetTargetWidth()*0.9 - fi.GetCursorWidth()) / 2, -0.01, 0.0}
+	return mgl32.Vec3{(fi.GetTargetWidth()*0.85 - fi.GetCursorWidth()) / 2, -0.01, 0.0}
 }
 
 type FormItemCharBase struct {
