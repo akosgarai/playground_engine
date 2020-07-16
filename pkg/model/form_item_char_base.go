@@ -12,10 +12,11 @@ import (
 )
 
 const (
-	ITEM_WIDTH_FULL  = float32(1.0)
-	ITEM_WIDTH_HALF  = float32(0.5)
-	ITEM_WIDTH_LONG  = float32(2.0 / 3.0)
-	ITEM_WIDTH_SHORT = float32(1.0 / 3.0)
+	ITEM_WIDTH_FULL        = float32(1.0)
+	ITEM_WIDTH_HALF        = float32(0.5)
+	ITEM_WIDTH_LONG        = float32(2.0 / 3.0)
+	ITEM_WIDTH_SHORT       = float32(1.0 / 3.0)
+	ITEM_HEIGHT_MULTIPLIER = float32(0.1 / 1.96)
 )
 
 type FormItemBase struct {
@@ -51,9 +52,6 @@ func NewFormItemBase(w, size float32, label string, mat *material.Material, wrap
 func (fi *FormItemBase) widthMultiplier() float32 {
 	return fi.size
 }
-func (fi *FormItemBase) heightMultiplier() float32 {
-	return 0.1 / 1.96
-}
 
 // It returns the width of the form item.
 func (fi *FormItemBase) GetFormItemWidth() float32 {
@@ -62,7 +60,7 @@ func (fi *FormItemBase) GetFormItemWidth() float32 {
 
 // It returns the height of the form item.
 func (fi *FormItemBase) GetFormItemHeight() float32 {
-	return fi.width * fi.heightMultiplier()
+	return fi.width * ITEM_HEIGHT_MULTIPLIER
 }
 
 // It returns the width of the label area. (55% of the halfwidth)
