@@ -20,7 +20,7 @@ type FormItemCharBase struct {
 }
 
 // NewFormItemCharBase returns a FormItemCharBase that could be the base of text based form items.
-func NewFormItemCharBase(maxWidth, widthRatio float32, label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemCharBase {
+func NewFormItemCharBase(maxWidth, widthRatio float32, label string, inputMaxLen int, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemCharBase {
 	m := NewFormItemBase(maxWidth, widthRatio, label, mat, wrapper)
 	m.GetSurface().SetPosition(position)
 	var writableTexture texture.Textures
@@ -46,7 +46,7 @@ func NewFormItemCharBase(maxWidth, widthRatio float32, label string, mat *materi
 		cursor:       cursor,
 		charOffsets:  []float32{},
 		value:        "",
-		maxLen:       9,
+		maxLen:       inputMaxLen,
 	}
 }
 func (fi *FormItemCharBase) cursorOffsetX() float32 {

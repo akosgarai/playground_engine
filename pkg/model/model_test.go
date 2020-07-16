@@ -1914,12 +1914,19 @@ func TestFormItemTextCharCallback(t *testing.T) {
 	if fi.value != "ba bbbbbb" {
 		t.Errorf("Invalid value. Instead of 'ba bbbbbb', we have '%s'.", fi.value)
 	}
-	fi.CharCallback('b', 0.1)
-	if fi.value != "ba bbbbbb" {
-		t.Log(len(fi.value))
-		t.Log(fi.value)
-		t.Log(fi.maxLen)
-		t.Errorf("Invalid value. Instead of 'ba bbbbbb', we have '%s'.", fi.value)
+	valueBase := "ba bbbbbb"
+	for i := 0; i < 15; i++ {
+		valueBase = valueBase + "b"
+		fi.CharCallback('b', 0.1)
+		if fi.value != valueBase {
+			t.Errorf("Invalid value (%d). Instead of '%s', we have '%s'.", i, valueBase, fi.value)
+		}
+	}
+	for i := 0; i < 10; i++ {
+		fi.CharCallback('b', 0.1)
+		if fi.value != valueBase {
+			t.Errorf("Invalid value (%d). Instead of '%s', we have '%s'.", i, valueBase, fi.value)
+		}
 	}
 }
 func TestFormItemTextValueToString(t *testing.T) {
@@ -2055,9 +2062,14 @@ func TestFormItemInt64CharCallback(t *testing.T) {
 		t.Errorf("Invalid value. Instead of '1', we have '%s'.", fi.value)
 	}
 	fi.value = strconv.Itoa(math.MaxInt64 - 10)
+	maxVal := strconv.Itoa(math.MaxInt64-10) + "1"
 	fi.CharCallback('1', 0.1)
-	if fi.value != strconv.Itoa(math.MaxInt64-10) {
-		t.Errorf("Invalid value. Instead of '%d', we have '%s'.", math.MaxInt64-10, fi.value)
+	if fi.value != maxVal {
+		t.Errorf("Invalid value. Instead of '%s', we have '%s'.", maxVal, fi.value)
+	}
+	fi.CharCallback('1', 0.1)
+	if fi.value != maxVal {
+		t.Errorf("Invalid value. Instead of '%s', we have '%s'.", maxVal, fi.value)
 	}
 }
 func TestFormItemInt64ValueToString(t *testing.T) {

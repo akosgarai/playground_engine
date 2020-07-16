@@ -16,6 +16,10 @@ const (
 	ITEM_WIDTH_LONG        = float32(2.0 / 3.0)
 	ITEM_WIDTH_SHORT       = float32(1.0 / 3.0)
 	ITEM_HEIGHT_MULTIPLIER = float32(0.1 / 1.96)
+	CHAR_NUM_INT           = 10
+	CHAR_NUM_FLOAT         = 10
+	CHAR_NUM_INT64         = 20
+	CHAR_NUM_TEXT          = 25
 )
 
 type FormItemBase struct {

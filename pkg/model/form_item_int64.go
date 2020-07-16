@@ -22,7 +22,7 @@ func (fi *FormItemInt64) GetValue() int64 {
 
 // NewFormItemInt64 returns a form item that maintains an int64 value.
 func NewFormItemInt64(maxWidth, itemWidth float32, label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemInt64 {
-	base := NewFormItemCharBase(maxWidth, itemWidth, label, mat, position, wrapper)
+	base := NewFormItemCharBase(maxWidth, itemWidth, label, CHAR_NUM_INT64, mat, position, wrapper)
 	return &FormItemInt64{
 		FormItemCharBase: base,
 		typeState:        "P",
@@ -89,7 +89,7 @@ func (fi *FormItemInt64) pushState(r rune) {
 
 // CharCallback validates the input character and appends it to the value if valid.
 func (fi *FormItemInt64) CharCallback(r rune, offsetX float32) {
-	if !fi.validRune(r) || len(fi.value) > fi.maxLen {
+	if !fi.validRune(r) || len(fi.value) >= fi.maxLen {
 		return
 	}
 	fi.value = fi.value + string(r)
