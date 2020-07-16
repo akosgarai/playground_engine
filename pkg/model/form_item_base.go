@@ -22,6 +22,11 @@ const (
 	CHAR_NUM_TEXT          = 35
 )
 
+type FloatValidator func(f float32) bool
+type Int64Validator func(i int64) bool
+type IntValidator func(i int) bool
+type StringValidator func(s string) bool
+
 type FormItemBase struct {
 	*BaseModel
 	width float32

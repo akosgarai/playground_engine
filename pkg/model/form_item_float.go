@@ -13,6 +13,7 @@ import (
 type FormItemFloat struct {
 	*FormItemCharBase
 	typeState string
+	validator FloatValidator
 }
 
 // GetValue returns the value of the form item. If the value can't parse as float32,
@@ -32,7 +33,13 @@ func NewFormItemFloat(maxWidth, itemWidth float32, label string, mat *material.M
 	return &FormItemFloat{
 		FormItemCharBase: base,
 		typeState:        "P",
+		validator:        nil,
 	}
+}
+
+// SetValidator sets the validator function
+func (fi *FormItemFloat) SetValidator(validator FloatValidator) {
+	fi.validator = validator
 }
 
 func (fi *FormItemFloat) pushState(r rune) {
@@ -156,6 +163,11 @@ func (fi *FormItemFloat) CharCallback(r rune, offsetX float32) {
 	fi.value = fi.value + string(r)
 	fi.MoveCursorWithOffset(offsetX)
 	fi.pushState(r)
+	if fi.validator != nil {
+		if !fi.validator(fi.GetValue()) {
+			fi.DeleteLastCharacter()
+		}
+	}
 }
 
 // DeleteLastCharacter removes the last typed character from the form item.

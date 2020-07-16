@@ -12,6 +12,7 @@ import (
 type FormItemInt64 struct {
 	*FormItemCharBase
 	typeState string
+	validator Int64Validator
 }
 
 // GetValue returns the value of the form item.
@@ -26,7 +27,13 @@ func NewFormItemInt64(maxWidth, itemWidth float32, label string, mat *material.M
 	return &FormItemInt64{
 		FormItemCharBase: base,
 		typeState:        "P",
+		validator:        nil,
 	}
+}
+
+// SetValidator sets the validator function
+func (fi *FormItemInt64) SetValidator(validator Int64Validator) {
+	fi.validator = validator
 }
 
 func (fi *FormItemInt64) validRune(r rune) bool {
@@ -95,6 +102,11 @@ func (fi *FormItemInt64) CharCallback(r rune, offsetX float32) {
 	fi.value = fi.value + string(r)
 	fi.MoveCursorWithOffset(offsetX)
 	fi.pushState(r)
+	if fi.validator != nil {
+		if !fi.validator(fi.GetValue()) {
+			fi.DeleteLastCharacter()
+		}
+	}
 }
 
 // DeleteLastCharacter removes the last typed character from the form item.
