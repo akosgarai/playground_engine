@@ -90,7 +90,7 @@ func (fi *FormItemBase) GetTargetHeight() float32 {
 // GetTargetWidth returns the width size of the target mesh
 // (text area, button)
 func (fi *FormItemBase) GetTargetWidth() float32 {
-	return fi.getWidthWithoutLabel() * 0.97
+	return fi.getWidthWithoutLabel() * 0.95
 }
 func (fi *FormItemBase) getWidthWithoutLabel() float32 {
 	return fi.GetFormItemWidth() - fi.GetLabelAreaWidth()
