@@ -249,9 +249,9 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	if closestDistance <= minDiff+0.01 {
 		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 		tmMesh.Material = material.Ruby
-		f.deleteCursor()
-		f.sinceLastClick = 0
 		if buttonStore.Get(LEFT_MOUSE_BUTTON) && f.sinceLastClick > EventEpsilon {
+			f.deleteCursor()
+			f.sinceLastClick = 0
 			switch f.closestModel.(type) {
 			case *model.FormItemBool:
 				formModel := f.closestModel.(*model.FormItemBool)
