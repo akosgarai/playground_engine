@@ -1915,7 +1915,7 @@ func TestFormItemTextCharCallback(t *testing.T) {
 		t.Errorf("Invalid value. Instead of 'ba bbbbbb', we have '%s'.", fi.value)
 	}
 	valueBase := "ba bbbbbb"
-	for i := 0; i < 15; i++ {
+	for i := 0; i < 25; i++ {
 		valueBase = valueBase + "b"
 		fi.CharCallback('b', 0.1)
 		if fi.value != valueBase {
