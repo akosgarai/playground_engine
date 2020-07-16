@@ -122,10 +122,13 @@ type Model interface {
 	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
 	Clear()
 	AddMesh(Mesh)
+	RotateX(float32)
+	RotateY(float32)
 }
 type FormItem interface {
 	Model
 	GetLabel() string
+	GetSurface() Mesh
 	ValueToString() string
 }
 type CharFormItem interface {

@@ -110,4 +110,60 @@ This screen is for displaying menus. It holds a Charset model, a texture for the
 
 ### FormScreen
 
-This screen is for displaying forms, like a settings page.
+This screen is for displaying forms, like a settings page. For displaying stuff, it uses the following system:
+
+- Full width items for text inputs.
+- Half width items for int / float inputs.
+- Long width items for int64 inputs.
+- Short width items for bool inputs.
+
+Positioning:
+
+**8 Possible position**:
+- Full item position (**F**)
+- Left Half item position (**LH**)
+- Right Half item position (**RH**)
+- Left Short item position (**LS**)
+- Middle Short item position (**MS**)
+- Right Short item position (**RS**)
+- Left Long item position (**LL**)
+- Right Long item position (**RL**)
+
+State machine for position step:
+- Initial state: **F**
+- Next state is calculated based on the current state & the current item width.
+
+```
+F   -(Full)->   F
+F   -(Half)->   LH
+F   -(Long)->   LL
+F   -(Short)->  LS
+LH  -(Full)->   F
+LH  -(Half)->   RH
+LH  -(Long)->   LL
+LH  -(Short)->  RS
+RH  -(Full)->   F
+RH  -(Half)->   LH
+RH  -(Long)->   LL
+RH  -(Short)->  LS
+LL  -(Full)->   F
+LL  -(Half)->   LH
+LL  -(Long)->   LL
+LL  -(Short)->  RS
+RL  -(Full)->   F
+RL  -(Half)->   LH
+RL  -(Long)->   LL
+RL  -(Short)->  LS
+LS  -(Full)->   F
+LS  -(Half)->   RH
+LS  -(Long)->   RL
+LS  -(Short)->  MS
+MS  -(Full)->   F
+MS  -(Half)->   LH
+MS  -(Long)->   LL
+MS  -(Short)->  RS
+RS  -(Full)->   F
+RS  -(Half)->   LH
+RS  -(Long)->   LL
+RS  -(Short)->  LS
+```

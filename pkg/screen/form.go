@@ -21,17 +21,26 @@ import (
 
 const (
 	FontFile           = "/assets/fonts/Frijole/Frijole-Regular.ttf"
-	BottomFrameWidth   = float32(2.0)
+	BottomFrameWidth   = float32(2.0) // the full width of the screen.
 	BottomFrameLength  = float32(0.02)
 	SideFrameLength    = float32(1.98)
-	SideFrameWidth     = float32(0.02)
+	SideFrameWidth     = float32(0.02) // the width of the border frames.
 	TopLeftFrameWidth  = float32(0.1)
+	FullWidth          = BottomFrameWidth - 2*SideFrameWidth
 	CameraMoveSpeed    = 0.005
 	LightConstantTerm  = float32(1.0)
 	LightLinearTerm    = float32(0.14)
 	LightQuadraticTerm = float32(0.07)
 	EventEpsilon       = 200
 	BACK_SPACE         = glfw.KeyBackspace
+
+	FullX       = 0
+	HalfLeftX   = 0.4
+	HalfRigthX  = -0.4
+	LongLeftX   = 0.4
+	LongRightX  = -0.4
+	ShortLeftX  = 0.4
+	ShortRightX = 0.4
 )
 
 var (
@@ -60,6 +69,9 @@ type FormScreen struct {
 	sinceLastClick  float64
 	sinceLastDelete float64
 	underEdit       interfaces.CharFormItem
+	// Item position
+	currentY      float32
+	lastItemState string
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
@@ -156,6 +168,8 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 		frame:          frame,
 		header:         label,
 		sinceLastClick: 0,
+		currentY:       0.9,
+		lastItemState:  "F",
 	}
 }
 
@@ -354,105 +368,54 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	}
 }
 
-// AddFormItemBool is for adding a bool form item to the form. It returns the index of the
-// inserted item.
-func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, defaultValue bool) int {
-	// calculate the position of the option:
-	// - bottom of the header: 0.85
-	// - formItem: 0.1
-	// - first form item Y: 0.80
-	// - left col X: 0.49
-	// - right col X: -0.49
-	lenItems := len(f.formItems)
-	posX := model.FormItemWidth / 2
-	if lenItems%2 == 1 {
-		posX = -1.0 * posX
-	}
-	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemBool(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
-	fi.SetValue(defaultValue)
+func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWrapper, defaultValue interface{}) int {
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
 	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
+	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
 	return len(f.formItems) - 1
+}
+
+// AddFormItemBool is for adding a bool form item to the form. It returns the index of the
+// inserted item.
+func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, defaultValue bool) int {
+	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	return f.addFormItem(fi, wrapper, defaultValue)
 }
 
 // AddFormItemInt is for adding an integer form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	lenItems := len(f.formItems)
-	posX := model.FormItemWidth / 2
-	if lenItems%2 == 1 {
-		posX = -1.0 * posX
-	}
-	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemInt(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
-	fi.RotateX(-90)
-	fi.RotateY(180)
-	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	f.formItems = append(f.formItems, fi)
-	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
-	return len(f.formItems) - 1
+	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	return f.addFormItem(fi, wrapper, defaultValue)
 }
 
 // AddFormItemFloat is for adding a float form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	lenItems := len(f.formItems)
-	posX := model.FormItemWidth / 2
-	if lenItems%2 == 1 {
-		posX = -1.0 * posX
-	}
-	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemFloat(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
-	fi.RotateX(-90)
-	fi.RotateY(180)
-	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	f.formItems = append(f.formItems, fi)
-	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
-	return len(f.formItems) - 1
+	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	return f.addFormItem(fi, wrapper, defaultValue)
 }
 
 // AddFormItemText is for adding a text form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	lenItems := len(f.formItems)
-	posX := model.FormItemWidth / 2
-	if lenItems%2 == 1 {
-		posX = -1.0 * posX
-	}
-	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemText(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
-	fi.RotateX(-90)
-	fi.RotateY(180)
-	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	f.formItems = append(f.formItems, fi)
-	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
-	return len(f.formItems) - 1
+	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	return f.addFormItem(fi, wrapper, defaultValue)
 }
 
 // AddFormItemInt64 is for adding an int64 form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	lenItems := len(f.formItems)
-	posX := model.FormItemWidth / 2
-	if lenItems%2 == 1 {
-		posX = -1.0 * posX
-	}
-	posY := 0.80 - float32((lenItems/2))*0.1
-	fi := model.NewFormItemInt64(BottomFrameWidth-2*BottomFrameLength, formLabel, material.Whiteplastic, mgl32.Vec3{posX, posY, 0}, wrapper)
-	fi.RotateX(-90)
-	fi.RotateY(180)
-	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -0.48, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	f.formItems = append(f.formItems, fi)
-	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
-	return len(f.formItems) - 1
+	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	return f.addFormItem(fi, wrapper, defaultValue)
 }
 func (f *FormScreen) setDefaultValueChar(input string, wrapper interfaces.GLWrapper) {
 	chars := []rune(input)
@@ -556,4 +519,127 @@ func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper i
 		fi.SetValue(valueNew.(bool))
 		break
 	}
+}
+func (f *FormScreen) pushState(itemWidth float32) {
+	switch f.lastItemState {
+	case "F", "RH", "RL", "RS":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			f.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			f.lastItemState = "LH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			f.lastItemState = "LL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			f.lastItemState = "LS"
+			break
+		}
+		break
+	case "LH":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			f.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			f.lastItemState = "RH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			f.lastItemState = "LL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			f.lastItemState = "RS"
+			break
+		}
+		break
+	case "LL":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			f.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			f.lastItemState = "LH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			f.lastItemState = "LL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			f.lastItemState = "RS"
+			break
+		}
+		break
+	case "LS":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			f.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			f.lastItemState = "RH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			f.lastItemState = "RL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			f.lastItemState = "MS"
+			break
+		}
+		break
+	case "MS":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			f.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			f.lastItemState = "LH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			f.lastItemState = "LL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			f.lastItemState = "RS"
+			break
+		}
+		break
+	default:
+		panic("Unhandled state.")
+	}
+}
+func (f *FormScreen) itemPosition(itemWidth, itemHeight float32) mgl32.Vec3 {
+	f.pushState(itemWidth)
+	fullWidth := BottomFrameWidth - SideFrameWidth
+	var x float32
+	switch f.lastItemState {
+	case "F":
+		f.currentY = f.currentY - itemHeight
+		x = 0.0
+		break
+	case "LH":
+		f.currentY = f.currentY - itemHeight
+		x = fullWidth / 4
+		break
+	case "LL":
+		f.currentY = f.currentY - itemHeight
+		x = fullWidth / 6
+		break
+	case "LS":
+		f.currentY = f.currentY - itemHeight
+		x = fullWidth / 3
+		break
+	case "RH":
+		x = -fullWidth / 4
+		break
+	case "RL":
+		x = -fullWidth / 6
+		break
+	case "RS":
+		x = -fullWidth / 3
+		break
+	case "MS":
+		x = 0.0
+		break
+	}
+
+	return mgl32.Vec3{x, f.currentY, 0}
 }
