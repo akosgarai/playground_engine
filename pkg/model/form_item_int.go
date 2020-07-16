@@ -12,6 +12,7 @@ import (
 type FormItemInt struct {
 	*FormItemCharBase
 	typeState string
+	validator IntValidator
 }
 
 // GetValue returns the value of the form item.
@@ -26,6 +27,7 @@ func NewFormItemInt(maxWidth, itemWidth float32, label string, mat *material.Mat
 	return &FormItemInt{
 		FormItemCharBase: base,
 		typeState:        "P",
+		validator:        nil,
 	}
 }
 
@@ -94,6 +96,11 @@ func (fi *FormItemInt) CharCallback(r rune, offsetX float32) {
 	fi.value = fi.value + string(r)
 	fi.MoveCursorWithOffset(offsetX)
 	fi.pushState(r)
+	if fi.validator != nil {
+		if !fi.validator(fi.GetValue()) {
+			fi.DeleteLastCharacter()
+		}
+	}
 }
 
 // DeleteLastCharacter removes the last typed character from the form item.
