@@ -372,7 +372,7 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWr
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -fi.GetFormItemWidth()/2, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, -0.01, 1.0/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
 	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
 	return len(f.formItems) - 1
