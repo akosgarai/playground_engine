@@ -381,7 +381,7 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWr
 // AddFormItemBool is for adding a bool form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, defaultValue bool) int {
-	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
 	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
@@ -389,7 +389,7 @@ func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrap
 // AddFormItemInt is for adding an integer form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
 	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
@@ -397,7 +397,7 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 // AddFormItemFloat is for adding a float form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
 	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
@@ -405,7 +405,7 @@ func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWra
 // AddFormItemText is for adding a text form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
 	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
@@ -413,7 +413,7 @@ func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrap
 // AddFormItemInt64 is for adding an int64 form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper, defaultValue string) int {
-	pos := f.itemPosition(FullWidth*model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
 	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
@@ -536,6 +536,8 @@ func (f *FormScreen) pushState(itemWidth float32) {
 		case model.ITEM_WIDTH_SHORT:
 			f.lastItemState = "LS"
 			break
+		default:
+			panic("Unhandled state.")
 		}
 		break
 	case "LH":
@@ -552,6 +554,8 @@ func (f *FormScreen) pushState(itemWidth float32) {
 		case model.ITEM_WIDTH_SHORT:
 			f.lastItemState = "RS"
 			break
+		default:
+			panic("Unhandled state.")
 		}
 		break
 	case "LL":
@@ -568,6 +572,8 @@ func (f *FormScreen) pushState(itemWidth float32) {
 		case model.ITEM_WIDTH_SHORT:
 			f.lastItemState = "RS"
 			break
+		default:
+			panic("Unhandled state.")
 		}
 		break
 	case "LS":
@@ -584,6 +590,8 @@ func (f *FormScreen) pushState(itemWidth float32) {
 		case model.ITEM_WIDTH_SHORT:
 			f.lastItemState = "MS"
 			break
+		default:
+			panic("Unhandled state.")
 		}
 		break
 	case "MS":
@@ -600,6 +608,8 @@ func (f *FormScreen) pushState(itemWidth float32) {
 		case model.ITEM_WIDTH_SHORT:
 			f.lastItemState = "RS"
 			break
+		default:
+			panic("Unhandled state.")
 		}
 		break
 	default:
@@ -608,7 +618,6 @@ func (f *FormScreen) pushState(itemWidth float32) {
 }
 func (f *FormScreen) itemPosition(itemWidth, itemHeight float32) mgl32.Vec3 {
 	f.pushState(itemWidth)
-	fullWidth := BottomFrameWidth - SideFrameWidth
 	var x float32
 	switch f.lastItemState {
 	case "F":
@@ -617,24 +626,24 @@ func (f *FormScreen) itemPosition(itemWidth, itemHeight float32) mgl32.Vec3 {
 		break
 	case "LH":
 		f.currentY = f.currentY - itemHeight
-		x = fullWidth / 4
+		x = FullWidth / 4
 		break
 	case "LL":
 		f.currentY = f.currentY - itemHeight
-		x = fullWidth / 6
+		x = FullWidth / 6
 		break
 	case "LS":
 		f.currentY = f.currentY - itemHeight
-		x = fullWidth / 3
+		x = FullWidth / 3
 		break
 	case "RH":
-		x = -fullWidth / 4
+		x = -FullWidth / 4
 		break
 	case "RL":
-		x = -fullWidth / 6
+		x = -FullWidth / 6
 		break
 	case "RS":
-		x = -fullWidth / 3
+		x = -FullWidth / 3
 		break
 	case "MS":
 		x = 0.0
