@@ -19,7 +19,7 @@ const (
 	CHAR_NUM_INT           = 10
 	CHAR_NUM_FLOAT         = 10
 	CHAR_NUM_INT64         = 20
-	CHAR_NUM_TEXT          = 25
+	CHAR_NUM_TEXT          = 35
 )
 
 type FormItemBase struct {
