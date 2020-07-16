@@ -131,6 +131,7 @@ type FormItem interface {
 	GetSurface() Mesh
 	ValueToString() string
 	GetLabelAreaWidth() float32
+	GetFormItemWidth() float32
 }
 type CharFormItem interface {
 	FormItem
