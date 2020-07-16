@@ -98,7 +98,7 @@ func (fi *FormItemBase) getWidthWithoutLabel() float32 {
 
 // GetTargetPosition returns the position vector of the target mesh.
 func (fi *FormItemBase) GetTargetPosition() mgl32.Vec3 {
-	pX := -fi.GetFormItemWidth()/2 + fi.GetLabelAreaWidth() + (fi.getWidthWithoutLabel() / 2)
+	pX := -fi.GetFormItemWidth()/2 + fi.GetLabelAreaWidth() + (fi.GetTargetWidth() / 2)
 	return mgl32.Vec3{pX, -0.01, 0.0}
 }
 
