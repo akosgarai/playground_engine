@@ -287,8 +287,9 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				msh, _ := formModel.ClosestMeshTo(mgl32.Vec3{coords.X(), coords.Y(), coords.Z() - 0.01})
 				index := formModel.GetIndex(msh)
 				if index > -1 {
-					formModel.SetTarget(index)
+					formModel.SetTarget(index - 1)
 				}
+				formModel.AddCursor()
 				f.underEdit = formModel
 				break
 			}
