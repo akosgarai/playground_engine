@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
@@ -81,7 +82,7 @@ func (fi *FormItemVector) cursorOffsetX() float32 {
 }
 func (fi *FormItemVector) GetIndex(m interfaces.Mesh) int {
 	for i, _ := range fi.meshes {
-		if fi.meshes[i] == m {
+		if reflect.DeepEqual(m, reflect.ValueOf(fi.meshes[i]).Interface()) {
 			return i
 		}
 	}
