@@ -141,6 +141,10 @@ type CharFormItem interface {
 	CharCallback(rune, float32)
 	GetTarget() Mesh
 }
+type VectorFormItem interface {
+	CharFormItem
+	SetTarget(int)
+}
 
 type KeyStore interface {
 	Get(glfw.Key) bool
