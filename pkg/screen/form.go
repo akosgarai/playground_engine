@@ -284,7 +284,8 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				break
 			case *model.FormItemVector:
 				formModel := f.closestModel.(*model.FormItemVector)
-				index := formModel.GetIndex(f.closestMesh)
+				msh, _ := formModel.ClosestMeshTo(mgl32.Vec3{coords.X(), coords.Y(), coords.Z() - 0.01})
+				index := formModel.GetIndex(msh)
 				if index > -1 {
 					formModel.SetTarget(index)
 				}

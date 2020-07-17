@@ -229,7 +229,7 @@ func (m *Model) ClosestMeshTo(position mgl32.Vec3) (interfaces.Mesh, float32) {
 				distance = bs.Distance([3]float32{position.X(), position.Y(), position.Z()})
 
 			}
-			if distance <= closest {
+			if distance < closest {
 				closest = distance
 				closestMesh = m.meshes[i]
 			}
