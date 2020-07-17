@@ -117,7 +117,7 @@ func (fi *FormItemBase) GetVectorTargetPosition(index int) mgl32.Vec3 {
 
 // GetVectorTargetWidth returns the width of a vector target item.
 func (fi *FormItemBase) GetVectorTargetWidth() float32 {
-	return fi.getWidthWithoutLabel() / 3.0
+	return fi.getWidthWithoutLabel() / 3.0 * 0.95
 }
 
 // GetCursorHeight returns the height size of the cursor.
