@@ -367,7 +367,7 @@ func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWra
 
 // AddFormItemVector is for adding a vector form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemVector(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.FloatValidator) int {
+func (f *FormScreen) AddFormItemVector(formLabel string, wrapper interfaces.GLWrapper, defaultValue [3]string, validator model.FloatValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
 	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, formLabel, model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
