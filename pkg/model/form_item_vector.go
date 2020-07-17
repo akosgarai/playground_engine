@@ -83,6 +83,7 @@ func (fi *FormItemVector) cursorOffsetX() float32 {
 func (fi *FormItemVector) GetIndex(m interfaces.Mesh) int {
 	for i, _ := range fi.meshes {
 		if reflect.DeepEqual(m, reflect.ValueOf(fi.meshes[i]).Interface()) {
+			fmt.Printf("Same stuff: %#v\n", m)
 			return i
 		}
 	}
