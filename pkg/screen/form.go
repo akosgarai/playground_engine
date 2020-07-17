@@ -198,6 +198,11 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
 				surfaceMesh.Material = DefaultFormItemMaterial
 				break
+			case *model.FormItemVector:
+				fi := f.shaderMap[s][index].(*model.FormItemVector)
+				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
+				surfaceMesh.Material = DefaultFormItemMaterial
+				break
 			}
 		}
 	}
@@ -277,6 +282,14 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				formModel.AddCursor()
 				f.underEdit = formModel
 				break
+			case *model.FormItemVector:
+				formModel := f.closestModel.(*model.FormItemVector)
+				index := formModel.GetIndex(f.closestMesh)
+				if index > -1 {
+					formModel.SetTarget(index)
+				}
+				f.underEdit = formModel
+				break
 			}
 		}
 	}
@@ -346,6 +359,17 @@ func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrap
 func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.Int64Validator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_LONG, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
 	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, formLabel, material.Whiteplastic, pos, wrapper)
+	if validator != nil {
+		fi.SetValidator(validator)
+	}
+	return f.addFormItem(fi, wrapper, defaultValue)
+}
+
+// AddFormItemVector is for adding a vector form item to the form. It returns the index of the
+// inserted item.
+func (f *FormScreen) AddFormItemVector(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.FloatValidator) int {
+	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, formLabel, model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -421,6 +445,19 @@ func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper i
 	case *model.FormItemBool:
 		fi := item.(*model.FormItemBool)
 		fi.SetValue(valueNew.(bool))
+		break
+	case *model.FormItemVector:
+		f.underEdit = item.(*model.FormItemVector)
+		newValues := valueNew.([3]string)
+		for i := 0; i < 3; i++ {
+			item.(*model.FormItemVector).SetTarget(i)
+			value := f.underEdit.ValueToString()
+			valueLength := len(value) + strings.Count(value, " ")
+			for i := 0; i < valueLength; i++ {
+				f.underEdit.DeleteLastCharacter()
+			}
+			f.setDefaultValueChar(newValues[i], wrapper)
+		}
 		break
 	}
 }

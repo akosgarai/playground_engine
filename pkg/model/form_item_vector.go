@@ -79,6 +79,14 @@ func (fi *FormItemVector) cursorOffsetX() float32 {
 	}
 	return result
 }
+func (fi *FormItemVector) GetIndex(m interfaces.Mesh) int {
+	for i, _ := range fi.meshes {
+		if fi.meshes[i] == m {
+			return i
+		}
+	}
+	return -1
+}
 
 // GetTarget returns the input target Mesh
 func (fi *FormItemVector) GetTarget() interfaces.Mesh {
