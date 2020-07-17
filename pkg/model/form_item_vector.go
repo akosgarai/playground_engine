@@ -32,7 +32,7 @@ func NewFormItemVector(maxWidth, widthRatio float32, label string, inputMaxLen i
 	var writableTexture texture.Textures
 	writableTexture.AddTexture(baseDirModel()+"/assets/paper.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.diffuse", wrapper)
 	writableTexture.AddTexture(baseDirModel()+"/assets/paper.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "tex.specular", wrapper)
-	writablePrimitive := rectangle.NewExact(m.GetTargetWidth(), m.GetTargetHeight())
+	writablePrimitive := rectangle.NewExact(m.GetVectorTargetWidth(), m.GetTargetHeight())
 
 	cursorPrimitive := rectangle.NewExact(m.GetCursorWidth(), m.GetCursorHeight())
 	var cursorTex texture.Textures
