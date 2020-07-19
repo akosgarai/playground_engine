@@ -38,12 +38,13 @@ const (
 )
 
 var (
-	DirectionalLightDirection = (mgl32.Vec3{0.0, 0.0, 1.0}).Normalize()
+	DirectionalLightDirection = mgl32.Vec3{0.0, 0.0, 1.0}.Normalize()
 	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
 
-	DefaultFormItemMaterial = material.Whiteplastic
+	DefaultFormItemMaterial   = material.Whiteplastic
+	HighlightFormItemMaterial = material.Ruby
 )
 
 type FormScreen struct {
@@ -60,6 +61,8 @@ type FormScreen struct {
 	// Item position
 	currentY      float32
 	lastItemState string
+	// Info box for displaying the details of the form items.
+	detailContentBox interfaces.Mesh
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
@@ -141,29 +144,33 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	textContainer.RotateY(180)
 	chars.PrintTo("Settings", -textWidth/2, -0.05, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, 0.0}, frame, wrapper)
+	detailContainer := frameRectangle(FullWidth, 0.3, mgl32.Vec3{-1.0 + BottomFrameLength + 0.15, 0.0, 0.0}, DefaultFormItemMaterial, wrapper)
 	frameModel.AddMesh(bottomFrame)
 	frameModel.AddMesh(leftFrame)
 	frameModel.AddMesh(rightFrame)
 	frameModel.AddMesh(topLeftFrame)
 	frameModel.AddMesh(topRightFrame)
+	frameModel.AddMesh(detailContainer)
 	s.AddModelToShader(frameModel, frameShaderApplication)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
-		ScreenBase:     s,
-		charset:        chars,
-		background:     background,
-		bgShader:       bgShaderApplication,
-		frame:          frame,
-		header:         label,
-		sinceLastClick: 0,
-		currentY:       0.9,
-		lastItemState:  "F",
+		ScreenBase:       s,
+		charset:          chars,
+		background:       background,
+		bgShader:         bgShaderApplication,
+		frame:            frame,
+		header:           label,
+		sinceLastClick:   0,
+		currentY:         0.9,
+		lastItemState:    "F",
+		detailContentBox: detailContainer,
 	}
 }
 
 // initMaterialForTheFormItems sets the material to the default of the form items.
 // It could be used un the update loop to make all of them to default state.
 func (f *FormScreen) initMaterialForTheFormItems() {
+	f.charset.CleanSurface(f.detailContentBox)
 	for s, _ := range f.shaderMap {
 		for index, _ := range f.shaderMap[s] {
 			switch f.shaderMap[s][index].(type) {
@@ -188,9 +195,9 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 				surfaceMesh.Material = DefaultFormItemMaterial
 				lightMesh := fi.GetLight().(*mesh.TexturedMaterialMesh)
 				if fi.GetValue() {
-					lightMesh.Material = material.Ruby
+					lightMesh.Material = HighlightFormItemMaterial
 				} else {
-					lightMesh.Material = material.Whiteplastic
+					lightMesh.Material = DefaultFormItemMaterial
 				}
 				break
 			case *model.FormItemInt64:
@@ -214,6 +221,14 @@ func (f *FormScreen) deleteCursor() {
 		f.underEdit.DeleteCursor()
 		f.underEdit = nil
 	}
+}
+
+// highlightFormAction updates the material of the closest mesh.
+// It also prints the details of the form item to the detail content box.
+func (f *FormScreen) highlightFormAction(desc string) {
+	tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
+	tmMesh.Material = HighlightFormItemMaterial
+	f.charset.PrintTo(desc, -FullWidth/2, -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 }
 
 // Update loops on the shaderMap, and calls Update function on every Model.
@@ -251,9 +266,8 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 
 	f.initMaterialForTheFormItems()
 	minDiff := float32(0.0)
+	desc := ""
 	if closestDistance <= minDiff+0.01 {
-		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-		tmMesh.Material = material.Ruby
 		if buttonStore.Get(LEFT_MOUSE_BUTTON) && f.sinceLastClick > EventEpsilon {
 			f.deleteCursor()
 			f.sinceLastClick = 0
@@ -261,25 +275,30 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			case *model.FormItemBool:
 				formModel := f.closestModel.(*model.FormItemBool)
 				formModel.SetValue(!formModel.GetValue())
+				desc = formModel.GetDescription()
 				break
 			case *model.FormItemInt:
 				formModel := f.closestModel.(*model.FormItemInt)
 				formModel.AddCursor()
+				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			case *model.FormItemFloat:
 				formModel := f.closestModel.(*model.FormItemFloat)
 				formModel.AddCursor()
+				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			case *model.FormItemText:
 				formModel := f.closestModel.(*model.FormItemText)
 				formModel.AddCursor()
+				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			case *model.FormItemInt64:
 				formModel := f.closestModel.(*model.FormItemInt64)
 				formModel.AddCursor()
+				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			case *model.FormItemVector:
@@ -290,10 +309,12 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 					formModel.SetTarget(index - 1)
 				}
 				formModel.AddCursor()
+				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			}
 		}
+		f.highlightFormAction(desc)
 	}
 	if keyStore.Get(BACK_SPACE) && f.sinceLastDelete > EventEpsilon {
 		f.sinceLastDelete = 0
