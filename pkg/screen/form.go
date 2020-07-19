@@ -150,7 +150,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	frameModel.AddMesh(rightFrame)
 	frameModel.AddMesh(topLeftFrame)
 	frameModel.AddMesh(topRightFrame)
-	frameModel.AddMesh(detailContainer)
+	background.AddMesh(detailContainer)
 	s.AddModelToShader(frameModel, frameShaderApplication)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
