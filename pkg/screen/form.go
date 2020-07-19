@@ -224,6 +224,32 @@ func (f *FormScreen) deleteCursor() {
 		f.underEdit = nil
 	}
 }
+func (f *FormScreen) wrapTextToLines(desc string, scale, maxLineWidth float32) []string {
+	words := strings.Split(desc, " ")
+	var result []string
+	line := ""
+	for i := 0; i < len(words); i++ {
+		lineWithNextWorld := line + words[i]
+		width := f.charset.TextWidth(lineWithNextWorld, scale)
+		if width > maxLineWidth {
+			result = append(result, line)
+			line = words[i]
+			continue
+		}
+		if i < len(words)-1 {
+			lineWithNextWorld = line + words[i] + " "
+			width = f.charset.TextWidth(lineWithNextWorld, scale)
+			if width > maxLineWidth {
+				result = append(result, line+words[i])
+				line = ""
+				continue
+			}
+		}
+		line = lineWithNextWorld
+	}
+	result = append(result, line)
+	return result
+}
 
 // highlightFormAction updates the material of the closest mesh.
 // It also prints the details of the form item to the detail content box.
@@ -231,7 +257,10 @@ func (f *FormScreen) highlightFormAction() {
 	tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 	tmMesh.Material = HighlightFormItemMaterial
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
-	f.charset.PrintTo(desc, -FullWidth/2, 0.14, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWindth, FullWidth)
+	for i := 0; i < len(lines); i++ {
+		f.charset.PrintTo(lines[i], -FullWidth/2, 0.14-float32(i)*0.1, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+	}
 }
 
 // Update loops on the shaderMap, and calls Update function on every Model.
