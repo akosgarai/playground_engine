@@ -231,7 +231,7 @@ func (f *FormScreen) highlightFormAction() {
 	tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 	tmMesh.Material = HighlightFormItemMaterial
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
-	f.charset.PrintTo(desc, -FullWidth/2, -0.1, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+	f.charset.PrintTo(desc, -FullWidth/2, 0.14, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 }
 
 // Update loops on the shaderMap, and calls Update function on every Model.
