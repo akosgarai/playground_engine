@@ -22,8 +22,8 @@ func (fi *FormItemInt) GetValue() int {
 }
 
 // NewFormItemInt returns a form item that maintains an integer value.
-func NewFormItemInt(maxWidth, itemWidth float32, label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemInt {
-	base := NewFormItemCharBase(maxWidth, itemWidth, label, CHAR_NUM_INT, mat, position, wrapper)
+func NewFormItemInt(maxWidth, itemWidth float32, label, description string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemInt {
+	base := NewFormItemCharBase(maxWidth, itemWidth, label, description, CHAR_NUM_INT, mat, position, wrapper)
 	return &FormItemInt{
 		FormItemCharBase: base,
 		typeState:        "P",

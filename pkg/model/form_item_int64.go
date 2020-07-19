@@ -22,8 +22,8 @@ func (fi *FormItemInt64) GetValue() int64 {
 }
 
 // NewFormItemInt64 returns a form item that maintains an int64 value.
-func NewFormItemInt64(maxWidth, itemWidth float32, label string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemInt64 {
-	base := NewFormItemCharBase(maxWidth, itemWidth, label, CHAR_NUM_INT64, mat, position, wrapper)
+func NewFormItemInt64(maxWidth, itemWidth float32, label, description string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemInt64 {
+	base := NewFormItemCharBase(maxWidth, itemWidth, label, description, CHAR_NUM_INT64, mat, position, wrapper)
 	return &FormItemInt64{
 		FormItemCharBase: base,
 		typeState:        "P",

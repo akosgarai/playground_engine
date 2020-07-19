@@ -17,10 +17,11 @@ import (
 )
 
 const (
-	InvalidFilename      = "not-existing-file.obj"
-	ValidFilename        = "testdata/test_cube.obj"
-	DefaultFormItemLabel = "form item label"
-	DefaultMaxWidth      = float32(1.96)
+	InvalidFilename            = "not-existing-file.obj"
+	ValidFilename              = "testdata/test_cube.obj"
+	DefaultFormItemLabel       = "form item label"
+	DefaultFormItemDescription = "form item description."
+	DefaultMaxWidth            = float32(1.96)
 )
 
 var (
@@ -1212,10 +1213,13 @@ func TestCharsetTextWidth(t *testing.T) {
 func testFormItemBool(t *testing.T) *FormItemBool {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemBool(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemBool(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, DefaultFormItemDescription, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	if fi.description != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.description)
 	}
 	return fi
 }
@@ -1227,7 +1231,12 @@ func TestFormItemBoolGetLabel(t *testing.T) {
 	if fi.GetLabel() != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
 	}
-
+}
+func TestFormItemBoolGetDescription(t *testing.T) {
+	fi := testFormItemBool(t)
+	if fi.GetDescription() != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.GetDescription())
+	}
 }
 func TestFormItemBoolGetValue(t *testing.T) {
 	fi := testFormItemBool(t)
@@ -1271,10 +1280,13 @@ func TestFormItemBoolValueToString(t *testing.T) {
 func testFormItemInt(t *testing.T) *FormItemInt {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemInt(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemInt(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, DefaultFormItemDescription, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	if fi.description != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.description)
 	}
 	return fi
 }
@@ -1286,7 +1298,12 @@ func TestFormItemIntGetLabel(t *testing.T) {
 	if fi.GetLabel() != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
 	}
-
+}
+func TestFormItemIntGetDescription(t *testing.T) {
+	fi := testFormItemInt(t)
+	if fi.GetDescription() != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.GetDescription())
+	}
 }
 func TestFormItemIntGetValue(t *testing.T) {
 	fi := testFormItemInt(t)
@@ -1467,10 +1484,13 @@ func TestFormItemIntDeleteLastCharacter(t *testing.T) {
 func testFormItemFloat(t *testing.T) *FormItemFloat {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemFloat(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemFloat(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, DefaultFormItemDescription, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	if fi.description != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.description)
 	}
 	return fi
 }
@@ -1482,7 +1502,12 @@ func TestFormItemFloatGetLabel(t *testing.T) {
 	if fi.GetLabel() != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
 	}
-
+}
+func TestFormItemFloatGetDescription(t *testing.T) {
+	fi := testFormItemFloat(t)
+	if fi.GetDescription() != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.GetDescription())
+	}
 }
 func TestFormItemFloatGetValue(t *testing.T) {
 	fi := testFormItemFloat(t)
@@ -1896,10 +1921,13 @@ func TestFormItemFloatDeleteLastCharacter(t *testing.T) {
 func testFormItemText(t *testing.T) *FormItemText {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemText(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemText(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, DefaultFormItemDescription, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	if fi.description != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.description)
 	}
 	return fi
 }
@@ -1911,7 +1939,12 @@ func TestFormItemTextGetLabel(t *testing.T) {
 	if fi.GetLabel() != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
 	}
-
+}
+func TestFormItemTextGetDescription(t *testing.T) {
+	fi := testFormItemText(t)
+	if fi.GetDescription() != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.GetDescription())
+	}
 }
 func TestFormItemTextGetValue(t *testing.T) {
 	fi := testFormItemText(t)
@@ -2074,10 +2107,13 @@ func TestFormItemTextDeleteLastCharacter(t *testing.T) {
 func testFormItemInt64(t *testing.T) *FormItemInt64 {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemInt64(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, mat, pos, wrapperMock)
+	fi := NewFormItemInt64(DefaultMaxWidth, ITEM_WIDTH_HALF, DefaultFormItemLabel, DefaultFormItemDescription, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	if fi.description != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.description)
 	}
 	return fi
 }
@@ -2089,7 +2125,12 @@ func TestFormItemInt64GetLabel(t *testing.T) {
 	if fi.GetLabel() != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
 	}
-
+}
+func TestFormItemInt64GetDescription(t *testing.T) {
+	fi := testFormItemInt64(t)
+	if fi.GetDescription() != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.GetDescription())
+	}
 }
 func TestFormItemInt64GetValue(t *testing.T) {
 	fi := testFormItemInt64(t)
@@ -2281,10 +2322,13 @@ func TestFormItemInt64DeleteLastCharacter(t *testing.T) {
 func testFormItemVector(t *testing.T) *FormItemVector {
 	mat := material.Chrome
 	pos := mgl32.Vec3{0, 0, 0}
-	fi := NewFormItemVector(DefaultMaxWidth, ITEM_WIDTH_FULL, DefaultFormItemLabel, 10, mat, pos, wrapperMock)
+	fi := NewFormItemVector(DefaultMaxWidth, ITEM_WIDTH_FULL, DefaultFormItemLabel, DefaultFormItemDescription, 10, mat, pos, wrapperMock)
 
 	if fi.label != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.label)
+	}
+	if fi.description != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.description)
 	}
 	return fi
 }
@@ -2295,6 +2339,12 @@ func TestFormItemVectorGetLabel(t *testing.T) {
 	fi := testFormItemVector(t)
 	if fi.GetLabel() != DefaultFormItemLabel {
 		t.Errorf("Invalid form item label. Instead of '%s', we have '%s'.", DefaultFormItemLabel, fi.GetLabel())
+	}
+}
+func TestFormItemVectorGetDescription(t *testing.T) {
+	fi := testFormItemVector(t)
+	if fi.GetDescription() != DefaultFormItemDescription {
+		t.Errorf("Invalid form item description. Instead of '%s', we have '%s'.", DefaultFormItemDescription, fi.GetDescription())
 	}
 }
 func TestFormItemVectorGetValue(t *testing.T) {

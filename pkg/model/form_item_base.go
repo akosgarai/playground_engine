@@ -29,9 +29,10 @@ type StringValidator func(s string) bool
 
 type FormItemBase struct {
 	*BaseModel
-	width float32
-	size  float32
-	label string
+	width       float32
+	size        float32
+	label       string
+	description string
 }
 
 // NewFormItemBase returns a FormItemBase. Its input is the width of the screen,
@@ -39,13 +40,14 @@ type FormItemBase struct {
 // the label, the material of the surface and a gl wrapper.
 // In case of invalid input enum, it panics.
 // It creates the surface mesh.
-func NewFormItemBase(w, size float32, label string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
+func NewFormItemBase(w, size float32, label, description string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
 	m := New()
 	fi := &FormItemBase{
-		BaseModel: m,
-		width:     w,
-		size:      size,
-		label:     label,
+		BaseModel:   m,
+		width:       w,
+		size:        size,
+		label:       label,
+		description: description,
 	}
 	labelPrimitive := rectangle.NewExact(fi.GetFormItemWidth(), fi.GetFormItemHeight())
 	v, i, bo := labelPrimitive.MeshInput()
@@ -84,6 +86,11 @@ func (fi *FormItemBase) GetSurface() interfaces.Mesh {
 // GetLabel returns the label string of the item.
 func (fi *FormItemBase) GetLabel() string {
 	return fi.label
+}
+
+// GetDescription returns the description string of the item.
+func (fi *FormItemBase) GetDescription() string {
+	return fi.description
 }
 
 // GetTargetHeight returns the height size of the target mesh

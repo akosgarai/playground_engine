@@ -26,8 +26,8 @@ type FormItemVector struct {
 	typeStates    []string
 }
 
-func NewFormItemVector(maxWidth, widthRatio float32, label string, inputMaxLen int, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemVector {
-	m := NewFormItemBase(maxWidth, widthRatio, label, mat, wrapper)
+func NewFormItemVector(maxWidth, widthRatio float32, label, description string, inputMaxLen int, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemVector {
+	m := NewFormItemBase(maxWidth, widthRatio, label, description, mat, wrapper)
 	m.GetSurface().SetPosition(position)
 
 	var writableTexture texture.Textures
