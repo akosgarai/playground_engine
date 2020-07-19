@@ -225,10 +225,11 @@ func (f *FormScreen) deleteCursor() {
 
 // highlightFormAction updates the material of the closest mesh.
 // It also prints the details of the form item to the detail content box.
-func (f *FormScreen) highlightFormAction(desc string) {
+func (f *FormScreen) highlightFormAction() {
 	tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 	tmMesh.Material = HighlightFormItemMaterial
-	f.charset.PrintTo(desc, -FullWidth/2, -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+	desc := f.closestModel.(interfaces.FormItem).GetDescription()
+	f.charset.PrintTo(desc, -FullWidth/2, -0.1, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 }
 
 // Update loops on the shaderMap, and calls Update function on every Model.
@@ -266,7 +267,6 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 
 	f.initMaterialForTheFormItems()
 	minDiff := float32(0.0)
-	desc := ""
 	if closestDistance <= minDiff+0.01 {
 		if buttonStore.Get(LEFT_MOUSE_BUTTON) && f.sinceLastClick > EventEpsilon {
 			f.deleteCursor()
@@ -275,30 +275,25 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			case *model.FormItemBool:
 				formModel := f.closestModel.(*model.FormItemBool)
 				formModel.SetValue(!formModel.GetValue())
-				desc = formModel.GetDescription()
 				break
 			case *model.FormItemInt:
 				formModel := f.closestModel.(*model.FormItemInt)
 				formModel.AddCursor()
-				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			case *model.FormItemFloat:
 				formModel := f.closestModel.(*model.FormItemFloat)
 				formModel.AddCursor()
-				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			case *model.FormItemText:
 				formModel := f.closestModel.(*model.FormItemText)
 				formModel.AddCursor()
-				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			case *model.FormItemInt64:
 				formModel := f.closestModel.(*model.FormItemInt64)
 				formModel.AddCursor()
-				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			case *model.FormItemVector:
@@ -309,12 +304,11 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 					formModel.SetTarget(index - 1)
 				}
 				formModel.AddCursor()
-				desc = formModel.GetDescription()
 				f.underEdit = formModel
 				break
 			}
 		}
-		f.highlightFormAction(desc)
+		f.highlightFormAction()
 	}
 	if keyStore.Get(BACK_SPACE) && f.sinceLastDelete > EventEpsilon {
 		f.sinceLastDelete = 0
