@@ -128,6 +128,7 @@ type Model interface {
 type FormItem interface {
 	Model
 	GetLabel() string
+	GetDescription() string
 	GetSurface() Mesh
 	ValueToString() string
 	GetLabelAreaWidth() float32

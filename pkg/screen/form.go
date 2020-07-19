@@ -38,12 +38,13 @@ const (
 )
 
 var (
-	DirectionalLightDirection = (mgl32.Vec3{0.0, 0.0, 1.0}).Normalize()
+	DirectionalLightDirection = mgl32.Vec3{0.0, 0.0, 1.0}.Normalize()
 	DirectionalLightAmbient   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightDiffuse   = mgl32.Vec3{0.5, 0.5, 0.5}
 	DirectionalLightSpecular  = mgl32.Vec3{1.0, 1.0, 1.0}
 
-	DefaultFormItemMaterial = material.Whiteplastic
+	DefaultFormItemMaterial   = material.Whiteplastic
+	HighlightFormItemMaterial = material.Ruby
 )
 
 type FormScreen struct {
@@ -60,6 +61,8 @@ type FormScreen struct {
 	// Item position
 	currentY      float32
 	lastItemState string
+	// Info box for displaying the details of the form items.
+	detailContentBox interfaces.Mesh
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
@@ -97,7 +100,7 @@ func cameraMovementMap() map[string]glfw.Key {
 	return cm
 }
 func setup(wrapper interfaces.GLWrapper) {
-	wrapper.ClearColor(0.7, 0.7, 0.7, 1.0)
+	wrapper.ClearColor(0.55, 0.55, 0.55, 1.0)
 	wrapper.Enable(glwrapper.DEPTH_TEST)
 	wrapper.DepthFunc(glwrapper.LESS)
 	wrapper.Enable(glwrapper.BLEND)
@@ -141,29 +144,35 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	textContainer.RotateY(180)
 	chars.PrintTo("Settings", -textWidth/2, -0.05, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, 0.0}, frame, wrapper)
+	detailContainer := frameRectangle(FullWidth, 0.3, mgl32.Vec3{0.0, -1.0 + BottomFrameLength + 0.15, 0.0}, DefaultFormItemMaterial, wrapper)
+	detailContainer.RotateX(-180)
+	detailContainer.RotateY(180)
 	frameModel.AddMesh(bottomFrame)
 	frameModel.AddMesh(leftFrame)
 	frameModel.AddMesh(rightFrame)
 	frameModel.AddMesh(topLeftFrame)
 	frameModel.AddMesh(topRightFrame)
+	background.AddMesh(detailContainer)
 	s.AddModelToShader(frameModel, frameShaderApplication)
 	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
-		ScreenBase:     s,
-		charset:        chars,
-		background:     background,
-		bgShader:       bgShaderApplication,
-		frame:          frame,
-		header:         label,
-		sinceLastClick: 0,
-		currentY:       0.9,
-		lastItemState:  "F",
+		ScreenBase:       s,
+		charset:          chars,
+		background:       background,
+		bgShader:         bgShaderApplication,
+		frame:            frame,
+		header:           label,
+		sinceLastClick:   0,
+		currentY:         0.9,
+		lastItemState:    "F",
+		detailContentBox: detailContainer,
 	}
 }
 
 // initMaterialForTheFormItems sets the material to the default of the form items.
 // It could be used un the update loop to make all of them to default state.
 func (f *FormScreen) initMaterialForTheFormItems() {
+	f.charset.CleanSurface(f.detailContentBox)
 	for s, _ := range f.shaderMap {
 		for index, _ := range f.shaderMap[s] {
 			switch f.shaderMap[s][index].(type) {
@@ -188,9 +197,9 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 				surfaceMesh.Material = DefaultFormItemMaterial
 				lightMesh := fi.GetLight().(*mesh.TexturedMaterialMesh)
 				if fi.GetValue() {
-					lightMesh.Material = material.Ruby
+					lightMesh.Material = HighlightFormItemMaterial
 				} else {
-					lightMesh.Material = material.Whiteplastic
+					lightMesh.Material = DefaultFormItemMaterial
 				}
 				break
 			case *model.FormItemInt64:
@@ -213,6 +222,44 @@ func (f *FormScreen) deleteCursor() {
 	if f.underEdit != nil {
 		f.underEdit.DeleteCursor()
 		f.underEdit = nil
+	}
+}
+func (f *FormScreen) wrapTextToLines(desc string, scale, maxLineWidth float32) []string {
+	words := strings.Split(desc, " ")
+	var result []string
+	line := ""
+	for i := 0; i < len(words); i++ {
+		lineWithNextWorld := line + words[i]
+		width := f.charset.TextWidth(lineWithNextWorld, scale)
+		if width > maxLineWidth {
+			result = append(result, line)
+			line = words[i]
+			continue
+		}
+		if i < len(words)-1 {
+			lineWithNextWorld = line + words[i] + " "
+			width = f.charset.TextWidth(lineWithNextWorld, scale)
+			if width > maxLineWidth {
+				result = append(result, line+words[i])
+				line = ""
+				continue
+			}
+		}
+		line = lineWithNextWorld
+	}
+	result = append(result, line)
+	return result
+}
+
+// highlightFormAction updates the material of the closest mesh.
+// It also prints the details of the form item to the detail content box.
+func (f *FormScreen) highlightFormAction() {
+	tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
+	tmMesh.Material = HighlightFormItemMaterial
+	desc := f.closestModel.(interfaces.FormItem).GetDescription()
+	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWindth, FullWidth)
+	for i := 0; i < len(lines); i++ {
+		f.charset.PrintTo(lines[i], -FullWidth/2, 0.14-float32(i)*0.1, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 	}
 }
 
@@ -252,8 +299,6 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	f.initMaterialForTheFormItems()
 	minDiff := float32(0.0)
 	if closestDistance <= minDiff+0.01 {
-		tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-		tmMesh.Material = material.Ruby
 		if buttonStore.Get(LEFT_MOUSE_BUTTON) && f.sinceLastClick > EventEpsilon {
 			f.deleteCursor()
 			f.sinceLastClick = 0
@@ -294,6 +339,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				break
 			}
 		}
+		f.highlightFormAction()
 	}
 	if keyStore.Get(BACK_SPACE) && f.sinceLastDelete > EventEpsilon {
 		f.sinceLastDelete = 0
@@ -324,17 +370,17 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWr
 
 // AddFormItemBool is for adding a bool form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, defaultValue bool) int {
+func (f *FormScreen) AddFormItemBool(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue bool) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_SHORT, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
 
 // AddFormItemInt is for adding an integer form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.IntValidator) int {
+func (f *FormScreen) AddFormItemInt(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.IntValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -343,9 +389,9 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 
 // AddFormItemFloat is for adding a float form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.FloatValidator) int {
+func (f *FormScreen) AddFormItemFloat(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.FloatValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -354,9 +400,9 @@ func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWra
 
 // AddFormItemText is for adding a text form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.StringValidator) int {
+func (f *FormScreen) AddFormItemText(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.StringValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -365,9 +411,9 @@ func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrap
 
 // AddFormItemInt64 is for adding an int64 form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.Int64Validator) int {
+func (f *FormScreen) AddFormItemInt64(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.Int64Validator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_LONG, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -376,9 +422,9 @@ func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWra
 
 // AddFormItemVector is for adding a vector form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemVector(formLabel string, wrapper interfaces.GLWrapper, defaultValue [3]string, validator model.FloatValidator) int {
+func (f *FormScreen) AddFormItemVector(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue [3]string, validator model.FloatValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, formLabel, model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, formLabel, formDescription, model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
