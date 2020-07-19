@@ -100,7 +100,7 @@ func cameraMovementMap() map[string]glfw.Key {
 	return cm
 }
 func setup(wrapper interfaces.GLWrapper) {
-	wrapper.ClearColor(0.7, 0.7, 0.7, 1.0)
+	wrapper.ClearColor(0.55, 0.55, 0.55, 1.0)
 	wrapper.Enable(glwrapper.DEPTH_TEST)
 	wrapper.DepthFunc(glwrapper.LESS)
 	wrapper.Enable(glwrapper.BLEND)
