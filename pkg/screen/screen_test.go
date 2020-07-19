@@ -22,6 +22,10 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+const (
+	DefaultFormItemDescription = "form item description."
+)
+
 var (
 	cam = camera.NewCamera(mgl32.Vec3{0, 0, 0}, mgl32.Vec3{0, 1, 0}, 0, 0)
 
@@ -703,9 +707,9 @@ func TestFormScreenUpdate(t *testing.T) {
 		ms := store.NewGlfwMouseStore()
 		form.Update(10, 0.5, 0.5, ks, ms)
 		// add option
-		form.AddFormItemBool("label bool", wrapperReal, true)
+		form.AddFormItemBool("label bool", DefaultFormItemDescription, wrapperReal, true)
 		form.Update(10, -0.4, 0.79, ks, ms)
-		form.AddFormItemInt("label int", wrapperReal, "1", nil)
+		form.AddFormItemInt("label int", DefaultFormItemDescription, wrapperReal, "1", nil)
 		form.Update(10, -0.4, 0.79, ks, ms)
 		ms.Set(LEFT_MOUSE_BUTTON, true)
 		form.sinceLastClick = 201
@@ -717,9 +721,9 @@ func TestFormScreenUpdate(t *testing.T) {
 		ks.Set(BACK_SPACE, true)
 		form.Update(10, 0.4, 0.79, ks, ms)
 		// further options
-		form.AddFormItemInt64("label int64", wrapperReal, "10", nil)
-		form.AddFormItemFloat("label float", wrapperReal, "0.44", nil)
-		form.AddFormItemText("label text", wrapperReal, "sample", nil)
+		form.AddFormItemInt64("label int64", DefaultFormItemDescription, wrapperReal, "10", nil)
+		form.AddFormItemFloat("label float", DefaultFormItemDescription, wrapperReal, "0.44", nil)
+		form.AddFormItemText("label text", DefaultFormItemDescription, wrapperReal, "sample", nil)
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
 		form.Update(10, 0.4, 0.69, ks, ms)
@@ -756,7 +760,7 @@ func TestFormScreenAddFormItemBool(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemBool(labels[i], wrapperReal, true)
+			index := form.AddFormItemBool(labels[i], DefaultFormItemDescription, wrapperReal, true)
 			if index != i {
 				t.Error("Invalid index.")
 			}
@@ -788,7 +792,7 @@ func TestFormScreenAddFormItemInt(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemInt(labels[i], wrapperReal, "1", nil)
+			index := form.AddFormItemInt(labels[i], DefaultFormItemDescription, wrapperReal, "1", nil)
 			if index != i {
 				t.Error("Invalid index.")
 			}
@@ -820,7 +824,7 @@ func TestFormScreenAddFormItemFloat(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemFloat(labels[i], wrapperReal, "0.2", nil)
+			index := form.AddFormItemFloat(labels[i], DefaultFormItemDescription, wrapperReal, "0.2", nil)
 			if index != i {
 				t.Error("Invalid index.")
 			}
@@ -852,7 +856,7 @@ func TestFormScreenAddFormItemInt64(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemInt64(labels[i], wrapperReal, "33366699900", nil)
+			index := form.AddFormItemInt64(labels[i], DefaultFormItemDescription, wrapperReal, "33366699900", nil)
 			if index != i {
 				t.Error("Invalid index.")
 			}
@@ -884,7 +888,7 @@ func TestFormScreenAddFormItemText(t *testing.T) {
 		defer testhelper.GlfwTerminate()
 		labels := []string{"label1", "label2", "label3", "label4"}
 		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemText(labels[i], wrapperReal, "sample text", nil)
+			index := form.AddFormItemText(labels[i], DefaultFormItemDescription, wrapperReal, "sample text", nil)
 			if index != i {
 				t.Error("Invalid index.")
 			}
@@ -914,10 +918,10 @@ func TestFormScreenCharCallback(t *testing.T) {
 		wrapperReal.InitOpenGL()
 		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
-		form.AddFormItemText("text", wrapperReal, "", nil)
-		form.AddFormItemInt("int", wrapperReal, "1", nil)
-		form.AddFormItemInt64("int64", wrapperReal, "2", nil)
-		form.AddFormItemFloat("float", wrapperReal, "0.0", nil)
+		form.AddFormItemText("text", DefaultFormItemDescription, wrapperReal, "", nil)
+		form.AddFormItemInt("int", DefaultFormItemDescription, wrapperReal, "1", nil)
+		form.AddFormItemInt64("int64", DefaultFormItemDescription, wrapperReal, "2", nil)
+		form.AddFormItemFloat("float", DefaultFormItemDescription, wrapperReal, "0.0", nil)
 		form.underEdit = form.formItems[0].(*model.FormItemText)
 		form.CharCallback('1', wrapperReal)
 		if form.underEdit.ValueToString() != "1" {
@@ -977,27 +981,27 @@ func TestFormGetFormItemValidIndex(t *testing.T) {
 		wrapperReal.InitOpenGL()
 		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
-		index := form.AddFormItemText("text", wrapperReal, "", nil)
+		index := form.AddFormItemText("text", DefaultFormItemDescription, wrapperReal, "", nil)
 		fi := form.GetFormItem(index)
 		if fi.ValueToString() != "" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemInt("int", wrapperReal, "0", nil)
+		index = form.AddFormItemInt("int", DefaultFormItemDescription, wrapperReal, "0", nil)
 		fi = form.GetFormItem(index)
 		if fi.ValueToString() != "0" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemInt64("int64", wrapperReal, "3", nil)
+		index = form.AddFormItemInt64("int64", DefaultFormItemDescription, wrapperReal, "3", nil)
 		fi = form.GetFormItem(index)
 		if fi.ValueToString() != "3" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemFloat("float", wrapperReal, "0.0", nil)
+		index = form.AddFormItemFloat("float", DefaultFormItemDescription, wrapperReal, "0.0", nil)
 		fi = form.GetFormItem(index)
 		if fi.ValueToString() != "0.0" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemBool("bool", wrapperReal, false)
+		index = form.AddFormItemBool("bool", DefaultFormItemDescription, wrapperReal, false)
 		fi = form.GetFormItem(index)
 		if fi.ValueToString() != "false" {
 			t.Error("Invalid form item initial value")
@@ -1024,27 +1028,27 @@ func TestFormGetFormItemValidIndexValidators(t *testing.T) {
 		wrapperReal.InitOpenGL()
 		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
-		index := form.AddFormItemText("text", wrapperReal, "", func(t string) bool { return true })
+		index := form.AddFormItemText("text", DefaultFormItemDescription, wrapperReal, "", func(t string) bool { return true })
 		fi := form.GetFormItem(index)
 		if fi.ValueToString() != "" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemInt("int", wrapperReal, "0", func(i int) bool { return true })
+		index = form.AddFormItemInt("int", DefaultFormItemDescription, wrapperReal, "0", func(i int) bool { return true })
 		fi = form.GetFormItem(index)
 		if fi.ValueToString() != "0" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemInt64("int64", wrapperReal, "3", func(i int64) bool { return true })
+		index = form.AddFormItemInt64("int64", DefaultFormItemDescription, wrapperReal, "3", func(i int64) bool { return true })
 		fi = form.GetFormItem(index)
 		if fi.ValueToString() != "3" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemFloat("float", wrapperReal, "0.0", func(f float32) bool { return true })
+		index = form.AddFormItemFloat("float", DefaultFormItemDescription, wrapperReal, "0.0", func(f float32) bool { return true })
 		fi = form.GetFormItem(index)
 		if fi.ValueToString() != "0.0" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemBool("bool", wrapperReal, false)
+		index = form.AddFormItemBool("bool", DefaultFormItemDescription, wrapperReal, false)
 		fi = form.GetFormItem(index)
 		if fi.ValueToString() != "false" {
 			t.Error("Invalid form item initial value")
@@ -1071,7 +1075,7 @@ func TestFormGetFormItemInvalidIndex(t *testing.T) {
 		wrapperReal.InitOpenGL()
 		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
-		index := form.AddFormItemText("text", wrapperReal, "txt", nil)
+		index := form.AddFormItemText("text", DefaultFormItemDescription, wrapperReal, "txt", nil)
 		_ = form.GetFormItem(index + 2)
 	}()
 }

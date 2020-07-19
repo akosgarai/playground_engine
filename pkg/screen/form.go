@@ -324,17 +324,17 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWr
 
 // AddFormItemBool is for adding a bool form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemBool(formLabel string, wrapper interfaces.GLWrapper, defaultValue bool) int {
+func (f *FormScreen) AddFormItemBool(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue bool) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_SHORT, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
 
 // AddFormItemInt is for adding an integer form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.IntValidator) int {
+func (f *FormScreen) AddFormItemInt(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.IntValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -343,9 +343,9 @@ func (f *FormScreen) AddFormItemInt(formLabel string, wrapper interfaces.GLWrapp
 
 // AddFormItemFloat is for adding a float form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.FloatValidator) int {
+func (f *FormScreen) AddFormItemFloat(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.FloatValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -354,9 +354,9 @@ func (f *FormScreen) AddFormItemFloat(formLabel string, wrapper interfaces.GLWra
 
 // AddFormItemText is for adding a text form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.StringValidator) int {
+func (f *FormScreen) AddFormItemText(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.StringValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -365,9 +365,9 @@ func (f *FormScreen) AddFormItemText(formLabel string, wrapper interfaces.GLWrap
 
 // AddFormItemInt64 is for adding an int64 form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWrapper, defaultValue string, validator model.Int64Validator) int {
+func (f *FormScreen) AddFormItemInt64(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.Int64Validator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_LONG, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, formLabel, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
@@ -376,9 +376,9 @@ func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWra
 
 // AddFormItemVector is for adding a vector form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemVector(formLabel string, wrapper interfaces.GLWrapper, defaultValue [3]string, validator model.FloatValidator) int {
+func (f *FormScreen) AddFormItemVector(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue [3]string, validator model.FloatValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, formLabel, model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, formLabel, formDescription, model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
