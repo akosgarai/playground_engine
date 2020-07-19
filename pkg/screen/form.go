@@ -198,6 +198,11 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
 				surfaceMesh.Material = DefaultFormItemMaterial
 				break
+			case *model.FormItemVector:
+				fi := f.shaderMap[s][index].(*model.FormItemVector)
+				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
+				surfaceMesh.Material = DefaultFormItemMaterial
+				break
 			}
 		}
 	}
@@ -277,6 +282,16 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				formModel.AddCursor()
 				f.underEdit = formModel
 				break
+			case *model.FormItemVector:
+				formModel := f.closestModel.(*model.FormItemVector)
+				msh, _ := formModel.ClosestMeshTo(mgl32.Vec3{coords.X(), coords.Y(), coords.Z() - 0.01})
+				index := formModel.GetIndex(msh)
+				if index > -1 {
+					formModel.SetTarget(index - 1)
+				}
+				formModel.AddCursor()
+				f.underEdit = formModel
+				break
 			}
 		}
 	}
@@ -285,7 +300,14 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		if f.underEdit != nil {
 			f.underEdit.DeleteLastCharacter()
 			f.charset.CleanSurface(f.underEdit.GetTarget())
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			switch f.underEdit.(type) {
+			case *model.FormItemVector:
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+				break
+			default:
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+				break
+			}
 		}
 	}
 }
@@ -351,6 +373,17 @@ func (f *FormScreen) AddFormItemInt64(formLabel string, wrapper interfaces.GLWra
 	}
 	return f.addFormItem(fi, wrapper, defaultValue)
 }
+
+// AddFormItemVector is for adding a vector form item to the form. It returns the index of the
+// inserted item.
+func (f *FormScreen) AddFormItemVector(formLabel string, wrapper interfaces.GLWrapper, defaultValue [3]string, validator model.FloatValidator) int {
+	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, formLabel, model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
+	if validator != nil {
+		fi.SetValidator(validator)
+	}
+	return f.addFormItem(fi, wrapper, defaultValue)
+}
 func (f *FormScreen) setDefaultValueChar(input string, wrapper interfaces.GLWrapper) {
 	chars := []rune(input)
 	for i := 0; i < len(chars); i++ {
@@ -364,7 +397,14 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 		offsetX := f.charset.TextWidth(string(char), InputTextFontScale/f.windowWindth)
 		f.underEdit.CharCallback(char, offsetX)
 		f.charset.CleanSurface(f.underEdit.GetTarget())
-		f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+		switch f.underEdit.(type) {
+		case *model.FormItemVector:
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			break
+		default:
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			break
+		}
 	}
 }
 
@@ -421,6 +461,19 @@ func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper i
 	case *model.FormItemBool:
 		fi := item.(*model.FormItemBool)
 		fi.SetValue(valueNew.(bool))
+		break
+	case *model.FormItemVector:
+		f.underEdit = item.(*model.FormItemVector)
+		newValues := valueNew.([3]string)
+		for i := 0; i < 3; i++ {
+			item.(*model.FormItemVector).SetTarget(i)
+			value := f.underEdit.ValueToString()
+			valueLength := len(value) + strings.Count(value, " ")
+			for i := 0; i < valueLength; i++ {
+				f.underEdit.DeleteLastCharacter()
+			}
+			f.setDefaultValueChar(newValues[i], wrapper)
+		}
 		break
 	}
 }

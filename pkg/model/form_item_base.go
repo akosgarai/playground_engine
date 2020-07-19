@@ -107,6 +107,19 @@ func (fi *FormItemBase) GetTargetPosition() mgl32.Vec3 {
 	return mgl32.Vec3{pX, -0.01, 0.0}
 }
 
+// GetVectorTargetPosition returns the position vector of the target mesh.
+func (fi *FormItemBase) GetVectorTargetPosition(index int) mgl32.Vec3 {
+	containerWidth := fi.GetVectorTargetWidth()
+	firstMiddlePosition := -fi.GetFormItemWidth()/2 + fi.GetLabelAreaWidth() + containerWidth/2
+	pX := firstMiddlePosition + float32(index)*containerWidth
+	return mgl32.Vec3{pX, -0.01, 0.0}
+}
+
+// GetVectorTargetWidth returns the width of a vector target item.
+func (fi *FormItemBase) GetVectorTargetWidth() float32 {
+	return fi.getWidthWithoutLabel() / 3.0 * 0.95
+}
+
 // GetCursorHeight returns the height size of the cursor.
 func (fi *FormItemBase) GetCursorHeight() float32 {
 	return fi.GetFormItemHeight() * 0.7
@@ -120,4 +133,9 @@ func (fi *FormItemBase) GetCursorWidth() float32 {
 // GetCursorInitialPosition returns the initial position vector of the cursor.
 func (fi *FormItemBase) GetCursorInitialPosition() mgl32.Vec3 {
 	return mgl32.Vec3{(fi.GetTargetWidth()*0.85 - fi.GetCursorWidth()) / 2, -0.01, 0.0}
+}
+
+// GetVectorCursorInitialPosition returns the initial position vector of the cursor.
+func (fi *FormItemBase) GetVectorCursorInitialPosition() mgl32.Vec3 {
+	return mgl32.Vec3{(fi.GetVectorTargetWidth()*0.85 - fi.GetCursorWidth()) / 2, -0.01, 0.0}
 }
