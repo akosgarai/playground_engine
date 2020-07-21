@@ -1,6 +1,7 @@
 package screen
 
 import (
+	"fmt"
 	"math"
 	"strings"
 
@@ -272,6 +273,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	}
 	newYPos := formItemCurrentY + FormItemMoveSpeed*float32(dt)*direction.Y()
 	minYValue := -1 + BottomFrameLength + 0.3 - f.currentY
+	fmt.Printf("current: '%f', newY: '%f', min: '%f', max: '%f', dt: '%f'\n", formItemCurrentY, newYPos, minYValue, formItemMaxY, dt)
 	if newYPos < formItemMaxY && newYPos > minYValue {
 		for m, _ := range f.shaderMap[f.formItemShader] {
 			f.shaderMap[f.formItemShader][m].SetDirection(direction)
