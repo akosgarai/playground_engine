@@ -652,5 +652,5 @@ func (f *FormScreen) itemPosition(itemWidth, itemHeight float32) mgl32.Vec3 {
 		break
 	}
 
-	return mgl32.Vec3{x, f.currentY, 0}
+	return mgl32.Vec3{x, f.currentY, ZBackground}
 }
