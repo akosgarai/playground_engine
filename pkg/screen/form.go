@@ -267,11 +267,11 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	// If the Down key is pressed => direction: down, velocity: c
 	// Otherwise => direction: null, velocity c
 	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
-		direction = mgl32.Vec3{0, 1, 0}
-	} else if keyStore.Get(KEY_DOWN) && !keyStore.Get(KEY_UP) {
 		direction = mgl32.Vec3{0, -1, 0}
+	} else if keyStore.Get(KEY_DOWN) && !keyStore.Get(KEY_UP) {
+		direction = mgl32.Vec3{0, 1, 0}
 	}
-	newYPos := formItemCurrentY + FormItemMoveSpeed*float32(dt)*direction.Y()
+	newYPos := formItemCurrentY + FormItemMoveSpeed*float32(dt)*-direction.Y()
 	maxYValue := (-1 + BottomFrameLength + 0.5 - f.currentY)
 	fmt.Printf("current: '%f', newY: '%f', min: '%f', max: '%f', dt: '%f'\n", formItemCurrentY, newYPos, formItemMinY, maxYValue, dt)
 	if newYPos > formItemMinY && newYPos < maxYValue {
