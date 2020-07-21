@@ -27,16 +27,17 @@ const (
 	SideFrameWidth     = float32(0.02) // the width of the border frames.
 	TopLeftFrameWidth  = float32(0.1)
 	FullWidth          = BottomFrameWidth - 2*SideFrameWidth // The full width of the usable area
-	LightConstantTerm  = float32(1.0)
-	LightLinearTerm    = float32(0.14)
-	LightQuadraticTerm = float32(0.07)
 	EventEpsilon       = 200
 	BACK_SPACE         = glfw.KeyBackspace
+	KEY_UP             = glfw.KeyUp
+	KEY_DOWN           = glfw.KeyDown
 	LabelFontScale     = float32(1.0)
 	InputTextFontScale = float32(0.80)
 	ZFrame             = float32(0.0)
 	ZText              = float32(-0.01)
 	ZBackground        = float32(0.02)
+	FormItemMoveSpeed  = float32(0.005)
+	formItemMaxY       = float32(0.0)
 )
 
 var (
@@ -47,6 +48,8 @@ var (
 
 	DefaultFormItemMaterial   = material.Whiteplastic
 	HighlightFormItemMaterial = material.Ruby
+	formItemMinY              = float32(0.0)
+	formItemCurrentY          = float32(0.0)
 )
 
 type FormScreen struct {
@@ -55,7 +58,7 @@ type FormScreen struct {
 	frame           *material.Material
 	header          string
 	formItems       []interfaces.FormItem
-	bgShader        *shader.Shader
+	formItemShader  *shader.Shader
 	sinceLastClick  float64
 	sinceLastDelete float64
 	underEdit       interfaces.CharFormItem
@@ -89,17 +92,9 @@ func charset(wrapper interfaces.GLWrapper) *model.Charset {
 func createCamera(ratio float32) *camera.Camera {
 	camera := camera.NewCamera(mgl32.Vec3{0, 0, -1.8}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
 	camera.SetupProjection(45, ratio, 0.001, 10.0)
-	camera.SetVelocity(0.005)
 	return camera
 }
 
-// Setup keymap for the camera movement
-func cameraMovementMap() map[string]glfw.Key {
-	cm := make(map[string]glfw.Key)
-	cm["up"] = glfw.KeyUp
-	cm["down"] = glfw.KeyDown
-	return cm
-}
 func setup(wrapper interfaces.GLWrapper) {
 	wrapper.ClearColor(0.55, 0.55, 0.55, 1.0)
 	wrapper.Enable(glwrapper.DEPTH_TEST)
@@ -112,7 +107,6 @@ func setup(wrapper interfaces.GLWrapper) {
 func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GLWrapper, wW, wH float32) *FormScreen {
 	s := newScreenBase()
 	s.SetCamera(createCamera(wW / wH))
-	s.SetCameraMovementMap(cameraMovementMap())
 	s.Setup(setup)
 	s.SetWindowSize(wW, wH)
 	s.SetWrapper(wrapper)
@@ -157,7 +151,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	return &FormScreen{
 		ScreenBase:       s,
 		charset:          chars,
-		bgShader:         bgShaderApplication,
+		formItemShader:   bgShaderApplication,
 		frame:            frame,
 		header:           label,
 		sinceLastClick:   0,
@@ -268,12 +262,18 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	f.sinceLastDelete = f.sinceLastDelete + dt
 	cursorX := float32(-posX)
 	cursorY := float32(posY)
-	if f.cameraSet {
-		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
-		cursorX = cursorX + f.GetCamera().GetPosition().X()
-		cursorY = cursorY + f.GetCamera().GetPosition().Y()
+	direction := mgl32.Vec3{0, 0, 0}
+	// If the Up key is pressed => direction: up, velocity: c
+	// If the Down key is pressed => direction: down, velocity: c
+	// Otherwise => direction: null, velocity c
+	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
+		direction = mgl32.Vec3{0, 1, 0}
+	} else if keyStore.Get(KEY_DOWN) && !keyStore.Get(KEY_UP) {
+		direction = mgl32.Vec3{0, -1, 0}
 	}
-
+	for m, _ := range f.shaderMap[f.formItemShader] {
+		f.shaderMap[f.formItemShader][m].SetDirection(direction)
+	}
 	coords := mgl32.Vec3{cursorX, cursorY, ZBackground}
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
@@ -359,7 +359,8 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWrapper, defaultValue interface{}) int {
 	fi.RotateX(-90)
 	fi.RotateY(180)
-	f.AddModelToShader(fi, f.bgShader)
+	fi.SetSpeed(FormItemMoveSpeed)
+	f.AddModelToShader(fi, f.formItemShader)
 	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, ZText, LabelFontScale/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
 	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
