@@ -1,7 +1,6 @@
 package screen
 
 import (
-	"fmt"
 	"math"
 	"strings"
 
@@ -49,7 +48,6 @@ var (
 
 	DefaultFormItemMaterial   = material.Whiteplastic
 	HighlightFormItemMaterial = material.Ruby
-	formItemCurrentY          = float32(0.0)
 )
 
 type FormScreen struct {
@@ -63,8 +61,9 @@ type FormScreen struct {
 	sinceLastDelete float64
 	underEdit       interfaces.CharFormItem
 	// Item position
-	currentY      float32
-	lastItemState string
+	currentY         float32
+	formItemCurrentY float32
+	lastItemState    string
 	// Info box for displaying the details of the form items.
 	detailContentBox interfaces.Mesh
 }
@@ -156,6 +155,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 		header:           label,
 		sinceLastClick:   0,
 		currentY:         0.9,
+		formItemCurrentY: float32(0.0),
 		lastItemState:    "F",
 		detailContentBox: detailContainer,
 	}
@@ -271,11 +271,10 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	} else if keyStore.Get(KEY_DOWN) && !keyStore.Get(KEY_UP) {
 		direction = mgl32.Vec3{0, 1, 0}
 	}
-	newYPos := formItemCurrentY + FormItemMoveSpeed*float32(dt)*direction.Y()
+	newYPos := f.formItemCurrentY + FormItemMoveSpeed*float32(dt)*direction.Y()
 	maxYValue := (-1 + BottomFrameLength + 0.5 - f.currentY)
-	fmt.Printf("current: '%f', newY: '%f', min: '%f', max: '%f', dt: '%f'\n", formItemCurrentY, newYPos, formItemMinY, maxYValue, dt)
 	if newYPos > formItemMinY && newYPos < maxYValue {
-		formItemCurrentY = newYPos
+		f.formItemCurrentY = newYPos
 	} else {
 		direction = mgl32.Vec3{0, 0, 0}
 	}
