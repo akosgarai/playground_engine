@@ -27,7 +27,6 @@ const (
 	SideFrameWidth     = float32(0.02) // the width of the border frames.
 	TopLeftFrameWidth  = float32(0.1)
 	FullWidth          = BottomFrameWidth - 2*SideFrameWidth // The full width of the usable area
-	CameraMoveSpeed    = 0.005
 	LightConstantTerm  = float32(1.0)
 	LightLinearTerm    = float32(0.14)
 	LightQuadraticTerm = float32(0.07)
@@ -88,7 +87,7 @@ func charset(wrapper interfaces.GLWrapper) *model.Charset {
 func createCamera(ratio float32) *camera.Camera {
 	camera := camera.NewCamera(mgl32.Vec3{0, 0, -1.8}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
 	camera.SetupProjection(45, ratio, 0.001, 10.0)
-	camera.SetVelocity(CameraMoveSpeed)
+	camera.SetVelocity(0.005)
 	return camera
 }
 
@@ -144,7 +143,7 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	textContainer.RotateY(180)
 	chars.PrintTo("Settings", -textWidth/2, -0.05, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, 0.0}, frame, wrapper)
-	detailContainer := frameRectangle(FullWidth, 0.3, mgl32.Vec3{0.0, -1.0 + BottomFrameLength + 0.15, 0.0}, DefaultFormItemMaterial, wrapper)
+	detailContainer := frameRectangle(FullWidth, 0.3, mgl32.Vec3{0.0, -1.0 + BottomFrameLength + 0.15, -0.02}, DefaultFormItemMaterial, wrapper)
 	detailContainer.RotateX(-180)
 	detailContainer.RotateY(180)
 	frameModel.AddMesh(bottomFrame)
