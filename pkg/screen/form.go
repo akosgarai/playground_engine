@@ -48,7 +48,6 @@ var (
 
 	DefaultFormItemMaterial   = material.Whiteplastic
 	HighlightFormItemMaterial = material.Ruby
-	formItemMinY              = float32(0.0)
 	formItemCurrentY          = float32(0.0)
 )
 
@@ -267,12 +266,17 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	// If the Down key is pressed => direction: down, velocity: c
 	// Otherwise => direction: null, velocity c
 	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
-		direction = mgl32.Vec3{0, 1, 0}
-	} else if keyStore.Get(KEY_DOWN) && !keyStore.Get(KEY_UP) {
 		direction = mgl32.Vec3{0, -1, 0}
+	} else if keyStore.Get(KEY_DOWN) && !keyStore.Get(KEY_UP) {
+		direction = mgl32.Vec3{0, 1, 0}
 	}
-	for m, _ := range f.shaderMap[f.formItemShader] {
-		f.shaderMap[f.formItemShader][m].SetDirection(direction)
+	newYPos := formItemCurrentY + FormItemMoveSpeed*float32(dt)*direction.Y()
+	minYValue := -1 + BottomFrameLength + 0.3 - f.currentY
+	if newYPos < formItemMaxY && newYPos > minYValue {
+		for m, _ := range f.shaderMap[f.formItemShader] {
+			f.shaderMap[f.formItemShader][m].SetDirection(direction)
+		}
+		formItemCurrentY = newYPos
 	}
 	coords := mgl32.Vec3{cursorX, cursorY, ZBackground}
 	closestDistance := float32(math.MaxFloat32)
