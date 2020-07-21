@@ -121,6 +121,8 @@ type Model interface {
 	IsTransparent() bool
 	ClosestMeshTo(mgl32.Vec3) (Mesh, float32)
 	Clear()
+	SetSpeed(float32)
+	SetDirection(mgl32.Vec3)
 	AddMesh(Mesh)
 	RotateX(float32)
 	RotateY(float32)
