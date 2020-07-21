@@ -274,7 +274,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		cursorY = cursorY + f.GetCamera().GetPosition().Y()
 	}
 
-	coords := mgl32.Vec3{cursorX, cursorY, 0.0}
+	coords := mgl32.Vec3{cursorX, cursorY, ZBackground}
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
 	var closestModel interfaces.Model
