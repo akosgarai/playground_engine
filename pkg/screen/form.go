@@ -272,7 +272,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		direction = mgl32.Vec3{0, 1, 0}
 	}
 	newYPos := formItemCurrentY + FormItemMoveSpeed*float32(dt)*direction.Y()
-	minYValue := -1 + BottomFrameLength + 0.3 - f.currentY
+	minYValue := (-1 + BottomFrameLength + 0.3 - f.currentY) * -1
 	fmt.Printf("current: '%f', newY: '%f', min: '%f', max: '%f', dt: '%f'\n", formItemCurrentY, newYPos, minYValue, formItemMaxY, dt)
 	if newYPos < formItemMaxY && newYPos > minYValue {
 		for m, _ := range f.shaderMap[f.formItemShader] {
