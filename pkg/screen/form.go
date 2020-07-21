@@ -34,6 +34,10 @@ const (
 	BACK_SPACE         = glfw.KeyBackspace
 	LabelFontScale     = float32(1.0)
 	InputTextFontScale = float32(0.80)
+	ZFrame             = float32(0.0)
+	ZFrameText         = float32(-0.01)
+	ZBackground        = float32(0.02)
+	ZBackgroundText    = float32(0.01)
 )
 
 var (
@@ -49,7 +53,6 @@ var (
 type FormScreen struct {
 	*ScreenBase
 	charset         *model.Charset
-	background      *model.BaseModel
 	frame           *material.Material
 	header          string
 	formItems       []interfaces.FormItem
@@ -130,20 +133,19 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 
 	chars := charset(wrapper)
 	s.AddModelToShader(chars, fgShaderApplication)
-	background := model.New()
 	frameModel := model.New()
 	// create frame.
-	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, 0.0}, frame, wrapper)
-	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, 0.0}, frame, wrapper)
-	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, 0.0}, frame, wrapper)
-	topLeftFrame := frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, 0.0}, frame, wrapper)
+	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, ZFrame}, frame, wrapper)
+	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, ZFrame}, frame, wrapper)
+	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, ZFrame}, frame, wrapper)
+	topLeftFrame := frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, ZFrame}, frame, wrapper)
 	textWidth := chars.TextWidth("Settings", 3.0/wW)
-	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{1 - TopLeftFrameWidth - textWidth/2, 0.925, 0}, frame, wrapper)
+	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{1 - TopLeftFrameWidth - textWidth/2, 0.925, ZFrame}, frame, wrapper)
 	textContainer.RotateX(-180)
 	textContainer.RotateY(180)
-	chars.PrintTo("Settings", -textWidth/2, -0.05, -0.01, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, 0.0}, frame, wrapper)
-	detailContainer := frameRectangle(FullWidth-0.02, 0.3, mgl32.Vec3{0.0, -1.0 + BottomFrameLength + 0.17, -0.02}, DefaultFormItemMaterial, wrapper)
+	chars.PrintTo("Settings", -textWidth/2, -0.05, ZFrameText, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, ZFrame}, frame, wrapper)
+	detailContainer := frameRectangle(FullWidth, 0.3, mgl32.Vec3{0.0, -1.0 + BottomFrameLength + 0.15, ZFrame}, DefaultFormItemMaterial, wrapper)
 	detailContainer.RotateX(-180)
 	detailContainer.RotateY(180)
 	frameModel.AddMesh(bottomFrame)
@@ -151,13 +153,11 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 	frameModel.AddMesh(rightFrame)
 	frameModel.AddMesh(topLeftFrame)
 	frameModel.AddMesh(topRightFrame)
-	background.AddMesh(detailContainer)
+	frameModel.AddMesh(detailContainer)
 	s.AddModelToShader(frameModel, frameShaderApplication)
-	s.AddModelToShader(background, bgShaderApplication)
 	return &FormScreen{
 		ScreenBase:       s,
 		charset:          chars,
-		background:       background,
 		bgShader:         bgShaderApplication,
 		frame:            frame,
 		header:           label,
@@ -258,7 +258,7 @@ func (f *FormScreen) highlightFormAction() {
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
 	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWindth, FullWidth)
 	for i := 0; i < len(lines); i++ {
-		f.charset.PrintTo(lines[i], -FullWidth/2, 0.12-float32(i)*0.075, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+		f.charset.PrintTo(lines[i], -FullWidth/2, 0.12-float32(i)*0.075, ZBackgroundText, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 	}
 }
 
@@ -347,10 +347,10 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			f.charset.CleanSurface(f.underEdit.GetTarget())
 			switch f.underEdit.(type) {
 			case *model.FormItemVector:
-				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZBackgroundText, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 				break
 			default:
-				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZBackgroundText, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 				break
 			}
 		}
@@ -361,7 +361,7 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWr
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	f.AddModelToShader(fi, f.bgShader)
-	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, -0.01, LabelFontScale/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, ZBackgroundText, LabelFontScale/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
 	f.formItems = append(f.formItems, fi)
 	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
 	return len(f.formItems) - 1
@@ -444,10 +444,10 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 		f.charset.CleanSurface(f.underEdit.GetTarget())
 		switch f.underEdit.(type) {
 		case *model.FormItemVector:
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZBackgroundText, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
 		default:
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, -0.01, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZBackgroundText, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 			break
 		}
 	}
