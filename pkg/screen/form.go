@@ -38,7 +38,7 @@ const (
 	ZText              = float32(-0.01)
 	ZBackground        = float32(0.02)
 	FormItemMoveSpeed  = float32(0.005)
-	formItemMaxY       = float32(0.0)
+	formItemMinY       = float32(0.0)
 )
 
 var (
@@ -272,9 +272,9 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		direction = mgl32.Vec3{0, -1, 0}
 	}
 	newYPos := formItemCurrentY + FormItemMoveSpeed*float32(dt)*direction.Y()
-	minYValue := (-1 + BottomFrameLength + 0.3 - f.currentY) * -1
-	fmt.Printf("current: '%f', newY: '%f', min: '%f', max: '%f', dt: '%f'\n", formItemCurrentY, newYPos, minYValue, formItemMaxY, dt)
-	if newYPos < formItemMaxY && newYPos > minYValue {
+	maxYValue := (-1 + BottomFrameLength + 0.3 - f.currentY)
+	fmt.Printf("current: '%f', newY: '%f', min: '%f', max: '%f', dt: '%f'\n", formItemCurrentY, newYPos, formItemMinY, maxYValue, dt)
+	if newYPos > formItemMinY && newYPos < maxYValue {
 		formItemCurrentY = newYPos
 	} else {
 		direction = mgl32.Vec3{0, 0, 0}
