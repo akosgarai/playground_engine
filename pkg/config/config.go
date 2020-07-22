@@ -64,6 +64,21 @@ func NewConfigItem(key, label, description string, defaultValue interface{}) *Co
 	}
 }
 
+// GetLabel returns the label of the ConfigItem
+func (ci *ConfigItem) GetLabel() string {
+	return ci.label
+}
+
+// GetDescription returns the description of the ConfigItem
+func (ci *ConfigItem) GetDescription() string {
+	return ci.description
+}
+
+// GetDefaultValue returns the default value of the ConfigItem
+func (ci *ConfigItem) GetDefaultValue() interface{} {
+	return ci.defaultValue
+}
+
 // SetCurrentValue gets a value interface input. It checks that the current value
 // type and the default value type is same or not. In case of difference, the value
 // will not be updated.

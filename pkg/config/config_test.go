@@ -29,11 +29,20 @@ func TestNewConfigItemValidValue(t *testing.T) {
 		if fi.label != tt.label {
 			t.Errorf("Invalid label value. Instead of '%s', we have '%s'.", tt.label, fi.label)
 		}
+		if fi.GetLabel() != tt.label {
+			t.Errorf("Invalid GetLabel value. Instead of '%s', we have '%s'.", tt.label, fi.GetLabel())
+		}
 		if fi.description != tt.desc {
 			t.Errorf("Invalid description value. Instead of '%s', we have '%s'.", tt.desc, fi.description)
 		}
+		if fi.GetDescription() != tt.desc {
+			t.Errorf("Invalid GetDescription value. Instead of '%s', we have '%s'.", tt.desc, fi.GetDescription())
+		}
 		if fi.defaultValue != tt.value {
-			t.Errorf("Invalid value value. Instead of '%s', we have '%s'.", tt.value, fi.defaultValue)
+			t.Errorf("Invalid default value. Instead of '%v', we have '%v'.", tt.value, fi.defaultValue)
+		}
+		if fi.GetDefaultValue() != tt.value {
+			t.Errorf("Invalid GetDefultValue. Instead of '%v', we have '%v'.", tt.value, fi.GetDefaultValue())
 		}
 	}
 }
