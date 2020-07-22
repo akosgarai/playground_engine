@@ -489,7 +489,7 @@ func (f *FormScreen) AddFormItemFloat(formLabel, formDescription string, wrapper
 // addFormItemFromConfigText sets up a FormItemText from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.StringValidator))
 	}
@@ -527,7 +527,7 @@ func (f *FormScreen) AddFormItemInt64(formLabel, formDescription string, wrapper
 // addFormItemFromConfigVector sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
