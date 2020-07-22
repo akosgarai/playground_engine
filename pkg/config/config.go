@@ -79,6 +79,11 @@ func (ci *ConfigItem) GetDefaultValue() interface{} {
 	return ci.defaultValue
 }
 
+// GetCurrentValue returns the current value of the ConfigItem
+func (ci *ConfigItem) GetCurrentValue() interface{} {
+	return ci.currentValue
+}
+
 // SetCurrentValue gets a value interface input. It checks that the current value
 // type and the default value type is same or not. In case of difference, the value
 // will not be updated.

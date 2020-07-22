@@ -101,8 +101,13 @@ func TestConfigItemSetCurrentValue(t *testing.T) {
 		for _, tt := range testData {
 			fi := NewConfigItem(tt.key, tt.label, tt.desc, tt.value)
 			err := fi.SetCurrentValue(ed.value)
-			if tt.key == ed.validKey && err != nil {
-				t.Errorf("Setting value should be successful for '%s'. We got the following error: '%#v'.", ed.validKey, err)
+			if tt.key == ed.validKey {
+				if err != nil {
+					t.Errorf("Setting value should be successful for '%s'. We got the following error: '%#v'.", ed.validKey, err)
+				}
+				if fi.GetCurrentValue() != ed.value {
+					t.Error("Invalid value.")
+				}
 			}
 			if tt.key != ed.validKey && err == nil {
 				t.Errorf("Setting value should be failed for '%s'.", ed.validKey)
