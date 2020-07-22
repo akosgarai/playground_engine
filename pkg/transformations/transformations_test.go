@@ -45,6 +45,22 @@ func TestVec3ToString(t *testing.T) {
 		}
 	}
 }
+func TestVectorToString(t *testing.T) {
+	testData := []struct {
+		v mgl32.Vec3
+		s [3]string
+	}{
+		{mgl32.Vec3{0, 0, 0}, [3]string{"0", "0", "0"}},
+		{mgl32.Vec3{0.5, 0.5, 0.5}, [3]string{"0.5", "0.5", "0.5"}},
+		{mgl32.Vec3{1.50005, 0.5, 0.5}, [3]string{"1.50005", "0.5", "0.5"}},
+	}
+	for _, tt := range testData {
+		str := VectorToString(tt.v)
+		if str != tt.s {
+			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
+		}
+	}
+}
 func TestFloat64ToString(t *testing.T) {
 	testData := []struct {
 		v float64
@@ -56,6 +72,22 @@ func TestFloat64ToString(t *testing.T) {
 	}
 	for _, tt := range testData {
 		str := Float64ToString(tt.v)
+		if str != tt.s {
+			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
+		}
+	}
+}
+func TestFloat64ToStringExact(t *testing.T) {
+	testData := []struct {
+		v float64
+		s string
+	}{
+		{0, "0"},
+		{1, "1"},
+		{0.5, "0.5"},
+	}
+	for _, tt := range testData {
+		str := Float64ToStringExact(tt.v)
 		if str != tt.s {
 			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
 		}
@@ -77,6 +109,22 @@ func TestFloat32ToString(t *testing.T) {
 		}
 	}
 }
+func TestFloat32ToStringExact(t *testing.T) {
+	testData := []struct {
+		v float32
+		s string
+	}{
+		{0, "0"},
+		{1, "1"},
+		{0.5, "0.5"},
+	}
+	for _, tt := range testData {
+		str := Float32ToStringExact(tt.v)
+		if str != tt.s {
+			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
+		}
+	}
+}
 func TestIntegerToString(t *testing.T) {
 	testData := []struct {
 		v int
@@ -88,6 +136,23 @@ func TestIntegerToString(t *testing.T) {
 	}
 	for _, tt := range testData {
 		str := IntegerToString(tt.v)
+		if str != tt.s {
+			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
+		}
+	}
+}
+func TestInteger64ToString(t *testing.T) {
+	testData := []struct {
+		v int64
+		s string
+	}{
+		{0, "0"},
+		{1, "1"},
+		{5, "5"},
+		{5010101010101010111, "5010101010101010111"},
+	}
+	for _, tt := range testData {
+		str := Integer64ToString(tt.v)
 		if str != tt.s {
 			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
 		}
