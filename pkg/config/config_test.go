@@ -7,7 +7,6 @@ import (
 )
 
 func TestNewConfigItemValidValue(t *testing.T) {
-	// t.Fatal("not implemented")
 	testData := []struct {
 		key       string
 		label     string
