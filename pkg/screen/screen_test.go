@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
+	"github.com/akosgarai/playground_engine/pkg/config"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
@@ -675,14 +676,41 @@ func TestNewFormScreen(t *testing.T) {
 		wrapperReal.InitOpenGL()
 		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
-		if form.header != screenLabel {
-			t.Errorf("Invalid header. Instead of '%s', we have '%s'.", screenLabel, form.header)
-		}
-		if form.frame != frameMat {
-			t.Error("Invalid material.")
-		}
 		if len(form.configuration) != 0 {
 			t.Errorf("Invalid initial configuration length. '%d'.", len(form.configuration))
+		}
+	}()
+}
+func TestNewFormScreenFromConfig(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		frameMat := material.Chrome
+		screenLabel := "test-label"
+		wW := float32(800)
+		wH := float32(800)
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		conf := config.New()
+		conf.AddConfig("key1", "label1", "desc1", "value", nil)
+		conf.AddConfig("key2", "label2", "desc2", 1, nil)
+		conf.AddConfig("key3", "label3", "desc3", float32(1), nil)
+		conf.AddConfig("key4", "label4", "desc4", int64(1), nil)
+		conf.AddConfig("key5", "label5", "desc5", false, nil)
+		conf.AddConfig("key6", "label6", "desc6", mgl32.Vec3{0, 0, 0}, nil)
+		order := []string{"key1", "key2", "key3", "key4", "key5", "key6", "key7"}
+		form := NewFormScreenFromConfig(frameMat, screenLabel, wrapperReal, wW, wH, conf, order)
+		defer testhelper.GlfwTerminate()
+		if len(form.configuration) != len(conf) {
+			t.Errorf("Invalid initial configuration length. Instead of '%d', we have '%d'.", len(conf), len(form.configuration))
 		}
 	}()
 }
