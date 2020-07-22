@@ -13,13 +13,14 @@ func TestNewConfigItemValidValue(t *testing.T) {
 		label string
 		desc  string
 		value interface{}
+		vtype int
 	}{
-		{"key1", "label 1", "description 1", int(7)},
-		{"key2", "label 2", "description 2", int64(7)},
-		{"key3", "label 3", "description 3", float32(7)},
-		{"key4", "label 4", "description 4", string("seven")},
-		{"key5", "label 5", "description 5", true},
-		{"key6", "label 6", "description 6", mgl32.Vec3{0, 0, 0}},
+		{"key1", "label 1", "description 1", int(7), ValueTypeInt},
+		{"key2", "label 2", "description 2", int64(7), ValueTypeInt64},
+		{"key3", "label 3", "description 3", float32(7), ValueTypeFloat},
+		{"key4", "label 4", "description 4", string("seven"), ValueTypeText},
+		{"key5", "label 5", "description 5", true, ValueTypeBool},
+		{"key6", "label 6", "description 6", mgl32.Vec3{0, 0, 0}, ValueTypeVector},
 	}
 	for _, tt := range testData {
 		fi := NewConfigItem(tt.key, tt.label, tt.desc, tt.value)
@@ -43,6 +44,9 @@ func TestNewConfigItemValidValue(t *testing.T) {
 		}
 		if fi.GetDefaultValue() != tt.value {
 			t.Errorf("Invalid GetDefultValue. Instead of '%v', we have '%v'.", tt.value, fi.GetDefaultValue())
+		}
+		if fi.GetValueType() != tt.vtype {
+			t.Errorf("Invalid GetValueType. Instead of '%d', we have '%d'.", tt.vtype, fi.GetValueType())
 		}
 	}
 }
