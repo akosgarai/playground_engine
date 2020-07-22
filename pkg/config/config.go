@@ -20,17 +20,18 @@ var (
 )
 
 type ConfigItem struct {
-	key          string
-	label        string
-	description  string
-	valueType    int
-	defaultValue interface{}
-	currentValue interface{}
+	key               string
+	label             string
+	description       string
+	valueType         int
+	defaultValue      interface{}
+	currentValue      interface{}
+	validatorFunction interface{}
 }
 
 // NewConfigItem returns a ConfigItem. It gets the valueType from the type of the defaultValue.
 // In case of unhandled type, it panics.
-func NewConfigItem(key, label, description string, defaultValue interface{}) *ConfigItem {
+func NewConfigItem(key, label, description string, defaultValue interface{}, validatorFunction interface{}) *ConfigItem {
 	var valueType int
 	switch defaultValue.(type) {
 	case string:
@@ -55,12 +56,13 @@ func NewConfigItem(key, label, description string, defaultValue interface{}) *Co
 		panic("Unhandled value type.")
 	}
 	return &ConfigItem{
-		key:          key,
-		label:        label,
-		description:  description,
-		valueType:    valueType,
-		defaultValue: defaultValue,
-		currentValue: defaultValue,
+		key:               key,
+		label:             label,
+		description:       description,
+		valueType:         valueType,
+		defaultValue:      defaultValue,
+		currentValue:      defaultValue,
+		validatorFunction: validatorFunction,
 	}
 }
 
@@ -87,6 +89,11 @@ func (ci *ConfigItem) GetCurrentValue() interface{} {
 // GetValueType returns the value type integer of the ConfigItem
 func (ci *ConfigItem) GetValueType() int {
 	return ci.valueType
+}
+
+// GetValidatorFunction returns the validator function of the ConfigItem
+func (ci *ConfigItem) GetValidatorFunction() interface{} {
+	return ci.validatorFunction
 }
 
 // SetCurrentValue gets a value interface input. It checks that the current value
@@ -139,8 +146,8 @@ func New() Config {
 
 // AddConfig inserts a new config item to the config. In case of invalid default value type
 // a panic will occure.
-func (c Config) AddConfig(key, label, description string, defaultValue interface{}) {
-	c[key] = NewConfigItem(key, label, description, defaultValue)
+func (c Config) AddConfig(key, label, description string, defaultValue interface{}, validator interface{}) {
+	c[key] = NewConfigItem(key, label, description, defaultValue, validator)
 }
 
 // SetCurrentValue sets the current value of the config item for the given key.
