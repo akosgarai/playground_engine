@@ -2,9 +2,11 @@ package screen
 
 import (
 	"math"
+	"strconv"
 	"strings"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
+	"github.com/akosgarai/playground_engine/pkg/config"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
@@ -14,6 +16,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/primitives/rectangle"
 	"github.com/akosgarai/playground_engine/pkg/shader"
 	"github.com/akosgarai/playground_engine/pkg/texture"
+	"github.com/akosgarai/playground_engine/pkg/transformations"
 
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
@@ -66,6 +69,10 @@ type FormScreen struct {
 	lastItemState    string
 	// Info box for displaying the details of the form items.
 	detailContentBox interfaces.Mesh
+	// configuration package
+	configuration config.Config
+	// map for formItem-configItem
+	formItemToConf map[interfaces.FormItem]*config.ConfigItem
 }
 
 func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
@@ -158,6 +165,8 @@ func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GL
 		formItemCurrentY: float32(0.0),
 		lastItemState:    "F",
 		detailContentBox: detailContainer,
+		configuration:    config.New(),
+		formItemToConf:   make(map[interfaces.FormItem]*config.ConfigItem),
 	}
 }
 
@@ -311,6 +320,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			case *model.FormItemBool:
 				formModel := f.closestModel.(*model.FormItemBool)
 				formModel.SetValue(!formModel.GetValue())
+				f.formItemToConf[formModel].SetCurrentValue(formModel.GetValue())
 				break
 			case *model.FormItemInt:
 				formModel := f.closestModel.(*model.FormItemInt)
@@ -350,6 +360,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		f.sinceLastDelete = 0
 		if f.underEdit != nil {
 			f.underEdit.DeleteLastCharacter()
+			f.syncFormItemValuesToConfigValue()
 			f.charset.CleanSurface(f.underEdit.GetTarget())
 			switch f.underEdit.(type) {
 			case *model.FormItemVector:
@@ -360,6 +371,25 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				break
 			}
 		}
+	}
+}
+func (f *FormScreen) syncFormItemValuesToConfigValue() {
+	switch f.underEdit.(type) {
+	case *model.FormItemInt:
+		f.formItemToConf[f.underEdit].SetCurrentValue(f.underEdit.(*model.FormItemInt).GetValue())
+		break
+	case *model.FormItemFloat:
+		f.formItemToConf[f.underEdit].SetCurrentValue(f.underEdit.(*model.FormItemFloat).GetValue())
+		break
+	case *model.FormItemText:
+		f.formItemToConf[f.underEdit].SetCurrentValue(f.underEdit.(*model.FormItemText).GetValue())
+		break
+	case *model.FormItemInt64:
+		f.formItemToConf[f.underEdit].SetCurrentValue(f.underEdit.(*model.FormItemInt64).GetValue())
+		break
+	case *model.FormItemVector:
+		f.formItemToConf[f.underEdit].SetCurrentValue(f.underEdit.(*model.FormItemVector).GetValue())
+		break
 	}
 }
 
@@ -374,67 +404,115 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWr
 	return len(f.formItems) - 1
 }
 
+// addFormItemFromConfigBool sets up a FormItemBool from a ConfigItem structure.
+func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
+	pos := f.itemPosition(model.ITEM_WIDTH_SHORT, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
+	f.formItemToConf[fi] = configItem
+	return f.addFormItem(fi, wrapper, configItem.GetDefaultValue())
+}
+
 // AddFormItemBool is for adding a bool form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemBool(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue bool) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_SHORT, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
-	return f.addFormItem(fi, wrapper, defaultValue)
+	key := "bool_form_item_" + strconv.Itoa(len(f.configuration))
+	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue)
+	return f.addFormItemFromConfigBool(f.configuration[key], wrapper)
+}
+
+// addFormItemFromConfigInt sets up a FormItemInt from a ConfigItem structure.
+func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, wrapper interfaces.GLWrapper, validator model.IntValidator) int {
+	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
+	if validator != nil {
+		fi.SetValidator(validator)
+	}
+	f.formItemToConf[fi] = configItem
+	return f.addFormItem(fi, wrapper, transformations.IntegerToString(configItem.GetDefaultValue().(int)))
 }
 
 // AddFormItemInt is for adding an integer form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemInt(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.IntValidator) int {
+func (f *FormScreen) AddFormItemInt(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue int, validator model.IntValidator) int {
+	key := "int_form_item_" + strconv.Itoa(len(f.configuration))
+	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue)
+	return f.addFormItemFromConfigInt(f.configuration[key], wrapper, validator)
+}
+
+// addFormItemFromConfigFloat sets up a FormItemFloat from a ConfigItem structure.
+func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, wrapper interfaces.GLWrapper, validator model.FloatValidator) int {
 	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
+	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
-	return f.addFormItem(fi, wrapper, defaultValue)
+	f.formItemToConf[fi] = configItem
+	return f.addFormItem(fi, wrapper, transformations.Float32ToStringExact(configItem.GetDefaultValue().(float32)))
 }
 
 // AddFormItemFloat is for adding a float form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemFloat(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.FloatValidator) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
+func (f *FormScreen) AddFormItemFloat(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue float32, validator model.FloatValidator) int {
+	key := "float_form_item_" + strconv.Itoa(len(f.configuration))
+	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue)
+	return f.addFormItemFromConfigFloat(f.configuration[key], wrapper, validator)
+}
+
+// addFormItemFromConfigText sets up a FormItemText from a ConfigItem structure.
+func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, wrapper interfaces.GLWrapper, validator model.StringValidator) int {
+	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
-	return f.addFormItem(fi, wrapper, defaultValue)
+	f.formItemToConf[fi] = configItem
+	return f.addFormItem(fi, wrapper, configItem.GetDefaultValue())
 }
 
 // AddFormItemText is for adding a text form item to the form. It returns the index of the
 // inserted item.
 func (f *FormScreen) AddFormItemText(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.StringValidator) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
+	key := "text_form_item_" + strconv.Itoa(len(f.configuration))
+	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue)
+	return f.addFormItemFromConfigText(f.configuration[key], wrapper, validator)
+}
+
+// addFormItemFromConfigInt64 sets up a FormItemInt64 from a ConfigItem structure.
+func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, wrapper interfaces.GLWrapper, validator model.Int64Validator) int {
+	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
-	return f.addFormItem(fi, wrapper, defaultValue)
+	f.formItemToConf[fi] = configItem
+	return f.addFormItem(fi, wrapper, transformations.Integer64ToString(configItem.GetDefaultValue().(int64)))
 }
 
 // AddFormItemInt64 is for adding an int64 form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemInt64(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.Int64Validator) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_LONG, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, formLabel, formDescription, material.Whiteplastic, pos, wrapper)
+func (f *FormScreen) AddFormItemInt64(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue int64, validator model.Int64Validator) int {
+	key := "int64_form_item_" + strconv.Itoa(len(f.configuration))
+	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue)
+	return f.addFormItemFromConfigInt64(f.configuration[key], wrapper, validator)
+}
+
+// addFormItemFromConfigVector sets up a FormItemInt64 from a ConfigItem structure.
+func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, wrapper interfaces.GLWrapper, validator model.FloatValidator) int {
+	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
+	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
 	if validator != nil {
 		fi.SetValidator(validator)
 	}
-	return f.addFormItem(fi, wrapper, defaultValue)
+	f.formItemToConf[fi] = configItem
+	return f.addFormItem(fi, wrapper, transformations.VectorToString(configItem.GetDefaultValue().(mgl32.Vec3)))
 }
 
 // AddFormItemVector is for adding a vector form item to the form. It returns the index of the
 // inserted item.
-func (f *FormScreen) AddFormItemVector(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue [3]string, validator model.FloatValidator) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, formLabel, formDescription, model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
-	if validator != nil {
-		fi.SetValidator(validator)
-	}
-	return f.addFormItem(fi, wrapper, defaultValue)
+func (f *FormScreen) AddFormItemVector(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue mgl32.Vec3, validator model.FloatValidator) int {
+	key := "vector_form_item_" + strconv.Itoa(len(f.configuration))
+	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue)
+	return f.addFormItemFromConfigVector(f.configuration[key], wrapper, validator)
 }
 func (f *FormScreen) setDefaultValueChar(input string, wrapper interfaces.GLWrapper) {
 	chars := []rune(input)
@@ -448,6 +526,7 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 	if f.underEdit != nil {
 		offsetX := f.charset.TextWidth(string(char), InputTextFontScale/f.windowWindth)
 		f.underEdit.CharCallback(char, offsetX)
+		f.syncFormItemValuesToConfigValue()
 		f.charset.CleanSurface(f.underEdit.GetTarget())
 		switch f.underEdit.(type) {
 		case *model.FormItemVector:
