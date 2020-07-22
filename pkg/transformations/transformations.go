@@ -28,9 +28,19 @@ func Float64ToString(num float64) string {
 	return strconv.FormatFloat(num, 'f', 10, 32)
 }
 
+// Float64ToStringExact returns the given float number in string format, with precision -1.
+func Float64ToStringExact(num float64) string {
+	return strconv.FormatFloat(num, 'f', -1, 32)
+}
+
 // Float32ToString returns the given float number in string format.
 func Float32ToString(num float32) string {
 	return Float64ToString(float64(num))
+}
+
+// Float32ToStringExact returns the given float number in string format.
+func Float32ToStringExact(num float32) string {
+	return Float64ToStringExact(float64(num))
 }
 
 // IntegerToString returns the string representation of the given integer

@@ -61,6 +61,22 @@ func TestFloat64ToString(t *testing.T) {
 		}
 	}
 }
+func TestFloat64ToStringExact(t *testing.T) {
+	testData := []struct {
+		v float64
+		s string
+	}{
+		{0, "0"},
+		{1, "1"},
+		{0.5, "0.5"},
+	}
+	for _, tt := range testData {
+		str := Float64ToStringExact(tt.v)
+		if str != tt.s {
+			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
+		}
+	}
+}
 func TestFloat32ToString(t *testing.T) {
 	testData := []struct {
 		v float32
@@ -72,6 +88,22 @@ func TestFloat32ToString(t *testing.T) {
 	}
 	for _, tt := range testData {
 		str := Float32ToString(tt.v)
+		if str != tt.s {
+			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
+		}
+	}
+}
+func TestFloat32ToStringExact(t *testing.T) {
+	testData := []struct {
+		v float32
+		s string
+	}{
+		{0, "0"},
+		{1, "1"},
+		{0.5, "0.5"},
+	}
+	for _, tt := range testData {
+		str := Float32ToStringExact(tt.v)
 		if str != tt.s {
 			t.Errorf("Invalid string representation. Instead of '%s', got '%s'", tt.s, str)
 		}
