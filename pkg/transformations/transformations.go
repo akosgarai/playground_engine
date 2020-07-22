@@ -15,6 +15,15 @@ func MouseCoordinates(currentX, currentY, windowWidth, windowHeight float64) (fl
 	return x, y
 }
 
+// VectorToString returns the exact values of the vector component as [3]string.
+func VectorToString(v mgl32.Vec3) [3]string {
+	var result [3]string
+	result[0] = Float32ToStringExact(v.X())
+	result[1] = Float32ToStringExact(v.Y())
+	result[2] = Float32ToStringExact(v.Z())
+	return result
+}
+
 // Vec3ToString helper function for the string representation of a vector. It is for the log.
 func Vec3ToString(v mgl32.Vec3) string {
 	x := Float32ToString(v.X())
@@ -46,6 +55,11 @@ func Float32ToStringExact(num float32) string {
 // IntegerToString returns the string representation of the given integer
 func IntegerToString(num int) string {
 	return strconv.Itoa(num)
+}
+
+// Integer64ToString returns the string representation of the given integer64.
+func Integer64ToString(num int64) string {
+	return strconv.FormatInt(num, 10)
 }
 
 // This function returns the abs. value of a float32 number.
