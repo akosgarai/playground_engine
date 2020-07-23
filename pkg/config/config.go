@@ -96,6 +96,12 @@ func (ci *ConfigItem) GetValidatorFunction() interface{} {
 	return ci.validatorFunction
 }
 
+// IsConfigOf gets a key as input and returns true, if the key is equal with
+// the key of the item
+func (ci *ConfigItem) IsConfigOf(key string) bool {
+	return ci.key == key
+}
+
 // SetCurrentValue gets a value interface input. It checks that the current value
 // type and the default value type is same or not. In case of difference, the value
 // will not be updated.

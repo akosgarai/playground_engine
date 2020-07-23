@@ -17,4 +17,4 @@ The package provides the `NewConfigItem` function for creating config items. The
 
 ## Config
 
-This structure holds ConfigItems. It maps the config item keys to config items. The `New` function is responsible for creating a new (empty) config map. The `AddConfig` function can be used to insert a new ConfigItem. Under the hood, it creates the new ConfigItem with the NewConfigItem function. With the `SetCurrentValue` function we can set the current value of the ConfigItem that is mapped to the given key.
+This structure holds ConfigItems. It maps the config item keys to config items. The `New` function is responsible for creating a new (empty) config map. The `AddConfig` function can be used to insert a new ConfigItem. Under the hood, it creates the new ConfigItem with the NewConfigItem function. With the `SetCurrentValue` function we can set the current value of the ConfigItem that is mapped to the given key. The `IsConfigOf` method could be used to check that the key that we know is connected to the form item or not.
