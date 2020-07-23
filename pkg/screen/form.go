@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	FontFile           = "/assets/fonts/Frijole/Frijole-Regular.ttf"
+	DefaultFontFile    = "/assets/fonts/Frijole/Frijole-Regular.ttf"
 	BottomFrameWidth   = float32(2.0) // the full width of the screen.
 	BottomFrameLength  = float32(0.02)
 	SideFrameLength    = float32(1.98)
@@ -53,10 +53,363 @@ var (
 	HighlightFormItemMaterial = material.Ruby
 )
 
+type FormScreenBuilder struct {
+	headerLabel   string
+	frameMaterial *material.Material
+	wrapper       interfaces.GLWrapper
+	windowWidth   float32
+	windowHeight  float32
+	config        config.Config
+	configOrder   []string
+	charset       *model.Charset
+	camera        *camera.Camera
+	lastItemState string
+	currentY      float32
+}
+
+func NewFormScreenBuilder() *FormScreenBuilder {
+	return &FormScreenBuilder{
+		headerLabel:   "Default label",
+		wrapper:       nil,
+		charset:       nil,
+		camera:        nil,
+		config:        config.New(),
+		lastItemState: "F",
+		currentY:      0.9,
+	}
+}
+
+// SetHeaderLabel sets the value for the header of the form, that is displayed
+// on the top left of the form.
+func (b *FormScreenBuilder) SetHeaderLabel(l string) {
+	b.headerLabel = l
+}
+
+// SetFrameMaterial sets the material that is used for the frame of the screen.
+func (b *FormScreenBuilder) SetFrameMaterial(m *material.Material) {
+	b.frameMaterial = m
+}
+
+// SetWrapper sets the wrapper.
+func (b *FormScreenBuilder) SetWrapper(w interfaces.GLWrapper) {
+	b.wrapper = w
+}
+
+// SetWindowSize sets the windowWidth and the windowHeight parameters.
+func (b *FormScreenBuilder) SetWindowSize(w, h float32) {
+	b.windowWidth = w
+	b.windowHeight = h
+}
+
+// SetConfig sets the config of the form.
+func (b *FormScreenBuilder) SetConfig(c config.Config) {
+	b.config = c
+}
+
+// SetConfigOrder setsh the order of the config items.
+func (b *FormScreenBuilder) SetConfigOrder(o []string) {
+	b.configOrder = o
+}
+
+// SetCharset sets the charset of the form screen.
+func (b *FormScreenBuilder) SetCharset(m *model.Charset) {
+	b.charset = m
+}
+
+// AddConfigBool is for adding a bool config item to the configs. It returns the key of the config.
+func (b *FormScreenBuilder) AddConfigBool(formLabel, formDescription string, defaultValue bool) string {
+	key := "bool_config_item_" + strconv.Itoa(len(b.config))
+	b.config.AddConfig(key, formLabel, formDescription, defaultValue, nil)
+	return key
+}
+
+// AddConfigInt is for adding an integer config item to the configs. It returns the key of the config.
+func (b *FormScreenBuilder) AddConfigInt(formLabel, formDescription string, defaultValue int, validator model.IntValidator) string {
+	key := "int_config_item_" + strconv.Itoa(len(b.config))
+	b.config.AddConfig(key, formLabel, formDescription, defaultValue, validator)
+	return key
+}
+
+// AddConfigFloat is for adding a float config item to the configs. It returns the key of the config.
+func (b *FormScreenBuilder) AddConfigFloat(formLabel, formDescription string, defaultValue float32, validator model.FloatValidator) string {
+	key := "float_config_item_" + strconv.Itoa(len(b.config))
+	b.config.AddConfig(key, formLabel, formDescription, defaultValue, validator)
+	return key
+}
+
+// AddConfigInt64 is for adding an int64 config item to the configs. It returns the key of the config.
+func (b *FormScreenBuilder) AddConfigInt64(formLabel, formDescription string, defaultValue int64, validator model.Int64Validator) string {
+	key := "int64_config_item_" + strconv.Itoa(len(b.config))
+	b.config.AddConfig(key, formLabel, formDescription, defaultValue, validator)
+	return key
+}
+
+// AddConfigVector is for adding a vector config item to the configs. It returns the key of the config.
+func (b *FormScreenBuilder) AddConfigVector(formLabel, formDescription string, defaultValue mgl32.Vec3, validator model.FloatValidator) string {
+	key := "vector_config_item_" + strconv.Itoa(len(b.config))
+	b.config.AddConfig(key, formLabel, formDescription, defaultValue, validator)
+	return key
+}
+
+// AddConfigText is for adding a text config item to the configs. It returns the key of the config.
+func (b *FormScreenBuilder) AddConfigText(formLabel, formDescription string, defaultValue string, validator model.StringValidator) string {
+	key := "text_config_item_" + strconv.Itoa(len(b.config))
+	b.config.AddConfig(key, formLabel, formDescription, defaultValue, validator)
+	return key
+}
+
+// It builds a form screen with the given setup. In case of missing wrapper, it panics.
+func (b *FormScreenBuilder) Build() *FormScreen {
+	if b.wrapper == nil {
+		panic("Wrapper is missing for the build process.")
+	}
+	if b.charset == nil {
+		b.defaultCharset()
+	}
+	s := newScreenBase()
+	s.SetCamera(b.defaultCamera())
+	s.Setup(setup)
+	s.SetWindowSize(b.windowWidth, b.windowHeight)
+	s.SetWrapper(b.wrapper)
+	bgShaderApplication := shader.NewTextureMatShaderBlending(b.wrapper)
+	frameShaderApplication := shader.NewMaterialShader(b.wrapper)
+	fgShaderApplication := shader.NewFontShader(b.wrapper)
+	s.AddShader(bgShaderApplication)
+	s.AddShader(fgShaderApplication)
+	s.AddShader(frameShaderApplication)
+
+	directionalLightSource := light.NewDirectionalLight([4]mgl32.Vec3{
+		DirectionalLightDirection,
+		DirectionalLightAmbient,
+		DirectionalLightDiffuse,
+		DirectionalLightSpecular,
+	})
+	s.AddDirectionalLightSource(directionalLightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
+	s.AddModelToShader(b.charset, fgShaderApplication)
+
+	frameModel := model.New()
+	// create frame.
+	textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
+	textContainer := b.frameRectangle(textWidth, 0.15, mgl32.Vec3{1 - TopLeftFrameWidth - textWidth/2, 0.925, ZFrame})
+	textContainer.RotateX(-180)
+	textContainer.RotateY(180)
+	b.charset.PrintTo(b.headerLabel, -textWidth/2, -0.05, ZText, 3.0/b.windowWidth, b.wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	detailContainer := b.frameRectangleWithMaterial(FullWidth, 0.3, mgl32.Vec3{0.0, -1.0 + BottomFrameLength + 0.15, ZFrame}, DefaultFormItemMaterial)
+	detailContainer.RotateX(-180)
+	detailContainer.RotateY(180)
+	frameModel.AddMesh(b.frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, ZFrame}))
+	frameModel.AddMesh(detailContainer)
+	s.AddModelToShader(frameModel, frameShaderApplication)
+
+	formScreen := &FormScreen{
+		ScreenBase:       s,
+		charset:          b.charset,
+		formItemShader:   bgShaderApplication,
+		sinceLastClick:   0,
+		formItemCurrentY: float32(0.0),
+		detailContentBox: detailContainer,
+		formItemToConf:   make(map[interfaces.FormItem]*config.ConfigItem),
+	}
+	for i := 0; i < len(b.configOrder); i++ {
+		key := b.configOrder[i]
+		if _, ok := b.config[key]; ok {
+			switch b.config[key].GetValueType() {
+			case config.ValueTypeInt:
+				formScreen.addFormItemFromConfigInt(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				break
+			case config.ValueTypeInt64:
+				formScreen.addFormItemFromConfigInt64(b.config[key], b.itemPosition(model.ITEM_WIDTH_LONG, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				break
+			case config.ValueTypeFloat:
+				formScreen.addFormItemFromConfigFloat(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				break
+			case config.ValueTypeText:
+				formScreen.addFormItemFromConfigText(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				break
+			case config.ValueTypeBool:
+				formScreen.addFormItemFromConfigBool(b.config[key], b.itemPosition(model.ITEM_WIDTH_SHORT, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				break
+			case config.ValueTypeVector:
+				formScreen.addFormItemFromConfigVector(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				break
+			}
+		}
+	}
+	formScreen.currentY = b.currentY
+
+	return formScreen
+}
+
+// It creates a rectangle for the screen frame.
+func (b *FormScreenBuilder) frameRectangle(width, length float32, position mgl32.Vec3) *mesh.TexturedMaterialMesh {
+	return b.frameRectangleWithMaterial(width, length, position, b.frameMaterial)
+}
+func (b *FormScreenBuilder) frameRectangleWithMaterial(width, length float32, position mgl32.Vec3, mat *material.Material) *mesh.TexturedMaterialMesh {
+	v, i, _ := rectangle.NewExact(width, length).MeshInput()
+	var tex texture.Textures
+	tex.TransparentTexture(1, 1, 128, "tex.diffuse", b.wrapper)
+	tex.TransparentTexture(1, 1, 128, "tex.specular", b.wrapper)
+	frameMesh := mesh.NewTexturedMaterialMesh(v, i, tex, mat, b.wrapper)
+	frameMesh.RotateX(90)
+	frameMesh.SetPosition(position)
+	return frameMesh
+}
+
+func (b *FormScreenBuilder) defaultCharset() {
+	cs, err := model.LoadCharset(baseDirScreen()+DefaultFontFile, 32, 127, 40.0, 72, b.wrapper)
+	if err != nil {
+		panic(err)
+	}
+	cs.SetTransparent(true)
+	b.charset = cs
+}
+
+// It creates a new camera with the necessary setup
+func (b *FormScreenBuilder) defaultCamera() *camera.Camera {
+	cam := camera.NewCamera(mgl32.Vec3{0, 0, -1.8}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
+	cam.SetupProjection(45, b.windowWidth/b.windowHeight, 0.001, 10.0)
+	return cam
+}
+func (b *FormScreenBuilder) itemPosition(itemWidth, itemHeight float32) mgl32.Vec3 {
+	b.pushState(itemWidth)
+	var x float32
+	switch b.lastItemState {
+	case "F":
+		b.currentY = b.currentY - itemHeight
+		x = 0.0
+		break
+	case "LH":
+		b.currentY = b.currentY - itemHeight
+		x = FullWidth / 4
+		break
+	case "LL":
+		b.currentY = b.currentY - itemHeight
+		x = FullWidth / 6
+		break
+	case "LS":
+		b.currentY = b.currentY - itemHeight
+		x = FullWidth / 3
+		break
+	case "RH":
+		x = -FullWidth / 4
+		break
+	case "RL":
+		x = -FullWidth / 6
+		break
+	case "RS":
+		x = -FullWidth / 3
+		break
+	case "MS":
+		x = 0.0
+		break
+	}
+
+	return mgl32.Vec3{x, b.currentY, ZBackground}
+}
+func (b *FormScreenBuilder) pushState(itemWidth float32) {
+	switch b.lastItemState {
+	case "F", "RH", "RL", "RS":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			b.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			b.lastItemState = "LH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			b.lastItemState = "LL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			b.lastItemState = "LS"
+			break
+		default:
+			panic("Unhandled state.")
+		}
+		break
+	case "LH":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			b.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			b.lastItemState = "RH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			b.lastItemState = "LL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			b.lastItemState = "RS"
+			break
+		default:
+			panic("Unhandled state.")
+		}
+		break
+	case "LL":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			b.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			b.lastItemState = "LH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			b.lastItemState = "LL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			b.lastItemState = "RS"
+			break
+		default:
+			panic("Unhandled state.")
+		}
+		break
+	case "LS":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			b.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			b.lastItemState = "RH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			b.lastItemState = "RL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			b.lastItemState = "MS"
+			break
+		default:
+			panic("Unhandled state.")
+		}
+		break
+	case "MS":
+		switch itemWidth {
+		case model.ITEM_WIDTH_FULL:
+			b.lastItemState = "F"
+			break
+		case model.ITEM_WIDTH_HALF:
+			b.lastItemState = "LH"
+			break
+		case model.ITEM_WIDTH_LONG:
+			b.lastItemState = "LL"
+			break
+		case model.ITEM_WIDTH_SHORT:
+			b.lastItemState = "RS"
+			break
+		default:
+			panic("Unhandled state.")
+		}
+		break
+	default:
+		panic("Unhandled state.")
+	}
+}
+
 type FormScreen struct {
 	*ScreenBase
 	charset         *model.Charset
-	formItems       []interfaces.FormItem
 	formItemShader  *shader.Shader
 	sinceLastClick  float64
 	sinceLastDelete float64
@@ -67,36 +420,8 @@ type FormScreen struct {
 	lastItemState    string
 	// Info box for displaying the details of the form items.
 	detailContentBox interfaces.Mesh
-	// configuration package
-	configuration config.Config
 	// map for formItem-configItem
 	formItemToConf map[interfaces.FormItem]*config.ConfigItem
-}
-
-func frameRectangle(width, length float32, position mgl32.Vec3, mat *material.Material, wrapper interfaces.GLWrapper) *mesh.TexturedMaterialMesh {
-	v, i, _ := rectangle.NewExact(width, length).MeshInput()
-	var tex texture.Textures
-	tex.TransparentTexture(1, 1, 128, "tex.diffuse", wrapper)
-	tex.TransparentTexture(1, 1, 128, "tex.specular", wrapper)
-	frameMesh := mesh.NewTexturedMaterialMesh(v, i, tex, mat, wrapper)
-	frameMesh.RotateX(90)
-	frameMesh.SetPosition(position)
-	return frameMesh
-}
-func charset(wrapper interfaces.GLWrapper) *model.Charset {
-	cs, err := model.LoadCharset(baseDirScreen()+FontFile, 32, 127, 40.0, 72, wrapper)
-	if err != nil {
-		panic(err)
-	}
-	cs.SetTransparent(true)
-	return cs
-}
-
-// It creates a new camera with the necessary setup
-func createCamera(ratio float32) *camera.Camera {
-	camera := camera.NewCamera(mgl32.Vec3{0, 0, -1.8}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
-	camera.SetupProjection(45, ratio, 0.001, 10.0)
-	return camera
 }
 
 func setup(wrapper interfaces.GLWrapper) {
@@ -105,97 +430,6 @@ func setup(wrapper interfaces.GLWrapper) {
 	wrapper.DepthFunc(glwrapper.LESS)
 	wrapper.Enable(glwrapper.BLEND)
 	wrapper.BlendFunc(glwrapper.SRC_APLHA, glwrapper.ONE_MINUS_SRC_ALPHA)
-}
-
-// NewFormScreenFromConfig returns a FormScreen. The formItems are also set, based on the input config, and config order.
-func NewFormScreenFromConfig(frame *material.Material, label string, wrapper interfaces.GLWrapper, wW, wH float32, conf config.Config, formItemOrder []string) *FormScreen {
-	formScreen := NewFormScreen(frame, label, wrapper, wW, wH)
-	formScreen.configuration = conf
-	for i := 0; i < len(formItemOrder); i++ {
-		key := formItemOrder[i]
-		if _, ok := formScreen.configuration[key]; ok {
-			switch formScreen.configuration[key].GetValueType() {
-			case config.ValueTypeInt:
-				formScreen.addFormItemFromConfigInt(conf[key], wrapper)
-				break
-			case config.ValueTypeInt64:
-				formScreen.addFormItemFromConfigInt64(conf[key], wrapper)
-				break
-			case config.ValueTypeFloat:
-				formScreen.addFormItemFromConfigFloat(conf[key], wrapper)
-				break
-			case config.ValueTypeText:
-				formScreen.addFormItemFromConfigText(conf[key], wrapper)
-				break
-			case config.ValueTypeBool:
-				formScreen.addFormItemFromConfigBool(conf[key], wrapper)
-				break
-			case config.ValueTypeVector:
-				formScreen.addFormItemFromConfigVector(conf[key], wrapper)
-				break
-			}
-		}
-	}
-	return formScreen
-}
-
-// NewFormScreen returns a FormScreen. The screen contains a material Frame.
-func NewFormScreen(frame *material.Material, label string, wrapper interfaces.GLWrapper, wW, wH float32) *FormScreen {
-	s := newScreenBase()
-	s.SetCamera(createCamera(wW / wH))
-	s.Setup(setup)
-	s.SetWindowSize(wW, wH)
-	s.SetWrapper(wrapper)
-	bgShaderApplication := shader.NewTextureMatShaderBlending(wrapper)
-	frameShaderApplication := shader.NewMaterialShader(wrapper)
-	fgShaderApplication := shader.NewFontShader(wrapper)
-	s.AddShader(bgShaderApplication)
-	s.AddShader(fgShaderApplication)
-	s.AddShader(frameShaderApplication)
-	LightSource := light.NewDirectionalLight([4]mgl32.Vec3{
-		DirectionalLightDirection,
-		DirectionalLightAmbient,
-		DirectionalLightDiffuse,
-		DirectionalLightSpecular,
-	})
-	s.AddDirectionalLightSource(LightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
-
-	chars := charset(wrapper)
-	s.AddModelToShader(chars, fgShaderApplication)
-	frameModel := model.New()
-	// create frame.
-	bottomFrame := frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, ZFrame}, frame, wrapper)
-	leftFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, ZFrame}, frame, wrapper)
-	rightFrame := frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, ZFrame}, frame, wrapper)
-	topLeftFrame := frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, ZFrame}, frame, wrapper)
-	textWidth := chars.TextWidth(label, 3.0/wW)
-	textContainer := frameRectangle(textWidth, 0.15, mgl32.Vec3{1 - TopLeftFrameWidth - textWidth/2, 0.925, ZFrame}, frame, wrapper)
-	textContainer.RotateX(-180)
-	textContainer.RotateY(180)
-	chars.PrintTo(label, -textWidth/2, -0.05, ZText, 3.0/wW, wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	topRightFrame := frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, ZFrame}, frame, wrapper)
-	detailContainer := frameRectangle(FullWidth, 0.3, mgl32.Vec3{0.0, -1.0 + BottomFrameLength + 0.15, ZFrame}, DefaultFormItemMaterial, wrapper)
-	detailContainer.RotateX(-180)
-	detailContainer.RotateY(180)
-	frameModel.AddMesh(bottomFrame)
-	frameModel.AddMesh(leftFrame)
-	frameModel.AddMesh(rightFrame)
-	frameModel.AddMesh(topLeftFrame)
-	frameModel.AddMesh(topRightFrame)
-	frameModel.AddMesh(detailContainer)
-	s.AddModelToShader(frameModel, frameShaderApplication)
-	return &FormScreen{
-		ScreenBase:       s,
-		charset:          chars,
-		formItemShader:   bgShaderApplication,
-		sinceLastClick:   0,
-		currentY:         0.9,
-		formItemCurrentY: float32(0.0),
-		lastItemState:    "F",
-		detailContentBox: detailContainer,
-		configuration:    config.New(),
-		formItemToConf:   make(map[interfaces.FormItem]*config.ConfigItem),
-	}
 }
 
 // initMaterialForTheFormItems sets the material to the default of the form items.
@@ -421,131 +655,76 @@ func (f *FormScreen) syncFormItemValuesToConfigValue() {
 	}
 }
 
-func (f *FormScreen) addFormItem(fi interfaces.FormItem, wrapper interfaces.GLWrapper, defaultValue interface{}) int {
+func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{}) {
 	fi.RotateX(-90)
 	fi.RotateY(180)
 	fi.SetSpeed(FormItemMoveSpeed)
 	f.AddModelToShader(fi, f.formItemShader)
-	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, ZText, LabelFontScale/f.windowWindth, wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	f.formItems = append(f.formItems, fi)
-	f.SetFormItemValue(len(f.formItems)-1, defaultValue, wrapper)
-	return len(f.formItems) - 1
+	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, ZText, LabelFontScale/f.windowWindth, f.wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.SetFormItemValue(fi, defaultValue)
 }
 
 // addFormItemFromConfigBool sets up a FormItemBool from a ConfigItem structure.
-func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_SHORT, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
+func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, pos mgl32.Vec3) {
+	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	f.formItemToConf[fi] = configItem
-	return f.addFormItem(fi, wrapper, configItem.GetDefaultValue())
-}
-
-// AddFormItemBool is for adding a bool form item to the form. It returns the index of the
-// inserted item.
-func (f *FormScreen) AddFormItemBool(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue bool) int {
-	key := "bool_form_item_" + strconv.Itoa(len(f.configuration))
-	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue, nil)
-	return f.addFormItemFromConfigBool(f.configuration[key], wrapper)
+	f.addFormItem(fi, configItem.GetDefaultValue())
 }
 
 // addFormItemFromConfigInt sets up a FormItemInt from a ConfigItem structure.
-func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
+func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos mgl32.Vec3) {
+	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.IntValidator))
 	}
 	f.formItemToConf[fi] = configItem
-	return f.addFormItem(fi, wrapper, transformations.IntegerToString(configItem.GetDefaultValue().(int)))
-}
-
-// AddFormItemInt is for adding an integer form item to the form. It returns the index of the
-// inserted item.
-func (f *FormScreen) AddFormItemInt(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue int, validator model.IntValidator) int {
-	key := "int_form_item_" + strconv.Itoa(len(f.configuration))
-	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue, validator)
-	return f.addFormItemFromConfigInt(f.configuration[key], wrapper)
+	f.addFormItem(fi, transformations.IntegerToString(configItem.GetDefaultValue().(int)))
 }
 
 // addFormItemFromConfigFloat sets up a FormItemFloat from a ConfigItem structure.
-func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
+func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, pos mgl32.Vec3) {
+	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
 	f.formItemToConf[fi] = configItem
-	return f.addFormItem(fi, wrapper, transformations.Float32ToStringExact(configItem.GetDefaultValue().(float32)))
-}
-
-// AddFormItemFloat is for adding a float form item to the form. It returns the index of the
-// inserted item.
-func (f *FormScreen) AddFormItemFloat(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue float32, validator model.FloatValidator) int {
-	key := "float_form_item_" + strconv.Itoa(len(f.configuration))
-	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue, validator)
-	return f.addFormItemFromConfigFloat(f.configuration[key], wrapper)
+	f.addFormItem(fi, transformations.Float32ToStringExact(configItem.GetDefaultValue().(float32)))
 }
 
 // addFormItemFromConfigText sets up a FormItemText from a ConfigItem structure.
-func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
+func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, pos mgl32.Vec3) {
+	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.StringValidator))
 	}
 	f.formItemToConf[fi] = configItem
-	return f.addFormItem(fi, wrapper, configItem.GetDefaultValue())
-}
-
-// AddFormItemText is for adding a text form item to the form. It returns the index of the
-// inserted item.
-func (f *FormScreen) AddFormItemText(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue string, validator model.StringValidator) int {
-	key := "text_form_item_" + strconv.Itoa(len(f.configuration))
-	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue, validator)
-	return f.addFormItemFromConfigText(f.configuration[key], wrapper)
+	f.addFormItem(fi, configItem.GetDefaultValue())
 }
 
 // addFormItemFromConfigInt64 sets up a FormItemInt64 from a ConfigItem structure.
-func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, wrapper)
+func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, pos mgl32.Vec3) {
+	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.Int64Validator))
 	}
 	f.formItemToConf[fi] = configItem
-	return f.addFormItem(fi, wrapper, transformations.Integer64ToString(configItem.GetDefaultValue().(int64)))
-}
-
-// AddFormItemInt64 is for adding an int64 form item to the form. It returns the index of the
-// inserted item.
-func (f *FormScreen) AddFormItemInt64(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue int64, validator model.Int64Validator) int {
-	key := "int64_form_item_" + strconv.Itoa(len(f.configuration))
-	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue, validator)
-	return f.addFormItemFromConfigInt64(f.configuration[key], wrapper)
+	f.addFormItem(fi, transformations.Integer64ToString(configItem.GetDefaultValue().(int64)))
 }
 
 // addFormItemFromConfigVector sets up a FormItemInt64 from a ConfigItem structure.
-func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, wrapper interfaces.GLWrapper) int {
-	pos := f.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER)
-	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, wrapper)
+func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, pos mgl32.Vec3) {
+	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
 	f.formItemToConf[fi] = configItem
-	return f.addFormItem(fi, wrapper, transformations.VectorToString(configItem.GetDefaultValue().(mgl32.Vec3)))
+	f.addFormItem(fi, transformations.VectorToString(configItem.GetDefaultValue().(mgl32.Vec3)))
 }
 
-// AddFormItemVector is for adding a vector form item to the form. It returns the index of the
-// inserted item.
-func (f *FormScreen) AddFormItemVector(formLabel, formDescription string, wrapper interfaces.GLWrapper, defaultValue mgl32.Vec3, validator model.FloatValidator) int {
-	key := "vector_form_item_" + strconv.Itoa(len(f.configuration))
-	f.configuration.AddConfig(key, formLabel, formDescription, defaultValue, validator)
-	return f.addFormItemFromConfigVector(f.configuration[key], wrapper)
-}
-func (f *FormScreen) setDefaultValueChar(input string, wrapper interfaces.GLWrapper) {
+func (f *FormScreen) setDefaultValueChar(input string) {
 	chars := []rune(input)
 	for i := 0; i < len(chars); i++ {
-		f.CharCallback(chars[i], wrapper)
+		f.CharCallback(chars[i], f.wrapper)
 	}
 }
 
@@ -567,19 +746,19 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 	}
 }
 
-// GetFormItem gets an index as input, and returns formItem[index] form item.
-// In case of invalid index, it panics.
-func (f *FormScreen) GetFormItem(index int) interfaces.FormItem {
-	if index > len(f.formItems) {
-		panic("Invalid form item index.")
+// GetFormItem gets a configkey as input, and returns the form item tha connects to the config.
+// In case of invalid key, it panics.
+func (f *FormScreen) GetFormItem(configKey string) interfaces.FormItem {
+	for fi, v := range f.formItemToConf {
+		if v.IsConfigOf(configKey) {
+			return fi
+		}
 	}
-	return f.formItems[index]
+	panic("Invalid config key:" + configKey)
 }
 
-// SetFormItemValue gets an index, a value and and a wrapper and sets the form
-// item value of the formItem[index].
-func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper interfaces.GLWrapper) {
-	item := f.GetFormItem(index)
+// SetFormItemValue gets a FormItem, a value and sets the value of the form item to the new one.
+func (f *FormScreen) SetFormItemValue(item interfaces.FormItem, valueNew interface{}) {
 	switch item.(type) {
 	case *model.FormItemInt:
 		f.underEdit = item.(*model.FormItemInt)
@@ -588,7 +767,7 @@ func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper i
 		for i := 0; i < valueLength; i++ {
 			f.underEdit.DeleteLastCharacter()
 		}
-		f.setDefaultValueChar(valueNew.(string), wrapper)
+		f.setDefaultValueChar(valueNew.(string))
 		break
 	case *model.FormItemFloat:
 		f.underEdit = item.(*model.FormItemFloat)
@@ -597,7 +776,7 @@ func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper i
 		for i := 0; i < valueLength; i++ {
 			f.underEdit.DeleteLastCharacter()
 		}
-		f.setDefaultValueChar(valueNew.(string), wrapper)
+		f.setDefaultValueChar(valueNew.(string))
 		break
 	case *model.FormItemText:
 		f.underEdit = item.(*model.FormItemText)
@@ -606,7 +785,7 @@ func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper i
 		for i := 0; i < valueLength; i++ {
 			f.underEdit.DeleteLastCharacter()
 		}
-		f.setDefaultValueChar(valueNew.(string), wrapper)
+		f.setDefaultValueChar(valueNew.(string))
 		break
 	case *model.FormItemInt64:
 		f.underEdit = item.(*model.FormItemInt64)
@@ -615,7 +794,7 @@ func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper i
 		for i := 0; i < valueLength; i++ {
 			f.underEdit.DeleteLastCharacter()
 		}
-		f.setDefaultValueChar(valueNew.(string), wrapper)
+		f.setDefaultValueChar(valueNew.(string))
 		break
 	case *model.FormItemBool:
 		fi := item.(*model.FormItemBool)
@@ -631,140 +810,8 @@ func (f *FormScreen) SetFormItemValue(index int, valueNew interface{}, wrapper i
 			for i := 0; i < valueLength; i++ {
 				f.underEdit.DeleteLastCharacter()
 			}
-			f.setDefaultValueChar(newValues[i], wrapper)
+			f.setDefaultValueChar(newValues[i])
 		}
 		break
 	}
-}
-func (f *FormScreen) pushState(itemWidth float32) {
-	switch f.lastItemState {
-	case "F", "RH", "RL", "RS":
-		switch itemWidth {
-		case model.ITEM_WIDTH_FULL:
-			f.lastItemState = "F"
-			break
-		case model.ITEM_WIDTH_HALF:
-			f.lastItemState = "LH"
-			break
-		case model.ITEM_WIDTH_LONG:
-			f.lastItemState = "LL"
-			break
-		case model.ITEM_WIDTH_SHORT:
-			f.lastItemState = "LS"
-			break
-		default:
-			panic("Unhandled state.")
-		}
-		break
-	case "LH":
-		switch itemWidth {
-		case model.ITEM_WIDTH_FULL:
-			f.lastItemState = "F"
-			break
-		case model.ITEM_WIDTH_HALF:
-			f.lastItemState = "RH"
-			break
-		case model.ITEM_WIDTH_LONG:
-			f.lastItemState = "LL"
-			break
-		case model.ITEM_WIDTH_SHORT:
-			f.lastItemState = "RS"
-			break
-		default:
-			panic("Unhandled state.")
-		}
-		break
-	case "LL":
-		switch itemWidth {
-		case model.ITEM_WIDTH_FULL:
-			f.lastItemState = "F"
-			break
-		case model.ITEM_WIDTH_HALF:
-			f.lastItemState = "LH"
-			break
-		case model.ITEM_WIDTH_LONG:
-			f.lastItemState = "LL"
-			break
-		case model.ITEM_WIDTH_SHORT:
-			f.lastItemState = "RS"
-			break
-		default:
-			panic("Unhandled state.")
-		}
-		break
-	case "LS":
-		switch itemWidth {
-		case model.ITEM_WIDTH_FULL:
-			f.lastItemState = "F"
-			break
-		case model.ITEM_WIDTH_HALF:
-			f.lastItemState = "RH"
-			break
-		case model.ITEM_WIDTH_LONG:
-			f.lastItemState = "RL"
-			break
-		case model.ITEM_WIDTH_SHORT:
-			f.lastItemState = "MS"
-			break
-		default:
-			panic("Unhandled state.")
-		}
-		break
-	case "MS":
-		switch itemWidth {
-		case model.ITEM_WIDTH_FULL:
-			f.lastItemState = "F"
-			break
-		case model.ITEM_WIDTH_HALF:
-			f.lastItemState = "LH"
-			break
-		case model.ITEM_WIDTH_LONG:
-			f.lastItemState = "LL"
-			break
-		case model.ITEM_WIDTH_SHORT:
-			f.lastItemState = "RS"
-			break
-		default:
-			panic("Unhandled state.")
-		}
-		break
-	default:
-		panic("Unhandled state.")
-	}
-}
-func (f *FormScreen) itemPosition(itemWidth, itemHeight float32) mgl32.Vec3 {
-	f.pushState(itemWidth)
-	var x float32
-	switch f.lastItemState {
-	case "F":
-		f.currentY = f.currentY - itemHeight
-		x = 0.0
-		break
-	case "LH":
-		f.currentY = f.currentY - itemHeight
-		x = FullWidth / 4
-		break
-	case "LL":
-		f.currentY = f.currentY - itemHeight
-		x = FullWidth / 6
-		break
-	case "LS":
-		f.currentY = f.currentY - itemHeight
-		x = FullWidth / 3
-		break
-	case "RH":
-		x = -FullWidth / 4
-		break
-	case "RL":
-		x = -FullWidth / 6
-		break
-	case "RS":
-		x = -FullWidth / 3
-		break
-	case "MS":
-		x = 0.0
-		break
-	}
-
-	return mgl32.Vec3{x, f.currentY, ZBackground}
 }

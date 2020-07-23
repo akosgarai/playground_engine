@@ -110,9 +110,22 @@ This screen is for displaying menus. It holds a Charset model, a texture for the
 
 ### FormScreen
 
-This screen is for displaying forms, like a settings page. For displaying stuff, it uses the following system:
+This screen is for displaying forms, like a settings page. It holds the followings:
 
-- Full width items for text inputs.
+- charset - the charset model for displaying text.
+- formItemShader - the shader that is used for rendering the form items.
+- sinceLastClick - the time since the last click event.
+- sinceLastDelete - the time since the last character deletion event.
+- underEdit - the character based form item, that is currently edited.
+- currentY - This value is used mostly for building the form. It also used for the movement of the form items (max y value calculation).
+- formItemCurrentY - The current offset of the form items in the Y axis. (move the screen with up / down cursors.)
+- lastItemState - It is the state of the latest inserted form item.
+- detailContentBox - The mesh of the detail container. It makes its update easier.
+- formItemToConf - It maps the FormItems to ConfigItems. It is used to sync the values.
+
+For displaying stuff, it uses the following system:
+
+- Full width items for text / vector inputs.
 - Half width items for int / float inputs.
 - Long width items for int64 inputs.
 - Short width items for bool inputs.
@@ -167,3 +180,15 @@ RS  -(Half)->   LH
 RS  -(Long)->   LL
 RS  -(Short)->  LS
 ```
+
+#### FormScreenBuilder
+
+This tool is provided for creating forms. The following variables could be set during the construction.
+
+- headerLabel - This is displayed on the top left of the screen.
+- frameMaterial - The material of the screen frame is set to this.
+- wrapper - The gl wrapper for the screen.
+- windowWidth, windowHeight - The size of the window.
+- config - The form items are based on this configuration.
+- configOrder - The order of the form items.
+- charset - The charset model that will be used for text writing.
