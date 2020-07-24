@@ -110,7 +110,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 // It creates a new camera with the necessary setup
 func (b *ScreenWithFrameBuilder) defaultCamera() *camera.Camera {
 	mat := mgl32.Perspective(b.fov, b.windowWidth/b.windowHeight, 0.001, 10)
-	cam := camera.NewCamera(mgl32.Vec3{0, 0, -mat[0]}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
+	cam := camera.NewCamera(mgl32.Vec3{0, 0, -mat[0] * (b.frameWidth / 2)}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
 	cam.SetupProjection(b.fov, b.windowWidth/b.windowHeight, 0.001, 10.0)
 	return cam
 }
