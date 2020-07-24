@@ -656,6 +656,12 @@ func TestMenuSetState(t *testing.T) {
 		t.Error("Invalid state")
 	}
 }
+func newFormScreen() *FormScreen {
+	builder := NewFormScreenBuilder()
+	builder.SetWrapper(wrapperReal)
+	builder.SetWindowSize(800, 800)
+	return builder.Build()
+}
 func TestNewFormScreen(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
@@ -667,50 +673,13 @@ func TestNewFormScreen(t *testing.T) {
 				t.Errorf("Shouldn't have panic, %#v.", r)
 			}
 		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
-		wW := float32(800)
-		wH := float32(800)
 		runtime.LockOSThread()
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		form := newFormScreen()
 		defer testhelper.GlfwTerminate()
-		if len(form.configuration) != 0 {
-			t.Errorf("Invalid initial configuration length. '%d'.", len(form.configuration))
-		}
-	}()
-}
-func TestNewFormScreenFromConfig(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping it in short mode")
-	}
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				defer testhelper.GlfwTerminate()
-				t.Errorf("Shouldn't have panic, %#v.", r)
-			}
-		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
-		wW := float32(800)
-		wH := float32(800)
-		runtime.LockOSThread()
-		testhelper.GlfwInit()
-		wrapperReal.InitOpenGL()
-		conf := config.New()
-		conf.AddConfig("key1", "label1", "desc1", "value", nil)
-		conf.AddConfig("key2", "label2", "desc2", 1, nil)
-		conf.AddConfig("key3", "label3", "desc3", float32(1), nil)
-		conf.AddConfig("key4", "label4", "desc4", int64(1), nil)
-		conf.AddConfig("key5", "label5", "desc5", false, nil)
-		conf.AddConfig("key6", "label6", "desc6", mgl32.Vec3{0, 0, 0}, nil)
-		order := []string{"key1", "key2", "key3", "key4", "key5", "key6", "key7"}
-		form := NewFormScreenFromConfig(frameMat, screenLabel, wrapperReal, wW, wH, conf, order)
-		defer testhelper.GlfwTerminate()
-		if len(form.configuration) != len(conf) {
-			t.Errorf("Invalid initial configuration length. Instead of '%d', we have '%d'.", len(conf), len(form.configuration))
+		if len(form.formItemToConf) != 0 {
+			t.Errorf("Invalid initial formItemToConf length. '%d'.", len(form.formItemToConf))
 		}
 	}()
 }
@@ -725,40 +694,37 @@ func TestFormScreenUpdate(t *testing.T) {
 				t.Errorf("Shouldn't have panic, %#v.", r)
 			}
 		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
+		builder := NewFormScreenBuilder()
+		builder.SetWrapper(wrapperReal)
+		builder.SetWindowSize(wW, wH)
+		builder.SetConfigOrder([]string{
+			builder.AddConfigBool("label bool", DefaultFormItemDescription, true),
+			builder.AddConfigInt("label int", DefaultFormItemDescription, 1, nil),
+			builder.AddConfigInt64("label int64", DefaultFormItemDescription, 10, nil),
+			builder.AddConfigFloat("label float", DefaultFormItemDescription, 0.44, nil),
+			builder.AddConfigText("label text", DefaultFormItemDescription, "sample", nil),
+			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
+		})
+		form := builder.Build()
 		ks := store.NewGlfwKeyStore()
 		ms := store.NewGlfwMouseStore()
 		form.Update(10, 0.5, 0.5, ks, ms)
-		// add option
-		index := form.AddFormItemBool("label bool", DefaultFormItemDescription, wrapperReal, true)
-		form.Update(10, -0.4, 0.79, ks, ms)
-		form.AddFormItemInt("label int", DefaultFormItemDescription, wrapperReal, 1, nil)
 		form.Update(10, -0.4, 0.79, ks, ms)
 		ms.Set(LEFT_MOUSE_BUTTON, true)
 		form.sinceLastClick = 201
 		form.Update(10, -0.4, 0.79, ks, ms)
-		if form.GetFormItem(index).(*model.FormItemBool).GetValue() != false {
-			t.Error("FormItemBool value should be toggled.")
-		}
 		form.sinceLastClick = 201
 		form.Update(10, 0.4, 0.79, ks, ms)
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
 		ks.Set(BACK_SPACE, true)
 		form.Update(10, 0.4, 0.79, ks, ms)
-		// further options
-		form.AddFormItemInt64("label int64", DefaultFormItemDescription, wrapperReal, 10, nil)
-		form.AddFormItemFloat("label float", DefaultFormItemDescription, wrapperReal, 0.44, nil)
-		form.AddFormItemText("label text", DefaultFormItemDescription, wrapperReal, "sample", nil)
-		form.AddFormItemVector("label vector", DefaultFormItemDescription, wrapperReal, mgl32.Vec3{0.01, 0.02, 0.03}, nil)
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
 		form.Update(10, 0.4, 0.69, ks, ms)
@@ -776,166 +742,6 @@ func TestFormScreenUpdate(t *testing.T) {
 		form.Update(10, 0.2, 0.49, ks, ms)
 	}()
 }
-func TestFormScreenAddFormItemBool(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping it in short mode")
-	}
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				defer testhelper.GlfwTerminate()
-				t.Errorf("Shouldn't have panic, %#v.", r)
-			}
-		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
-		wW := float32(800)
-		wH := float32(800)
-		runtime.LockOSThread()
-		testhelper.GlfwInit()
-		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
-		defer testhelper.GlfwTerminate()
-		labels := []string{"label1", "label2", "label3", "label4"}
-		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemBool(labels[i], DefaultFormItemDescription, wrapperReal, true)
-			if index != i {
-				t.Error("Invalid index.")
-			}
-			if len(form.formItems) != i+1 {
-				t.Error("Invalid number of form items.")
-			}
-		}
-	}()
-}
-func TestFormScreenAddFormItemInt(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping it in short mode")
-	}
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				defer testhelper.GlfwTerminate()
-				t.Errorf("Shouldn't have panic, %#v.", r)
-			}
-		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
-		wW := float32(800)
-		wH := float32(800)
-		runtime.LockOSThread()
-		testhelper.GlfwInit()
-		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
-		defer testhelper.GlfwTerminate()
-		labels := []string{"label1", "label2", "label3", "label4"}
-		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemInt(labels[i], DefaultFormItemDescription, wrapperReal, 1, nil)
-			if index != i {
-				t.Error("Invalid index.")
-			}
-			if len(form.formItems) != i+1 {
-				t.Error("Invalid number of form items.")
-			}
-		}
-	}()
-}
-func TestFormScreenAddFormItemFloat(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping it in short mode")
-	}
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				defer testhelper.GlfwTerminate()
-				t.Errorf("Shouldn't have panic, %#v.", r)
-			}
-		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
-		wW := float32(800)
-		wH := float32(800)
-		runtime.LockOSThread()
-		testhelper.GlfwInit()
-		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
-		defer testhelper.GlfwTerminate()
-		labels := []string{"label1", "label2", "label3", "label4"}
-		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemFloat(labels[i], DefaultFormItemDescription, wrapperReal, 0.2, nil)
-			if index != i {
-				t.Error("Invalid index.")
-			}
-			if len(form.formItems) != i+1 {
-				t.Error("Invalid number of form items.")
-			}
-		}
-	}()
-}
-func TestFormScreenAddFormItemInt64(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping it in short mode")
-	}
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				defer testhelper.GlfwTerminate()
-				t.Errorf("Shouldn't have panic, %#v.", r)
-			}
-		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
-		wW := float32(800)
-		wH := float32(800)
-		runtime.LockOSThread()
-		testhelper.GlfwInit()
-		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
-		defer testhelper.GlfwTerminate()
-		labels := []string{"label1", "label2", "label3", "label4"}
-		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemInt64(labels[i], DefaultFormItemDescription, wrapperReal, 33366699900, nil)
-			if index != i {
-				t.Error("Invalid index.")
-			}
-			if len(form.formItems) != i+1 {
-				t.Error("Invalid number of form items.")
-			}
-		}
-	}()
-}
-func TestFormScreenAddFormItemText(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping it in short mode")
-	}
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				defer testhelper.GlfwTerminate()
-				t.Errorf("Shouldn't have panic, %#v.", r)
-			}
-		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
-		wW := float32(800)
-		wH := float32(800)
-		runtime.LockOSThread()
-		testhelper.GlfwInit()
-		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
-		defer testhelper.GlfwTerminate()
-		labels := []string{"label1", "label2", "label3", "label4"}
-		for i := 0; i < len(labels); i++ {
-			index := form.AddFormItemText(labels[i], DefaultFormItemDescription, wrapperReal, "sample text", nil)
-			if index != i {
-				t.Error("Invalid index.")
-			}
-			if len(form.formItems) != i+1 {
-				t.Error("Invalid number of form items.")
-			}
-		}
-	}()
-}
 func TestFormScreenCharCallback(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
@@ -947,35 +753,37 @@ func TestFormScreenCharCallback(t *testing.T) {
 				t.Errorf("Shouldn't have panic, %#v.", r)
 			}
 		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		builder := NewFormScreenBuilder()
+		builder.SetWrapper(wrapperReal)
+		builder.SetWindowSize(wW, wH)
+		textKey := builder.AddConfigText("text", DefaultFormItemDescription, "", nil)
+		intKey := builder.AddConfigInt("int", DefaultFormItemDescription, 1, nil)
+		int64Key := builder.AddConfigInt64("int64", DefaultFormItemDescription, 2, nil)
+		floatKey := builder.AddConfigFloat("float", DefaultFormItemDescription, 0.0, nil)
+		builder.SetConfigOrder([]string{textKey, intKey, int64Key, floatKey})
+		form := builder.Build()
 		defer testhelper.GlfwTerminate()
-		form.AddFormItemText("text", DefaultFormItemDescription, wrapperReal, "", nil)
-		form.AddFormItemInt("int", DefaultFormItemDescription, wrapperReal, 1, nil)
-		form.AddFormItemInt64("int64", DefaultFormItemDescription, wrapperReal, 2, nil)
-		form.AddFormItemFloat("float", DefaultFormItemDescription, wrapperReal, 0.0, nil)
-		form.underEdit = form.formItems[0].(*model.FormItemText)
+		form.underEdit = form.GetFormItem(textKey).(*model.FormItemText)
 		form.CharCallback('1', wrapperReal)
 		if form.underEdit.ValueToString() != "1" {
 			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
 		}
-		form.underEdit = form.formItems[1].(*model.FormItemInt)
+		form.underEdit = form.GetFormItem(intKey).(*model.FormItemInt)
 		form.CharCallback('1', wrapperReal)
 		if form.underEdit.ValueToString() != "11" {
 			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
 		}
-		form.underEdit = form.formItems[2].(*model.FormItemInt64)
+		form.underEdit = form.GetFormItem(int64Key).(*model.FormItemInt64)
 		form.CharCallback('1', wrapperReal)
 		if form.underEdit.ValueToString() != "21" {
 			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
 		}
-		form.underEdit = form.formItems[3].(*model.FormItemFloat)
+		form.underEdit = form.GetFormItem(floatKey).(*model.FormItemFloat)
 		form.CharCallback('1', wrapperReal)
 		if form.underEdit.ValueToString() != "0" {
 			t.Errorf("Invalid value: '%s'.", form.underEdit.ValueToString())
@@ -990,7 +798,7 @@ func TestFormScreenCharCallback(t *testing.T) {
 		}
 	}()
 }
-func TestFormScreenSetup(t *testing.T) {
+func TestFormScreenSetupFormScreen(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
 	}
@@ -1004,7 +812,7 @@ func TestFormScreenSetup(t *testing.T) {
 		runtime.LockOSThread()
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
-		setup(wrapperReal)
+		setupFormScreen(wrapperReal)
 	}()
 }
 func TestFormGetFormItemValidIndex(t *testing.T) {
@@ -1018,37 +826,40 @@ func TestFormGetFormItemValidIndex(t *testing.T) {
 				t.Errorf("Shouldn't have panic, %#v.", r)
 			}
 		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
-		index := form.AddFormItemText("text", DefaultFormItemDescription, wrapperReal, "", nil)
-		fi := form.GetFormItem(index)
+		builder := NewFormScreenBuilder()
+		builder.SetWrapper(wrapperReal)
+		builder.SetWindowSize(wW, wH)
+		textKey := builder.AddConfigText("text", DefaultFormItemDescription, "", nil)
+		intKey := builder.AddConfigInt("int", DefaultFormItemDescription, 0, nil)
+		int64Key := builder.AddConfigInt64("int64", DefaultFormItemDescription, 3, nil)
+		floatKey := builder.AddConfigFloat("float", DefaultFormItemDescription, 0.0, nil)
+		boolKey := builder.AddConfigBool("bool", DefaultFormItemDescription, false)
+		vectorKey := builder.AddConfigVector("vector", DefaultFormItemDescription, mgl32.Vec3{0, 1, 0}, nil)
+		builder.SetConfigOrder([]string{textKey, intKey, int64Key, floatKey, boolKey, vectorKey})
+		form := builder.Build()
+		fi := form.GetFormItem(textKey)
 		if fi.ValueToString() != "" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemInt("int", DefaultFormItemDescription, wrapperReal, 0, nil)
-		fi = form.GetFormItem(index)
+		fi = form.GetFormItem(intKey)
 		if fi.ValueToString() != "0" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemInt64("int64", DefaultFormItemDescription, wrapperReal, 3, nil)
-		fi = form.GetFormItem(index)
+		fi = form.GetFormItem(int64Key)
 		if fi.ValueToString() != "3" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemFloat("float", DefaultFormItemDescription, wrapperReal, 0.0, nil)
-		fi = form.GetFormItem(index)
+		fi = form.GetFormItem(floatKey)
 		if fi.ValueToString() != "0" {
 			t.Errorf("Invalid form item initial value. '%s'.", fi.ValueToString())
 		}
-		index = form.AddFormItemBool("bool", DefaultFormItemDescription, wrapperReal, false)
-		fi = form.GetFormItem(index)
+		fi = form.GetFormItem(boolKey)
 		if fi.ValueToString() != "false" {
 			t.Error("Invalid form item initial value")
 		}
@@ -1065,40 +876,44 @@ func TestFormGetFormItemValidIndexValidators(t *testing.T) {
 				t.Errorf("Shouldn't have panic, %#v.", r)
 			}
 		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
 		defer testhelper.GlfwTerminate()
-		index := form.AddFormItemText("text", DefaultFormItemDescription, wrapperReal, "", func(t string) bool { return true })
-		fi := form.GetFormItem(index)
+		builder := NewFormScreenBuilder()
+		builder.SetWrapper(wrapperReal)
+		builder.SetWindowSize(wW, wH)
+		textKey := builder.AddConfigText("text", DefaultFormItemDescription, "", func(t string) bool { return true })
+		intKey := builder.AddConfigInt("int", DefaultFormItemDescription, 0, func(i int) bool { return true })
+		int64Key := builder.AddConfigInt64("int64", DefaultFormItemDescription, 3, func(i int64) bool { return true })
+		floatKey := builder.AddConfigFloat("float", DefaultFormItemDescription, 0.0, func(f float32) bool { return true })
+		boolKey := builder.AddConfigBool("bool", DefaultFormItemDescription, false)
+		vectorKey := builder.AddConfigVector("vector", DefaultFormItemDescription, mgl32.Vec3{0, 1, 0}, func(f float32) bool { return true })
+		builder.SetConfigOrder([]string{textKey, intKey, int64Key, floatKey, boolKey, vectorKey})
+		form := builder.Build()
+		fi := form.GetFormItem(textKey)
 		if fi.ValueToString() != "" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemInt("int", DefaultFormItemDescription, wrapperReal, 0, func(i int) bool { return true })
-		fi = form.GetFormItem(index)
+		fi = form.GetFormItem(intKey)
 		if fi.ValueToString() != "0" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemInt64("int64", DefaultFormItemDescription, wrapperReal, 3, func(i int64) bool { return true })
-		fi = form.GetFormItem(index)
+		fi = form.GetFormItem(int64Key)
 		if fi.ValueToString() != "3" {
 			t.Error("Invalid form item initial value")
 		}
-		index = form.AddFormItemFloat("float", DefaultFormItemDescription, wrapperReal, 0.0, func(f float32) bool { return true })
-		fi = form.GetFormItem(index)
+		fi = form.GetFormItem(floatKey)
 		if fi.ValueToString() != "0" {
 			t.Errorf("Invalid form item initial value. '%s'.", fi.ValueToString())
 		}
-		index = form.AddFormItemBool("bool", DefaultFormItemDescription, wrapperReal, false)
-		fi = form.GetFormItem(index)
+		fi = form.GetFormItem(boolKey)
 		if fi.ValueToString() != "false" {
 			t.Error("Invalid form item initial value")
 		}
+		_ = form.GetFormItem(vectorKey)
 	}()
 }
 func TestFormGetFormItemInvalidIndex(t *testing.T) {
@@ -1112,16 +927,170 @@ func TestFormGetFormItemInvalidIndex(t *testing.T) {
 				t.Error("Should have panic.")
 			}
 		}()
-		frameMat := material.Chrome
-		screenLabel := "test-label"
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
-		form := NewFormScreen(frameMat, screenLabel, wrapperReal, wW, wH)
+		builder := NewFormScreenBuilder()
+		builder.SetWrapper(wrapperReal)
+		builder.SetWindowSize(wW, wH)
+		form := builder.Build()
 		defer testhelper.GlfwTerminate()
-		index := form.AddFormItemText("text", DefaultFormItemDescription, wrapperReal, "txt", nil)
-		_ = form.GetFormItem(index + 2)
+		_ = form.GetFormItem("invalidkey")
 	}()
+}
+func TestNewFormScreenBuilder(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	if builder.headerLabel != "Default label" {
+		t.Error("Invalid default label")
+	}
+	if builder.wrapper != nil {
+		t.Error("Wrapper supposed to be nil by default")
+	}
+	if builder.charset != nil {
+		t.Error("Charset supposed to be nil by default")
+	}
+}
+func TestFormScreenBuilderBuild(t *testing.T) {
+	t.Skip("Unimplemented")
+}
+func TestFormScreenBuilderSetHeaderLabel(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	label := "new label"
+	builder.SetHeaderLabel(label)
+	if builder.headerLabel != label {
+		t.Errorf("Invalid header label. Instead of '%s', we have '%s'.", label, builder.headerLabel)
+	}
+}
+func TestFormScreenBuilderSetWrapper(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	builder.SetWrapper(wrapperMock)
+	if builder.wrapper != wrapperMock {
+		t.Error("Invalid wrapper")
+	}
+}
+func TestFormScreenBuilderSetWindowSize(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	wW := float32(800)
+	wH := float32(800)
+	builder.SetWindowSize(wW, wH)
+	if builder.windowWidth != wW {
+		t.Errorf("Invalid window width. Instead of '%f', we have '%f'.", wW, builder.windowWidth)
+	}
+	if builder.windowHeight != wH {
+		t.Errorf("Invalid window height. Instead of '%f', we have '%f'.", wH, builder.windowHeight)
+	}
+}
+func TestFormScreenBuilderSetConfig(t *testing.T) {
+	conf := config.New()
+	builder := NewFormScreenBuilder()
+	builder.SetConfig(conf)
+	if !reflect.DeepEqual(builder.config, conf) {
+		t.Error("Invalid configuration.")
+	}
+}
+func TestFormScreenBuilderSetConfigOrder(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	order := []string{"o1", "p1", "l1"}
+	builder.SetConfigOrder(order)
+	if !reflect.DeepEqual(builder.configOrder, order) {
+		t.Error("Invalid order.")
+	}
+}
+func TestFormScreenBuilderSetCharset(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	runtime.LockOSThread()
+	testhelper.GlfwInit()
+	defer testhelper.GlfwTerminate()
+	wrapperReal.InitOpenGL()
+	builder := NewFormScreenBuilder()
+	charset, err := model.LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40.0, 72, wrapperReal)
+	if err != nil {
+		t.Errorf("Error during load charset: %#v.", err)
+	}
+	builder.SetCharset(charset)
+	if builder.charset != charset {
+		t.Error("Invalid charset.")
+	}
+}
+func TestFormScreenBuilderAddConfigBool(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	if len(builder.config) != 0 {
+		t.Error("Invalid initial config length.")
+	}
+	confLabel := "label"
+	confDesc := "desc"
+	value := true
+	builder.AddConfigBool(confLabel, confDesc, value)
+	if len(builder.config) != 1 {
+		t.Error("Invalid config length.")
+	}
+}
+func TestFormScreenBuilderAddConfigInt(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	if len(builder.config) != 0 {
+		t.Error("Invalid initial config length.")
+	}
+	confLabel := "label"
+	confDesc := "desc"
+	value := 3
+	builder.AddConfigInt(confLabel, confDesc, value, nil)
+	if len(builder.config) != 1 {
+		t.Error("Invalid config length.")
+	}
+}
+func TestFormScreenBuilderAddConfigInt64(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	if len(builder.config) != 0 {
+		t.Error("Invalid initial config length.")
+	}
+	confLabel := "label"
+	confDesc := "desc"
+	value := int64(3)
+	builder.AddConfigInt64(confLabel, confDesc, value, nil)
+	if len(builder.config) != 1 {
+		t.Error("Invalid config length.")
+	}
+}
+func TestFormScreenBuilderAddConfigFloat(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	if len(builder.config) != 0 {
+		t.Error("Invalid initial config length.")
+	}
+	confLabel := "label"
+	confDesc := "desc"
+	value := float32(3.3)
+	builder.AddConfigFloat(confLabel, confDesc, value, nil)
+	if len(builder.config) != 1 {
+		t.Error("Invalid config length.")
+	}
+}
+func TestFormScreenBuilderAddConfigText(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	if len(builder.config) != 0 {
+		t.Error("Invalid initial config length.")
+	}
+	confLabel := "label"
+	confDesc := "desc"
+	value := "test"
+	builder.AddConfigText(confLabel, confDesc, value, nil)
+	if len(builder.config) != 1 {
+		t.Error("Invalid config length.")
+	}
+}
+func TestFormScreenBuilderAddConfigVector(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	if len(builder.config) != 0 {
+		t.Error("Invalid initial config length.")
+	}
+	confLabel := "label"
+	confDesc := "desc"
+	value := mgl32.Vec3{0, 1, 0}
+	builder.AddConfigVector(confLabel, confDesc, value, nil)
+	if len(builder.config) != 1 {
+		t.Error("Invalid config length.")
+	}
 }

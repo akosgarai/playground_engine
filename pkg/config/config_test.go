@@ -51,6 +51,12 @@ func TestNewConfigItemValidValue(t *testing.T) {
 		if fi.GetValidatorFunction() != nil {
 			_ = fi.GetValidatorFunction()
 		}
+		if fi.IsConfigOf(tt.key) == false {
+			t.Error("It supposed to be the config of its own key")
+		}
+		if fi.IsConfigOf(tt.key+"wrong") == true {
+			t.Error("It isn't supposed to be the config of the wrong key")
+		}
 	}
 }
 func TestNewConfigItemInvalidValue(t *testing.T) {
