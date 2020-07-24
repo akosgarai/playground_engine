@@ -16,6 +16,9 @@ import (
 
 type ScreenWithFrame struct {
 	*ScreenBase
+	frameWidth       float32 // the size on the x axis
+	frameLength      float32 // the size on the y axis
+	detailContentBox interfaces.Mesh
 }
 
 // tmp function for testing
@@ -26,26 +29,35 @@ func (f *ScreenWithFrame) Update(dt, posX, posY float64, keyStore interfaces.RoK
 func (f *ScreenWithFrame) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 }
 
+// GetFullWidth returns the width of the drawable screen. (width - 2*length)
+func (f *ScreenWithFrame) GetFullWidth() float32 {
+	return f.frameWidth - (2 * f.frameLength)
+}
+
 type ScreenWithFrameBuilder struct {
-	wrapper           interfaces.GLWrapper
-	windowWidth       float32
-	windowHeight      float32
-	frameMaterial     *material.Material
-	frameWidth        float32 // the size on the x axis
-	frameLength       float32 // the size on the y axis
-	frameTopLeftWidth float32 // for supporting the header text, there is an option to give a padding here.
-	fov               float32
-	labelWidth        float32
+	wrapper                  interfaces.GLWrapper
+	windowWidth              float32
+	windowHeight             float32
+	frameMaterial            *material.Material
+	frameWidth               float32 // the size on the x axis
+	frameLength              float32 // the size on the y axis
+	frameTopLeftWidth        float32 // for supporting the header text, there is an option to give a padding here.
+	fov                      float32
+	labelWidth               float32
+	detailContentBoxHeight   float32
+	detailContentBoxMaterial *material.Material
 }
 
 // NewScreenWithFrameBuilder returns a builder instance.
 func NewScreenWithFrameBuilder() *ScreenWithFrameBuilder {
 	return &ScreenWithFrameBuilder{
-		frameWidth:        BottomFrameWidth,
-		frameLength:       BottomFrameLength,
-		frameTopLeftWidth: TopLeftFrameWidth,
-		fov:               float32(45),
-		labelWidth:        float32(0.0),
+		frameWidth:               BottomFrameWidth,
+		frameLength:              BottomFrameLength,
+		frameTopLeftWidth:        TopLeftFrameWidth,
+		fov:                      float32(45),
+		labelWidth:               float32(0.0),
+		detailContentBoxHeight:   float32(0.0),
+		detailContentBoxMaterial: DefaultFormItemMaterial,
 	}
 }
 
@@ -72,9 +84,14 @@ func (b *ScreenWithFrameBuilder) SetFrameMaterial(m *material.Material) {
 	b.frameMaterial = m
 }
 
-// SetLabelText sets the label text of the screen.
+// SetLabelText sets the label text width of the screen.
 func (b *ScreenWithFrameBuilder) SetLabelWidth(w float32) {
 	b.labelWidth = w
+}
+
+// SetDetailContentBoxHeight sets the height of the detailContentBox.
+func (b *ScreenWithFrameBuilder) SetDetailContentBoxHeight(h float32) {
+	b.detailContentBoxHeight = h
 }
 
 func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
@@ -94,12 +111,23 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	halfWidth := b.frameWidth / 2
 	halfLength := b.frameLength / 2
 	framePosition := halfWidth - halfLength
+	fullWithoutFrame := b.frameWidth - (2 * b.frameLength)
 
 	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength, mgl32.Vec3{0.0, -framePosition, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{-framePosition, 0.0, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{framePosition, 0.0, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{halfWidth - (b.frameTopLeftWidth / 2), framePosition, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameWidth-b.frameTopLeftWidth-b.labelWidth, b.frameLength, mgl32.Vec3{(-b.frameTopLeftWidth - b.labelWidth) / 2, framePosition, ZFrame}))
+	var detailContentBox interfaces.Mesh
+	if b.detailContentBoxHeight > 0.0 {
+		detailContainerPosition := mgl32.Vec3{0.0, -halfWidth + b.frameLength + b.detailContentBoxHeight/2, ZFrame}
+		detailContainer := b.frameRectangleWithMaterial(fullWithoutFrame, b.detailContentBoxHeight, detailContainerPosition, b.detailContentBoxMaterial)
+		detailContainer.RotateX(-180)
+		detailContainer.RotateY(180)
+		frameModel.AddMesh(detailContainer)
+	} else {
+		detailContentBox = nil
+	}
 	s.AddModelToShader(frameModel, frameShaderApplication)
 	directionalLightSource := light.NewDirectionalLight([4]mgl32.Vec3{
 		DirectionalLightDirection,
@@ -110,7 +138,10 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	s.AddDirectionalLightSource(directionalLightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
 
 	return &ScreenWithFrame{
-		ScreenBase: s,
+		ScreenBase:       s,
+		frameWidth:       b.frameWidth,
+		frameLength:      b.frameLength,
+		detailContentBox: detailContentBox,
 	}
 }
 
