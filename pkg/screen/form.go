@@ -698,7 +698,7 @@ func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, po
 
 // addFormItemFromConfigInt64 sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.Int64Validator))
 	}
