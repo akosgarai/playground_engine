@@ -798,7 +798,7 @@ func TestFormScreenCharCallback(t *testing.T) {
 		}
 	}()
 }
-func TestFormScreenSetup(t *testing.T) {
+func TestFormScreenSetupFormScreen(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
 	}
@@ -812,7 +812,7 @@ func TestFormScreenSetup(t *testing.T) {
 		runtime.LockOSThread()
 		testhelper.GlfwInit()
 		wrapperReal.InitOpenGL()
-		setup(wrapperReal)
+		setupFormScreen(wrapperReal)
 	}()
 }
 func TestFormGetFormItemValidIndex(t *testing.T) {

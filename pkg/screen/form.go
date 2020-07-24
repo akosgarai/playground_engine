@@ -165,7 +165,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	}
 	s := newScreenBase()
 	s.SetCamera(b.defaultCamera())
-	s.Setup(setup)
+	s.Setup(setupFormScreen)
 	s.SetWindowSize(b.windowWidth, b.windowHeight)
 	s.SetWrapper(b.wrapper)
 	bgShaderApplication := shader.NewTextureMatShaderBlending(b.wrapper)
@@ -420,7 +420,7 @@ type FormScreen struct {
 	formItemToConf map[interfaces.FormItem]*config.ConfigItem
 }
 
-func setup(wrapper interfaces.GLWrapper) {
+func setupFormScreen(wrapper interfaces.GLWrapper) {
 	wrapper.ClearColor(0.55, 0.55, 0.55, 1.0)
 	wrapper.Enable(glwrapper.DEPTH_TEST)
 	wrapper.DepthFunc(glwrapper.LESS)
@@ -429,7 +429,7 @@ func setup(wrapper interfaces.GLWrapper) {
 }
 
 // initMaterialForTheFormItems sets the material to the default of the form items.
-// It could be used un the update loop to make all of them to default state.
+// It is used in the update loop to push all of them to default state.
 func (f *FormScreen) initMaterialForTheFormItems() {
 	f.charset.CleanSurface(f.detailContentBox)
 	for s, _ := range f.shaderMap {
@@ -522,8 +522,8 @@ func (f *FormScreen) highlightFormAction() {
 	}
 }
 
-// Update loops on the shaderMap, and calls Update function on every Model.
-// It also handles the camera movement and rotation, if the camera is set.
+// Update function increases the time since the last events with dt. Handles the up / down scroll events.
+// Sets the form items to their initial state and then handles the mouse events and also the deletion events.
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	f.sinceLastClick = f.sinceLastClick + dt
 	f.sinceLastDelete = f.sinceLastDelete + dt
