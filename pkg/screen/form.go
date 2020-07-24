@@ -40,7 +40,6 @@ const (
 	ZText              = float32(-0.01)
 	ZBackground        = float32(0.02)
 	FormItemMoveSpeed  = float32(0.005)
-	formItemMinY       = float32(0.0)
 )
 
 var (
@@ -62,9 +61,8 @@ type FormScreenBuilder struct {
 	config        config.Config
 	configOrder   []string
 	charset       *model.Charset
-	camera        *camera.Camera
 	lastItemState string
-	currentY      float32
+	offsetY       float32
 }
 
 func NewFormScreenBuilder() *FormScreenBuilder {
@@ -72,10 +70,9 @@ func NewFormScreenBuilder() *FormScreenBuilder {
 		headerLabel:   "Default label",
 		wrapper:       nil,
 		charset:       nil,
-		camera:        nil,
 		config:        config.New(),
 		lastItemState: "F",
-		currentY:      0.9,
+		offsetY:       0.9,
 	}
 }
 
@@ -206,13 +203,13 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	s.AddModelToShader(frameModel, frameShaderApplication)
 
 	formScreen := &FormScreen{
-		ScreenBase:       s,
-		charset:          b.charset,
-		formItemShader:   bgShaderApplication,
-		sinceLastClick:   0,
-		formItemCurrentY: float32(0.0),
-		detailContentBox: detailContainer,
-		formItemToConf:   make(map[interfaces.FormItem]*config.ConfigItem),
+		ScreenBase:          s,
+		charset:             b.charset,
+		formItemShader:      bgShaderApplication,
+		sinceLastClick:      0,
+		currentScrollOffset: float32(0.0),
+		detailContentBox:    detailContainer,
+		formItemToConf:      make(map[interfaces.FormItem]*config.ConfigItem),
 	}
 	for i := 0; i < len(b.configOrder); i++ {
 		key := b.configOrder[i]
@@ -239,7 +236,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 			}
 		}
 	}
-	formScreen.currentY = b.currentY
+	formScreen.maxScrollOffset = (-1 + BottomFrameLength + 0.5 - b.offsetY)
 
 	return formScreen
 }
@@ -279,19 +276,19 @@ func (b *FormScreenBuilder) itemPosition(itemWidth, itemHeight float32) mgl32.Ve
 	var x float32
 	switch b.lastItemState {
 	case "F":
-		b.currentY = b.currentY - itemHeight
+		b.offsetY = b.offsetY - itemHeight
 		x = 0.0
 		break
 	case "LH":
-		b.currentY = b.currentY - itemHeight
+		b.offsetY = b.offsetY - itemHeight
 		x = FullWidth / 4
 		break
 	case "LL":
-		b.currentY = b.currentY - itemHeight
+		b.offsetY = b.offsetY - itemHeight
 		x = FullWidth / 6
 		break
 	case "LS":
-		b.currentY = b.currentY - itemHeight
+		b.offsetY = b.offsetY - itemHeight
 		x = FullWidth / 3
 		break
 	case "RH":
@@ -308,7 +305,7 @@ func (b *FormScreenBuilder) itemPosition(itemWidth, itemHeight float32) mgl32.Ve
 		break
 	}
 
-	return mgl32.Vec3{x, b.currentY, ZBackground}
+	return mgl32.Vec3{x, b.offsetY, ZBackground}
 }
 func (b *FormScreenBuilder) pushState(itemWidth float32) {
 	switch b.lastItemState {
@@ -415,9 +412,8 @@ type FormScreen struct {
 	sinceLastDelete float64
 	underEdit       interfaces.CharFormItem
 	// Item position
-	currentY         float32
-	formItemCurrentY float32
-	lastItemState    string
+	maxScrollOffset     float32
+	currentScrollOffset float32
 	// Info box for displaying the details of the form items.
 	detailContentBox interfaces.Mesh
 	// map for formItem-configItem
@@ -542,10 +538,9 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	} else if keyStore.Get(KEY_DOWN) && !keyStore.Get(KEY_UP) {
 		direction = mgl32.Vec3{0, 1, 0}
 	}
-	newYPos := f.formItemCurrentY + FormItemMoveSpeed*float32(dt)*direction.Y()
-	maxYValue := (-1 + BottomFrameLength + 0.5 - f.currentY)
-	if newYPos > formItemMinY && newYPos < maxYValue {
-		f.formItemCurrentY = newYPos
+	newScrollOffset := f.currentScrollOffset + FormItemMoveSpeed*float32(dt)*direction.Y()
+	if newScrollOffset > float32(0.0) && newScrollOffset < f.maxScrollOffset {
+		f.currentScrollOffset = newScrollOffset
 	} else {
 		direction = mgl32.Vec3{0, 0, 0}
 	}

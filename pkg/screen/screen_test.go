@@ -951,9 +951,6 @@ func TestNewFormScreenBuilder(t *testing.T) {
 	if builder.charset != nil {
 		t.Error("Charset supposed to be nil by default")
 	}
-	if builder.camera != nil {
-		t.Error("camera supposed to be nil by default")
-	}
 }
 func TestFormScreenBuilderBuild(t *testing.T) {
 	t.Skip("Unimplemented")

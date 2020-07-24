@@ -117,20 +117,70 @@ This screen is for displaying forms, like a settings page. It holds the followin
 - sinceLastClick - the time since the last click event.
 - sinceLastDelete - the time since the last character deletion event.
 - underEdit - the character based form item, that is currently edited.
-- currentY - This value is used mostly for building the form. It also used for the movement of the form items (max y value calculation).
-- formItemCurrentY - The current offset of the form items in the Y axis. (move the screen with up / down cursors.)
-- lastItemState - It is the state of the latest inserted form item.
+- maxScrollOffset - The maximum offset of the scrolling. It is calculated from the lengths of the screen and the form items.
+- currentScrollOffset - The current offset of the form items in the Y axis. (move the screen with up / down cursors.)
 - detailContentBox - The mesh of the detail container. It makes its update easier.
 - formItemToConf - It maps the FormItems to ConfigItems. It is used to sync the values.
 
+**Features**
+
+If the mouse cursor is above a form item, it triggers a hover effect, that does the followings:
+
+- Updates the form item material to the Highlight value.
+- Displays the form item description in the detailContentBox.
+
+This screen supports scrolling on the `Y` axis. This feature is active, if we have more form items that we can display on the visible area. The scolling can be triggered with the `up` and `down` arrow keys.
+
+Clicking on a hovered item.
+
+- On a bool input, it negates its value.
+- On a character based form item, it activates its edit mode, a cursor appeares at the end of the current value.
+
+Editing the value of a character based form item. Aka character callback & backspace key handler.
+
+- A new character can be added to the end of the current value.
+- The last character can be deleted.
+
+#### FormScreenBuilder
+
+This tool is provided for creating forms. The following variables could be set during the construction.
+
+- headerLabel - This is displayed on the top left of the screen.
+- frameMaterial - The material of the screen frame is set to this.
+- wrapper - The gl wrapper for the screen.
+- windowWidth, windowHeight - The size of the window.
+- config - The form items are based on this configuration.
+- configOrder - The order of the form items.
+- charset - The charset model that will be used for text writing.
+- lastItemState - It is the state of the latest inserted form item.
+- offsetY - The y component of the position of the last inserted item.
+
+Set... functions are provided for the `headerLabel`, `frameMaterial`, `wrapper`, `windowWidth`, `windowHeight`, `config`, `configOrder`, `charset`. The `lastItemState`, and the `offsetY` is used and maintained during the process of the form item building from the config items.
+
 For displaying stuff, it uses the following system:
 
-- Full width items for text / vector inputs.
-- Half width items for int / float inputs.
-- Long width items for int64 inputs.
-- Short width items for bool inputs.
+- `Full` width items for text / vector inputs. It is the longest width. It fits to the screens full width.
+- `Half` width items for int / float inputs. Half width. It fits to the screens half width.
+- `Long` width items for int64 inputs. 2/3 width. It fits to the screens 2/3 width.
+- `Short` width items for bool inputs. 1/3 width. It fits to the screens 1/3 width.
 
-Positioning:
+```
+---------
+|       | - full width
+---------
+|   |   | - half - half width
+---------
+|  |    | - short - long width
+---------
+|    |  | - long - short width
+---------
+|   ||  | - half - short width
+---------
+|  ||   | - short - half width
+---------
+|  | |  | - short - short - short width
+---------
+```
 
 **8 Possible position**:
 - Full item position (**F**)
@@ -181,14 +231,3 @@ RS  -(Long)->   LL
 RS  -(Short)->  LS
 ```
 
-#### FormScreenBuilder
-
-This tool is provided for creating forms. The following variables could be set during the construction.
-
-- headerLabel - This is displayed on the top left of the screen.
-- frameMaterial - The material of the screen frame is set to this.
-- wrapper - The gl wrapper for the screen.
-- windowWidth, windowHeight - The size of the window.
-- config - The form items are based on this configuration.
-- configOrder - The order of the form items.
-- charset - The charset model that will be used for text writing.
