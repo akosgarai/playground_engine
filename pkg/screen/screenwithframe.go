@@ -84,6 +84,11 @@ func (b *ScreenWithFrameBuilder) SetFrameMaterial(m *material.Material) {
 	b.frameMaterial = m
 }
 
+// SetDetailContentBoxMaterial sets the material that is used for the  detailcontentbox.
+func (b *ScreenWithFrameBuilder) SetDetailContentBoxMaterial(m *material.Material) {
+	b.detailContentBoxMaterial = m
+}
+
 // SetLabelText sets the label text width of the screen.
 func (b *ScreenWithFrameBuilder) SetLabelWidth(w float32) {
 	b.labelWidth = w
