@@ -1,7 +1,6 @@
 package screen
 
 import (
-	"fmt"
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
@@ -35,6 +34,7 @@ type ScreenWithFrameBuilder struct {
 	frameWidth        float32 // the size on the x axis
 	frameLength       float32 // the size on the y axis
 	frameTopLeftWidth float32 // for supporting the header text, there is an option to give a padding here.
+	cameraDistanceZ   float32
 }
 
 // NewScreenWithFrameBuilder returns a builder instance.
@@ -43,6 +43,7 @@ func NewScreenWithFrameBuilder() *ScreenWithFrameBuilder {
 		frameWidth:        BottomFrameWidth,
 		frameLength:       BottomFrameLength,
 		frameTopLeftWidth: TopLeftFrameWidth,
+		cameraDistanceZ:   float32(-1.8),
 	}
 }
 
@@ -57,6 +58,11 @@ func (b *ScreenWithFrameBuilder) SetFrameSize(w, l, r float32) {
 	b.frameWidth = w
 	b.frameLength = l
 	b.frameTopLeftWidth = r
+}
+
+// SetCameraDistanceZ sets the windowWidth and the windowHeight parameters.
+func (b *ScreenWithFrameBuilder) SetCameraDistanceZ(z float32) {
+	b.cameraDistanceZ = z
 }
 
 // SetWrapper sets the wrapper.
@@ -86,7 +92,6 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	halfWidth := b.frameWidth / 2
 	halfLength := b.frameLength / 2
 	framePosition := halfWidth - halfLength
-	fmt.Printf("width: '%f', halfWidth: '%f', length: '%f', halflength'%f', position: '%f'.\n", b.frameWidth, halfWidth, b.frameLength, halfLength, framePosition)
 
 	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength, mgl32.Vec3{0.0, -framePosition, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{-framePosition, 0.0, ZFrame}))
@@ -109,7 +114,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 
 // It creates a new camera with the necessary setup
 func (b *ScreenWithFrameBuilder) defaultCamera() *camera.Camera {
-	cam := camera.NewCamera(mgl32.Vec3{0, 0, -1.8}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
+	cam := camera.NewCamera(mgl32.Vec3{0, 0, b.cameraDistanceZ}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
 	cam.SetupProjection(45, b.windowWidth/b.windowHeight, 0.001, 10.0)
 	return cam
 }
