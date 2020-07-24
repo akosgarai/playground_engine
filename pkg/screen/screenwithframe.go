@@ -34,7 +34,7 @@ type ScreenWithFrameBuilder struct {
 	frameWidth        float32 // the size on the x axis
 	frameLength       float32 // the size on the y axis
 	frameTopLeftWidth float32 // for supporting the header text, there is an option to give a padding here.
-	cameraDistanceZ   float32
+	fov               float32
 }
 
 // NewScreenWithFrameBuilder returns a builder instance.
@@ -43,7 +43,7 @@ func NewScreenWithFrameBuilder() *ScreenWithFrameBuilder {
 		frameWidth:        BottomFrameWidth,
 		frameLength:       BottomFrameLength,
 		frameTopLeftWidth: TopLeftFrameWidth,
-		cameraDistanceZ:   float32(-1.8),
+		fov:               float32(45),
 	}
 }
 
@@ -58,11 +58,6 @@ func (b *ScreenWithFrameBuilder) SetFrameSize(w, l, r float32) {
 	b.frameWidth = w
 	b.frameLength = l
 	b.frameTopLeftWidth = r
-}
-
-// SetCameraDistanceZ sets the windowWidth and the windowHeight parameters.
-func (b *ScreenWithFrameBuilder) SetCameraDistanceZ(z float32) {
-	b.cameraDistanceZ = z
 }
 
 // SetWrapper sets the wrapper.
@@ -114,8 +109,9 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 
 // It creates a new camera with the necessary setup
 func (b *ScreenWithFrameBuilder) defaultCamera() *camera.Camera {
-	cam := camera.NewCamera(mgl32.Vec3{0, 0, b.cameraDistanceZ}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
-	cam.SetupProjection(45, b.windowWidth/b.windowHeight, 0.001, 10.0)
+	mat := mgl32.Perspective(b.fov, b.windowWidth/b.windowHeight, 0.001, 10)
+	cam := camera.NewCamera(mgl32.Vec3{0, 0, -mat[0]}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
+	cam.SetupProjection(b.fov, b.windowWidth/b.windowHeight, 0.001, 10.0)
 	return cam
 }
 
