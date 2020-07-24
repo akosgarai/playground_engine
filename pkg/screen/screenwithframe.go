@@ -27,21 +27,35 @@ func (f *ScreenWithFrame) CharCallback(char rune, wrapper interfaces.GLWrapper) 
 }
 
 type ScreenWithFrameBuilder struct {
-	wrapper       interfaces.GLWrapper
-	windowWidth   float32
-	windowHeight  float32
-	frameMaterial *material.Material
+	wrapper           interfaces.GLWrapper
+	windowWidth       float32
+	windowHeight      float32
+	frameMaterial     *material.Material
+	frameWidth        float32 // the size on the x axis
+	frameLength       float32 // the size on the y axis
+	frameTopLeftWidth float32 // for supporting the header text, there is an option to give a padding here.
 }
 
 // NewScreenWithFrameBuilder returns a builder instance.
 func NewScreenWithFrameBuilder() *ScreenWithFrameBuilder {
-	return &ScreenWithFrameBuilder{}
+	return &ScreenWithFrameBuilder{
+		frameWidth:        BottomFrameWidth,
+		frameLength:       BottomFrameLength,
+		frameTopLeftWidth: TopLeftFrameWidth,
+	}
 }
 
 // SetWindowSize sets the windowWidth and the windowHeight parameters.
 func (b *ScreenWithFrameBuilder) SetWindowSize(w, h float32) {
 	b.windowWidth = w
 	b.windowHeight = h
+}
+
+// SetFrameSize sets the frameWidth and the frameLength parameters.
+func (b *ScreenWithFrameBuilder) SetFrameSize(w, l, r float32) {
+	b.frameWidth = w
+	b.frameLength = l
+	b.frameTopLeftWidth = r
 }
 
 // SetWrapper sets the wrapper.
@@ -67,11 +81,14 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	s.AddShader(frameShaderApplication)
 
 	frameModel := model.New()
-	frameModel.AddMesh(b.frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(2.0-TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth) / 2, 0.99, ZFrame}))
+	// calculate the positions of the frames:
+	halfWidth := b.frameWidth / 2
+	halfLength := b.frameLength / 2
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength, mgl32.Vec3{0.0, -halfWidth - halfLength, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{-halfWidth - halfLength, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{halfWidth - halfLength, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{halfWidth - (b.frameTopLeftWidth / 2), halfWidth - halfLength, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth-b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{(-b.frameTopLeftWidth) / 2, halfWidth - halfLength, ZFrame}))
 	s.AddModelToShader(frameModel, frameShaderApplication)
 	directionalLightSource := light.NewDirectionalLight([4]mgl32.Vec3{
 		DirectionalLightDirection,
