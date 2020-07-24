@@ -1,6 +1,7 @@
 package screen
 
 import (
+	"fmt"
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
@@ -84,11 +85,14 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	// calculate the positions of the frames:
 	halfWidth := b.frameWidth / 2
 	halfLength := b.frameLength / 2
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength, mgl32.Vec3{0.0, -halfWidth - halfLength, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{-halfWidth - halfLength, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{halfWidth - halfLength, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{halfWidth - (b.frameTopLeftWidth / 2), halfWidth - halfLength, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth-b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{(-b.frameTopLeftWidth) / 2, halfWidth - halfLength, ZFrame}))
+	framePosition := halfWidth - halfLength
+	fmt.Printf("width: '%f', halfWidth: '%f', length: '%f', halflength'%f', position: '%f'.\n", b.frameWidth, halfWidth, b.frameLength, halfLength, framePosition)
+
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength, mgl32.Vec3{0.0, -framePosition, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{-framePosition, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{framePosition, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{halfWidth - (b.frameTopLeftWidth / 2), framePosition, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth-b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{(-b.frameTopLeftWidth) / 2, framePosition, ZFrame}))
 	s.AddModelToShader(frameModel, frameShaderApplication)
 	directionalLightSource := light.NewDirectionalLight([4]mgl32.Vec3{
 		DirectionalLightDirection,
