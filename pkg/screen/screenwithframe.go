@@ -35,6 +35,7 @@ type ScreenWithFrameBuilder struct {
 	frameLength       float32 // the size on the y axis
 	frameTopLeftWidth float32 // for supporting the header text, there is an option to give a padding here.
 	fov               float32
+	labelWidth        float32
 }
 
 // NewScreenWithFrameBuilder returns a builder instance.
@@ -44,6 +45,7 @@ func NewScreenWithFrameBuilder() *ScreenWithFrameBuilder {
 		frameLength:       BottomFrameLength,
 		frameTopLeftWidth: TopLeftFrameWidth,
 		fov:               float32(45),
+		labelWidth:        float32(0.0),
 	}
 }
 
@@ -70,6 +72,11 @@ func (b *ScreenWithFrameBuilder) SetFrameMaterial(m *material.Material) {
 	b.frameMaterial = m
 }
 
+// SetLabelText sets the label text of the screen.
+func (b *ScreenWithFrameBuilder) SetLabelWidth(w float32) {
+	b.labelWidth = w
+}
+
 func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	if b.wrapper == nil {
 		panic("Wrapper is missing for the build process.")
@@ -92,7 +99,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{-framePosition, 0.0, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{framePosition, 0.0, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{halfWidth - (b.frameTopLeftWidth / 2), framePosition, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth-b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{(-b.frameTopLeftWidth) / 2, framePosition, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth-b.frameTopLeftWidth-b.labelWidth, b.frameLength, mgl32.Vec3{(-b.frameTopLeftWidth - b.labelWidth) / 2, framePosition, ZFrame}))
 	s.AddModelToShader(frameModel, frameShaderApplication)
 	directionalLightSource := light.NewDirectionalLight([4]mgl32.Vec3{
 		DirectionalLightDirection,
