@@ -3,6 +3,7 @@ package screen
 import (
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
+	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/model"
@@ -72,6 +73,13 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	frameModel.AddMesh(b.frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(2.0-TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth) / 2, 0.99, ZFrame}))
 	s.AddModelToShader(frameModel, frameShaderApplication)
+	directionalLightSource := light.NewDirectionalLight([4]mgl32.Vec3{
+		DirectionalLightDirection,
+		DirectionalLightAmbient,
+		DirectionalLightDiffuse,
+		DirectionalLightSpecular,
+	})
+	s.AddDirectionalLightSource(directionalLightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
 
 	return &ScreenWithFrame{
 		ScreenBase: s,
