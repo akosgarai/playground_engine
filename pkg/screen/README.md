@@ -89,6 +89,29 @@ Export creates a directory for the screen and calls Export function on the model
 
 Some screens are provided by the engine.
 
+### ScreenWithFrame
+
+This screen extension is a base screen, that contains a frame on its edge. It supports a label text on the top of the screen. The frame isn't set behind the label. It also provides an option for activating a surface on the bottom of the screen. This surface could be used for displaying text. A builder is provided for creating this screen. This screen holds the followings:
+
+- frameWidth - The width of the the visible screen. It is the width (length on the `X` axis) of the frames.
+- frameLength - The length (on the `Y` axis) of the frames.
+- detailContentBox - This is the mesh that could be used for displaying the text.
+
+It provides a function (GetFullWidth) for getting the width of the usable area.
+
+### ScreenWithFrameBuilder
+
+This is a handy tool for creating ScreenWithFrames. It provides Set... and Build functions.
+
+- `SetWrapper` function sets the wrapper for further usage.
+- `SetWindowSize` function sets the windowWidth and windowHeight variables.
+- `SetLabelWidth` function could be used for creating the frame padding to the label text.
+- `SetFrameSize` function sets the frameWidth, frameLength, and frameTopLeftWidth variables.
+- `SetFrameMaterial` function sets the material of the frames.
+- `SetDetailContentBoxMaterial` function sets the material of the detailContentBox.
+- `SetDetailContentBoxHeight` function sets the height of the detailContentBox. If this value is 0, the building step of this box will be skipped.
+- `Build` function returns a ScreenWithFrame with the given setup. If the detailContentBoxHeight is 0, then the detailContentBox will be set to `nil`.
+
 ### MenuScreen
 
 This screen is for displaying menus. It holds a Charset model, a texture for the menu items, the default and the hover material. It also holds an Options array that contains the displayable items. The options holds conditions for displaying.
@@ -110,7 +133,7 @@ This screen is for displaying menus. It holds a Charset model, a texture for the
 
 ### FormScreen
 
-This screen is for displaying forms, like a settings page. It holds the followings:
+This screen is for displaying forms, like a settings page. It is a `ScreenWithFrame` extension. It holds the followings:
 
 - charset - the charset model for displaying text.
 - formItemShader - the shader that is used for rendering the form items.
@@ -119,8 +142,9 @@ This screen is for displaying forms, like a settings page. It holds the followin
 - underEdit - the character based form item, that is currently edited.
 - maxScrollOffset - The maximum offset of the scrolling. It is calculated from the lengths of the screen and the form items.
 - currentScrollOffset - The current offset of the form items in the Y axis. (move the screen with up / down cursors.)
-- detailContentBox - The mesh of the detail container. It makes its update easier.
 - formItemToConf - It maps the FormItems to ConfigItems. It is used to sync the values.
+- formItemLabelColor - It is the color of the form item labels.
+- formItemInputColor - It is the color of the form item inputs.
 
 **Features**
 
@@ -143,19 +167,19 @@ Editing the value of a character based form item. Aka character callback & backs
 
 #### FormScreenBuilder
 
-This tool is provided for creating forms. The following variables could be set during the construction.
+This tool is provided for creating forms. It is a `ScreenWithFrameBuilder` extension. The following variables could be set during the construction.
 
 - headerLabel - This is displayed on the top left of the screen.
-- frameMaterial - The material of the screen frame is set to this.
-- wrapper - The gl wrapper for the screen.
-- windowWidth, windowHeight - The size of the window.
 - config - The form items are based on this configuration.
 - configOrder - The order of the form items.
 - charset - The charset model that will be used for text writing.
 - lastItemState - It is the state of the latest inserted form item.
 - offsetY - The y component of the position of the last inserted item.
+- headerLabelColor - The color of the header label text.
+- formItemLabelColor - It is the color of the form item labels.
+- formItemInputColor - It is the color of the form item inputs.
 
-Set... functions are provided for the `headerLabel`, `frameMaterial`, `wrapper`, `windowWidth`, `windowHeight`, `config`, `configOrder`, `charset`. The `lastItemState`, and the `offsetY` is used and maintained during the process of the form item building from the config items.
+Set... functions are provided for the `headerLabel`, `windowHeight`, `config`, `configOrder`, `charset`, `headerLabelColor`, `formItemLabelColor`, `formItemInputColor`. The `lastItemState`, and the `offsetY` is used and maintained during the process of the form item building from the config items.
 
 For displaying stuff, it uses the following system:
 
