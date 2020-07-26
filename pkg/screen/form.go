@@ -161,9 +161,12 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	if b.charset == nil {
 		b.defaultCharset()
 	}
+	var textWidth float32
 	if b.headerLabel != "" {
 		textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
 		b.SetLabelWidth(textWidth)
+	} else {
+		textWidth = 0.0
 	}
 	s := b.ScreenWithFrameBuilder.Build()
 	s.Setup(setupFormScreen)
