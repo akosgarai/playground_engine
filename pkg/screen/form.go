@@ -161,6 +161,10 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	if b.charset == nil {
 		b.defaultCharset()
 	}
+	if b.headerLabel != "" {
+		textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
+		b.SetLabelWidth(textWidth)
+	}
 	s := b.ScreenWithFrameBuilder.Build()
 	s.Setup(setupFormScreen)
 
@@ -172,8 +176,6 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
 	if b.headerLabel != "" {
-		textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
-		b.SetLabelWidth(textWidth)
 		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, b.frameWidth/2 - 0.075, ZFrame}
 		textContainer := b.frameRectangle(textWidth, 0.15, textContainerPosition)
 		textContainer.RotateX(-180)
