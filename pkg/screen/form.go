@@ -45,17 +45,24 @@ var (
 
 	DefaultFormItemMaterial   = material.Whiteplastic
 	HighlightFormItemMaterial = material.Ruby
+
+	DefaultFormScreenHeaderLabelColor   = mgl32.Vec3{0, 0, 1}
+	DefaultFormScreenFormItemLabelColor = mgl32.Vec3{0, 0, 1}
+	DefaultFormScreenFormItemInputColor = mgl32.Vec3{0, 0.5, 0}
 )
 
 type FormScreenBuilder struct {
 	*ScreenWithFrameBuilder
-	headerLabel      string
-	formItemMaterial *material.Material
-	config           config.Config
-	configOrder      []string
-	charset          *model.Charset
-	lastItemState    string
-	offsetY          float32
+	headerLabel        string
+	formItemMaterial   *material.Material
+	config             config.Config
+	configOrder        []string
+	charset            *model.Charset
+	lastItemState      string
+	offsetY            float32
+	headerLabelColor   mgl32.Vec3
+	formItemLabelColor mgl32.Vec3
+	formItemInputColor mgl32.Vec3
 }
 
 func NewFormScreenBuilder() *FormScreenBuilder {
@@ -72,6 +79,9 @@ func NewFormScreenBuilder() *FormScreenBuilder {
 		lastItemState:          "F",
 		offsetY:                0.9,
 		formItemMaterial:       DefaultFormItemMaterial,
+		headerLabelColor:       DefaultFormScreenHeaderLabelColor,
+		formItemLabelColor:     DefaultFormScreenFormItemLabelColor,
+		formItemInputColor:     DefaultFormScreenFormItemInputColor,
 	}
 }
 
@@ -104,6 +114,21 @@ func (b *FormScreenBuilder) SetConfigOrder(o []string) {
 // SetCharset sets the charset of the form screen.
 func (b *FormScreenBuilder) SetCharset(m *model.Charset) {
 	b.charset = m
+}
+
+// SetHeaderLabelColor sets the color of the header label.
+func (b *FormScreenBuilder) SetHeaderLabelColor(c mgl32.Vec3) {
+	b.headerLabelColor = c
+}
+
+// SetFormItemLabelColor sets the color of the FormItem labels.
+func (b *FormScreenBuilder) SetFormItemLabelColor(c mgl32.Vec3) {
+	b.formItemLabelColor = c
+}
+
+// SetFormItemInputColor sets the color of the FormItem labels.
+func (b *FormScreenBuilder) SetFormItemInputColor(c mgl32.Vec3) {
+	b.formItemInputColor = c
 }
 
 // AddConfigBool is for adding a bool config item to the configs. It returns the key of the config.
@@ -178,7 +203,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		textContainer := b.frameRectangle(textWidth, 0.15, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
-		b.charset.PrintTo(b.headerLabel, -textWidth/2, -0.05, ZText, 3.0/b.windowWidth, b.wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+		b.charset.PrintTo(b.headerLabel, -textWidth/2, -0.05, ZText, 3.0/b.windowWidth, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
 	}
 
 	formScreen := &FormScreen{
@@ -188,6 +213,8 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		sinceLastClick:      0,
 		currentScrollOffset: float32(0.0),
 		formItemToConf:      make(map[interfaces.FormItem]*config.ConfigItem),
+		formItemLabelColor:  b.formItemLabelColor,
+		formItemInputColor:  b.formItemInputColor,
 	}
 	b.offsetY = b.frameWidth/2 - 0.1
 	for i := 0; i < len(b.configOrder); i++ {
@@ -388,7 +415,9 @@ type FormScreen struct {
 	maxScrollOffset     float32
 	currentScrollOffset float32
 	// map for formItem-configItem
-	formItemToConf map[interfaces.FormItem]*config.ConfigItem
+	formItemToConf     map[interfaces.FormItem]*config.ConfigItem
+	formItemLabelColor mgl32.Vec3
+	formItemInputColor mgl32.Vec3
 }
 
 func setupFormScreen(wrapper interfaces.GLWrapper) {
@@ -595,10 +624,10 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			f.charset.CleanSurface(f.underEdit.GetTarget())
 			switch f.underEdit.(type) {
 			case *model.FormItemVector:
-				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 				break
 			default:
-				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 				break
 			}
 		}
@@ -629,7 +658,7 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{
 	fi.RotateY(180)
 	fi.SetSpeed(FormItemMoveSpeed)
 	f.AddModelToShader(fi, f.formItemShader)
-	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, ZText, LabelFontScale/f.windowWindth, f.wrapper, fi.GetSurface(), []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
+	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, ZText, LabelFontScale/f.windowWindth, f.wrapper, fi.GetSurface(), []mgl32.Vec3{f.formItemLabelColor})
 	f.SetFormItemValue(fi, defaultValue)
 }
 
@@ -706,10 +735,10 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 		f.charset.CleanSurface(f.underEdit.GetTarget())
 		switch f.underEdit.(type) {
 		case *model.FormItemVector:
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 			break
 		default:
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 			break
 		}
 	}

@@ -53,6 +53,30 @@ func TestFormScreenBuilderSetWindowSize(t *testing.T) {
 		t.Errorf("Invalid window height. Instead of '%f', we have '%f'.", wH, builder.windowHeight)
 	}
 }
+func TestFormScreenBuilderSetHeaderLabelColor(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	color := mgl32.Vec3{1, 0, 1}
+	builder.SetHeaderLabelColor(color)
+	if builder.headerLabelColor != color {
+		t.Error("Invalid header label color.")
+	}
+}
+func TestFormScreenBuilderSetFormItemLabelColor(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	color := mgl32.Vec3{1, 0, 1}
+	builder.SetFormItemLabelColor(color)
+	if builder.formItemLabelColor != color {
+		t.Error("Invalid form item label color.")
+	}
+}
+func TestFormScreenBuilderSetFormItemInputColor(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	color := mgl32.Vec3{1, 0, 1}
+	builder.SetFormItemInputColor(color)
+	if builder.formItemInputColor != color {
+		t.Error("Invalid form item input color.")
+	}
+}
 func TestFormScreenBuilderSetConfig(t *testing.T) {
 	conf := config.New()
 	builder := NewFormScreenBuilder()
