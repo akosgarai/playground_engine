@@ -87,6 +87,11 @@ func NewFormScreenBuilder() *FormScreenBuilder {
 	}
 }
 
+// GetFullWidth returns the width of the drawable screen. (width - 2*length)
+func (f *FormScreenBuilder) GetFullWidth() float32 {
+	return f.frameWidth - (2 * f.frameLength)
+}
+
 // SetFrameSize sets the frameWidth and the frameLength, left padding parameters.
 func (b *FormScreenBuilder) SetFrameSize(w, l, r float32) {
 	b.frameWidth = w
@@ -229,22 +234,22 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		if _, ok := b.config[key]; ok {
 			switch b.config[key].GetValueType() {
 			case config.ValueTypeInt:
-				formScreen.addFormItemFromConfigInt(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigInt(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
 				break
 			case config.ValueTypeInt64:
-				formScreen.addFormItemFromConfigInt64(b.config[key], b.itemPosition(model.ITEM_WIDTH_LONG, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigInt64(b.config[key], b.itemPosition(model.ITEM_WIDTH_LONG, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
 				break
 			case config.ValueTypeFloat:
-				formScreen.addFormItemFromConfigFloat(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigFloat(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
 				break
 			case config.ValueTypeText:
-				formScreen.addFormItemFromConfigText(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigText(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
 				break
 			case config.ValueTypeBool:
-				formScreen.addFormItemFromConfigBool(b.config[key], b.itemPosition(model.ITEM_WIDTH_SHORT, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigBool(b.config[key], b.itemPosition(model.ITEM_WIDTH_SHORT, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
 				break
 			case config.ValueTypeVector:
-				formScreen.addFormItemFromConfigVector(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, FullWidth*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigVector(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
 				break
 			}
 		}
@@ -288,24 +293,24 @@ func (b *FormScreenBuilder) itemPosition(itemWidth, itemHeight float32) mgl32.Ve
 		break
 	case "LH":
 		b.offsetY = b.offsetY - itemHeight
-		x = FullWidth / 4
+		x = b.GetFullWidth() / 4
 		break
 	case "LL":
 		b.offsetY = b.offsetY - itemHeight
-		x = FullWidth / 6
+		x = b.GetFullWidth() / 6
 		break
 	case "LS":
 		b.offsetY = b.offsetY - itemHeight
-		x = FullWidth / 3
+		x = b.GetFullWidth() / 3
 		break
 	case "RH":
-		x = -FullWidth / 4
+		x = -b.GetFullWidth() / 4
 		break
 	case "RL":
-		x = -FullWidth / 6
+		x = -b.GetFullWidth() / 6
 		break
 	case "RS":
-		x = -FullWidth / 3
+		x = -b.GetFullWidth() / 3
 		break
 	case "MS":
 		x = 0.0
@@ -524,9 +529,9 @@ func (f *FormScreen) highlightFormAction() {
 		return
 	}
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
-	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWindth, FullWidth)
+	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWindth, f.GetFullWidth())
 	for i := 0; i < len(lines); i++ {
-		f.charset.PrintTo(lines[i], -FullWidth/2, 0.12-float32(i)*0.075, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
+		f.charset.PrintTo(lines[i], -f.GetFullWidth()/2, 0.12-float32(i)*0.075, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{mgl32.Vec3{0, 0.5, 0}})
 	}
 }
 
@@ -669,14 +674,14 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{
 
 // addFormItemFromConfigBool sets up a FormItemBool from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemBool(FullWidth, model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemBool(f.GetFullWidth(), model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	f.formItemToConf[fi] = configItem
 	f.addFormItem(fi, configItem.GetDefaultValue())
 }
 
 // addFormItemFromConfigInt sets up a FormItemInt from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemInt(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.IntValidator))
 	}
@@ -686,7 +691,7 @@ func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos
 
 // addFormItemFromConfigFloat sets up a FormItemFloat from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemFloat(FullWidth, model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemFloat(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
@@ -696,7 +701,7 @@ func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigText sets up a FormItemText from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemText(FullWidth, model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemText(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.StringValidator))
 	}
@@ -706,7 +711,7 @@ func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, po
 
 // addFormItemFromConfigInt64 sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt64(FullWidth, model.ITEM_WIDTH_LONG, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemInt64(f.GetFullWidth(), model.ITEM_WIDTH_LONG, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.Int64Validator))
 	}
@@ -716,7 +721,7 @@ func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigVector sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemVector(FullWidth, model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemVector(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
