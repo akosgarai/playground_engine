@@ -53,37 +53,30 @@ var (
 )
 
 type FormScreenBuilder struct {
-	headerLabel            string
-	frameMaterial          *material.Material
-	formItemMaterial       *material.Material
-	wrapper                interfaces.GLWrapper
-	windowWidth            float32
-	windowHeight           float32
-	config                 config.Config
-	configOrder            []string
-	charset                *model.Charset
-	lastItemState          string
-	offsetY                float32
-	frameWidth             float32 // the size on the x axis
-	frameLength            float32 // the size on the y axis
-	frameTopLeftWidth      float32 // for supporting the header text, there is an option to give a padding here.
-	detailContentBoxHeight float32
+	*ScreenWithFrameBuilder
+	headerLabel      string
+	formItemMaterial *material.Material
+	config           config.Config
+	configOrder      []string
+	charset          *model.Charset
+	lastItemState    string
+	offsetY          float32
 }
 
 func NewFormScreenBuilder() *FormScreenBuilder {
+	swfb := NewScreenWithFrameBuilder()
+	swfb.SetFrameSize(DefaultFrameWidth, DefaultFrameLength, TopLeftFrameWidth)
+	swfb.SetFrameMaterial(HighlightFormItemMaterial)
+	swfb.SetDetailContentBoxMaterial(DefaultFormItemMaterial)
+	swfb.SetDetailContentBoxHeight(0.3)
 	return &FormScreenBuilder{
+		ScreenWithFrameBuilder: swfb,
 		headerLabel:            "Default label",
-		wrapper:                nil,
 		charset:                nil,
 		config:                 config.New(),
 		lastItemState:          "F",
 		offsetY:                0.9,
 		formItemMaterial:       DefaultFormItemMaterial,
-		frameMaterial:          HighlightFormItemMaterial,
-		frameWidth:             DefaultFrameWidth,
-		frameLength:            DefaultFrameLength,
-		frameTopLeftWidth:      TopLeftFrameWidth,
-		detailContentBoxHeight: 0.3,
 	}
 }
 
@@ -92,43 +85,15 @@ func (f *FormScreenBuilder) GetFullWidth() float32 {
 	return f.frameWidth - (2 * f.frameLength)
 }
 
-// SetFrameSize sets the frameWidth and the frameLength, left padding parameters.
-func (b *FormScreenBuilder) SetFrameSize(w, l, r float32) {
-	b.frameWidth = w
-	b.frameLength = l
-	b.frameTopLeftWidth = r
-}
-
-// SetDetailContentBoxHeight sets the height of the detailContentBox.
-func (b *FormScreenBuilder) SetDetailContentBoxHeight(h float32) {
-	b.detailContentBoxHeight = h
-}
-
 // SetHeaderLabel sets the value for the header of the form, that is displayed
 // on the top left of the form.
 func (b *FormScreenBuilder) SetHeaderLabel(l string) {
 	b.headerLabel = l
 }
 
-// SetFrameMaterial sets the material that is used for the frame of the screen.
-func (b *FormScreenBuilder) SetFrameMaterial(m *material.Material) {
-	b.frameMaterial = m
-}
-
 // SetFormItemMaterial sets the material that is used for the form items and the detailcontentbox.
 func (b *FormScreenBuilder) SetFormItemMaterial(m *material.Material) {
 	b.formItemMaterial = m
-}
-
-// SetWrapper sets the wrapper.
-func (b *FormScreenBuilder) SetWrapper(w interfaces.GLWrapper) {
-	b.wrapper = w
-}
-
-// SetWindowSize sets the windowWidth and the windowHeight parameters.
-func (b *FormScreenBuilder) SetWindowSize(w, h float32) {
-	b.windowWidth = w
-	b.windowHeight = h
 }
 
 // SetConfig sets the config of the form.
@@ -196,16 +161,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	if b.charset == nil {
 		b.defaultCharset()
 	}
-	builder := NewScreenWithFrameBuilder()
-	builder.SetWindowSize(b.windowWidth, b.windowHeight)
-	builder.SetWrapper(b.wrapper)
-	builder.SetFrameSize(b.frameWidth, b.frameLength, b.frameTopLeftWidth)
-	builder.SetFrameMaterial(b.frameMaterial)
-	builder.SetDetailContentBoxMaterial(b.formItemMaterial)
-	builder.SetDetailContentBoxHeight(b.detailContentBoxHeight)
-	textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
-	builder.SetLabelWidth(textWidth)
-	s := builder.Build()
+	s := b.ScreenWithFrameBuilder.Build()
 	s.Setup(setupFormScreen)
 
 	bgShaderApplication := shader.NewTextureMatShaderBlending(b.wrapper)
@@ -215,6 +171,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
+	textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
 	textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, b.frameWidth/2 - 0.075, ZFrame}
 	textContainer := b.frameRectangle(textWidth, 0.15, textContainerPosition)
 	textContainer.RotateX(-180)

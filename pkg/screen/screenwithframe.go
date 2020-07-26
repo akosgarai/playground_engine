@@ -58,6 +58,7 @@ func NewScreenWithFrameBuilder() *ScreenWithFrameBuilder {
 		labelWidth:               float32(0.0),
 		detailContentBoxHeight:   float32(0.0),
 		detailContentBoxMaterial: DefaultFormItemMaterial,
+		wrapper:                  nil,
 	}
 }
 
