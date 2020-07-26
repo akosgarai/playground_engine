@@ -541,8 +541,8 @@ func (f *FormScreen) highlightFormAction() {
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	f.sinceLastClick = f.sinceLastClick + dt
 	f.sinceLastDelete = f.sinceLastDelete + dt
-	cursorX := float32(-posX)
-	cursorY := float32(posY)
+	cursorX := float32(-posX) * f.frameWidth / 2
+	cursorY := float32(posY) * f.frameWidth / 2
 	direction := mgl32.Vec3{0, 0, 0}
 	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
 		direction = mgl32.Vec3{0, -1, 0}
