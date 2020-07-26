@@ -5,11 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/config"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
-	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/model"
@@ -40,6 +38,8 @@ const (
 	ZText              = float32(-0.01)
 	ZBackground        = float32(0.02)
 	FormItemMoveSpeed  = float32(0.005)
+	DefaultFrameWidth  = float32(2.0) // the full width of the screen.
+	DefaultFrameLength = float32(0.02)
 )
 
 var (
@@ -53,27 +53,50 @@ var (
 )
 
 type FormScreenBuilder struct {
-	headerLabel   string
-	frameMaterial *material.Material
-	wrapper       interfaces.GLWrapper
-	windowWidth   float32
-	windowHeight  float32
-	config        config.Config
-	configOrder   []string
-	charset       *model.Charset
-	lastItemState string
-	offsetY       float32
+	headerLabel            string
+	frameMaterial          *material.Material
+	formItemMaterial       *material.Material
+	wrapper                interfaces.GLWrapper
+	windowWidth            float32
+	windowHeight           float32
+	config                 config.Config
+	configOrder            []string
+	charset                *model.Charset
+	lastItemState          string
+	offsetY                float32
+	frameWidth             float32 // the size on the x axis
+	frameLength            float32 // the size on the y axis
+	frameTopLeftWidth      float32 // for supporting the header text, there is an option to give a padding here.
+	detailContentBoxHeight float32
 }
 
 func NewFormScreenBuilder() *FormScreenBuilder {
 	return &FormScreenBuilder{
-		headerLabel:   "Default label",
-		wrapper:       nil,
-		charset:       nil,
-		config:        config.New(),
-		lastItemState: "F",
-		offsetY:       0.9,
+		headerLabel:            "Default label",
+		wrapper:                nil,
+		charset:                nil,
+		config:                 config.New(),
+		lastItemState:          "F",
+		offsetY:                0.9,
+		formItemMaterial:       DefaultFormItemMaterial,
+		frameMaterial:          HighlightFormItemMaterial,
+		frameWidth:             DefaultFrameWidth,
+		frameLength:            DefaultFrameLength,
+		frameTopLeftWidth:      TopLeftFrameWidth,
+		detailContentBoxHeight: 0.3,
 	}
+}
+
+// SetFrameSize sets the frameWidth and the frameLength, left padding parameters.
+func (b *FormScreenBuilder) SetFrameSize(w, l, r float32) {
+	b.frameWidth = w
+	b.frameLength = l
+	b.frameTopLeftWidth = r
+}
+
+// SetDetailContentBoxHeight sets the height of the detailContentBox.
+func (b *FormScreenBuilder) SetDetailContentBoxHeight(h float32) {
+	b.detailContentBoxHeight = h
 }
 
 // SetHeaderLabel sets the value for the header of the form, that is displayed
@@ -85,6 +108,11 @@ func (b *FormScreenBuilder) SetHeaderLabel(l string) {
 // SetFrameMaterial sets the material that is used for the frame of the screen.
 func (b *FormScreenBuilder) SetFrameMaterial(m *material.Material) {
 	b.frameMaterial = m
+}
+
+// SetFormItemMaterial sets the material that is used for the form items and the detailcontentbox.
+func (b *FormScreenBuilder) SetFormItemMaterial(m *material.Material) {
+	b.formItemMaterial = m
 }
 
 // SetWrapper sets the wrapper.
@@ -163,52 +191,36 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	if b.charset == nil {
 		b.defaultCharset()
 	}
-	s := newScreenBase()
-	s.SetCamera(b.defaultCamera())
+	builder := NewScreenWithFrameBuilder()
+	builder.SetWindowSize(b.windowWidth, b.windowHeight)
+	builder.SetWrapper(b.wrapper)
+	builder.SetFrameSize(b.frameWidth, b.frameLength, b.frameTopLeftWidth)
+	builder.SetFrameMaterial(b.frameMaterial)
+	builder.SetDetailContentBoxMaterial(b.formItemMaterial)
+	builder.SetDetailContentBoxHeight(b.detailContentBoxHeight)
+	textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
+	builder.SetLabelWidth(textWidth)
+	s := builder.Build()
 	s.Setup(setupFormScreen)
-	s.SetWindowSize(b.windowWidth, b.windowHeight)
-	s.SetWrapper(b.wrapper)
+
 	bgShaderApplication := shader.NewTextureMatShaderBlending(b.wrapper)
-	frameShaderApplication := shader.NewMaterialShader(b.wrapper)
 	fgShaderApplication := shader.NewFontShader(b.wrapper)
 	s.AddShader(bgShaderApplication)
 	s.AddShader(fgShaderApplication)
-	s.AddShader(frameShaderApplication)
 
-	directionalLightSource := light.NewDirectionalLight([4]mgl32.Vec3{
-		DirectionalLightDirection,
-		DirectionalLightAmbient,
-		DirectionalLightDiffuse,
-		DirectionalLightSpecular,
-	})
-	s.AddDirectionalLightSource(directionalLightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
-	frameModel := model.New()
-	// create frame.
-	textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
-	textContainer := b.frameRectangle(textWidth, 0.15, mgl32.Vec3{1 - TopLeftFrameWidth - textWidth/2, 0.925, ZFrame})
+	textContainer := b.frameRectangle(textWidth, 0.15, mgl32.Vec3{1 - b.frameTopLeftWidth - textWidth/2, 0.925, ZFrame})
 	textContainer.RotateX(-180)
 	textContainer.RotateY(180)
 	b.charset.PrintTo(b.headerLabel, -textWidth/2, -0.05, ZText, 3.0/b.windowWidth, b.wrapper, textContainer, []mgl32.Vec3{mgl32.Vec3{0, 0, 1}})
-	detailContainer := b.frameRectangleWithMaterial(FullWidth, 0.3, mgl32.Vec3{0.0, -1.0 + BottomFrameLength + 0.15, ZFrame}, DefaultFormItemMaterial)
-	detailContainer.RotateX(-180)
-	detailContainer.RotateY(180)
-	frameModel.AddMesh(b.frameRectangle(BottomFrameWidth, BottomFrameLength, mgl32.Vec3{0.0, -0.99, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{-0.99, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(SideFrameWidth, SideFrameLength, mgl32.Vec3{0.99, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(TopLeftFrameWidth, BottomFrameLength, mgl32.Vec3{0.95, 0.99, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(2.0-TopLeftFrameWidth-textWidth, BottomFrameLength, mgl32.Vec3{(-TopLeftFrameWidth - textWidth) / 2, 0.99, ZFrame}))
-	frameModel.AddMesh(detailContainer)
-	s.AddModelToShader(frameModel, frameShaderApplication)
 
 	formScreen := &FormScreen{
-		ScreenBase:          s,
+		ScreenWithFrame:     s,
 		charset:             b.charset,
 		formItemShader:      bgShaderApplication,
 		sinceLastClick:      0,
 		currentScrollOffset: float32(0.0),
-		detailContentBox:    detailContainer,
 		formItemToConf:      make(map[interfaces.FormItem]*config.ConfigItem),
 	}
 	for i := 0; i < len(b.configOrder); i++ {
@@ -236,7 +248,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 			}
 		}
 	}
-	formScreen.maxScrollOffset = (-1 + BottomFrameLength + 0.5 - b.offsetY)
+	formScreen.maxScrollOffset = (-(b.frameWidth) + b.frameLength + b.detailContentBoxHeight - b.offsetY)
 
 	return formScreen
 }
@@ -265,12 +277,6 @@ func (b *FormScreenBuilder) defaultCharset() {
 	b.charset = cs
 }
 
-// It creates a new camera with the necessary setup
-func (b *FormScreenBuilder) defaultCamera() *camera.Camera {
-	cam := camera.NewCamera(mgl32.Vec3{0, 0, -1.8}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
-	cam.SetupProjection(45, b.windowWidth/b.windowHeight, 0.001, 10.0)
-	return cam
-}
 func (b *FormScreenBuilder) itemPosition(itemWidth, itemHeight float32) mgl32.Vec3 {
 	b.pushState(itemWidth)
 	var x float32
@@ -405,7 +411,7 @@ func (b *FormScreenBuilder) pushState(itemWidth float32) {
 }
 
 type FormScreen struct {
-	*ScreenBase
+	*ScreenWithFrame
 	charset         *model.Charset
 	formItemShader  *shader.Shader
 	sinceLastClick  float64
@@ -414,8 +420,6 @@ type FormScreen struct {
 	// Item position
 	maxScrollOffset     float32
 	currentScrollOffset float32
-	// Info box for displaying the details of the form items.
-	detailContentBox interfaces.Mesh
 	// map for formItem-configItem
 	formItemToConf map[interfaces.FormItem]*config.ConfigItem
 }
@@ -515,6 +519,9 @@ func (f *FormScreen) wrapTextToLines(desc string, scale, maxLineWidth float32) [
 func (f *FormScreen) highlightFormAction() {
 	tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 	tmMesh.Material = HighlightFormItemMaterial
+	if f.detailContentBox == nil {
+		return
+	}
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
 	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWindth, FullWidth)
 	for i := 0; i < len(lines); i++ {
@@ -530,14 +537,14 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	cursorX := float32(-posX)
 	cursorY := float32(posY)
 	direction := mgl32.Vec3{0, 0, 0}
-	// If the Up key is pressed => direction: up, velocity: c
-	// If the Down key is pressed => direction: down, velocity: c
-	// Otherwise => direction: null, velocity c
 	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
 		direction = mgl32.Vec3{0, -1, 0}
 	} else if keyStore.Get(KEY_DOWN) && !keyStore.Get(KEY_UP) {
 		direction = mgl32.Vec3{0, 1, 0}
 	}
+	// If the Up key is pressed => direction: up, velocity: c
+	// If the Down key is pressed => direction: down, velocity: c
+	// Otherwise => direction: null, velocity c
 	newScrollOffset := f.currentScrollOffset + FormItemMoveSpeed*float32(dt)*direction.Y()
 	if newScrollOffset > float32(0.0) && newScrollOffset < f.maxScrollOffset {
 		f.currentScrollOffset = newScrollOffset
@@ -566,7 +573,6 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	f.closestMesh = closestMesh
 	f.closestDistance = closestDistance
 	f.closestModel = closestModel
-
 	f.initMaterialForTheFormItems()
 	minDiff := float32(0.0)
 	if closestDistance <= minDiff+0.01 {
@@ -613,6 +619,7 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 		}
 		f.highlightFormAction()
 	}
+
 	if keyStore.Get(BACK_SPACE) && f.sinceLastDelete > EventEpsilon {
 		f.sinceLastDelete = 0
 		if f.underEdit != nil {
