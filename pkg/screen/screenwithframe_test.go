@@ -10,11 +10,11 @@ import (
 
 func TestNewScreenWithFrameBuilder(t *testing.T) {
 	fb := NewScreenWithFrameBuilder()
-	dfw := BottomFrameWidth
+	dfw := DefaultFrameWidth
 	if fb.frameWidth != dfw {
 		t.Errorf("Invalid frameWidth. Instead of '%f', it is '%f'.", dfw, fb.frameWidth)
 	}
-	dfl := BottomFrameLength
+	dfl := DefaultFrameLength
 	if fb.frameLength != dfl {
 		t.Errorf("Invalid frameLength. Instead of '%f', it is '%f'.", dfl, fb.frameLength)
 	}

@@ -22,12 +22,7 @@ import (
 
 const (
 	DefaultFontFile    = "/assets/fonts/Frijole/Frijole-Regular.ttf"
-	BottomFrameWidth   = float32(2.0) // the full width of the screen.
-	BottomFrameLength  = float32(0.02)
-	SideFrameLength    = float32(1.98)
-	SideFrameWidth     = float32(0.02) // the width of the border frames.
 	TopLeftFrameWidth  = float32(0.1)
-	FullWidth          = BottomFrameWidth - 2*SideFrameWidth // The full width of the usable area
 	EventEpsilon       = 200
 	BACK_SPACE         = glfw.KeyBackspace
 	KEY_UP             = glfw.KeyUp

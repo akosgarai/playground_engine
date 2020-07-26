@@ -51,8 +51,8 @@ type ScreenWithFrameBuilder struct {
 // NewScreenWithFrameBuilder returns a builder instance.
 func NewScreenWithFrameBuilder() *ScreenWithFrameBuilder {
 	return &ScreenWithFrameBuilder{
-		frameWidth:               BottomFrameWidth,
-		frameLength:              BottomFrameLength,
+		frameWidth:               DefaultFrameWidth,
+		frameLength:              DefaultFrameLength,
 		frameTopLeftWidth:        TopLeftFrameWidth,
 		fov:                      float32(45),
 		labelWidth:               float32(0.0),
