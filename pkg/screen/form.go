@@ -229,7 +229,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		currentScrollOffset: float32(0.0),
 		formItemToConf:      make(map[interfaces.FormItem]*config.ConfigItem),
 	}
-	b.offsetY = b.frameWidth - 0.1
+	b.offsetY = b.frameWidth/2 - 0.1
 	for i := 0; i < len(b.configOrder); i++ {
 		key := b.configOrder[i]
 		if _, ok := b.config[key]; ok {
