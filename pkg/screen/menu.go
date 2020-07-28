@@ -191,7 +191,7 @@ func (m *MenuScreen) BuildScreen() {
 		surface := m.menuSurface(mgl32.Vec3{0.0, positionY, ZBackground})
 		optionsToDisplay[i].SetSurface(surface)
 		surfaceToOption[surface] = optionsToDisplay[i]
-		m.charset.PrintTo(optionsToDisplay[i].label, positionX, -0.03, ZText, 3.0/m.windowWindth, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
+		m.charset.PrintTo(optionsToDisplay[i].label, positionX, -0.03, -ZText, 3.0/m.windowWindth, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
 		positionY += m.frameWidth * 0.2
 	}
 	bottomOfTheTopForegroundArea := m.frameWidth/2.0 - m.frameLength
