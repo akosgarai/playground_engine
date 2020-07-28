@@ -16,9 +16,10 @@ import (
 
 type ScreenWithFrame struct {
 	*ScreenBase
-	frameWidth       float32 // the size on the x axis
-	frameLength      float32 // the size on the y axis
-	detailContentBox interfaces.Mesh
+	frameWidth             float32 // the size on the x axis
+	frameLength            float32 // the size on the y axis
+	detailContentBox       interfaces.Mesh
+	detailContentBoxHeight float32
 }
 
 // tmp function for testing
@@ -144,10 +145,11 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	s.AddDirectionalLightSource(directionalLightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
 
 	return &ScreenWithFrame{
-		ScreenBase:       s,
-		frameWidth:       b.frameWidth,
-		frameLength:      b.frameLength,
-		detailContentBox: detailContentBox,
+		ScreenBase:             s,
+		frameWidth:             b.frameWidth,
+		frameLength:            b.frameLength,
+		detailContentBox:       detailContentBox,
+		detailContentBoxHeight: b.detailContentBoxHeight,
 	}
 }
 
