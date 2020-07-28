@@ -63,6 +63,7 @@ type MenuScreenBuilder struct {
 	state                   map[string]bool
 }
 
+// NewMenuScreenBuilder returns a MenuScreenBuilder that we cen use for creating a MenuScreen.
 func NewMenuScreenBuilder() *MenuScreenBuilder {
 	swfb := NewScreenWithFrameBuilder()
 	swfb.SetFrameSize(DefaultFrameWidth, DefaultFrameLength, TopLeftFrameWidth)
@@ -86,21 +87,33 @@ func (b *MenuScreenBuilder) defaultCharset() {
 	cs.SetTransparent(true)
 	b.charset = cs
 }
+
+// SetMenuItemSurfaceTexture sets the texture of the menu item.
 func (b *MenuScreenBuilder) SetMenuItemSurfaceTexture(tex texture.Textures) {
 	b.menuItemSurfaceTexture = tex
 }
+
+// SetMenuItemDefaultMaterial sets the default material of the menu item.
 func (b *MenuScreenBuilder) SetMenuItemDefaultMaterial(mat *material.Material) {
 	b.menuItemDefaultMaterial = mat
 }
+
+// SetMenuItemHighlightMaterial sets the hover material of the menu item.
 func (b *MenuScreenBuilder) SetMenuItemHighlightMaterial(mat *material.Material) {
 	b.menuItemHoverMaterial = mat
 }
+
+// SetMenuItemFontColor sets the font color of the menu item.
 func (b *MenuScreenBuilder) SetMenuItemFontColor(c mgl32.Vec3) {
 	b.menuItemFontColor = c
 }
+
+// SetBackgroundColor sets the background color of the menu screen.
 func (b *MenuScreenBuilder) SetBackgroundColor(c mgl32.Vec3) {
 	b.backgroundColor = c
 }
+
+// SetState updates the current state of the screen.
 func (b *MenuScreenBuilder) SetState(m map[string]bool) {
 	b.state = m
 }
