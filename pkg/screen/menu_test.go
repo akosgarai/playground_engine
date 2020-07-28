@@ -139,6 +139,9 @@ func TestMenuScreenBuilderAddOption(t *testing.T) {
 	}
 }
 func TestMenuScreenBuilderBuild(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	runtime.LockOSThread()
 	testhelper.GlfwInit()
 	wrapperReal.InitOpenGL()
@@ -158,6 +161,9 @@ func TestMenuScreenBuilderBuild(t *testing.T) {
 	b.Build()
 }
 func NewTestMenuScreen(t *testing.T) *MenuScreen {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	testhelper.GlfwInit()
 	wrapperReal.InitOpenGL()
 	charset, err := model.LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40.0, 72, wrapperReal)
@@ -198,6 +204,9 @@ func NewTestMenuScreen(t *testing.T) *MenuScreen {
 	return menu
 }
 func NewTestMenuScreenWithOptions(t *testing.T) *MenuScreen {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
 	testhelper.GlfwInit()
 	wrapperReal.InitOpenGL()
 	charset, err := model.LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40.0, 72, wrapperReal)
