@@ -96,6 +96,7 @@ This screen extension is a base screen, that contains a frame on its edge. It su
 - frameWidth - The width of the the visible screen. It is the width (length on the `X` axis) of the frames.
 - frameLength - The length (on the `Y` axis) of the frames.
 - detailContentBox - This is the mesh that could be used for displaying the text.
+- detailContentBoxHeight - This is the height of the detailContentBox mesh.
 
 It provides a function (GetFullWidth) for getting the width of the usable area.
 
