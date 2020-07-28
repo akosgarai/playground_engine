@@ -114,7 +114,22 @@ This is a handy tool for creating ScreenWithFrames. It provides Set... and Build
 
 ### MenuScreen
 
-This screen is for displaying menus. It holds a Charset model, a texture for the menu items, the default and the hover material. It also holds an Options array that contains the displayable items. The options holds conditions for displaying.
+This screen is for displaying menus. It is a `ScreenWithFrame` extension. It holds the followings:
+
+- charset - the charset model for displaying text.
+- background - the background model of the screen.
+- surfaceTexture - the texture that we use for covering the menu items.
+- defaultMaterial - the default material of the menu items.
+- hoverMaterial - the highlight material of the menu items.
+- options - the list of the options that could be displayed.
+- backgroundShader - the shader that is used for rendering the menu items.
+- fontShader - the shader that is used for rendering the texts.
+- fontColor - the color of the glyphs.
+- backgroundColor - the clear color of the screen.
+- state - the current state of the screen.
+- surfaceToOption - it maps the surface meshes to the options.
+- maxScrollOffset - in case of long menu, the scrolling is supported. It limits the scrolling.
+- currentScrollOffset - The current offset of the form items in the Y axis. (move the screen with up / down cursors.)
 
 ```
  _______________
@@ -130,6 +145,33 @@ This screen is for displaying menus. It holds a Charset model, a texture for the
  | text     - 0.2 - Exit
  |	    - 0.1
 ```
+
+**Features**
+
+If the mouse cursor is above a form item, it triggers a hover effect, that does the followings:
+
+- Updates the menu item material to the Highlight value.
+
+This screen supports scrolling on the `Y` axis. This feature is active, if we have more form items that we can display on the visible area. The scolling can be triggered with the `up` and `down` arrow keys.
+
+Clicking on a hovered item.
+
+- It triggers a clickEvent function call on the option.
+
+#### MenuScreenBuilder
+
+This tool is provided for creating menus. It is a `ScreenWithFrameBuilder` extension. The following variables could be set during the construction.
+
+- charset - the charset model for displaying text.
+- menuItemSurfaceTexture - the texture that we use for covering the menu items.
+- defaultMaterial - the default material of the menu items.
+- hoverMaterial - the highlight material of the menu items.
+- options - the list of the options that could be displayed.
+- menuItemFontColor - the color of the glyphs.
+- backgroundColor - the clear color of the screen.
+- state - the initial state of the screen.
+
+Set... functions are provided for the `charset`, `menuItemSurfaceTexture`, `defaultMaterial`, `hoverMaterial`, `options`, `menuItemFontColor`, `backgroundColor`, `state`.
 
 ### FormScreen
 
