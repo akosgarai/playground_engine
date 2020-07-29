@@ -452,8 +452,6 @@ func TestFormScreenUpdate(t *testing.T) {
 		form.Update(0.4, -0.4, 0.79, ks, ms)
 		ks.Set(KEY_DOWN, false)
 		form.Update(0.4, -0.4, 0.79, ks, ms)
-		t.Log(form.currentScrollOffset)
-		t.Log(form.maxScrollOffset)
 	}()
 }
 func newFormScreen() *FormScreen {
