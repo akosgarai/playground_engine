@@ -242,7 +242,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 			}
 		}
 	}
-	formScreen.maxScrollOffset = (-(b.frameWidth) + b.frameLength + b.detailContentBoxHeight - b.offsetY)
+	formScreen.maxScrollOffset = (-(b.frameWidth / 2.0) + b.frameLength + b.detailContentBoxHeight - b.offsetY)
 	if formScreen.maxScrollOffset < 0 {
 		formScreen.maxScrollOffset = 0.0
 	}
