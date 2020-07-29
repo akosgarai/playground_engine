@@ -378,6 +378,36 @@ func TestFormScreenUpdate(t *testing.T) {
 			builder.AddConfigFloat("label float", longDescription, 0.44, nil),
 			builder.AddConfigText("label text", DefaultFormItemDescription, "sample", nil),
 			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
+			builder.AddConfigBool("label bool", DefaultFormItemDescription, true),
+			builder.AddConfigInt("label int", DefaultFormItemDescription, 1, nil),
+			builder.AddConfigInt64("label int64", DefaultFormItemDescription, 10, nil),
+			builder.AddConfigFloat("label float", longDescription, 0.44, nil),
+			builder.AddConfigText("label text", DefaultFormItemDescription, "sample", nil),
+			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
+			builder.AddConfigBool("label bool", DefaultFormItemDescription, true),
+			builder.AddConfigInt("label int", DefaultFormItemDescription, 1, nil),
+			builder.AddConfigInt64("label int64", DefaultFormItemDescription, 10, nil),
+			builder.AddConfigFloat("label float", longDescription, 0.44, nil),
+			builder.AddConfigText("label text", DefaultFormItemDescription, "sample", nil),
+			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
+			builder.AddConfigBool("label bool", DefaultFormItemDescription, true),
+			builder.AddConfigInt("label int", DefaultFormItemDescription, 1, nil),
+			builder.AddConfigInt64("label int64", DefaultFormItemDescription, 10, nil),
+			builder.AddConfigFloat("label float", longDescription, 0.44, nil),
+			builder.AddConfigText("label text", DefaultFormItemDescription, "sample", nil),
+			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
+			builder.AddConfigBool("label bool", DefaultFormItemDescription, true),
+			builder.AddConfigInt("label int", DefaultFormItemDescription, 1, nil),
+			builder.AddConfigInt64("label int64", DefaultFormItemDescription, 10, nil),
+			builder.AddConfigFloat("label float", longDescription, 0.44, nil),
+			builder.AddConfigText("label text", DefaultFormItemDescription, "sample", nil),
+			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
+			builder.AddConfigBool("label bool", DefaultFormItemDescription, true),
+			builder.AddConfigInt("label int", DefaultFormItemDescription, 1, nil),
+			builder.AddConfigInt64("label int64", DefaultFormItemDescription, 10, nil),
+			builder.AddConfigFloat("label float", longDescription, 0.44, nil),
+			builder.AddConfigText("label text", DefaultFormItemDescription, "sample", nil),
+			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
 		})
 		form := builder.Build()
 		ks := store.NewGlfwKeyStore()
@@ -385,12 +415,6 @@ func TestFormScreenUpdate(t *testing.T) {
 		form.Update(10, 0.5, 0.5, ks, ms)
 		form.Update(10, -0.4, 0.79, ks, ms)
 		ms.Set(LEFT_MOUSE_BUTTON, true)
-		ks.Set(KEY_UP, true)
-		form.Update(0.4, -0.4, 0.79, ks, ms)
-		ks.Set(KEY_UP, false)
-		ks.Set(KEY_DOWN, true)
-		form.Update(0.4, -0.4, 0.79, ks, ms)
-		ks.Set(KEY_DOWN, false)
 		form.sinceLastClick = 201
 		form.Update(10, -0.4, 0.79, ks, ms) // bool
 		form.sinceLastClick = 201
@@ -420,6 +444,14 @@ func TestFormScreenUpdate(t *testing.T) {
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
 		form.Update(10, -0.4, 0.39, ks, ms) // vector
+		ms.Set(LEFT_MOUSE_BUTTON, false)
+		ks.Set(KEY_UP, true)
+		form.Update(0.4, -0.4, 0.79, ks, ms)
+		ks.Set(KEY_UP, false)
+		ks.Set(KEY_DOWN, true)
+		form.Update(0.4, -0.4, 0.79, ks, ms)
+		ks.Set(KEY_DOWN, false)
+		form.Update(0.4, -0.4, 0.79, ks, ms)
 	}()
 }
 func newFormScreen() *FormScreen {
