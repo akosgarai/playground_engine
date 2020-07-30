@@ -10,6 +10,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/screen"
 	"github.com/akosgarai/playground_engine/pkg/store"
+	"github.com/akosgarai/playground_engine/pkg/texture"
 	"github.com/akosgarai/playground_engine/pkg/theme"
 	"github.com/akosgarai/playground_engine/pkg/transformations"
 
@@ -74,13 +75,17 @@ type Application struct {
 
 // New returns an application instance
 func New(wrapper interfaces.GLWrapper) *Application {
+	ui := *theme.Default
+	var tex texture.Textures
+	tex.TransparentTexture(1, 1, 1, "paper", wrapper)
+	ui.SetMenuItemSurfaceTexture(tex)
 	return &Application{
 		mouseDowns: store.NewGlfwMouseStore(),
 		keyDowns:   store.NewGlfwKeyStore(),
 		menuSet:    false,
 		wrapper:    wrapper,
 		window:     nil,
-		ui:         *theme.Default,
+		ui:         ui,
 	}
 }
 
