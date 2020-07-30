@@ -19,6 +19,6 @@ var (
 		headerLabelColor:        mgl32.Vec3{0, 0, 1},
 		labelColor:              mgl32.Vec3{0, 0, 1},
 		inputColor:              mgl32.Vec3{0, 0.5, 0},
-		backgroundColor:         mgl32.Vec3{0, 0, 1},
+		backgroundColor:         mgl32.Vec3{0.55, 0.55, 0.55},
 	}
 )
