@@ -6,8 +6,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/akosgarai/playground_engine/pkg/config"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
+	"github.com/akosgarai/playground_engine/pkg/screen"
 	"github.com/akosgarai/playground_engine/pkg/store"
+	"github.com/akosgarai/playground_engine/pkg/theme"
 	"github.com/akosgarai/playground_engine/pkg/transformations"
 
 	"github.com/akosgarai/coldet"
@@ -65,6 +68,8 @@ type Application struct {
 
 	// wrapper for char callback
 	wrapper interfaces.GLWrapper
+	// Theme of the UI items.
+	ui theme.Theme
 }
 
 // New returns an application instance
@@ -74,6 +79,8 @@ func New(wrapper interfaces.GLWrapper) *Application {
 		keyDowns:   store.NewGlfwKeyStore(),
 		menuSet:    false,
 		wrapper:    wrapper,
+		window:     nil,
+		ui:         *theme.Default,
 	}
 }
 
@@ -86,6 +93,11 @@ func (a *Application) Log() string {
 		logString += fmt.Sprintf("\tactiveScreen: %s\n", a.activeScreen.Log())
 	}
 	return logString
+}
+
+// SetTheme sets the theme of the ui items.
+func (a *Application) SetTheme(t theme.Theme) {
+	a.ui = t
 }
 
 // SetWrapper updates the wrapper with the new one.
@@ -270,4 +282,52 @@ func (a *Application) export() {
 		a.screens[s].Export(ExportBaseDir + "/" + Directory + "/" + modelDir)
 		i++
 	}
+}
+
+// MenuScreen creates a menu screen based on the current theme.
+func (a *Application) BuildMenuScreen(options []screen.Option) *screen.MenuScreen {
+	if a.window == nil {
+		panic("Window is missing.")
+	}
+	ww, wh := a.window.GetSize()
+	builder := screen.NewMenuScreenBuilder()
+	builder.SetWrapper(a.wrapper)
+	builder.SetWindowSize(float32(ww), float32(wh))
+	builder.SetFrameSize(a.ui.GetFrameWidth(), a.ui.GetFrameLength(), a.ui.GetFrameTopLeftWidth())
+	builder.SetFrameMaterial(a.ui.GetFrameMaterial())
+	builder.SetBackgroundColor(a.ui.GetBackgroundColor())
+	builder.SetMenuItemSurfaceTexture(a.ui.GetMenuItemSurfaceTexture())
+	builder.SetMenuItemDefaultMaterial(a.ui.GetMenuItemDefaultMaterial())
+	builder.SetMenuItemHighlightMaterial(a.ui.GetMenuItemHoverMaterial())
+	builder.SetMenuItemFontColor(a.ui.GetLabelColor())
+	for i := 0; i < len(options); i++ {
+		builder.AddOption(options[i])
+	}
+	return builder.Build()
+}
+
+// FormScreen creates a form screen based on the current theme. In case of
+// missing window it panics.
+func (a *Application) BuildFormScreen(settings config.Config, order []string, label string) *screen.FormScreen {
+	if a.window == nil {
+		panic("Window is missing.")
+	}
+	ww, wh := a.window.GetSize()
+	builder := screen.NewFormScreenBuilder()
+	builder.SetWrapper(a.wrapper)
+	builder.SetWindowSize(float32(ww), float32(wh))
+	builder.SetFrameSize(a.ui.GetFrameWidth(), a.ui.GetFrameLength(), a.ui.GetFrameTopLeftWidth())
+	builder.SetFrameMaterial(a.ui.GetFrameMaterial())
+	builder.SetDetailContentBoxMaterial(a.ui.GetMenuItemDefaultMaterial())
+	builder.SetDetailContentBoxHeight(a.ui.GetDetailContentBoxHeight())
+	builder.SetFormItemMaterial(a.ui.GetMenuItemDefaultMaterial())
+	builder.SetFormItemHighlightMaterial(a.ui.GetMenuItemHoverMaterial())
+	builder.SetHeaderLabelColor(a.ui.GetHeaderLabelColor())
+	builder.SetHeaderLabel(label)
+	builder.SetFormItemLabelColor(a.ui.GetLabelColor())
+	builder.SetFormItemInputColor(a.ui.GetInputColor())
+	builder.SetClearColor(a.ui.GetBackgroundColor())
+	builder.SetConfig(settings)
+	builder.SetConfigOrder(order)
+	return builder.Build()
 }
