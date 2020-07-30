@@ -49,6 +49,7 @@ var (
 	DefaultFormScreenHeaderLabelColor   = mgl32.Vec3{0, 0, 1}
 	DefaultFormScreenFormItemLabelColor = mgl32.Vec3{0, 0, 1}
 	DefaultFormScreenFormItemInputColor = mgl32.Vec3{0, 0.5, 0}
+	DefaultClearColor                   = mgl32.Vec3{0.55, 0.55, 0.55}
 )
 
 type FormScreenBuilder struct {
@@ -64,6 +65,7 @@ type FormScreenBuilder struct {
 	headerLabelColor          mgl32.Vec3
 	formItemLabelColor        mgl32.Vec3
 	formItemInputColor        mgl32.Vec3
+	clearColor                mgl32.Vec3
 }
 
 func NewFormScreenBuilder() *FormScreenBuilder {
@@ -84,6 +86,7 @@ func NewFormScreenBuilder() *FormScreenBuilder {
 		headerLabelColor:          DefaultFormScreenHeaderLabelColor,
 		formItemLabelColor:        DefaultFormScreenFormItemLabelColor,
 		formItemInputColor:        DefaultFormScreenFormItemInputColor,
+		clearColor:                DefaultClearColor,
 	}
 }
 
@@ -136,6 +139,11 @@ func (b *FormScreenBuilder) SetFormItemLabelColor(c mgl32.Vec3) {
 // SetFormItemInputColor sets the color of the FormItem labels.
 func (b *FormScreenBuilder) SetFormItemInputColor(c mgl32.Vec3) {
 	b.formItemInputColor = c
+}
+
+// SetClearColor sets the color of the background.
+func (b *FormScreenBuilder) SetClearColor(c mgl32.Vec3) {
+	b.clearColor = c
 }
 
 // AddConfigBool is for adding a bool config item to the configs. It returns the key of the config.
@@ -196,7 +204,6 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		textWidth = 0.0
 	}
 	s := b.ScreenWithFrameBuilder.Build()
-	s.Setup(setupFormScreen)
 
 	bgShaderApplication := shader.NewTextureMatShaderBlending(b.wrapper)
 	fgShaderApplication := shader.NewFontShader(b.wrapper)
@@ -224,7 +231,9 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		formItemInputColor:        b.formItemInputColor,
 		formItemDefaultMaterial:   b.formItemMaterial,
 		formItemHighlightMaterial: b.formItemHighlightMaterial,
+		clearColor:                b.clearColor,
 	}
+	s.Setup(formScreen.setupFormScreen)
 	b.offsetY = b.frameWidth/2 - 0.1
 	for i := 0; i < len(b.configOrder); i++ {
 		key := b.configOrder[i]
@@ -431,13 +440,15 @@ type FormScreen struct {
 	formItemToConf     map[interfaces.FormItem]*config.ConfigItem
 	formItemLabelColor mgl32.Vec3
 	formItemInputColor mgl32.Vec3
+	clearColor         mgl32.Vec3
 	// materials
 	formItemDefaultMaterial   *material.Material
 	formItemHighlightMaterial *material.Material
 }
 
-func setupFormScreen(wrapper interfaces.GLWrapper) {
-	wrapper.ClearColor(0.55, 0.55, 0.55, 1.0)
+func (f *FormScreen) setupFormScreen(wrapper interfaces.GLWrapper) {
+	col := f.clearColor
+	wrapper.ClearColor(col.X(), col.Y(), col.Z(), 1.0)
 	wrapper.Enable(glwrapper.DEPTH_TEST)
 	wrapper.DepthFunc(glwrapper.LESS)
 	wrapper.Enable(glwrapper.BLEND)
