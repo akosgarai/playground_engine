@@ -75,17 +75,13 @@ type Application struct {
 
 // New returns an application instance
 func New(wrapper interfaces.GLWrapper) *Application {
-	ui := *theme.Default
-	var tex texture.Textures
-	tex.TransparentTexture(1, 1, 1, "paper", wrapper)
-	ui.SetMenuItemSurfaceTexture(tex)
 	return &Application{
 		mouseDowns: store.NewGlfwMouseStore(),
 		keyDowns:   store.NewGlfwKeyStore(),
 		menuSet:    false,
 		wrapper:    wrapper,
 		window:     nil,
-		ui:         ui,
+		ui:         *theme.Default,
 	}
 }
 
@@ -103,6 +99,11 @@ func (a *Application) Log() string {
 // SetTheme sets the theme of the ui items.
 func (a *Application) SetTheme(t theme.Theme) {
 	a.ui = t
+}
+
+// SetTheme sets the theme of the ui items.
+func (a *Application) SetThemeTexture(t texture.Textures) {
+	a.ui.SetMenuItemSurfaceTexture(t)
 }
 
 // SetWrapper updates the wrapper with the new one.
@@ -293,6 +294,11 @@ func (a *Application) export() {
 func (a *Application) BuildMenuScreen(options []screen.Option) *screen.MenuScreen {
 	if a.window == nil {
 		panic("Window is missing.")
+	}
+	if a.ui.GetMenuItemSurfaceTexture() == nil {
+		var tex texture.Textures
+		tex.TransparentTexture(1, 1, 1, "paper", a.wrapper)
+		a.ui.SetMenuItemSurfaceTexture(tex)
 	}
 	ww, wh := a.window.GetSize()
 	builder := screen.NewMenuScreenBuilder()
