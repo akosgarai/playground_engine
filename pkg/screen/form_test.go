@@ -221,6 +221,14 @@ func TestFormScreenBuilderSetFormItemMaterial(t *testing.T) {
 		t.Error("Invalid formItemMaterial.")
 	}
 }
+func TestFormScreenBuilderSetFormItemHighlightMaterial(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	mat := material.Ruby
+	builder.SetFormItemHighlightMaterial(mat)
+	if builder.formItemHighlightMaterial != mat {
+		t.Error("Invalid formItemHighlightMaterial.")
+	}
+}
 func TestFormScreenBuilderSetDetailContentBoxHeight(t *testing.T) {
 	builder := NewFormScreenBuilder()
 	height := float32(0.2)

@@ -53,16 +53,17 @@ var (
 
 type FormScreenBuilder struct {
 	*ScreenWithFrameBuilder
-	headerLabel        string
-	formItemMaterial   *material.Material
-	config             config.Config
-	configOrder        []string
-	charset            *model.Charset
-	lastItemState      string
-	offsetY            float32
-	headerLabelColor   mgl32.Vec3
-	formItemLabelColor mgl32.Vec3
-	formItemInputColor mgl32.Vec3
+	headerLabel               string
+	formItemMaterial          *material.Material
+	formItemHighlightMaterial *material.Material
+	config                    config.Config
+	configOrder               []string
+	charset                   *model.Charset
+	lastItemState             string
+	offsetY                   float32
+	headerLabelColor          mgl32.Vec3
+	formItemLabelColor        mgl32.Vec3
+	formItemInputColor        mgl32.Vec3
 }
 
 func NewFormScreenBuilder() *FormScreenBuilder {
@@ -72,16 +73,17 @@ func NewFormScreenBuilder() *FormScreenBuilder {
 	swfb.SetDetailContentBoxMaterial(DefaultFormItemMaterial)
 	swfb.SetDetailContentBoxHeight(0.3)
 	return &FormScreenBuilder{
-		ScreenWithFrameBuilder: swfb,
-		headerLabel:            "Default label",
-		charset:                nil,
-		config:                 config.New(),
-		lastItemState:          "F",
-		offsetY:                0.9,
-		formItemMaterial:       DefaultFormItemMaterial,
-		headerLabelColor:       DefaultFormScreenHeaderLabelColor,
-		formItemLabelColor:     DefaultFormScreenFormItemLabelColor,
-		formItemInputColor:     DefaultFormScreenFormItemInputColor,
+		ScreenWithFrameBuilder:    swfb,
+		headerLabel:               "Default label",
+		charset:                   nil,
+		config:                    config.New(),
+		lastItemState:             "F",
+		offsetY:                   0.9,
+		formItemMaterial:          DefaultFormItemMaterial,
+		formItemHighlightMaterial: HighlightFormItemMaterial,
+		headerLabelColor:          DefaultFormScreenHeaderLabelColor,
+		formItemLabelColor:        DefaultFormScreenFormItemLabelColor,
+		formItemInputColor:        DefaultFormScreenFormItemInputColor,
 	}
 }
 
@@ -99,6 +101,11 @@ func (b *FormScreenBuilder) SetHeaderLabel(l string) {
 // SetFormItemMaterial sets the material that is used for the form items and the detailcontentbox.
 func (b *FormScreenBuilder) SetFormItemMaterial(m *material.Material) {
 	b.formItemMaterial = m
+}
+
+// SetFormItemHighlightMaterial sets the material that is used for the hovered form items.
+func (b *FormScreenBuilder) SetFormItemHighlightMaterial(m *material.Material) {
+	b.formItemHighlightMaterial = m
 }
 
 // SetConfig sets the config of the form.
@@ -207,14 +214,16 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	}
 
 	formScreen := &FormScreen{
-		ScreenWithFrame:     s,
-		charset:             b.charset,
-		formItemShader:      bgShaderApplication,
-		sinceLastClick:      0,
-		currentScrollOffset: float32(0.0),
-		formItemToConf:      make(map[interfaces.FormItem]*config.ConfigItem),
-		formItemLabelColor:  b.formItemLabelColor,
-		formItemInputColor:  b.formItemInputColor,
+		ScreenWithFrame:           s,
+		charset:                   b.charset,
+		formItemShader:            bgShaderApplication,
+		sinceLastClick:            0,
+		currentScrollOffset:       float32(0.0),
+		formItemToConf:            make(map[interfaces.FormItem]*config.ConfigItem),
+		formItemLabelColor:        b.formItemLabelColor,
+		formItemInputColor:        b.formItemInputColor,
+		formItemDefaultMaterial:   b.formItemMaterial,
+		formItemHighlightMaterial: b.formItemHighlightMaterial,
 	}
 	b.offsetY = b.frameWidth/2 - 0.1
 	for i := 0; i < len(b.configOrder); i++ {
@@ -422,6 +431,9 @@ type FormScreen struct {
 	formItemToConf     map[interfaces.FormItem]*config.ConfigItem
 	formItemLabelColor mgl32.Vec3
 	formItemInputColor mgl32.Vec3
+	// materials
+	formItemDefaultMaterial   *material.Material
+	formItemHighlightMaterial *material.Material
 }
 
 func setupFormScreen(wrapper interfaces.GLWrapper) {
@@ -442,38 +454,38 @@ func (f *FormScreen) initMaterialForTheFormItems() {
 			case *model.FormItemInt:
 				fi := f.shaderMap[s][index].(*model.FormItemInt)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
-				surfaceMesh.Material = DefaultFormItemMaterial
+				surfaceMesh.Material = f.formItemDefaultMaterial
 				break
 			case *model.FormItemFloat:
 				fi := f.shaderMap[s][index].(*model.FormItemFloat)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
-				surfaceMesh.Material = DefaultFormItemMaterial
+				surfaceMesh.Material = f.formItemDefaultMaterial
 				break
 			case *model.FormItemText:
 				fi := f.shaderMap[s][index].(*model.FormItemText)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
-				surfaceMesh.Material = DefaultFormItemMaterial
+				surfaceMesh.Material = f.formItemDefaultMaterial
 				break
 			case *model.FormItemBool:
 				fi := f.shaderMap[s][index].(*model.FormItemBool)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
-				surfaceMesh.Material = DefaultFormItemMaterial
+				surfaceMesh.Material = f.formItemDefaultMaterial
 				lightMesh := fi.GetLight().(*mesh.TexturedMaterialMesh)
 				if fi.GetValue() {
-					lightMesh.Material = HighlightFormItemMaterial
+					lightMesh.Material = f.formItemHighlightMaterial
 				} else {
-					lightMesh.Material = DefaultFormItemMaterial
+					lightMesh.Material = f.formItemDefaultMaterial
 				}
 				break
 			case *model.FormItemInt64:
 				fi := f.shaderMap[s][index].(*model.FormItemInt64)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
-				surfaceMesh.Material = DefaultFormItemMaterial
+				surfaceMesh.Material = f.formItemDefaultMaterial
 				break
 			case *model.FormItemVector:
 				fi := f.shaderMap[s][index].(*model.FormItemVector)
 				surfaceMesh := fi.GetSurface().(*mesh.TexturedMaterialMesh)
-				surfaceMesh.Material = DefaultFormItemMaterial
+				surfaceMesh.Material = f.formItemDefaultMaterial
 				break
 			}
 		}
@@ -518,7 +530,7 @@ func (f *FormScreen) wrapTextToLines(desc string, scale, maxLineWidth float32) [
 // It also prints the details of the form item to the detail content box.
 func (f *FormScreen) highlightFormAction() {
 	tmMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-	tmMesh.Material = HighlightFormItemMaterial
+	tmMesh.Material = f.formItemHighlightMaterial
 	if f.detailContentBox == nil {
 		return
 	}
@@ -668,14 +680,14 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{
 
 // addFormItemFromConfigBool sets up a FormItemBool from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemBool(f.GetFullWidth(), model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemBool(f.GetFullWidth(), model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	f.formItemToConf[fi] = configItem
 	f.addFormItem(fi, configItem.GetDefaultValue())
 }
 
 // addFormItemFromConfigInt sets up a FormItemInt from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemInt(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.IntValidator))
 	}
@@ -685,7 +697,7 @@ func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos
 
 // addFormItemFromConfigFloat sets up a FormItemFloat from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemFloat(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemFloat(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
@@ -695,7 +707,7 @@ func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigText sets up a FormItemText from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemText(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemText(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.StringValidator))
 	}
@@ -705,7 +717,7 @@ func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, po
 
 // addFormItemFromConfigInt64 sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt64(f.GetFullWidth(), model.ITEM_WIDTH_LONG, configItem.GetLabel(), configItem.GetDescription(), material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemInt64(f.GetFullWidth(), model.ITEM_WIDTH_LONG, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.Int64Validator))
 	}
@@ -715,7 +727,7 @@ func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigVector sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemVector(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, material.Whiteplastic, pos, f.wrapper)
+	fi := model.NewFormItemVector(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
