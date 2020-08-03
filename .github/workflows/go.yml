@@ -69,4 +69,5 @@ jobs:
     - name: Test
       env:
         DISPLAY: ":99.0"
-      run: MESA_GL_VERSION_OVERRIDE=3.3 xvfb-run go test -cover ./pkg/...
+        MESA_GL_VERSION_OVERRIDE: "3.3"
+      run: xvfb-run --auto-servernum go test -cover ./pkg/...
