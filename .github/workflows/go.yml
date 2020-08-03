@@ -27,6 +27,26 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
+    - name: Downgrade gl version to 3.3 in glwrapper
+      run: |
+          sed -i 's|v4.1-core|v3.3-core|' pkg/glwrapper/wrapper.go
+
+    - name: Downgrade gl version to 3.3 in glwrapper tests.
+      run: |
+          sed -i 's|version 410|version 330|' pkg/glwrapper/wrapper_test.go
+
+    - name: Downgrade gl version to 3.3 in shader package tests.
+      run: |
+          sed -i 's|version 410|version 330|' pkg/shader/shader_test.go
+
+    - name: Downgrade gl version to 3.3 in shader applications.
+      run: |
+          sed -i 's|version 410|version 330|' pkg/shader/shaders/*
+
+    - name: Get 3.3 gl.
+      run: |
+        go get github.com/go-gl/gl/v3.3-core/gl
+
     - name: Get dependencies
       run: |
         go mod download
