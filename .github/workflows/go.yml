@@ -71,7 +71,12 @@ jobs:
       run: |
            xvfb-run glxinfo
 
+    - name: Start xvfb and give some time
+      env:
+        DISPLAY: ":99.0"
+      run: xvfb start && sleep 3
+
     - name: Test
       env:
         DISPLAY: ":99.0"
-      run: xvfb-run --auto-servernum go test -cover ./pkg/...
+      run: go test -cover ./pkg/...
