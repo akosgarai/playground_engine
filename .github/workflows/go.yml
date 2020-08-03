@@ -31,6 +31,14 @@ jobs:
       run: |
           sed -i 's|v4.1-core|v3.3-core|' pkg/glwrapper/wrapper.go
 
+    - name: Downgrade gl version to 3.3 in glwrapper - major gl version
+      run: |
+          sed -i 's|GL_MAJOR_VERSION = 4|GL_MAJOR_VERSION = 3|' pkg/glwrapper/wrapper.go
+
+    - name: Downgrade gl version to 3.3 in glwrapper - minor gl version
+      run: |
+          sed -i 's|GL_MINOR_VERSION = 1|GL_MINOR_VERSION = 3|' pkg/glwrapper/wrapper.go
+
     - name: Downgrade gl version to 3.3 in glwrapper tests.
       run: |
           sed -i 's|version 410|version 330|' pkg/glwrapper/wrapper_test.go
