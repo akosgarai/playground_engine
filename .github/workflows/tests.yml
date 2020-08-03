@@ -59,18 +59,8 @@ jobs:
       run: |
         go mod download
 
-    - name: lspci to detect stuff
-      run: lspci
-
-    - name: Opengl version after openrndr
-      env:
-        MESA_GL_VERSION_OVERRIDE: "3.3"
-      run: |
-           xvfb-run glxinfo
-
     - name: Test
       env:
-        DISPLAY: ":99.0"
         MESA_GL_VERSION_OVERRIDE: "3.3"
       run: xvfb-run --auto-servernum go test -cover -coverprofile=profile.cov ./pkg/...
 
