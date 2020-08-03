@@ -34,7 +34,8 @@ jobs:
     - uses: openrndr/setup-opengl@v1
     - name: Opengl version after openrndr
       run: |
-           xvfb-run glxinfo | grep "OpenGL version"
+           xvfb-run glxinfo
+
     - name: Test
       env:
         DISPLAY: ":99.0"
