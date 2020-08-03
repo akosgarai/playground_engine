@@ -36,6 +36,9 @@ jobs:
     - name: lspci to detect stuff
       run: lspci
 
+    - name: ubuntu drivers
+      run: ubuntu-drivers devices
+
     - name: Opengl version after openrndr
       run: |
            xvfb-run glxinfo
