@@ -12,4 +12,8 @@ For managing the colors / materials / sizes in one place. It holds the following
 - headerLabelColor - The color of the texts that we display in the header.
 - labelColor - The color of the labels.
 - inputColor - The color of the user input texts.
-- backgroundColor - THe color of the background.
+- backgroundColor - The color of the background.
+
+`Set...` and `Get...` commands are provided for every parameter.
+
+This package also provides a theme called `Default` that could be used as default theme.
