@@ -11,6 +11,7 @@ The common application related stuff goes here. It holds
 - `menuScreen`, the screen that is connected to the application menu.
 - `menuSet`, this flag is true if the menuScreen has been set.
 - `wrapper`, the interface for calling gl commands.
+- `ui`, the theme that we use for menu and form screens.
 
 ## New
 
@@ -99,3 +100,19 @@ SetWrapper updates the wrapper with the new one.
 ## GetWrapper
 
 GetWrapper returns the current wrapper of the application.
+
+## SetTheme
+
+SetTheme sets the theme of the application.
+
+## SetThemeTexture
+
+SetThemeTexture sets the texture that we use for the form and menu items.
+
+## BuildMenuScreen
+
+MenuScreen creates a menu screen based on the current theme. in case of missing window it panics.
+
+## BuildFormScreen
+
+FormScreen creates a form screen based on the current theme. In case of missing window it panics.

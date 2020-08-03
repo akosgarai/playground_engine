@@ -290,7 +290,8 @@ func (a *Application) export() {
 	}
 }
 
-// MenuScreen creates a menu screen based on the current theme.
+// MenuScreen creates a menu screen based on the current theme. in case of
+// missing window it panics.
 func (a *Application) BuildMenuScreen(options []screen.Option) *screen.MenuScreen {
 	if a.window == nil {
 		panic("Window is missing.")
