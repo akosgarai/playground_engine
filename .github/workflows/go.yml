@@ -32,6 +32,10 @@ jobs:
         go mod download
 
     - uses: openrndr/setup-opengl@v1
+
+    - name: lspci to detect stuff
+      run: lspci
+
     - name: Opengl version after openrndr
       run: |
            xvfb-run glxinfo
