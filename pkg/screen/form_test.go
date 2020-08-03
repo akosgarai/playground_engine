@@ -77,6 +77,14 @@ func TestFormScreenBuilderSetFormItemInputColor(t *testing.T) {
 		t.Error("Invalid form item input color.")
 	}
 }
+func TestFormScreenBuilderSetClearColor(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	color := mgl32.Vec3{1, 0, 1}
+	builder.SetClearColor(color)
+	if builder.clearColor != color {
+		t.Error("Invalid background color.")
+	}
+}
 func TestFormScreenBuilderSetConfig(t *testing.T) {
 	conf := config.New()
 	builder := NewFormScreenBuilder()
@@ -221,6 +229,14 @@ func TestFormScreenBuilderSetFormItemMaterial(t *testing.T) {
 		t.Error("Invalid formItemMaterial.")
 	}
 }
+func TestFormScreenBuilderSetFormItemHighlightMaterial(t *testing.T) {
+	builder := NewFormScreenBuilder()
+	mat := material.Ruby
+	builder.SetFormItemHighlightMaterial(mat)
+	if builder.formItemHighlightMaterial != mat {
+		t.Error("Invalid formItemHighlightMaterial.")
+	}
+}
 func TestFormScreenBuilderSetDetailContentBoxHeight(t *testing.T) {
 	builder := NewFormScreenBuilder()
 	height := float32(0.2)
@@ -330,23 +346,6 @@ func TestFormScreenBuilderBuild(t *testing.T) {
 		}
 		builder.SetConfigOrder(configOrder)
 		_ = builder.Build()
-	}()
-}
-func TestFormScreenSetupFormScreen(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping it in short mode")
-	}
-	func() {
-		defer func() {
-			if r := recover(); r != nil {
-				defer testhelper.GlfwTerminate()
-				t.Errorf("Shouldn't have panic, %#v.", r)
-			}
-		}()
-		runtime.LockOSThread()
-		testhelper.GlfwInit()
-		wrapperReal.InitOpenGL()
-		setupFormScreen(wrapperReal)
 	}()
 }
 func TestFormScreenUpdate(t *testing.T) {
@@ -459,6 +458,24 @@ func newFormScreen() *FormScreen {
 	builder.SetWrapper(wrapperReal)
 	builder.SetWindowSize(800, 800)
 	return builder.Build()
+}
+func TestFormScreenSetupFormScreen(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Shouldn't have panic, %#v.", r)
+			}
+		}()
+		runtime.LockOSThread()
+		testhelper.GlfwInit()
+		wrapperReal.InitOpenGL()
+		form := newFormScreen()
+		form.setupFormScreen(wrapperReal)
+	}()
 }
 func TestNewFormScreen(t *testing.T) {
 	if testing.Short() {
