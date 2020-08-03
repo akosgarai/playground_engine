@@ -72,4 +72,9 @@ jobs:
       env:
         DISPLAY: ":99.0"
         MESA_GL_VERSION_OVERRIDE: "3.3"
-      run: xvfb-run --auto-servernum go test -cover ./pkg/...
+      run: xvfb-run --auto-servernum go test -cover -coverprofile=profile.cov ./pkg/...
+
+    - name: Coverage
+    - uses: shogo82148/actions-goveralls@v1
+        with:
+          path-to-profile: profile.cov
