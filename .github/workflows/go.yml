@@ -74,7 +74,7 @@ jobs:
     - name: Start xvfb and give some time
       env:
         DISPLAY: ":99.0"
-      run: xvfb start && sleep 3
+      run: sh -e /etc/init.d/xvfb start && sleep 3
 
     - name: Test
       env:
