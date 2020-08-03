@@ -76,5 +76,5 @@ jobs:
 
     - name: Coverage
     - uses: shogo82148/actions-goveralls@v1
-        with:
-          path-to-profile: profile.cov
+      with:
+        path-to-profile: profile.cov
