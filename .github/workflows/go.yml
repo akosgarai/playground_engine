@@ -63,6 +63,8 @@ jobs:
       run: lspci
 
     - name: Opengl version after openrndr
+      env:
+        MESA_GL_VERSION_OVERRIDE: "3.3"
       run: |
            xvfb-run glxinfo
 
