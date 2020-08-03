@@ -188,6 +188,9 @@ This screen is for displaying forms, like a settings page. It is a `ScreenWithFr
 - formItemToConf - It maps the FormItems to ConfigItems. It is used to sync the values.
 - formItemLabelColor - It is the color of the form item labels.
 - formItemInputColor - It is the color of the form item inputs.
+- clearColor - It is the color that we use for the background. The clear color of the screen.
+- formItemDefaultMaterial - It is the material of the form items. It might be changed on hover event.
+- formItemHighlightMaterial - It is the material of the form items in case of hover event.
 
 **Features**
 
@@ -213,6 +216,8 @@ Editing the value of a character based form item. Aka character callback & backs
 This tool is provided for creating forms. It is a `ScreenWithFrameBuilder` extension. The following variables could be set during the construction.
 
 - headerLabel - This is displayed on the top left of the screen.
+- formItemMaterial - It is the material of the form items. It might be changed on hover event.
+- formItemHighlightMaterial - It is the material of the form items in case of hover event.
 - config - The form items are based on this configuration.
 - configOrder - The order of the form items.
 - charset - The charset model that will be used for text writing.
@@ -221,8 +226,9 @@ This tool is provided for creating forms. It is a `ScreenWithFrameBuilder` exten
 - headerLabelColor - The color of the header label text.
 - formItemLabelColor - It is the color of the form item labels.
 - formItemInputColor - It is the color of the form item inputs.
+- clearColor - It is the color that we use for the background. The clear color of the screen.
 
-Set... functions are provided for the `headerLabel`, `windowHeight`, `config`, `configOrder`, `charset`, `headerLabelColor`, `formItemLabelColor`, `formItemInputColor`. The `lastItemState`, and the `offsetY` is used and maintained during the process of the form item building from the config items.
+Set... functions are provided for the `headerLabel`, `config`, `configOrder`, `charset`, `headerLabelColor`, `formItem...`, `clearColor` params. The `lastItemState`, and the `offsetY` is used and maintained during the process of the form item building from the config items.
 
 For displaying stuff, it uses the following system:
 
