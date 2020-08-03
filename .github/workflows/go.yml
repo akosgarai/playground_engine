@@ -32,4 +32,6 @@ jobs:
         go mod download
 
     - name: Test
+      env:
+        DISPLAY: ":99.0"
       run: xvfb-run --auto-servernum go test -cover ./pkg/...
