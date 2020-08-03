@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/model"
@@ -143,7 +144,7 @@ func TestMenuScreenBuilderBuild(t *testing.T) {
 		t.Skip("Skipping it in short mode")
 	}
 	runtime.LockOSThread()
-	testhelper.GlfwInit()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 	wrapperReal.InitOpenGL()
 	b := NewMenuScreenBuilder()
 	defer testhelper.GlfwTerminate()
@@ -164,7 +165,7 @@ func NewTestMenuScreen(t *testing.T) *MenuScreen {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
 	}
-	testhelper.GlfwInit()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 	wrapperReal.InitOpenGL()
 	charset, err := model.LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40.0, 72, wrapperReal)
 	if err != nil {
@@ -207,7 +208,7 @@ func NewTestMenuScreenWithOptions(t *testing.T) *MenuScreen {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")
 	}
-	testhelper.GlfwInit()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 	wrapperReal.InitOpenGL()
 	charset, err := model.LoadCharset("./assets/fonts/Desyrel/desyrel.ttf", 32, 127, 40.0, 72, wrapperReal)
 	if err != nil {

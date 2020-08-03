@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/akosgarai/playground_engine/pkg/config"
+	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/model"
 	"github.com/akosgarai/playground_engine/pkg/store"
@@ -106,7 +107,7 @@ func TestFormScreenBuilderSetCharset(t *testing.T) {
 		t.Skip("Skipping it in short mode")
 	}
 	runtime.LockOSThread()
-	testhelper.GlfwInit()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 	defer testhelper.GlfwTerminate()
 	wrapperReal.InitOpenGL()
 	builder := NewFormScreenBuilder()
@@ -257,7 +258,7 @@ func TestFormScreenBuilderBuild(t *testing.T) {
 			}
 		}()
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		defer testhelper.GlfwTerminate()
 		wrapperReal.InitOpenGL()
 
@@ -362,7 +363,7 @@ func TestFormScreenUpdate(t *testing.T) {
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		wrapperReal.InitOpenGL()
 		defer testhelper.GlfwTerminate()
 		builder := NewFormScreenBuilder()
@@ -471,7 +472,7 @@ func TestFormScreenSetupFormScreen(t *testing.T) {
 			}
 		}()
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		wrapperReal.InitOpenGL()
 		form := newFormScreen()
 		form.setupFormScreen(wrapperReal)
@@ -489,7 +490,7 @@ func TestNewFormScreen(t *testing.T) {
 			}
 		}()
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		wrapperReal.InitOpenGL()
 		form := newFormScreen()
 		defer testhelper.GlfwTerminate()
@@ -512,7 +513,7 @@ func TestFormGetFormItemValidIndex(t *testing.T) {
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		wrapperReal.InitOpenGL()
 		defer testhelper.GlfwTerminate()
 		builder := NewFormScreenBuilder()
@@ -562,7 +563,7 @@ func TestFormSetFormItemValue(t *testing.T) {
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		wrapperReal.InitOpenGL()
 		defer testhelper.GlfwTerminate()
 		builder := NewFormScreenBuilder()
@@ -623,7 +624,7 @@ func TestFormGetFormItemValidIndexValidators(t *testing.T) {
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		wrapperReal.InitOpenGL()
 		defer testhelper.GlfwTerminate()
 		builder := NewFormScreenBuilder()
@@ -674,7 +675,7 @@ func TestFormGetFormItemInvalidIndex(t *testing.T) {
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		wrapperReal.InitOpenGL()
 		builder := NewFormScreenBuilder()
 		builder.SetWrapper(wrapperReal)
@@ -698,7 +699,7 @@ func TestFormScreenCharCallback(t *testing.T) {
 		wW := float32(800)
 		wH := float32(800)
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		wrapperReal.InitOpenGL()
 		builder := NewFormScreenBuilder()
 		builder.SetWrapper(wrapperReal)

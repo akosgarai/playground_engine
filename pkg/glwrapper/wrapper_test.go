@@ -38,7 +38,7 @@ var w Wrapper
 
 func setup() {
 	runtime.LockOSThread()
-	testhelper.GlfwInit()
+	testhelper.GlfwInit(GL_MAJOR_VERSION, GL_MINOR_VERSION)
 	w.InitOpenGL()
 }
 

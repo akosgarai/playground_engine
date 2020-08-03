@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/testhelper"
 )
@@ -118,7 +119,7 @@ func TestScreenWithFrameBuilderBuild(t *testing.T) {
 			}
 		}()
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		defer testhelper.GlfwTerminate()
 		wrapperReal.InitOpenGL()
 		fb := NewScreenWithFrameBuilder()
@@ -141,7 +142,7 @@ func TestScreenWithFrameBuilderBuildWithoutWrapper(t *testing.T) {
 			}
 		}()
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		defer testhelper.GlfwTerminate()
 		wrapperReal.InitOpenGL()
 		fb := NewScreenWithFrameBuilder()
@@ -163,7 +164,7 @@ func TestScreenWithFrame(t *testing.T) {
 			}
 		}()
 		runtime.LockOSThread()
-		testhelper.GlfwInit()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
 		defer testhelper.GlfwTerminate()
 		wrapperReal.InitOpenGL()
 		fb := NewScreenWithFrameBuilder()
