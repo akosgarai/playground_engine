@@ -1,5 +1,7 @@
 # Playgorund Engine
 
+![Tests](https://github.com/akosgarai/playground_engine/workflows/Go/badge.svg)
+
 This engine is written for playing around with the opengle v4.x features. It contains basic primitives, supports camera, light sources, materials, textures, (wavefront) model import / export solutions.
 
 ## CLI
