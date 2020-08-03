@@ -25,13 +25,13 @@ func Float32ApproxEqual(a, b, epsilon float32) bool {
 	return (a-b) < epsilon && (b-a) < epsilon
 }
 
-func GlfwInit() {
+func GlfwInit(major, minor int) {
 	if err := glfw.Init(); err != nil {
 		panic(fmt.Errorf("could not initialize glfw: %v", err))
 	}
 
-	glfw.WindowHint(glfw.ContextVersionMajor, 4)
-	glfw.WindowHint(glfw.ContextVersionMinor, 1)
+	glfw.WindowHint(glfw.ContextVersionMajor, major)
+	glfw.WindowHint(glfw.ContextVersionMinor, minor)
 	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)

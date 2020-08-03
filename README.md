@@ -1,5 +1,8 @@
 # Playgorund Engine
 
+![Tests](https://github.com/akosgarai/playground_engine/workflows/Tests/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/akosgarai/playground_engine/badge.svg?branch=master)](https://coveralls.io/github/akosgarai/playground_engine?branch=master)
+
 This engine is written for playing around with the opengle v4.x features. It contains basic primitives, supports camera, light sources, materials, textures, (wavefront) model import / export solutions.
 
 ## CLI

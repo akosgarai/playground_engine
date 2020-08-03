@@ -38,7 +38,7 @@ var w Wrapper
 
 func setup() {
 	runtime.LockOSThread()
-	testhelper.GlfwInit()
+	testhelper.GlfwInit(GL_MAJOR_VERSION, GL_MINOR_VERSION)
 	w.InitOpenGL()
 }
 
@@ -50,7 +50,8 @@ func TestGenVertexArrays(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
-				t.Error("It shouldn't fail.")
+				t.Log(r)
+				t.Errorf("It shouldn't fail. '%#v'.", r)
 			}
 		}()
 		setup()
