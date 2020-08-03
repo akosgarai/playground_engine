@@ -50,7 +50,8 @@ func TestGenVertexArrays(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
-				t.Error("It shouldn't fail.")
+				t.Log(r)
+				t.Errorf("It shouldn't fail. '%#v'.", r)
 			}
 		}()
 		setup()

@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"unsafe"
 
+	"github.com/akosgarai/playground_engine/pkg/glwrapper"
+
 	"github.com/akosgarai/coldet"
 	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
@@ -30,8 +32,8 @@ func GlfwInit() {
 		panic(fmt.Errorf("could not initialize glfw: %v", err))
 	}
 
-	glfw.WindowHint(glfw.ContextVersionMajor, 4)
-	glfw.WindowHint(glfw.ContextVersionMinor, 1)
+	glfw.WindowHint(glfw.ContextVersionMajor, glwrapper.GL_MAJOR_VERSION)
+	glfw.WindowHint(glfw.ContextVersionMinor, glwrapper.GL_MINOR_VERSION)
 	glfw.WindowHint(glfw.Resizable, glfw.False)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
