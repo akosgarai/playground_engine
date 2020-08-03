@@ -74,9 +74,9 @@ jobs:
     - name: Start xvfb and give some time
       env:
         DISPLAY: ":99.0"
-      run: sh -e /etc/init.d/xvfb start && sleep 3
+      run: where xvfb 
 
     - name: Test
       env:
         DISPLAY: ":99.0"
-      run: go test -cover ./pkg/...
+      run: MESA_GL_VERSION_OVERRIDE=3.3 xvfb-run go test -cover ./pkg/...
