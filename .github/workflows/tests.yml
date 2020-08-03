@@ -75,6 +75,6 @@ jobs:
       run: xvfb-run --auto-servernum go test -cover -coverprofile=profile.cov ./pkg/...
 
     - name: Coverage
-    - uses: shogo82148/actions-goveralls@v1
+      uses: shogo82148/actions-goveralls@v1
       with:
         path-to-profile: profile.cov
