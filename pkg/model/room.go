@@ -122,7 +122,7 @@ func (b *RoomBuilder) Build() *Room {
 	V, I, bo := frontCuboid.MaterialMeshInput()
 
 	frontWallMain := mesh.NewMaterialMesh(V, I, material.Chrome, b.wrapper)
-	frontWallMain.SetPosition(mgl32.Vec3{(b.width - b.doorWidth) / 2, b.height / 2, (b.length - b.wallWidth) / 2})
+	frontWallMain.SetPosition(mgl32.Vec3{b.doorWidth / 2, b.height / 2, (b.length - b.wallWidth) / 2})
 	frontWallMain.SetParent(floor)
 	frontWallMain.SetBoundingObject(bo)
 
