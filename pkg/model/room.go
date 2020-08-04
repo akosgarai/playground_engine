@@ -23,6 +23,137 @@ const (
 	doorAnimationTime = float64(1000)
 )
 
+type RoomBuilder struct {
+	position   mgl32.Vec3 // the position of the room (center point of the floor mesh)
+	width      float32    // the length of the usable area in the x axis
+	height     float32    // the lenght of the usable area in the y axis
+	length     float32    // the length of the usable area in the z axis
+	wallWidth  float32    // the width of the walls
+	doorWidth  float32    // the width of the door that is on the right side of the front wall.
+	doorHeight float32    // the height of the door that is on the right side of the front wall.
+	wrapper    interfaces.GLWrapper
+}
+
+func NewRoomBuilder() *RoomBuilder {
+	return &RoomBuilder{
+		position:   mgl32.Vec3{0.0, 0.0, 0.0},
+		width:      1.0,
+		height:     1.0,
+		length:     1.0,
+		wallWidth:  0.005,
+		doorWidth:  0.4,
+		doorHeight: 0.6,
+		wrapper:    nil,
+	}
+}
+
+// SetPosition sets the position.
+func (b *RoomBuilder) SetPosition(p mgl32.Vec3) {
+	b.position = p
+}
+
+// SetWrapper sets the wrapper.
+func (b *RoomBuilder) SetWrapper(w interfaces.GLWrapper) {
+	b.wrapper = w
+}
+
+// SetSize sets the width, height, length values.
+func (b *RoomBuilder) SetSize(w, h, l float32) {
+	b.width = w
+	b.height = h
+	b.length = l
+}
+
+// SetWallWidth sets the wallWidth.
+func (b *RoomBuilder) SetWallWidth(w float32) {
+	b.wallWidth = w
+}
+
+// SetDoorSize sets the doorWidth, doorHeight values.
+func (b *RoomBuilder) SetDoorSize(w, h float32) {
+	b.doorWidth = w
+	b.doorHeight = h
+}
+
+// Build returns a material room that is constructed from the given setup.
+func (b *RoomBuilder) Build() *Room {
+	if b.wrapper == nil {
+		panic("Wrapper is missing.")
+	}
+	// floor + ceiling
+	basementSizeCuboid := cuboid.New(b.width, b.length, b.wallWidth)
+	basementV, basementI, bo := basementSizeCuboid.MaterialMeshInput()
+
+	floor := mesh.NewMaterialMesh(basementV, basementI, material.Chrome, b.wrapper)
+	floor.SetPosition(b.position)
+	floor.SetBoundingObject(bo)
+
+	ceiling := mesh.NewMaterialMesh(basementV, basementI, material.Chrome, b.wrapper)
+	ceiling.SetPosition(mgl32.Vec3{0.0, b.height, 0.0})
+	ceiling.SetParent(floor)
+	ceiling.SetBoundingObject(bo)
+
+	// back wall
+	backWallSizeCuboid := cuboid.New(b.width, b.wallWidth, b.length)
+	backWallV, backWallI, bo := backWallSizeCuboid.MaterialMeshInput()
+
+	backWall := mesh.NewMaterialMesh(backWallV, backWallI, material.Chrome, b.wrapper)
+	backWall.SetPosition(mgl32.Vec3{0.0, (b.height - b.wallWidth) / 2, -(b.length + b.wallWidth) / 2})
+	backWall.SetParent(floor)
+	backWall.SetBoundingObject(bo)
+
+	// side wall
+	sideWallSizeCuboid := cuboid.New(b.wallWidth, b.height, b.length)
+	sideWallV, sideWallI, bo := sideWallSizeCuboid.MaterialMeshInput()
+
+	rightWall := mesh.NewMaterialMesh(sideWallV, sideWallI, material.Chrome, b.wrapper)
+	rightWall.SetPosition(mgl32.Vec3{-(b.width - b.wallWidth) / 2, b.height / 2, 0.0})
+	rightWall.SetParent(floor)
+	rightWall.SetBoundingObject(bo)
+
+	leftWall := mesh.NewMaterialMesh(sideWallV, sideWallI, material.Chrome, b.wrapper)
+	leftWall.SetPosition(mgl32.Vec3{(b.width - b.wallWidth) / 2, b.height / 2, 0.0})
+	leftWall.SetParent(floor)
+	leftWall.SetBoundingObject(bo)
+
+	// front wall parts
+
+	frontCuboid := cuboid.New(b.width-b.doorWidth, b.wallWidth, b.height)
+	V, I, bo := frontCuboid.MaterialMeshInput()
+
+	frontWallMain := mesh.NewMaterialMesh(V, I, material.Chrome, b.wrapper)
+	frontWallMain.SetPosition(mgl32.Vec3{(b.width - b.doorWidth) / 2, b.height / 2, (b.length - b.wallWidth) / 2})
+	frontWallMain.SetParent(floor)
+	frontWallMain.SetBoundingObject(bo)
+
+	frontTopCuboid := cuboid.New(b.doorWidth, b.wallWidth, b.height-b.doorHeight)
+	V, I, bo = frontTopCuboid.MaterialMeshInput()
+
+	frontWallRest := mesh.NewMaterialMesh(V, I, material.Chrome, b.wrapper)
+	frontWallRest.SetPosition(mgl32.Vec3{-(b.width - (b.doorWidth / 2)), (b.height - b.doorHeight) / 2, (b.length - b.wallWidth) / 2})
+	frontWallRest.SetParent(floor)
+	frontWallRest.SetBoundingObject(bo)
+
+	doorCuboid := cuboid.New(b.doorWidth, b.wallWidth, b.doorHeight)
+	V, I, bo = doorCuboid.MaterialMeshInput()
+
+	door := mesh.NewMaterialMesh(V, I, material.Bronze, b.wrapper)
+	door.SetPosition(mgl32.Vec3{-(b.width - (b.doorWidth / 2)), b.doorHeight / 2, (b.length - b.wallWidth) / 2})
+	door.SetParent(floor)
+	door.SetBoundingObject(bo)
+
+	m := newCDModel()
+	m.AddMesh(floor)
+	m.AddMesh(ceiling)
+	m.AddMesh(backWall)
+	m.AddMesh(rightWall)
+	m.AddMesh(leftWall)
+	m.AddMesh(frontWallMain)
+	m.AddMesh(frontWallRest)
+	m.AddMesh(door)
+	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0}
+}
+
 type Room struct {
 	BaseCollisionDetectionModel
 	doorState            int
