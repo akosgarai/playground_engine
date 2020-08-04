@@ -20,8 +20,6 @@ import (
 )
 
 const (
-	DEBUG  = glfw.KeyH
-	EXPORT = glfw.KeyP
 	ESCAPE = glfw.KeyEscape
 )
 
@@ -183,16 +181,6 @@ func (a *Application) KeyCallback(w *glfw.Window, key glfw.Key, scancode int, ac
 			a.window.SetShouldClose(true)
 		}
 		break
-	case DEBUG:
-		if action != glfw.Release {
-			fmt.Printf("%s\n", a.Log())
-		}
-		break
-	case EXPORT:
-		if action != glfw.Release {
-			a.export()
-		}
-		break
 	default:
 		a.SetKeyState(key, action)
 		break
@@ -270,8 +258,8 @@ func (a *Application) SetUniformVector(key string, value mgl32.Vec3) {
 	}
 }
 
-// This function is called for starting the export process. It is attached to a key callback.
-func (a *Application) export() {
+// Export function starts the export process, that creates wavefron object and material files.
+func (a *Application) Export() {
 	ExportBaseDir := "./exports"
 	Directory := time.Now().Format("20060102150405")
 	err := os.Mkdir(ExportBaseDir+"/"+Directory, os.ModeDir|os.ModePerm)
