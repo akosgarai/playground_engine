@@ -25,6 +25,7 @@ const (
 
 type RoomBuilder struct {
 	position   mgl32.Vec3 // the position of the room (center point of the floor mesh)
+	worldUp    mgl32.Vec3 // the up direction in the world.
 	width      float32    // the length of the usable area in the x axis
 	height     float32    // the lenght of the usable area in the y axis
 	length     float32    // the length of the usable area in the z axis
@@ -37,6 +38,7 @@ type RoomBuilder struct {
 func NewRoomBuilder() *RoomBuilder {
 	return &RoomBuilder{
 		position:   mgl32.Vec3{0.0, 0.0, 0.0},
+		worldUp:    mgl32.Vec3{0.0, 1.0, 0.0},
 		width:      1.0,
 		height:     1.0,
 		length:     1.0,
@@ -50,6 +52,11 @@ func NewRoomBuilder() *RoomBuilder {
 // SetPosition sets the position.
 func (b *RoomBuilder) SetPosition(p mgl32.Vec3) {
 	b.position = p
+}
+
+// SetWorldUpDirection sets the worldUp.
+func (b *RoomBuilder) SetWorldUpDirection(p mgl32.Vec3) {
+	b.worldUp = p.Normalize()
 }
 
 // SetWrapper sets the wrapper.

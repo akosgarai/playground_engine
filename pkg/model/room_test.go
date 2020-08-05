@@ -10,8 +10,12 @@ import (
 func TestNewRoomBuilder(t *testing.T) {
 	b := NewRoomBuilder()
 	expectedPos := mgl32.Vec3{0, 0, 0}
+	expectedDir := mgl32.Vec3{0, 1, 0}
 	if b.position != expectedPos {
 		t.Errorf("Invalid position. '%#v'.", b.position)
+	}
+	if b.worldUp != expectedDir {
+		t.Errorf("Invalid worldUp. '%#v'.", b.worldUp)
 	}
 	if b.width != float32(1.0) {
 		t.Errorf("Invalid width. '%f'.", b.width)
@@ -38,6 +42,18 @@ func TestRoomBuilderSetPosition(t *testing.T) {
 	b.SetPosition(expectedPos)
 	if b.position != expectedPos {
 		t.Errorf("Invalid position. '%#v'.", b.position)
+	}
+}
+func TestRoomBuilderSetWorldUpDirection(t *testing.T) {
+	b := NewRoomBuilder()
+	expectedDir := mgl32.Vec3{1, 0, 0}
+	b.SetWorldUpDirection(expectedDir)
+	if b.worldUp != expectedDir {
+		t.Errorf("Invalid worldUp. '%#v'.", b.worldUp)
+	}
+	b.SetWorldUpDirection(expectedDir.Mul(5))
+	if b.worldUp != expectedDir {
+		t.Errorf("Invalid worldUp. '%#v'.", b.worldUp)
 	}
 }
 func TestRoomBuilderSetSize(t *testing.T) {
