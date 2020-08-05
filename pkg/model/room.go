@@ -104,8 +104,8 @@ func (b *RoomBuilder) Build() *Room {
 	// - get the mul4 product of the 3 component (translation transform).
 	// - except the first one, where only the rotations has to be set,
 	// both the rotation and position has to be transformed.
-	rotationTransformationMatrix := mgl32.HomogRotate3DX(mgl32.DegToRad(b.rotationX)).Mul4(
-		mgl32.HomogRotate3DY(mgl32.DegToRad(b.rotationY))).Mul4(
+	rotationTransformationMatrix := mgl32.HomogRotate3DY(mgl32.DegToRad(b.rotationY)).Mul4(
+		mgl32.HomogRotate3DX(mgl32.DegToRad(b.rotationX))).Mul4(
 		mgl32.HomogRotate3DZ(mgl32.DegToRad(b.rotationZ)))
 	// floor + ceiling
 	basementSizeCuboid := cuboid.New(b.width, b.length, b.wallWidth)
