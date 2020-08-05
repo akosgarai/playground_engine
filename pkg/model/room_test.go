@@ -99,6 +99,22 @@ func TestRoomBuilderSetDoorSize(t *testing.T) {
 		t.Errorf("Invalid door height. '%f'.", b.doorHeight)
 	}
 }
+func TestRoomBuilderSetRotation(t *testing.T) {
+	b := NewRoomBuilder()
+	expectedX := float32(2.0)
+	expectedY := float32(2.1)
+	expectedZ := float32(2.2)
+	b.SetRotation(expectedX, expectedY, expectedZ)
+	if b.rotationX != expectedX {
+		t.Errorf("Invalid x rotation. '%f'.", b.rotationX)
+	}
+	if b.rotationY != expectedY {
+		t.Errorf("Invalid y rotation. '%f'.", b.rotationY)
+	}
+	if b.rotationZ != expectedZ {
+		t.Errorf("Invalid z rotation. '%f'.", b.rotationZ)
+	}
+}
 func TestRoomBuilderBuild(t *testing.T) {
 	func() {
 		defer func() {

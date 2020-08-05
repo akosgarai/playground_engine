@@ -32,6 +32,9 @@ type RoomBuilder struct {
 	wallWidth  float32    // the width of the walls
 	doorWidth  float32    // the width of the door that is on the right side of the front wall.
 	doorHeight float32    // the height of the door that is on the right side of the front wall.
+	rotationX  float32
+	rotationY  float32
+	rotationZ  float32
 	wrapper    interfaces.GLWrapper
 }
 
@@ -45,6 +48,9 @@ func NewRoomBuilder() *RoomBuilder {
 		wallWidth:  0.005,
 		doorWidth:  0.4,
 		doorHeight: 0.6,
+		rotationX:  0.0,
+		rotationY:  0.0,
+		rotationZ:  0.0,
 		wrapper:    nil,
 	}
 }
@@ -82,11 +88,25 @@ func (b *RoomBuilder) SetDoorSize(w, h float32) {
 	b.doorHeight = h
 }
 
+// SetRotation sets the rotationX, rotationY, rotationZ values. The inputs has to be angles.
+func (b *RoomBuilder) SetRotation(x, y, z float32) {
+	b.rotationX = x
+	b.rotationY = y
+	b.rotationZ = z
+}
+
 // Build returns a material room that is constructed from the given setup.
 func (b *RoomBuilder) Build() *Room {
 	if b.wrapper == nil {
 		panic("Wrapper is missing.")
 	}
+	// rotation calculation:
+	// - get the mul4 product of the 3 component (translation transform).
+	// - except the first one, where only the rotations has to be set,
+	// both the rotation and position has to be transformed.
+	rotationTransformationMatrix := mgl32.HomogRotate3DX(mgl32.DegToRad(b.rotationX)).Mul4(
+		mgl32.HomogRotate3DY(mgl32.DegToRad(b.rotationY))).Mul4(
+		mgl32.HomogRotate3DZ(mgl32.DegToRad(b.rotationZ)))
 	// floor + ceiling
 	basementSizeCuboid := cuboid.New(b.width, b.length, b.wallWidth)
 	basementV, basementI, bo := basementSizeCuboid.MaterialMeshInput()
@@ -96,7 +116,8 @@ func (b *RoomBuilder) Build() *Room {
 	floor.SetBoundingObject(bo)
 
 	ceiling := mesh.NewMaterialMesh(basementV, basementI, material.Chrome, b.wrapper)
-	ceiling.SetPosition(mgl32.Vec3{0.0, b.height, 0.0})
+	ceilingPosition := mgl32.TransformCoordinate(mgl32.Vec3{0.0, b.height, 0.0}, rotationTransformationMatrix)
+	ceiling.SetPosition(ceilingPosition)
 	ceiling.SetParent(floor)
 	ceiling.SetBoundingObject(bo)
 
@@ -105,7 +126,8 @@ func (b *RoomBuilder) Build() *Room {
 	backWallV, backWallI, bo := backWallSizeCuboid.MaterialMeshInput()
 
 	backWall := mesh.NewMaterialMesh(backWallV, backWallI, material.Chrome, b.wrapper)
-	backWall.SetPosition(mgl32.Vec3{0.0, (b.height - b.wallWidth) / 2, -(b.length + b.wallWidth) / 2})
+	backWallPosition := mgl32.TransformCoordinate(mgl32.Vec3{0.0, (b.height - b.wallWidth) / 2, -(b.length + b.wallWidth) / 2}, rotationTransformationMatrix)
+	backWall.SetPosition(backWallPosition)
 	backWall.SetParent(floor)
 	backWall.SetBoundingObject(bo)
 
@@ -114,12 +136,14 @@ func (b *RoomBuilder) Build() *Room {
 	sideWallV, sideWallI, bo := sideWallSizeCuboid.MaterialMeshInput()
 
 	rightWall := mesh.NewMaterialMesh(sideWallV, sideWallI, material.Chrome, b.wrapper)
-	rightWall.SetPosition(mgl32.Vec3{-(b.width - b.wallWidth) / 2, b.height / 2, 0.0})
+	rightWallPosition := mgl32.TransformCoordinate(mgl32.Vec3{-(b.width - b.wallWidth) / 2, b.height / 2, 0.0}, rotationTransformationMatrix)
+	rightWall.SetPosition(rightWallPosition)
 	rightWall.SetParent(floor)
 	rightWall.SetBoundingObject(bo)
 
 	leftWall := mesh.NewMaterialMesh(sideWallV, sideWallI, material.Chrome, b.wrapper)
-	leftWall.SetPosition(mgl32.Vec3{(b.width - b.wallWidth) / 2, b.height / 2, 0.0})
+	leftWallPosition := mgl32.TransformCoordinate(mgl32.Vec3{(b.width - b.wallWidth) / 2, b.height / 2, 0.0}, rotationTransformationMatrix)
+	leftWall.SetPosition(leftWallPosition)
 	leftWall.SetParent(floor)
 	leftWall.SetBoundingObject(bo)
 
@@ -129,7 +153,8 @@ func (b *RoomBuilder) Build() *Room {
 	V, I, bo := frontCuboid.MaterialMeshInput()
 
 	frontWallMain := mesh.NewMaterialMesh(V, I, material.Chrome, b.wrapper)
-	frontWallMain.SetPosition(mgl32.Vec3{-b.doorWidth / 2, b.height / 2, (b.length - b.wallWidth) / 2})
+	frontWallMainPosition := mgl32.TransformCoordinate(mgl32.Vec3{-b.doorWidth / 2, b.height / 2, (b.length - b.wallWidth) / 2}, rotationTransformationMatrix)
+	frontWallMain.SetPosition(frontWallMainPosition)
 	frontWallMain.SetParent(floor)
 	frontWallMain.SetBoundingObject(bo)
 
@@ -137,7 +162,8 @@ func (b *RoomBuilder) Build() *Room {
 	V, I, bo = frontTopCuboid.MaterialMeshInput()
 
 	frontWallRest := mesh.NewMaterialMesh(V, I, material.Chrome, b.wrapper)
-	frontWallRest.SetPosition(mgl32.Vec3{((b.width - b.doorWidth) / 2), (b.height + b.doorHeight) / 2, (b.length - b.wallWidth) / 2})
+	frontWallRestPosition := mgl32.TransformCoordinate(mgl32.Vec3{((b.width - b.doorWidth) / 2), (b.height + b.doorHeight) / 2, (b.length - b.wallWidth) / 2}, rotationTransformationMatrix)
+	frontWallRest.SetPosition(frontWallRestPosition)
 	frontWallRest.SetParent(floor)
 	frontWallRest.SetBoundingObject(bo)
 
@@ -145,7 +171,8 @@ func (b *RoomBuilder) Build() *Room {
 	V, I, bo = doorCuboid.MaterialMeshInput()
 
 	door := mesh.NewMaterialMesh(V, I, material.Bronze, b.wrapper)
-	door.SetPosition(mgl32.Vec3{((b.width - b.doorWidth) / 2), b.doorHeight / 2, (b.length - b.wallWidth) / 2})
+	doorPosition := mgl32.TransformCoordinate(mgl32.Vec3{((b.width - b.doorWidth) / 2), b.doorHeight / 2, (b.length - b.wallWidth) / 2}, rotationTransformationMatrix)
+	door.SetPosition(doorPosition)
 	door.SetParent(floor)
 	door.SetBoundingObject(bo)
 
