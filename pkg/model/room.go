@@ -304,7 +304,7 @@ func (b *RoomBuilder) BuildTexture() *Room {
 		frontWallMain3.SetPosition(b.stripFrontTopWallPosition())
 		frontWallMain3.SetParent(floor)
 		frontWallMain3.SetBoundingObject(bo)
-		m.AddMesh(frontWallMain3)
+		//m.AddMesh(frontWallMain3)
 
 		frontWallMain4 := mesh.NewTexturedMaterialMesh(V, I, concreteTexture, material.Chrome, b.wrapper)
 		frontWallMain4.SetPosition(b.stripFrontBottomWallPosition())
