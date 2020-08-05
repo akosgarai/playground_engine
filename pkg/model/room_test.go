@@ -10,12 +10,8 @@ import (
 func TestNewRoomBuilder(t *testing.T) {
 	b := NewRoomBuilder()
 	expectedPos := mgl32.Vec3{0, 0, 0}
-	expectedDir := mgl32.Vec3{0, 1, 0}
 	if b.position != expectedPos {
 		t.Errorf("Invalid position. '%#v'.", b.position)
-	}
-	if b.worldUp != expectedDir {
-		t.Errorf("Invalid worldUp. '%#v'.", b.worldUp)
 	}
 	if b.width != float32(1.0) {
 		t.Errorf("Invalid width. '%f'.", b.width)
@@ -35,6 +31,18 @@ func TestNewRoomBuilder(t *testing.T) {
 	if b.doorWidth != float32(0.4) {
 		t.Errorf("Invalid door width. '%f'.", b.doorWidth)
 	}
+	if b.frontWindow != false {
+		t.Errorf("Invalid frontWindow.")
+	}
+	if b.backWindow != false {
+		t.Errorf("Invalid backWindow.")
+	}
+	if b.leftWindow != false {
+		t.Errorf("Invalid leftWindow.")
+	}
+	if b.rightWindow != false {
+		t.Errorf("Invalid rightWindow.")
+	}
 }
 func TestRoomBuilderSetPosition(t *testing.T) {
 	b := NewRoomBuilder()
@@ -42,18 +50,6 @@ func TestRoomBuilderSetPosition(t *testing.T) {
 	b.SetPosition(expectedPos)
 	if b.position != expectedPos {
 		t.Errorf("Invalid position. '%#v'.", b.position)
-	}
-}
-func TestRoomBuilderSetWorldUpDirection(t *testing.T) {
-	b := NewRoomBuilder()
-	expectedDir := mgl32.Vec3{1, 0, 0}
-	b.SetWorldUpDirection(expectedDir)
-	if b.worldUp != expectedDir {
-		t.Errorf("Invalid worldUp. '%#v'.", b.worldUp)
-	}
-	b.SetWorldUpDirection(expectedDir.Mul(5))
-	if b.worldUp != expectedDir {
-		t.Errorf("Invalid worldUp. '%#v'.", b.worldUp)
 	}
 }
 func TestRoomBuilderSetSize(t *testing.T) {
@@ -99,6 +95,18 @@ func TestRoomBuilderSetDoorSize(t *testing.T) {
 		t.Errorf("Invalid door height. '%f'.", b.doorHeight)
 	}
 }
+func TestRoomBuilderSetWindowSize(t *testing.T) {
+	b := NewRoomBuilder()
+	expectedW := float32(2.0)
+	expectedH := float32(2.1)
+	b.SetWindowSize(expectedW, expectedH)
+	if b.windowWidth != expectedW {
+		t.Errorf("Invalid window width. '%f'.", b.windowWidth)
+	}
+	if b.windowHeight != expectedH {
+		t.Errorf("Invalid window height. '%f'.", b.windowHeight)
+	}
+}
 func TestRoomBuilderSetRotation(t *testing.T) {
 	b := NewRoomBuilder()
 	expectedX := float32(2.0)
@@ -115,7 +123,47 @@ func TestRoomBuilderSetRotation(t *testing.T) {
 		t.Errorf("Invalid z rotation. '%f'.", b.rotationZ)
 	}
 }
-func TestRoomBuilderBuild(t *testing.T) {
+func TestRoomBuilderWithFrontWindow(t *testing.T) {
+	b := NewRoomBuilder()
+	values := []bool{true, true, false, false, true, false}
+	for i, v := range values {
+		b.WithFrontWindow(v)
+		if b.frontWindow != v {
+			t.Errorf("Invalid frontWindow value (%v)", i)
+		}
+	}
+}
+func TestRoomBuilderWithBackWindow(t *testing.T) {
+	b := NewRoomBuilder()
+	values := []bool{true, true, false, false, true, false}
+	for i, v := range values {
+		b.WithBackWindow(v)
+		if b.backWindow != v {
+			t.Errorf("Invalid backWindow value (%v)", i)
+		}
+	}
+}
+func TestRoomBuilderWithLeftWindow(t *testing.T) {
+	b := NewRoomBuilder()
+	values := []bool{true, true, false, false, true, false}
+	for i, v := range values {
+		b.WithLeftWindow(v)
+		if b.leftWindow != v {
+			t.Errorf("Invalid leftWindow value (%v)", i)
+		}
+	}
+}
+func TestRoomBuilderWithRightWindow(t *testing.T) {
+	b := NewRoomBuilder()
+	values := []bool{true, true, false, false, true, false}
+	for i, v := range values {
+		b.WithRightWindow(v)
+		if b.rightWindow != v {
+			t.Errorf("Invalid rightWindow value (%v)", i)
+		}
+	}
+}
+func TestRoomBuilderBuildMaterial(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -124,10 +172,10 @@ func TestRoomBuilderBuild(t *testing.T) {
 		}()
 		b := NewRoomBuilder()
 		b.SetWrapper(wrapperMock)
-		_ = b.Build()
+		_ = b.BuildMaterial()
 	}()
 }
-func TestRoomBuilderBuildWithoutWrapper(t *testing.T) {
+func TestRoomBuilderBuildMaterialWithoutWrapper(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r == nil {
@@ -135,7 +183,32 @@ func TestRoomBuilderBuildWithoutWrapper(t *testing.T) {
 			}
 		}()
 		b := NewRoomBuilder()
-		_ = b.Build()
+		_ = b.BuildMaterial()
+	}()
+}
+func TestRoomBuilderBuildTexture(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("It shouldn't have panic. '%#v'.", r)
+			}
+		}()
+		b := NewRoomBuilder()
+		b.SetWrapper(wrapperMock)
+		_ = b.BuildTexture()
+		b.WithFrontWindow(true)
+		_ = b.BuildTexture()
+	}()
+}
+func TestRoomBuilderBuildTextureWithoutWrapper(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("It should have paniced.")
+			}
+		}()
+		b := NewRoomBuilder()
+		_ = b.BuildTexture()
 	}()
 }
 
