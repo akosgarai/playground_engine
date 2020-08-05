@@ -129,7 +129,7 @@ func (b *RoomBuilder) Build() *Room {
 	V, I, bo := frontCuboid.MaterialMeshInput()
 
 	frontWallMain := mesh.NewMaterialMesh(V, I, material.Chrome, b.wrapper)
-	frontWallMain.SetPosition(mgl32.Vec3{b.doorWidth / 2, b.height / 2, (b.length - b.wallWidth) / 2})
+	frontWallMain.SetPosition(mgl32.Vec3{-b.doorWidth / 2, b.height / 2, (b.length - b.wallWidth) / 2})
 	frontWallMain.SetParent(floor)
 	frontWallMain.SetBoundingObject(bo)
 
@@ -137,7 +137,7 @@ func (b *RoomBuilder) Build() *Room {
 	V, I, bo = frontTopCuboid.MaterialMeshInput()
 
 	frontWallRest := mesh.NewMaterialMesh(V, I, material.Chrome, b.wrapper)
-	frontWallRest.SetPosition(mgl32.Vec3{-((b.width - b.doorWidth) / 2), (b.height - b.doorHeight) / 2, (b.length - b.wallWidth) / 2})
+	frontWallRest.SetPosition(mgl32.Vec3{((b.width - b.doorWidth) / 2), (b.height - b.doorHeight) / 2, (b.length - b.wallWidth) / 2})
 	frontWallRest.SetParent(floor)
 	frontWallRest.SetBoundingObject(bo)
 
@@ -145,7 +145,7 @@ func (b *RoomBuilder) Build() *Room {
 	V, I, bo = doorCuboid.MaterialMeshInput()
 
 	door := mesh.NewMaterialMesh(V, I, material.Bronze, b.wrapper)
-	door.SetPosition(mgl32.Vec3{-((b.width - b.doorWidth) / 2), -(b.height + b.doorHeight) / 2, (b.length - b.wallWidth) / 2})
+	door.SetPosition(mgl32.Vec3{((b.width - b.doorWidth) / 2), b.doorHeight / 2, (b.length - b.wallWidth) / 2})
 	door.SetParent(floor)
 	door.SetBoundingObject(bo)
 
