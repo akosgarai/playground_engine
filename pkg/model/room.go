@@ -145,7 +145,7 @@ func (b *RoomBuilder) Build() *Room {
 	V, I, bo = doorCuboid.MaterialMeshInput()
 
 	door := mesh.NewMaterialMesh(V, I, material.Bronze, b.wrapper)
-	door.SetPosition(mgl32.Vec3{-((b.width - b.doorWidth) / 2), b.doorHeight / 2, (b.length - b.wallWidth) / 2})
+	door.SetPosition(mgl32.Vec3{-((b.width - b.doorWidth) / 2), -(b.height + b.doorHeight) / 2, (b.length - b.wallWidth) / 2})
 	door.SetParent(floor)
 	door.SetBoundingObject(bo)
 
