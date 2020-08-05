@@ -637,5 +637,5 @@ func (r *Room) Update(dt float64) {
 	}
 }
 func (r *Room) GetDoor() interfaces.Mesh {
-	return r.meshes[7]
+	return r.meshes[2]
 }
