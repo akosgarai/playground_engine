@@ -101,7 +101,7 @@ func (b *RoomBuilder) Build() *Room {
 	ceiling.SetBoundingObject(bo)
 
 	// back wall
-	backWallSizeCuboid := cuboid.New(b.width, b.wallWidth, b.length)
+	backWallSizeCuboid := cuboid.New(b.width, b.wallWidth, b.height)
 	backWallV, backWallI, bo := backWallSizeCuboid.MaterialMeshInput()
 
 	backWall := mesh.NewMaterialMesh(backWallV, backWallI, material.Chrome, b.wrapper)
