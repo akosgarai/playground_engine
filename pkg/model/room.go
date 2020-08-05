@@ -110,7 +110,7 @@ func (b *RoomBuilder) Build() *Room {
 	backWall.SetBoundingObject(bo)
 
 	// side wall
-	sideWallSizeCuboid := cuboid.New(b.wallWidth, b.height, b.length)
+	sideWallSizeCuboid := cuboid.New(b.wallWidth, b.length, b.height)
 	sideWallV, sideWallI, bo := sideWallSizeCuboid.MaterialMeshInput()
 
 	rightWall := mesh.NewMaterialMesh(sideWallV, sideWallI, material.Chrome, b.wrapper)
