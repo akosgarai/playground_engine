@@ -176,7 +176,7 @@ func (b *RoomBuilder) stripFrontRightWallPosition() mgl32.Vec3 {
 func (b *RoomBuilder) stripFrontTopWallPosition() mgl32.Vec3 {
 	origPosition := mgl32.Vec3{
 		-(b.width - 2*b.stripFrontLongWidth() - b.windowWidth) / 2,
-		b.height - b.stripFrontShortHeight()/2,
+		b.stripFrontShortHeight() + b.windowHeight + b.stripFrontShortHeight()/2,
 		(b.length - b.wallWidth) / 2,
 	}
 	return mgl32.TransformCoordinate(origPosition, b.rotationTransformationMatrix())
@@ -304,7 +304,7 @@ func (b *RoomBuilder) BuildTexture() *Room {
 		frontWallMain3.SetPosition(b.stripFrontTopWallPosition())
 		frontWallMain3.SetParent(floor)
 		frontWallMain3.SetBoundingObject(bo)
-		//m.AddMesh(frontWallMain3)
+		m.AddMesh(frontWallMain3)
 
 		frontWallMain4 := mesh.NewTexturedMaterialMesh(V, I, concreteTexture, material.Chrome, b.wrapper)
 		frontWallMain4.SetPosition(b.stripFrontBottomWallPosition())
