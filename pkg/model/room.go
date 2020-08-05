@@ -167,20 +167,20 @@ func (b *RoomBuilder) stripFrontShortHeight() float32 {
 	return (b.height - b.windowHeight) / 2
 }
 func (b *RoomBuilder) stripFrontLeftWallPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width + b.stripFrontLongWidth()) / 2, b.height / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
+	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width - b.stripFrontLongWidth()) / 2, b.height / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) stripFrontRightWallPosition() mgl32.Vec3 {
 	origPosition := mgl32.Vec3{-b.width/2 + b.stripFrontLongWidth() + b.windowWidth + b.stripFrontLongWidth()/2, b.height / 2, (b.length - b.wallWidth) / 2}
 	return mgl32.TransformCoordinate(origPosition, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) stripFrontTopWallPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width + b.windowWidth) / 2, (b.height - b.stripFrontShortHeight()) / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
+	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width - b.windowWidth) / 2, (b.height - b.stripFrontShortHeight()) / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) stripFrontBottomWallPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width + b.windowWidth) / 2, b.stripFrontShortHeight() / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
+	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width - b.windowWidth) / 2, b.stripFrontShortHeight() / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) frontWindowPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width + b.windowWidth) / 2, b.stripFrontShortHeight() + b.windowHeight/2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
+	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width - b.windowWidth) / 2, b.stripFrontShortHeight() + b.windowHeight/2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
 }
 
 // BuildTexture returns a textured material room that is constructed from the given setup.
