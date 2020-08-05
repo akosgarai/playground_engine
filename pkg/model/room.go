@@ -114,6 +114,9 @@ func (b *RoomBuilder) Build() *Room {
 	floor := mesh.NewMaterialMesh(basementV, basementI, material.Chrome, b.wrapper)
 	floor.SetPosition(b.position)
 	floor.SetBoundingObject(bo)
+	floor.RotateY(b.rotationY)
+	floor.RotateX(b.rotationX)
+	floor.RotateZ(b.rotationZ)
 
 	ceiling := mesh.NewMaterialMesh(basementV, basementI, material.Chrome, b.wrapper)
 	ceilingPosition := mgl32.TransformCoordinate(mgl32.Vec3{0.0, b.height, 0.0}, rotationTransformationMatrix)
