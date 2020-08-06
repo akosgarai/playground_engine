@@ -242,8 +242,6 @@ func (b *RoomBuilder) BuildTexture() *Room {
 	door.SetPosition(b.frontDoorPosition())
 	door.SetParent(floor)
 	door.SetBoundingObject(bo)
-	door.RotateY(180)
-	door.RotateX(180)
 	m.AddMesh(door)
 
 	// front above the door.
