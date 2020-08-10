@@ -460,10 +460,11 @@ func (r *Room) animateDoor(dt float64) {
 	}
 	r.doorAnimationonAngle = r.doorAnimationonAngle + rotationDeg
 	doorNewPosition := mgl32.TransformCoordinate(r.doorInitialPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), rotatedAxis))
+	doorNewerPosition := mgl32.TransformCoordinate(r.doorInitialPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), mgl32.Vec3{0.0, 1.0, 0.0}))
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
 	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDeg*0.125}
-	fmt.Printf("DoorNewPosition: %v\nDoorCalPosition: %v\n", doorNewPosition, calculatedPosition)
+	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, calculatedPosition)
 
 	door.SetPosition(calculatedPosition)
 	door.RotateY(rotationDeg * rotatedAxis.Y())
