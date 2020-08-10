@@ -447,7 +447,7 @@ func (r *Room) animateDoor(dt float64) {
 	parentRotationMatrix := door.GetParentRotationTransformation()
 	doorRotationMatrix := door.RotationTransformation().Mul4(parentRotationMatrix.Inv())
 	origRotationAxis := mgl32.Vec3{0.0, 1.0, 0.0}
-	rotatedAxis := mgl32.TransformNormal(origRotationAxis, door.RotationTransformation()).Normalize()
+	rotatedAxis := mgl32.TransformNormal(origRotationAxis, parentRotationMatrix).Normalize()
 
 	fmt.Printf("ParentRotationMatrix: '%v'\nDoorRotationMatrix: '%v'\nDoorFullRotation: '%v'\nRotatedAxis: '%v'\n", parentRotationMatrix, doorRotationMatrix, door.RotationTransformation(), rotatedAxis)
 
