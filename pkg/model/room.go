@@ -476,7 +476,7 @@ func (r *Room) animateDoor(dt float64) {
 	doorDiffFromInitPoint := doorPosFromAttachPoint.Sub(r.doorInitialPosition)
 	doorBrandNewPos := r.doorInitialPosition.Add(doorDiffFromInitPoint)
 	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDegDiff*0.125, currentPos.Y(), currentPos.Z() + cosDegDiff*0.125}
-	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorBrandNewPosition: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, doorBrandNewPos, calculatedPosition)
+	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorBrandNewPosition: %v\nDoorPosFromAttachPoint: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, doorBrandNewPos, doorPosFromAttachPoint, calculatedPosition)
 
 	door.SetPosition(calculatedPosition)
 	door.RotateY(rotationDeg * rotatedAxis.Y())
