@@ -467,13 +467,14 @@ func (r *Room) animateDoor(dt float64) {
 	doorNewPosition := mgl32.TransformCoordinate(doorNewWorldPosition, doorParentTranslationMatrix.Inv())
 	doorNewerPosition := mgl32.TransformCoordinate(doorNewerWorldPosition, doorParentTranslationMatrix.Inv())
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
-	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
-	rotatedOrigoBasedVector := mgl32.Vec3{-r.doorWidth / 2 * sinDeg, 0.0, r.doorWidth / 2 * cosDeg}
+	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(rotationDeg))))
+	cosDegDiff := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
+	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
 	doorAttachPoint := mgl32.Vec3{r.doorInitialPosition.X() + r.doorWidth/2, r.doorInitialPosition.Y(), r.doorInitialPosition.Z()}
 	doorPosFromAttachPoint := doorAttachPoint.Add(rotatedOrigoBasedVector)
 	doorDiffFromInitPoint := doorPosFromAttachPoint.Sub(doorPosFromAttachPoint.Sub(r.doorInitialPosition))
 	doorBrandNewPos := r.doorInitialPosition.Add(doorDiffFromInitPoint)
-	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDeg*0.125}
+	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDegDiff*0.125}
 	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorBrandNewPosition: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, doorBrandNewPos, calculatedPosition)
 
 	door.SetPosition(calculatedPosition)
