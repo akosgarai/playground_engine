@@ -102,6 +102,7 @@ type Mesh interface {
 	ModelTransformation() mgl32.Mat4
 	TranslationTransformation() mgl32.Mat4
 	GetParentTranslationTransformation() mgl32.Mat4
+	GetParentRotationTransformation() mgl32.Mat4
 	RotationTransformation() mgl32.Mat4
 	ScaleTransformation() mgl32.Mat4
 	IsParentMesh() bool

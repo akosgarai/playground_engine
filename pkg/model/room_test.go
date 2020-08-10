@@ -249,6 +249,12 @@ func CheckDefaultRoomOptions(room *Room, t *testing.T) {
 	if room.doorState != _DOOR_OPENED {
 		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_OPENED, room.doorState)
 	}
+	/*
+		doorOpenedPosition := mgl32.Vec3{0, 0, 0}
+		if room.GetDoor().GetPosition() != doorOpenedPosition {
+			t.Errorf("Invalid opened door poisiton. Instead of '%v', it is '%v'.", doorOpenedPosition, room.GetDoor().GetPosition())
+		}
+	*/
 	room.PushDoorState()
 	room.animateDoor(100)
 	if room.currentAnimationTime != 100.0 {

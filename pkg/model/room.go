@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
@@ -441,6 +442,13 @@ func (r *Room) animateDoor(dt float64) {
 
 	door := r.GetDoor()
 	currentPos := door.GetPosition()
+	parentRotationMatrix := door.GetParentRotationTransformation()
+	doorRotationMatrix := door.RotationTransformation().Mul4(parentRotationMatrix.Inv())
+	origRotationAxis := mgl32.Vec3{0.0, 1.0, 0.0}
+	rotatedAxis := mgl32.TransformNormal(origRotationAxis, parentRotationMatrix).Normalize()
+
+	fmt.Printf("ParentRotationMatrix: '%v'\nDoorRotationMatrix: '%v'\nRotatedAxis: '%v'\n", parentRotationMatrix, doorRotationMatrix, rotatedAxis)
+
 	var rotationDeg float32
 	if r.doorState == _DOOR_OPENING {
 		rotationDeg = float32(90.0 / doorAnimationTime * maxDelta)
@@ -450,8 +458,11 @@ func (r *Room) animateDoor(dt float64) {
 	}
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
+
 	door.SetPosition(mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDeg*0.125})
-	door.RotateY(-rotationDeg)
+	door.RotateY(-rotationDeg * rotatedAxis.Y())
+	door.RotateX(-rotationDeg * rotatedAxis.X())
+	door.RotateZ(-rotationDeg * rotatedAxis.Z())
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
 	}
