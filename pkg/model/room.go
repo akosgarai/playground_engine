@@ -24,7 +24,7 @@ const (
 type RoomBuilder struct {
 	position      mgl32.Vec3 // the position of the room (center point of the floor mesh)
 	width         float32    // the length of the usable area in the x axis
-	height        float32    // the lenght of the usable area in the y axis
+	height        float32    // the length of the usable area in the y axis
 	length        float32    // the length of the usable area in the z axis
 	wallWidth     float32    // the width of the walls
 	doorWidth     float32    // the width of the door that is on the right side of the front wall.
