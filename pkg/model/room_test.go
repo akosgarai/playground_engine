@@ -213,20 +213,20 @@ func TestRoomBuilderBuildTextureWithoutWrapper(t *testing.T) {
 }
 
 func CheckDefaultRoomOptions(room *Room, t *testing.T) {
-	doorPosition := mgl32.Vec3{-0.4975, 0.7, 0.6975}
+	doorPosition := mgl32.Vec3{0.3, 0.3, 0.4975}
 	if room.GetDoor().GetPosition() != doorPosition {
 		t.Errorf("Invalid door position. Instead of '%v', we have '%v'.", doorPosition, room.GetDoor().GetPosition())
 	}
-	if room.doorState != _DOOR_OPENED {
-		t.Errorf("Invalid initial door state. Instead of '%d', we have '%d'.", _DOOR_OPENED, room.doorState)
+	if room.doorState != _DOOR_CLOSED {
+		t.Errorf("Invalid initial door state. Instead of '%d', we have '%d'.", _DOOR_CLOSED, room.doorState)
 	}
 	room.PushDoorState()
-	if room.doorState != _DOOR_CLOSING {
-		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_CLOSING, room.doorState)
+	if room.doorState != _DOOR_OPENING {
+		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_OPENING, room.doorState)
 	}
 	room.PushDoorState()
-	if room.doorState != _DOOR_CLOSING {
-		t.Errorf("Invalid door state. Instead of '%d', we have '%d'.", _DOOR_CLOSING, room.doorState)
+	if room.doorState != _DOOR_OPENING {
+		t.Errorf("Invalid door state. Instead of '%d', we have '%d'.", _DOOR_OPENING, room.doorState)
 	}
 
 	room.doorState = _DOOR_CLOSED
@@ -270,14 +270,20 @@ func CheckDefaultRoomOptions(room *Room, t *testing.T) {
 func TestMaterialRoom(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
 
-	room := NewMaterialRoom(position, wrapperMock)
+	b := NewRoomBuilder()
+	b.SetWrapper(wrapperMock)
+	b.SetPosition(position)
+	room := b.BuildMaterial()
 
 	CheckDefaultRoomOptions(room, t)
 }
 func TestTexturedRoom(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
 
-	room := NewTextureRoom(position, wrapperMock)
+	b := NewRoomBuilder()
+	b.SetWrapper(wrapperMock)
+	b.SetPosition(position)
+	room := b.BuildTexture()
 
 	CheckDefaultRoomOptions(room, t)
 }
