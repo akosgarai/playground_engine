@@ -459,8 +459,12 @@ func (r *Room) animateDoor(dt float64) {
 		rotationDeg = float32(-90.0 / doorAnimationTime * maxDelta)
 	}
 	r.doorAnimationonAngle = r.doorAnimationonAngle + rotationDeg
-	doorNewPosition := mgl32.TransformCoordinate(r.doorInitialPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), rotatedAxis))
-	doorNewerPosition := mgl32.TransformCoordinate(r.doorInitialPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), mgl32.Vec3{0.0, 1.0, 0.0}))
+	doorParentTranslationMatrix := door.GetParentTranslationTransformation()
+	doorInitialWorldPosition := mgl32.TransformCoordinate(r.doorInitialPosition, doorParentTranslationMatrix)
+	doorNewWorldPosition := mgl32.TransformCoordinate(doorInitialWorldPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), rotatedAxis))
+	doorNewerWorldPosition := mgl32.TransformCoordinate(doorInitialWorldPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), mgl32.Vec3{0.0, 1.0, 0.0}))
+	doorNewPosition := mgl32.TransformCoordinate(doorNewWorldPosition, doorParentTranslationMatrix.Inv())
+	doorNewerPosition := mgl32.TransformCoordinate(doorNewerWorldPosition, doorParentTranslationMatrix.Inv())
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
 	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDeg*0.125}
