@@ -460,9 +460,9 @@ func (r *Room) animateDoor(dt float64) {
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
 
 	door.SetPosition(mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDeg*0.125})
-	door.RotateY(-rotationDeg * rotatedAxis.Y())
-	door.RotateX(-rotationDeg * rotatedAxis.X())
-	door.RotateZ(-rotationDeg * rotatedAxis.Z())
+	door.RotateY(rotationDeg * rotatedAxis.Y())
+	door.RotateX(rotationDeg * rotatedAxis.X())
+	door.RotateZ(rotationDeg * rotatedAxis.Z())
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
 	}
