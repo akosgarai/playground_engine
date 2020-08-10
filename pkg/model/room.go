@@ -417,13 +417,14 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	frontWallMain.SetBoundingObject(bo)
 	m.AddMesh(frontWallMain)
 
-	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0}
+	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition()}
 }
 
 type Room struct {
 	BaseCollisionDetectionModel
 	doorState            int
 	currentAnimationTime float64
+	doorInitialPosition  mgl32.Vec3
 }
 
 func (r *Room) PushDoorState() {
@@ -447,7 +448,7 @@ func (r *Room) animateDoor(dt float64) {
 	origRotationAxis := mgl32.Vec3{0.0, 1.0, 0.0}
 	rotatedAxis := mgl32.TransformNormal(origRotationAxis, door.RotationTransformation()).Normalize()
 
-	fmt.Printf("ParentRotationMatrix: '%v'\nDoorRotationMatrix: '%v'\nRotatedAxis: '%v'\n", parentRotationMatrix, doorRotationMatrix, rotatedAxis)
+	fmt.Printf("ParentRotationMatrix: '%v'\nDoorRotationMatrix: '%v'\nDoorFullRotation: '%v'\n0RotatedAxis: '%v'\n", parentRotationMatrix, doorRotationMatrix, door.RotationTransformation(), rotatedAxis)
 
 	var rotationDeg float32
 	if r.doorState == _DOOR_OPENING {
@@ -456,6 +457,8 @@ func (r *Room) animateDoor(dt float64) {
 	if r.doorState == _DOOR_CLOSING {
 		rotationDeg = float32(-90.0 / doorAnimationTime * maxDelta)
 	}
+	doorNewPosition := mgl32.TransformCoordinate(r.doorInitialPosition, mgl32.HomogRotate3D(mgl32.DegToRad(rotationDeg), rotatedAxis))
+	fmt.Printf("DoorNewPosition: %v\n", doorNewPosition)
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
 
