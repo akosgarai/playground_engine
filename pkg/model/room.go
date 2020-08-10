@@ -417,7 +417,7 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	frontWallMain.SetBoundingObject(bo)
 	m.AddMesh(frontWallMain)
 
-	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition()}
+	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition(), doorAnimationonAngle: 0.0}
 }
 
 type Room struct {
@@ -425,6 +425,7 @@ type Room struct {
 	doorState            int
 	currentAnimationTime float64
 	doorInitialPosition  mgl32.Vec3
+	doorAnimationonAngle float32
 }
 
 func (r *Room) PushDoorState() {
@@ -445,7 +446,7 @@ func (r *Room) animateDoor(dt float64) {
 	currentPos := door.GetPosition()
 	parentRotationMatrix := door.GetParentRotationTransformation()
 	doorRotationMatrix := door.RotationTransformation().Mul4(parentRotationMatrix.Inv())
-	origRotationAxis := mgl32.Vec3{1.0, 0.0, 1.0}.Normalize()
+	origRotationAxis := mgl32.Vec3{0.0, 1.0, 0.0}
 	rotatedAxis := mgl32.TransformNormal(origRotationAxis, door.RotationTransformation()).Normalize()
 
 	fmt.Printf("ParentRotationMatrix: '%v'\nDoorRotationMatrix: '%v'\nDoorFullRotation: '%v'\nRotatedAxis: '%v'\n", parentRotationMatrix, doorRotationMatrix, door.RotationTransformation(), rotatedAxis)
@@ -457,7 +458,8 @@ func (r *Room) animateDoor(dt float64) {
 	if r.doorState == _DOOR_CLOSING {
 		rotationDeg = float32(-90.0 / doorAnimationTime * maxDelta)
 	}
-	doorNewPosition := mgl32.TransformCoordinate(r.doorInitialPosition, mgl32.HomogRotate3D(mgl32.DegToRad(rotationDeg), rotatedAxis))
+	r.doorAnimationonAngle = r.doorAnimationonAngle + rotationDeg
+	doorNewPosition := mgl32.TransformCoordinate(r.doorInitialPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), rotatedAxis))
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
 	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDeg*0.125}
