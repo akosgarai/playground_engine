@@ -417,7 +417,7 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	frontWallMain.SetBoundingObject(bo)
 	m.AddMesh(frontWallMain)
 
-	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition(), doorAnimationonAngle: 0.0}
+	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition(), doorAnimationonAngle: 0.0, doorWidth: b.doorWidth}
 }
 
 type Room struct {
@@ -426,6 +426,7 @@ type Room struct {
 	currentAnimationTime float64
 	doorInitialPosition  mgl32.Vec3
 	doorAnimationonAngle float32
+	doorWidth            float32
 }
 
 func (r *Room) PushDoorState() {
@@ -467,8 +468,13 @@ func (r *Room) animateDoor(dt float64) {
 	doorNewerPosition := mgl32.TransformCoordinate(doorNewerWorldPosition, doorParentTranslationMatrix.Inv())
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
+	rotatedOrigoBasedVector := mgl32.Vec3{-r.doorWidth / 2 * sinDeg, 0.0, r.doorWidth / 2 * cosDeg}
+	doorAttachPoint := mgl32.Vec3{r.doorInitialPosition.X() + r.doorWidth/2, r.doorInitialPosition.Y(), r.doorInitialPosition.Z()}
+	doorPosFromAttachPoint := doorAttachPoint.Add(rotatedOrigoBasedVector)
+	doorDiffFromInitPoint := doorPosFromAttachPoint.Sub(doorPosFromAttachPoint.Sub(r.doorInitialPosition))
+	doorBrandNewPos := r.doorInitialPosition.Add(doorDiffFromInitPoint)
 	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDeg*0.125}
-	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, calculatedPosition)
+	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorBrandNewPosition: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, doorBrandNewPos, calculatedPosition)
 
 	door.SetPosition(calculatedPosition)
 	door.RotateY(rotationDeg * rotatedAxis.Y())
