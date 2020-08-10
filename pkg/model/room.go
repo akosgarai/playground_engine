@@ -470,8 +470,8 @@ func (r *Room) animateDoor(dt float64) {
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(rotationDeg))))
 	cosDegDiff := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
 	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
-	doorAttachPoint := mgl32.Vec3{r.doorInitialPosition.X() + r.doorWidth/2, r.doorInitialPosition.Y(), r.doorInitialPosition.Z()}
-	doorPosFromAttachPoint := doorAttachPoint.Add(rotatedOrigoBasedVector)
+	doorAttachPoint := r.doorInitialPosition.Add(mgl32.Vec3{r.doorWidth / 2, 0.0, 0.0})
+	doorPosFromAttachPoint := doorAttachPoint.Add(rotatedOrigoBasedVector.Mul(r.doorWidth / 2))
 	doorDiffFromInitPoint := doorPosFromAttachPoint.Sub(doorPosFromAttachPoint.Sub(r.doorInitialPosition))
 	doorBrandNewPos := r.doorInitialPosition.Add(doorDiffFromInitPoint)
 	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDeg*0.125, currentPos.Y(), currentPos.Z() + cosDegDiff*0.125}
