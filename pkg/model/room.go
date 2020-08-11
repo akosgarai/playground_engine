@@ -461,7 +461,7 @@ func (r *Room) animateDoor(dt float64) {
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
 
 	// calculate the rotation vector of the door.
-	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
+	rotatedOrigoBasedVector := mgl32.Vec3{cosDeg, 0.0, -sinDeg}
 	// attach point of the door
 	doorAttachPoint := r.doorInitialPosition.Add(mgl32.Vec3{r.doorWidth / 2, 0.0, 0.0})
 	// the new position of the door.
