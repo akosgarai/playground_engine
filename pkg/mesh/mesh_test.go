@@ -300,6 +300,25 @@ func TestRotateZ(t *testing.T) {
 		t.Error("RotateZ should update the roll")
 	}
 }
+func TestGetAngels(t *testing.T) {
+	m := NewPointMesh(wrapperMock)
+	rotationAngleX := float32(90.0)
+	rotationAngleY := float32(70.0)
+	rotationAngleZ := float32(40.0)
+	m.RotateX(rotationAngleX)
+	m.RotateY(rotationAngleY)
+	m.RotateZ(rotationAngleZ)
+	p, y, r := m.GetAngles()
+	if p != rotationAngleX {
+		t.Errorf("Invalid pitch. instead of '%f', it is '%f'.", rotationAngleX, p)
+	}
+	if y != rotationAngleY {
+		t.Errorf("Invalid yaw. instead of '%f', it is '%f'.", rotationAngleY, y)
+	}
+	if r != rotationAngleZ {
+		t.Errorf("Invalid roll. instead of '%f', it is '%f'.", rotationAngleZ, r)
+	}
+}
 func TestIsBoundingObjectParamsSet(t *testing.T) {
 	var m Mesh
 	boParams := make(map[string]float32)
