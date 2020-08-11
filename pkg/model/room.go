@@ -494,7 +494,7 @@ func (r *Room) animateDoor(dt float64) {
 	// rotation weight form the components of the rotated up vector
 	transformedUp := mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, attachPointRotationMatrix)
 	transformedLeft := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, attachPointRotationMatrix)
-	transformedFw := mgl32.TransformNormal(mgl32.Vec3{0.0, 0.0, 1.0}, attachPointRotationMatrix)
+	transformedFw := mgl32.TransformNormal(mgl32.Vec3{0.0, 0.0, -1.0}, attachPointRotationMatrix)
 
 	// the new position of the door.
 	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
