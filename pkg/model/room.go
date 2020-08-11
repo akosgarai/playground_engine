@@ -472,15 +472,17 @@ func (r *Room) animateDoor(dt float64) {
 	r.currentAnimationTime += maxDelta
 
 	// calculate the rotation angle. It depends on the doorState.
-	var rotationDeg float32
+	pitch, yaw, roll := r.GetFloor().GetAngles()
+	fmt.Printf("----------------\nPitch: '%f'\tYaw: '%f'\tRoll: '%f'\n", pitch, yaw, roll)
+	var rotationDegY float32
 	if r.doorState == _DOOR_OPENING {
-		rotationDeg = float32(90.0 / doorAnimationTime * maxDelta)
+		rotationDegY = float32(90.0 / doorAnimationTime * maxDelta)
 	}
 	if r.doorState == _DOOR_CLOSING {
-		rotationDeg = float32(-90.0 / doorAnimationTime * maxDelta)
+		rotationDegY = float32(-90.0 / doorAnimationTime * maxDelta)
 	}
 	// The current animation angle is increased with the current rotation deg.
-	r.doorAnimationonAngle = r.doorAnimationonAngle - rotationDeg
+	r.doorAnimationonAngle = r.doorAnimationonAngle - rotationDegY
 
 	// sin, cos of the current angle.
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
@@ -505,9 +507,9 @@ func (r *Room) animateDoor(dt float64) {
 	door := r.GetDoor()
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	door.RotateZ(rotationDeg * transformedFw.Y())
-	door.RotateX(rotationDeg * transformedLeft.Y())
-	door.RotateY(rotationDeg * transformedUp.Y())
+	door.RotateZ(rotationDegY * transformedFw.Y())
+	door.RotateX(rotationDegY * transformedLeft.Y())
+	door.RotateY(rotationDegY * transformedUp.Y())
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
@@ -523,4 +525,7 @@ func (r *Room) Update(dt float64) {
 }
 func (r *Room) GetDoor() interfaces.Mesh {
 	return r.meshes[2]
+}
+func (r *Room) GetFloor() interfaces.Mesh {
+	return r.meshes[0]
 }

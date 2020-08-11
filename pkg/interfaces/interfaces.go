@@ -109,6 +109,7 @@ type Mesh interface {
 	RotateX(float32)
 	RotateY(float32)
 	RotateZ(float32)
+	GetAngles() (float32, float32, float32)
 	RotatePosition(float32, mgl32.Vec3)
 	IsBoundingObjectSet() bool
 	GetBoundingObject() *boundingobject.BoundingObject
