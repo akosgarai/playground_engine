@@ -213,7 +213,7 @@ func TestRoomBuilderBuildTextureWithoutWrapper(t *testing.T) {
 }
 
 func CheckDefaultRoomOptions(room *Room, t *testing.T) {
-	doorPosition := mgl32.Vec3{0.3, 0.3, 0.4975}
+	doorPosition := mgl32.Vec3{-0.2, 0.0, 0.0}
 	if room.GetDoor().GetPosition() != doorPosition {
 		t.Errorf("Invalid door position. Instead of '%v', we have '%v'.", doorPosition, room.GetDoor().GetPosition())
 	}

@@ -151,7 +151,7 @@ func (b *RoomBuilder) fullRightWallPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width - b.wallWidth) / 2, b.height / 2, 0.0}, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) frontDoorPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{((b.width - b.doorWidth) / 2), b.doorHeight / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
+	return mgl32.TransformCoordinate(mgl32.Vec3{-b.doorWidth / 2, 0.0, 0.0}, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) frontDoorWallAttachPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{b.width / 2, b.doorHeight / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
@@ -236,13 +236,18 @@ func (b *RoomBuilder) BuildTexture() *Room {
 	ceiling.SetBoundingObject(bo)
 	m.AddMesh(ceiling)
 
+	// attach point mesh
+	attachPoint := mesh.NewPointMesh(b.wrapper)
+	attachPoint.SetParent(floor)
+	attachPoint.SetPosition(b.frontDoorWallAttachPosition())
+
 	// door
 	doorCuboid := cuboid.New(b.doorWidth, b.wallWidth, b.doorHeight)
 	V, I, bo := doorCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_SAME)
 
 	door := mesh.NewTexturedMesh(V, I, doorTexture, b.wrapper)
 	door.SetPosition(b.frontDoorPosition())
-	door.SetParent(floor)
+	door.SetParent(attachPoint)
 	door.SetBoundingObject(bo)
 	m.AddMesh(door)
 
@@ -342,7 +347,7 @@ func (b *RoomBuilder) BuildTexture() *Room {
 		currentAnimationTime:        0,
 		doorAnimationonAngle:        90.0,
 		doorWidth:                   b.doorWidth,
-		doorWallAttachPoint:         b.frontDoorWallAttachPosition(),
+		doorWallAttachPoint:         attachPoint,
 	}
 }
 
@@ -371,13 +376,17 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	ceiling.SetBoundingObject(bo)
 	m.AddMesh(ceiling)
 
+	// attach point mesh
+	attachPoint := mesh.NewPointMesh(b.wrapper)
+	attachPoint.SetParent(floor)
+	attachPoint.SetPosition(b.frontDoorWallAttachPosition())
 	// front door
 	doorCuboid := cuboid.New(b.doorWidth, b.wallWidth, b.doorHeight)
 	V, I, bo := doorCuboid.MaterialMeshInput()
 
 	door := mesh.NewMaterialMesh(V, I, material.Bronze, b.wrapper)
 	door.SetPosition(b.frontDoorPosition())
-	door.SetParent(floor)
+	door.SetParent(attachPoint)
 	door.SetBoundingObject(bo)
 	m.AddMesh(door)
 
@@ -433,7 +442,7 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 		currentAnimationTime:        0,
 		doorAnimationonAngle:        90.0,
 		doorWidth:                   b.doorWidth,
-		doorWallAttachPoint:         b.frontDoorWallAttachPosition(),
+		doorWallAttachPoint:         attachPoint,
 	}
 }
 
@@ -441,7 +450,7 @@ type Room struct {
 	BaseCollisionDetectionModel
 	doorState            int
 	currentAnimationTime float64
-	doorWallAttachPoint  mgl32.Vec3
+	doorWallAttachPoint  interfaces.Mesh
 	doorAnimationonAngle float32
 	doorWidth            float32
 }
@@ -480,9 +489,9 @@ func (r *Room) animateDoor(dt float64) {
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVector := mgl32.Vec3{sinDeg, 0.0, cosDeg}
 	// the new position of the door.
-	doorPosFromAttachPoint := r.doorWallAttachPoint.Add(rotatedOrigoBasedVector.Mul(r.doorWidth / 2))
+	doorPosFromAttachPoint := r.doorWallAttachPoint.GetPosition().Add(rotatedOrigoBasedVector.Mul(r.doorWidth / 2))
 	fmt.Printf("DoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\n",
-		doorPosFromAttachPoint, r.doorWallAttachPoint, rotatedOrigoBasedVector)
+		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector)
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
