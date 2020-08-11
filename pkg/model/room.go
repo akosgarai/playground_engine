@@ -463,7 +463,7 @@ func (r *Room) animateDoor(dt float64) {
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVector := mgl32.Vec3{cosDeg, 0.0, -sinDeg}
 	// attach point of the door
-	doorAttachPoint := r.doorInitialPosition.Add(mgl32.Vec3{r.doorWidth / 2, 0.0, 0.0})
+	doorAttachPoint := r.doorInitialPosition.Add(mgl32.Vec3{-r.doorWidth / 2, 0.0, 0.0})
 	// the new position of the door.
 	doorPosFromAttachPoint := doorAttachPoint.Add(rotatedOrigoBasedVector.Mul(r.doorWidth / 2))
 	fmt.Printf("DoorInitialPosition:\t%v\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\n",
