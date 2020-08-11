@@ -491,17 +491,21 @@ func (r *Room) animateDoor(dt float64) {
 	// what if i transform the robv with the rotation of the parent mesh. in this case it will be the fine position of the stuff.
 	attachPointRotationMatrix := r.doorWallAttachPoint.RotationTransformation()
 	transformedVector := mgl32.TransformNormal(rotatedOrigoBasedVector, attachPointRotationMatrix)
+	// rotation weight form the components of the rotated up vector
+	transformedUp := mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, attachPointRotationMatrix)
 
 	// the new position of the door.
 	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
-	fmt.Printf("DoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\n",
-		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector)
+	fmt.Printf("DoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t%v\n",
+		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector, transformedUp)
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	door.RotateY(-rotationDeg)
+	door.RotateY(-rotationDeg * transformedUp.Y())
+	door.RotateX(-rotationDeg * transformedUp.X())
+	door.RotateZ(-rotationDeg * transformedUp.Z())
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
