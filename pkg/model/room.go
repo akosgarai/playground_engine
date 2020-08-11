@@ -153,6 +153,9 @@ func (b *RoomBuilder) fullRightWallPosition() mgl32.Vec3 {
 func (b *RoomBuilder) frontDoorPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{((b.width - b.doorWidth) / 2), b.doorHeight / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
 }
+func (b *RoomBuilder) frontDoorWallAttachPosition() mgl32.Vec3 {
+	return mgl32.TransformCoordinate(mgl32.Vec3{b.width / 2, b.doorHeight / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
+}
 func (b *RoomBuilder) frontAboveDoorWallPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{((b.width - b.doorWidth) / 2), (b.height + b.doorHeight) / 2, (b.length - b.wallWidth) / 2}, b.rotationTransformationMatrix())
 }
@@ -333,7 +336,14 @@ func (b *RoomBuilder) BuildTexture() *Room {
 	if b.frontWindow || b.backWindow || b.leftWindow || b.rightWindow {
 		m.SetTransparent(true)
 	}
-	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition(), doorAnimationonAngle: 90.0, doorWidth: b.doorWidth}
+	return &Room{
+		BaseCollisionDetectionModel: *m,
+		doorState:                   _DOOR_CLOSED,
+		currentAnimationTime:        0,
+		doorAnimationonAngle:        90.0,
+		doorWidth:                   b.doorWidth,
+		doorWallAttachPoint:         b.frontDoorWallAttachPosition(),
+	}
 }
 
 // BuildMaterial returns a material room that is constructed from the given setup.
@@ -417,14 +427,21 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	frontWallMain.SetBoundingObject(bo)
 	m.AddMesh(frontWallMain)
 
-	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition(), doorAnimationonAngle: 90.0, doorWidth: b.doorWidth}
+	return &Room{
+		BaseCollisionDetectionModel: *m,
+		doorState:                   _DOOR_CLOSED,
+		currentAnimationTime:        0,
+		doorAnimationonAngle:        90.0,
+		doorWidth:                   b.doorWidth,
+		doorWallAttachPoint:         b.frontDoorWallAttachPosition(),
+	}
 }
 
 type Room struct {
 	BaseCollisionDetectionModel
 	doorState            int
 	currentAnimationTime float64
-	doorInitialPosition  mgl32.Vec3
+	doorWallAttachPoint  mgl32.Vec3
 	doorAnimationonAngle float32
 	doorWidth            float32
 }
@@ -462,12 +479,10 @@ func (r *Room) animateDoor(dt float64) {
 
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVector := mgl32.Vec3{sinDeg, 0.0, cosDeg}
-	// attach point of the door
-	doorAttachPoint := r.doorInitialPosition.Add(mgl32.Vec3{-r.doorWidth / 2, 0.0, 0.0})
 	// the new position of the door.
-	doorPosFromAttachPoint := doorAttachPoint.Add(rotatedOrigoBasedVector.Mul(r.doorWidth / 2))
-	fmt.Printf("DoorInitialPosition:\t%v\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\n",
-		r.doorInitialPosition, doorPosFromAttachPoint, doorAttachPoint, rotatedOrigoBasedVector)
+	doorPosFromAttachPoint := r.doorWallAttachPoint.Add(rotatedOrigoBasedVector.Mul(r.doorWidth / 2))
+	fmt.Printf("DoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\n",
+		doorPosFromAttachPoint, r.doorWallAttachPoint, rotatedOrigoBasedVector)
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
