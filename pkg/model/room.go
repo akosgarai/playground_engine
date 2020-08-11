@@ -496,7 +496,7 @@ func (r *Room) animateDoor(dt float64) {
 
 	// the new position of the door.
 	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
-	fmt.Printf("DoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t%v\n",
+	fmt.Printf("------------\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t\t%v\n",
 		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector, transformedUp)
 
 	// Update door position to the newly calculated one.
@@ -504,8 +504,8 @@ func (r *Room) animateDoor(dt float64) {
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
 	door.RotateY(rotationDeg * transformedUp.Y())
-	door.RotateX(-rotationDeg * transformedUp.X())
-	door.RotateZ(rotationDeg * transformedUp.Z())
+	door.RotateX(rotationDeg * transformedUp.Z())
+	door.RotateZ(rotationDeg * transformedUp.X())
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
