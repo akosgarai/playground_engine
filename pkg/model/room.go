@@ -469,27 +469,12 @@ func (r *Room) animateDoor(dt float64) {
 	fmt.Printf("DoorInitialPosition:\t%v\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\n",
 		r.doorInitialPosition, doorPosFromAttachPoint, doorAttachPoint, rotatedOrigoBasedVector)
 
+	// Update door position to the newly calculated one.
 	door := r.GetDoor()
-	currentPos := door.GetPosition()
-	parentRotationMatrix := door.GetParentRotationTransformation()
-	origRotationAxis := mgl32.Vec3{0.0, 1.0, 0.0}
-	rotatedAxis := mgl32.TransformNormal(origRotationAxis, parentRotationMatrix).Normalize()
+	door.SetPosition(doorPosFromAttachPoint)
+	// Apply the rotation on the y axis.
+	door.RotateY(rotationDeg)
 
-	doorParentTranslationMatrix := door.GetParentTranslationTransformation()
-	doorInitialWorldPosition := mgl32.TransformCoordinate(r.doorInitialPosition, doorParentTranslationMatrix)
-	doorNewWorldPosition := mgl32.TransformCoordinate(doorInitialWorldPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), rotatedAxis))
-	doorNewerWorldPosition := mgl32.TransformCoordinate(doorInitialWorldPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), mgl32.Vec3{0.0, 1.0, 0.0}))
-	doorNewPosition := mgl32.TransformCoordinate(doorNewWorldPosition, doorParentTranslationMatrix.Inv())
-	doorNewerPosition := mgl32.TransformCoordinate(doorNewerWorldPosition, doorParentTranslationMatrix.Inv())
-	sinDegDiff := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
-	cosDegDiff := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
-	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDegDiff*0.125, currentPos.Y(), currentPos.Z() + cosDegDiff*0.125}
-	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, calculatedPosition)
-
-	door.SetPosition(calculatedPosition)
-	door.RotateY(rotationDeg * rotatedAxis.Y())
-	door.RotateX(rotationDeg * rotatedAxis.X())
-	door.RotateZ(rotationDeg * rotatedAxis.Z())
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
 	}
