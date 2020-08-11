@@ -487,7 +487,7 @@ func (r *Room) animateDoor(dt float64) {
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
 
 	// calculate the rotation vector of the door.
-	rotatedOrigoBasedVector := mgl32.Vec3{sinDeg, 0.0, cosDeg}
+	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
 	// what if i transform the robv with the rotation of the parent mesh. in this case it will be the fine position of the stuff.
 	attachPointRotationMatrix := r.doorWallAttachPoint.RotationTransformation()
 	transformedVector := mgl32.TransformNormal(rotatedOrigoBasedVector, attachPointRotationMatrix)
@@ -501,7 +501,7 @@ func (r *Room) animateDoor(dt float64) {
 	door := r.GetDoor()
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	door.RotateY(rotationDeg)
+	door.RotateY(-rotationDeg)
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
