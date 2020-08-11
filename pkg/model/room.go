@@ -488,10 +488,14 @@ func (r *Room) animateDoor(dt float64) {
 
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVector := mgl32.Vec3{sinDeg, 0.0, cosDeg}
+	// what if i transform the robv with the rotation of the parent mesh. in this case it will be the fine position of the stuff.
+	attachPointRotationMatrix := r.doorWallAttachPoint.RotationTransformation()
+	transformedVector := mgl32.TransformNormal(rotatedOrigoBasedVector, attachPointRotationMatrix)
+
 	// the new position of the door.
-	doorPosFromAttachPoint := rotatedOrigoBasedVector.Mul(r.doorWidth / 2)
-	fmt.Printf("DoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\n",
-		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector)
+	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
+	fmt.Printf("DoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\n",
+		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector)
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
