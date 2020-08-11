@@ -333,7 +333,7 @@ func (b *RoomBuilder) BuildTexture() *Room {
 	if b.frontWindow || b.backWindow || b.leftWindow || b.rightWindow {
 		m.SetTransparent(true)
 	}
-	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0}
+	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition(), doorAnimationonAngle: 90.0, doorWidth: b.doorWidth}
 }
 
 // BuildMaterial returns a material room that is constructed from the given setup.
@@ -417,7 +417,7 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	frontWallMain.SetBoundingObject(bo)
 	m.AddMesh(frontWallMain)
 
-	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition(), doorAnimationonAngle: 0.0, doorWidth: b.doorWidth}
+	return &Room{BaseCollisionDetectionModel: *m, doorState: _DOOR_CLOSED, currentAnimationTime: 0, doorInitialPosition: door.GetPosition(), doorAnimationonAngle: 90.0, doorWidth: b.doorWidth}
 }
 
 type Room struct {
@@ -454,14 +454,14 @@ func (r *Room) animateDoor(dt float64) {
 		rotationDeg = float32(-90.0 / doorAnimationTime * maxDelta)
 	}
 	// The current animation angle is increased with the current rotation deg.
-	r.doorAnimationonAngle = r.doorAnimationonAngle + rotationDeg
+	r.doorAnimationonAngle = r.doorAnimationonAngle - rotationDeg
 
 	// sin, cos of the current angle.
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
 
 	// calculate the rotation vector of the door.
-	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
+	rotatedOrigoBasedVector := mgl32.Vec3{sinDeg, 0.0, cosDeg}
 	// attach point of the door
 	doorAttachPoint := r.doorInitialPosition.Add(mgl32.Vec3{-r.doorWidth / 2, 0.0, 0.0})
 	// the new position of the door.
