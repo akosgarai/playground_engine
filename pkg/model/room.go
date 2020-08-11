@@ -440,18 +440,12 @@ func (r *Room) animateDoor(dt float64) {
 	if r.doorState == _DOOR_OPENED || r.doorState == _DOOR_CLOSED {
 		return
 	}
+	// calculate the current delta time. If dt is gt than the remaining
+	// animation time, it is decresed.
 	maxDelta := math.Min(dt, doorAnimationTime-r.currentAnimationTime+dt)
 	r.currentAnimationTime += maxDelta
 
-	door := r.GetDoor()
-	currentPos := door.GetPosition()
-	parentRotationMatrix := door.GetParentRotationTransformation()
-	doorRotationMatrix := door.RotationTransformation().Mul4(parentRotationMatrix.Inv())
-	origRotationAxis := mgl32.Vec3{0.0, 1.0, 0.0}
-	rotatedAxis := mgl32.TransformNormal(origRotationAxis, parentRotationMatrix).Normalize()
-
-	fmt.Printf("ParentRotationMatrix: '%v'\nDoorRotationMatrix: '%v'\nDoorFullRotation: '%v'\nRotatedAxis: '%v'\n", parentRotationMatrix, doorRotationMatrix, door.RotationTransformation(), rotatedAxis)
-
+	// calculate the rotation angle. It depends on the doorState.
 	var rotationDeg float32
 	if r.doorState == _DOOR_OPENING {
 		rotationDeg = float32(90.0 / doorAnimationTime * maxDelta)
@@ -459,24 +453,38 @@ func (r *Room) animateDoor(dt float64) {
 	if r.doorState == _DOOR_CLOSING {
 		rotationDeg = float32(-90.0 / doorAnimationTime * maxDelta)
 	}
+	// The current animation angle is increased with the current rotation deg.
 	r.doorAnimationonAngle = r.doorAnimationonAngle + rotationDeg
+
+	// sin, cos of the current angle.
+	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
+	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
+
+	// calculate the rotation vector of the door.
+	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
+	// attach point of the door
+	doorAttachPoint := r.doorInitialPosition.Add(mgl32.Vec3{r.doorWidth / 2, 0.0, 0.0})
+	// the new position of the door.
+	doorPosFromAttachPoint := doorAttachPoint.Add(rotatedOrigoBasedVector.Mul(r.doorWidth / 2))
+	fmt.Printf("DoorInitialPosition:\t%v\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\n",
+		r.doorInitialPosition, doorPosFromAttachPoint, doorAttachPoint, rotatedOrigoBasedVector)
+
+	door := r.GetDoor()
+	currentPos := door.GetPosition()
+	parentRotationMatrix := door.GetParentRotationTransformation()
+	origRotationAxis := mgl32.Vec3{0.0, 1.0, 0.0}
+	rotatedAxis := mgl32.TransformNormal(origRotationAxis, parentRotationMatrix).Normalize()
+
 	doorParentTranslationMatrix := door.GetParentTranslationTransformation()
 	doorInitialWorldPosition := mgl32.TransformCoordinate(r.doorInitialPosition, doorParentTranslationMatrix)
 	doorNewWorldPosition := mgl32.TransformCoordinate(doorInitialWorldPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), rotatedAxis))
 	doorNewerWorldPosition := mgl32.TransformCoordinate(doorInitialWorldPosition, mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), mgl32.Vec3{0.0, 1.0, 0.0}))
 	doorNewPosition := mgl32.TransformCoordinate(doorNewWorldPosition, doorParentTranslationMatrix.Inv())
 	doorNewerPosition := mgl32.TransformCoordinate(doorNewerWorldPosition, doorParentTranslationMatrix.Inv())
-	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
-	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
 	sinDegDiff := float32(math.Sin(float64(mgl32.DegToRad(rotationDeg))))
 	cosDegDiff := float32(math.Cos(float64(mgl32.DegToRad(90 - rotationDeg))))
-	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
-	doorAttachPoint := r.doorInitialPosition.Sub(mgl32.Vec3{r.doorWidth / 2, 0.0, 0.0})
-	doorPosFromAttachPoint := doorAttachPoint.Add(rotatedOrigoBasedVector.Mul(r.doorWidth / 2))
-	doorDiffFromInitPoint := doorPosFromAttachPoint.Sub(r.doorInitialPosition)
-	doorBrandNewPos := r.doorInitialPosition.Add(doorDiffFromInitPoint)
 	calculatedPosition := mgl32.Vec3{currentPos.X() - sinDegDiff*0.125, currentPos.Y(), currentPos.Z() + cosDegDiff*0.125}
-	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorBrandNewPosition: %v\nDoorPosFromAttachPoint: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, doorBrandNewPos, doorPosFromAttachPoint, calculatedPosition)
+	fmt.Printf("DoorNewPosition: %v\nDoorNewerPosition: %v\nDoorCalPosition: %v\n", doorNewPosition, doorNewerPosition, calculatedPosition)
 
 	door.SetPosition(calculatedPosition)
 	door.RotateY(rotationDeg * rotatedAxis.Y())
