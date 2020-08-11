@@ -474,13 +474,18 @@ func (r *Room) animateDoor(dt float64) {
 	// calculate the rotation angle. It depends on the doorState.
 	pitch, yaw, roll := r.GetFloor().GetAngles()
 	fmt.Printf("----------------\nPitch: '%f'\tYaw: '%f'\tRoll: '%f'\n", pitch, yaw, roll)
-	var rotationDegY float32
+	var rotationDegY, rotationDegX, rotationDegZ float32
 	if r.doorState == _DOOR_OPENING {
 		rotationDegY = float32(90.0 / doorAnimationTime * maxDelta)
+		rotationDegX = float32(float64(int(pitch)%90) / doorAnimationTime * maxDelta)
+		rotationDegZ = float32(float64(int(roll)%90) / doorAnimationTime * maxDelta)
 	}
 	if r.doorState == _DOOR_CLOSING {
 		rotationDegY = float32(-90.0 / doorAnimationTime * maxDelta)
+		rotationDegX = -float32(float64(int(pitch)%90) / doorAnimationTime * maxDelta)
+		rotationDegZ = -float32(float64(int(roll)%90) / doorAnimationTime * maxDelta)
 	}
+	fmt.Printf("----------------\nrotationDegX: '%f'\trotationDegY: '%f'\trotationDegZ: '%f'\n", rotationDegX, rotationDegY, rotationDegZ)
 	// The current animation angle is increased with the current rotation deg.
 	r.doorAnimationonAngle = r.doorAnimationonAngle - rotationDegY
 
