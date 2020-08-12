@@ -504,9 +504,11 @@ func (r *Room) animateDoor(dt float64) {
 	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
 	rX, rY, rZ := r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp))
 	rX2, rY2, rZ2 := r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUpInvert))
+	rX3, rY3, rZ3 := r.matrixToAngles(attachPointRotationMatrix)
 	fmt.Printf("----------------\nrotationDegY: %f\n", rotationDegY)
 	fmt.Printf("---------------\nRx: %f Ry: %f Rz: %f\n", rX, rY, rZ)
 	fmt.Printf("---------------\nRx2: %f Ry2: %f Rz2: %f\n", rX2, rY2, rZ2)
+	fmt.Printf("---------------\nRx3: %f Ry3: %f Rz3: %f\n", rX3, rY3, rZ3)
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
