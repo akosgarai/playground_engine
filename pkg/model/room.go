@@ -472,20 +472,13 @@ func (r *Room) animateDoor(dt float64) {
 	r.currentAnimationTime += maxDelta
 
 	// calculate the rotation angle. It depends on the doorState.
-	pitch, yaw, roll := r.GetFloor().GetAngles()
-	fmt.Printf("----------------\nPitch: '%f'\tYaw: '%f'\tRoll: '%f'\n", pitch, yaw, roll)
-	var rotationDegY, rotationDegX, rotationDegZ float32
+	var rotationDegY float32
 	if r.doorState == _DOOR_OPENING {
 		rotationDegY = float32(90.0 / doorAnimationTime * maxDelta)
-		rotationDegX = float32(float64(int(pitch)%90) / doorAnimationTime * maxDelta)
-		rotationDegZ = float32(float64(int(roll)%90) / doorAnimationTime * maxDelta)
 	}
 	if r.doorState == _DOOR_CLOSING {
 		rotationDegY = float32(-90.0 / doorAnimationTime * maxDelta)
-		rotationDegX = -float32(float64(int(pitch)%90) / doorAnimationTime * maxDelta)
-		rotationDegZ = -float32(float64(int(roll)%90) / doorAnimationTime * maxDelta)
 	}
-	fmt.Printf("----------------\nrotationDegX: '%f'\trotationDegY: '%f'\trotationDegZ: '%f'\n", rotationDegX, rotationDegY, rotationDegZ)
 	// The current animation angle is increased with the current rotation deg.
 	r.doorAnimationonAngle = r.doorAnimationonAngle - rotationDegY
 
@@ -510,21 +503,24 @@ func (r *Room) animateDoor(dt float64) {
 
 	// get rotation euler angles. transformedUp is the axis of our transformation. The angle is rotationDegY.
 	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
-	rX, rY, rZ := r.matrixToAngles(mgl32.HomogRotate3D(rotationDegY, transformedUp))
+	rX, rY, rZ := r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp))
+	fmt.Printf("----------------\nrotationDegY: %f\n", rotationDegY)
 	fmt.Printf("---------------\nRx: %f Ry: %f Rz: %f\n", rX, rY, rZ)
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	door.RotateZ(rX)
-	door.RotateX(rZ)
+	door.RotateZ(rZ)
+	door.RotateX(rX)
 	door.RotateY(rY)
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
 	}
 }
+
+// returns angles
 func (r *Room) matrixToAngles(m mgl32.Mat4) (float32, float32, float32) {
 	var x, y, z float32
 	if m.At(1, 2) < 1 {
@@ -542,7 +538,7 @@ func (r *Room) matrixToAngles(m mgl32.Mat4) (float32, float32, float32) {
 		y = -float32(math.Atan2(-float64(m.At(0, 1)), float64(m.At(0, 0))))
 		z = 0
 	}
-	return x, y, z
+	return mgl32.RadToDeg(x), mgl32.RadToDeg(y), mgl32.RadToDeg(z)
 }
 
 // Update function loops over each of the meshes and calls their Update function.
