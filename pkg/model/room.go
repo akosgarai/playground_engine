@@ -504,19 +504,22 @@ func (r *Room) animateDoor(dt float64) {
 	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
 	rX, rY, rZ := r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp))
 	rX2, rY2, rZ2 := r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUpInvert))
-	rX3, rY3, rZ3 := r.matrixToAngles(attachPointRotationMatrix)
+	door := r.GetDoor()
+	// translation transformation inv. rotation, translation back:
+	translationTransformationMatrix := door.TranslationTransformation()
+	fullMatrix := translationTransformationMatrix.Inv().Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp)).Mul4(translationTransformationMatrix)
+	rX3, rY3, rZ3 := r.matrixToAngles(fullMatrix)
 	fmt.Printf("----------------\nrotationDegY: %f\n", rotationDegY)
 	fmt.Printf("---------------\nRx: %f Ry: %f Rz: %f\n", rX, rY, rZ)
 	fmt.Printf("---------------\nRx2: %f Ry2: %f Rz2: %f\n", rX2, rY2, rZ2)
 	fmt.Printf("---------------\nRx3: %f Ry3: %f Rz3: %f\n", rX3, rY3, rZ3)
 
 	// Update door position to the newly calculated one.
-	door := r.GetDoor()
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	door.RotateZ(rZ2)
-	door.RotateX(rX2)
-	door.RotateY(rY2)
+	door.RotateZ(rZ)
+	door.RotateX(rX)
+	door.RotateY(rY)
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
