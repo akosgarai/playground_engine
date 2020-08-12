@@ -509,13 +509,16 @@ func (r *Room) animateDoor(dt float64) {
 	translationTransformationMatrix := door.TranslationTransformation()
 	fullMatrix := translationTransformationMatrix.Inv().Mul4(attachPointRotationMatrix.Inv()).Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp)).Mul4(attachPointRotationMatrix).Mul4(translationTransformationMatrix)
 	fullMatrixI := translationTransformationMatrix.Inv().Mul4(attachPointRotationMatrix.Inv()).Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUpInvert)).Mul4(attachPointRotationMatrix).Mul4(translationTransformationMatrix)
+	fullMatrixOrigAxis := translationTransformationMatrix.Inv().Mul4(attachPointRotationMatrix.Inv()).Mul4(mgl32.HomogRotate3DY(mgl32.DegToRad(rotationDegY))).Mul4(attachPointRotationMatrix).Mul4(translationTransformationMatrix)
 	rX3, rY3, rZ3 := r.matrixToAngles(fullMatrix)
 	rX4, rY4, rZ4 := r.matrixToAngles(fullMatrixI)
+	rX5, rY5, rZ5 := r.matrixToAngles(fullMatrixOrigAxis)
 	fmt.Printf("----------------\nrotationDegY: %f\n", rotationDegY)
 	fmt.Printf("---------------\nRx: %f Ry: %f Rz: %f\n", rX, rY, rZ)
 	fmt.Printf("---------------\nRx2: %f Ry2: %f Rz2: %f\n", rX2, rY2, rZ2)
 	fmt.Printf("---------------\nRx3: %f Ry3: %f Rz3: %f\n", rX3, rY3, rZ3)
 	fmt.Printf("---------------\nRx4: %f Ry4: %f Rz4: %f\n", rX4, rY4, rZ4)
+	fmt.Printf("---------------\nRx5: %f Ry5: %f Rz5: %f\n", rX5, rY5, rZ5)
 
 	// Update door position to the newly calculated one.
 	door.SetPosition(doorPosFromAttachPoint)
