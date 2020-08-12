@@ -510,15 +510,15 @@ func (r *Room) animateDoor(dt float64) {
 	door := r.GetDoor()
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	//door.RotateZ(rZ)
-	//door.RotateX(rX)
+	door.RotateZ(rZ)
+	door.RotateX(rX)
 	door.RotateY(rY)
 
 	// Door rotation angles:
 	dx, dy, dz := r.matrixToAngles(door.RotationTransformation())
 	fmt.Printf("---------------\nDoor Rotation angles:\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
 	// Expected rotation angles:
-	dx, dy, dz = r.matrixToAngles(mgl32.HomogRotate3DY(mgl32.DegToRad(-r.doorAnimationonAngle)).Mul4(attachPointRotationMatrix))
+	dx, dy, dz = r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), transformedUp).Mul4(attachPointRotationMatrix))
 	fmt.Printf("---------------\nExpected Rotation angles:\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
 
 	if r.currentAnimationTime >= doorAnimationTime {
