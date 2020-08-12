@@ -493,13 +493,11 @@ func (r *Room) animateDoor(dt float64) {
 	transformedVector := mgl32.TransformNormal(rotatedOrigoBasedVector, attachPointRotationMatrix)
 	// rotation weight form the components of the rotated up vector
 	transformedUp := mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, attachPointRotationMatrix)
-	transformedLeft := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, attachPointRotationMatrix)
-	transformedFw := mgl32.TransformNormal(mgl32.Vec3{0.0, 0.0, -1.0}, attachPointRotationMatrix)
 
 	// the new position of the door.
 	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
-	fmt.Printf("------------\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t\t%v\nTransformedLeft:\t%v\nTransformedFw:\t\t%v\n",
-		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector, transformedUp, transformedLeft, transformedFw)
+	fmt.Printf("------------\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t\t%v\n",
+		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector, transformedUp)
 
 	// get rotation euler angles. transformedUp is the axis of our transformation. The angle is rotationDegY.
 	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
@@ -511,9 +509,9 @@ func (r *Room) animateDoor(dt float64) {
 	door := r.GetDoor()
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	door.RotateZ(rZ)
-	door.RotateX(rX)
-	door.RotateY(rY)
+	door.RotateZ(rZ * transformedUp.Z() * -1)
+	door.RotateX(rX * transformedUp.X() * -1)
+	door.RotateY(rY * transformedUp.Y() * -1)
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
