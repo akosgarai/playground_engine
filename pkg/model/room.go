@@ -508,6 +508,9 @@ func (r *Room) animateDoor(dt float64) {
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
+	// Door rotation angles:
+	dx, dy, dz := r.matrixToAngles(door.RotationTransformation())
+	fmt.Printf("---------------\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
 	door.RotateZ(rZ)
