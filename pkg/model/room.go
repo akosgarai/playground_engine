@@ -508,6 +508,14 @@ func (r *Room) animateDoor(dt float64) {
 	fmt.Printf("------------\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t\t%v\nTransformedLeft:\t%v\nTransformedFw:\t\t%v\n",
 		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector, transformedUp, transformedLeft, transformedFw)
 
+	// get rotation euler angles. transformedUp is the axis of our transformation. The angle is rotationDegY.
+	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
+	rotationMatrixOnDoorSystem := mgl32.HomogRotate3D(rotationDegY, transformedUp)
+	rX := float32(math.Asin(float64(-rotationMatrixOnDoorSystem.At(1, 2))))
+	rY := float32(math.Atan2(float64(rotationMatrixOnDoorSystem.At(0, 2)), float64(rotationMatrixOnDoorSystem.At(2, 2))))
+	rZ := float32(math.Atan2(float64(rotationMatrixOnDoorSystem.At(1, 0)), float64(rotationMatrixOnDoorSystem.At(1, 1))))
+	fmt.Printf("---------------\nRx: %f Ry: %f Rz: %f\n", rX, rY, rZ)
+
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
 	// Apply the rotation on the y axis.
