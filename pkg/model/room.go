@@ -509,9 +509,9 @@ func (r *Room) animateDoor(dt float64) {
 	door := r.GetDoor()
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	door.RotateZ(rZ * transformedUp.Z())
-	door.RotateX(rX * transformedUp.X())
-	door.RotateY(rY * transformedUp.Y())
+	door.RotateZ(rZ)
+	door.RotateX(rX)
+	door.RotateY(rY)
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
