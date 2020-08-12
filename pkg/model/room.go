@@ -506,7 +506,7 @@ func (r *Room) animateDoor(dt float64) {
 	rX2, rY2, rZ2 := r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUpInvert))
 	door := r.GetDoor()
 	// translation transformation inv. rotation, translation back:
-	translationTransformationMatrix := door.TranslationTransformation()
+	translationTransformationMatrix := r.doorWallAttachPoint.TranslationTransformation()
 	fullMatrix := translationTransformationMatrix.Inv().Mul4(attachPointRotationMatrix.Inv()).Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp)).Mul4(attachPointRotationMatrix).Mul4(translationTransformationMatrix)
 	fullMatrixI := translationTransformationMatrix.Inv().Mul4(attachPointRotationMatrix.Inv()).Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUpInvert)).Mul4(attachPointRotationMatrix).Mul4(translationTransformationMatrix)
 	rXOA, _, rZOA := r.matrixToAngles(attachPointRotationMatrix)
