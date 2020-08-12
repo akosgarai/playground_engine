@@ -518,7 +518,7 @@ func (r *Room) animateDoor(dt float64) {
 	dx, dy, dz := r.matrixToAngles(door.RotationTransformation())
 	fmt.Printf("---------------\nDoor Rotation angles:\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
 	// Expected rotation angles:
-	dx, dy, dz = r.matrixToAngles(attachPointRotationMatrix.Mul4(mgl32.HomogRotate3DY(rotationDegY)))
+	dx, dy, dz = r.matrixToAngles(attachPointRotationMatrix.Mul4(mgl32.HomogRotate3DY(r.doorAnimationonAngle)))
 	fmt.Printf("---------------\nExpected Rotation angles:\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
 
 	if r.currentAnimationTime >= doorAnimationTime {
