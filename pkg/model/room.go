@@ -492,7 +492,7 @@ func (r *Room) animateDoor(dt float64) {
 	attachPointRotationMatrix := r.doorWallAttachPoint.RotationTransformation()
 	transformedVector := mgl32.TransformNormal(rotatedOrigoBasedVector, attachPointRotationMatrix)
 	// rotation weight form the components of the rotated up vector
-	transformedUp := mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, attachPointRotationMatrix)
+	transformedUp := mgl32.TransformNormal(mgl32.Vec3{0.0, -1.0, 0.0}, attachPointRotationMatrix)
 
 	// the new position of the door.
 	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
@@ -511,7 +511,7 @@ func (r *Room) animateDoor(dt float64) {
 	// Apply the rotation on the y axis.
 	door.RotateZ(rZ * transformedUp.Z())
 	door.RotateX(rX * transformedUp.X())
-	door.RotateY(rY * transformedUp.Y() * -1)
+	door.RotateY(rY * transformedUp.Y())
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
