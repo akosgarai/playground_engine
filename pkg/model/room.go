@@ -532,8 +532,8 @@ func (r *Room) matrixToAngles(m mgl32.Mat4) (float32, float32, float32) {
 			z = 0
 		}
 	} else {
-		x = math.Pi / 2
-		y = -float32(math.Atan2(-float64(m.At(0, 1)), float64(m.At(0, 0))))
+		x = -math.Pi / 2
+		y = float32(math.Atan2(-float64(m.At(0, 1)), float64(m.At(0, 0))))
 		z = 0
 	}
 	return mgl32.RadToDeg(x), mgl32.RadToDeg(y), mgl32.RadToDeg(z)
