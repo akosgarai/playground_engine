@@ -510,10 +510,7 @@ func (r *Room) animateDoor(dt float64) {
 
 	// get rotation euler angles. transformedUp is the axis of our transformation. The angle is rotationDegY.
 	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
-	rotationMatrixOnDoorSystem := mgl32.HomogRotate3D(rotationDegY, transformedUp)
-	rX := float32(math.Asin(float64(-rotationMatrixOnDoorSystem.At(1, 2))))
-	rY := float32(math.Atan2(float64(rotationMatrixOnDoorSystem.At(0, 2)), float64(rotationMatrixOnDoorSystem.At(2, 2))))
-	rZ := float32(math.Atan2(float64(rotationMatrixOnDoorSystem.At(1, 0)), float64(rotationMatrixOnDoorSystem.At(1, 1))))
+	rX, rY, rZ := r.matrixToAngles(mgl32.HomogRotate3D(rotationDegY, transformedUp))
 	fmt.Printf("---------------\nRx: %f Ry: %f Rz: %f\n", rX, rY, rZ)
 
 	// Update door position to the newly calculated one.
@@ -527,6 +524,25 @@ func (r *Room) animateDoor(dt float64) {
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
 	}
+}
+func (r *Room) matrixToAngles(m mgl32.Mat4) (float32, float32, float32) {
+	var x, y, z float32
+	if m.At(1, 2) < 1 {
+		if m.At(1, 2) > -1 {
+			x = float32(math.Asin(-float64(m.At(1, 2))))
+			y = float32(math.Atan2(float64(m.At(0, 2)), float64(m.At(2, 2))))
+			z = float32(math.Atan2(float64(m.At(1, 0)), float64(m.At(1, 1))))
+		} else {
+			x = math.Pi / 2
+			y = -float32(math.Atan2(-float64(m.At(0, 1)), float64(m.At(0, 0))))
+			z = 0
+		}
+	} else {
+		x = math.Pi / 2
+		y = -float32(math.Atan2(-float64(m.At(0, 1)), float64(m.At(0, 0))))
+		z = 0
+	}
+	return x, y, z
 }
 
 // Update function loops over each of the meshes and calls their Update function.
