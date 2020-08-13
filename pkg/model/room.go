@@ -574,9 +574,9 @@ func (r *Room) animateDoor(dt float64) {
 	fmt.Printf("---------------\nDoor diff angles:\nx: %f y: %f z: %f\n", eX-dX, eY-dY, eZ-dZ)
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
-	door.RotateZ(rZ)
-	door.RotateX(rX)
-	door.RotateY(rY)
+	door.RotateZ(eZ - dZ)
+	door.RotateX(eX - dX)
+	door.RotateY(eY - dY)
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
