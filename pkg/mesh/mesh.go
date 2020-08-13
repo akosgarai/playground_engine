@@ -222,6 +222,11 @@ func (m *Mesh) IsBoundingObjectSet() bool {
 	return m.boundingObjectSet
 }
 
+// GetAngles returns the pitch, yaw, roll angles in this order
+func (m *Mesh) GetAngles() (float32, float32, float32) {
+	return m.pitch, m.yaw, m.roll
+}
+
 type TexturedMesh struct {
 	Mesh
 	Indices  []uint32
