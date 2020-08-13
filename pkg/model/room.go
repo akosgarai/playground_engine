@@ -360,11 +360,22 @@ func (b *RoomBuilder) BuildTexture() *Room {
 	if b.frontWindow || b.backWindow || b.leftWindow || b.rightWindow {
 		m.SetTransparent(true)
 	}
+
+	var dS int
+	var dAA float32
+	if b.doorOpened {
+		dS = _DOOR_OPENED
+		dAA = float32(0.0)
+	} else {
+		dS = _DOOR_CLOSED
+		dAA = float32(90.0)
+	}
+
 	return &Room{
 		BaseCollisionDetectionModel: *m,
-		doorState:                   _DOOR_CLOSED,
+		doorState:                   dS,
 		currentAnimationTime:        0,
-		doorAnimationonAngle:        90.0,
+		doorAnimationonAngle:        dAA,
 		doorWidth:                   b.doorWidth,
 		doorWallAttachPoint:         attachPoint,
 	}
@@ -459,11 +470,21 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	frontWallMain.SetBoundingObject(bo)
 	m.AddMesh(frontWallMain)
 
+	var dS int
+	var dAA float32
+	if b.doorOpened {
+		dS = _DOOR_OPENED
+		dAA = float32(0.0)
+	} else {
+		dS = _DOOR_CLOSED
+		dAA = float32(90.0)
+	}
+
 	return &Room{
 		BaseCollisionDetectionModel: *m,
-		doorState:                   _DOOR_CLOSED,
+		doorState:                   dS,
 		currentAnimationTime:        0,
-		doorAnimationonAngle:        90.0,
+		doorAnimationonAngle:        dAA,
 		doorWidth:                   b.doorWidth,
 		doorWallAttachPoint:         attachPoint,
 	}
