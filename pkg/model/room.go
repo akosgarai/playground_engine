@@ -38,6 +38,7 @@ type RoomBuilder struct {
 	backWindow    bool
 	leftWindow    bool
 	rightWindow   bool
+	doorOpened    bool
 	windowWidth   float32 // the width of the windows that we could set on the textured rooms.
 	windowHeight  float32 // the height of the windows that we could set on the textured rooms.
 	wrapper       interfaces.GLWrapper
@@ -60,6 +61,7 @@ func NewRoomBuilder() *RoomBuilder {
 		backWindow:    false,
 		leftWindow:    false,
 		rightWindow:   false,
+		doorOpened:    false,
 		windowWidth:   0.2,
 		windowHeight:  0.4,
 		assetsBaseDir: baseDirModel(),
@@ -84,6 +86,16 @@ func (b *RoomBuilder) WithLeftWindow(v bool) {
 // WithRightWindow sets the rightWindow flag
 func (b *RoomBuilder) WithRightWindow(v bool) {
 	b.rightWindow = v
+}
+
+// WithOpenedDoor sets the doorOpened flag to true
+func (b *RoomBuilder) WithOpenedDoor() {
+	b.doorOpened = true
+}
+
+// WithClosedDoor sets the doorOpened flag to false
+func (b *RoomBuilder) WithClosedDoor() {
+	b.doorOpened = false
 }
 
 // SetPosition sets the position.
@@ -150,7 +162,10 @@ func (b *RoomBuilder) fullLeftWallPosition() mgl32.Vec3 {
 func (b *RoomBuilder) fullRightWallPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width - b.wallWidth) / 2, b.height / 2, 0.0}, b.rotationTransformationMatrix())
 }
-func (b *RoomBuilder) frontDoorPosition() mgl32.Vec3 {
+func (b *RoomBuilder) frontDoorOpenedPosition() mgl32.Vec3 {
+	return mgl32.TransformCoordinate(mgl32.Vec3{0.0, b.doorWidth / 2, 0.0}, b.rotationTransformationMatrix())
+}
+func (b *RoomBuilder) frontDoorClosedPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{-b.doorWidth / 2, 0.0, 0.0}, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) frontDoorWallAttachPosition() mgl32.Vec3 {
@@ -246,8 +261,12 @@ func (b *RoomBuilder) BuildTexture() *Room {
 	V, I, bo := doorCuboid.TexturedMeshInput(cuboid.TEXTURE_ORIENTATION_SAME)
 
 	door := mesh.NewTexturedMesh(V, I, doorTexture, b.wrapper)
-	door.SetPosition(b.frontDoorPosition())
 	door.SetParent(attachPoint)
+	if b.doorOpened {
+		door.SetPosition(b.frontDoorOpenedPosition())
+	} else {
+		door.SetPosition(b.frontDoorClosedPosition())
+	}
 	door.SetBoundingObject(bo)
 	m.AddMesh(door)
 
@@ -385,8 +404,12 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	V, I, bo := doorCuboid.MaterialMeshInput()
 
 	door := mesh.NewMaterialMesh(V, I, material.Bronze, b.wrapper)
-	door.SetPosition(b.frontDoorPosition())
 	door.SetParent(attachPoint)
+	if b.doorOpened {
+		door.SetPosition(b.frontDoorOpenedPosition())
+	} else {
+		door.SetPosition(b.frontDoorClosedPosition())
+	}
 	door.SetBoundingObject(bo)
 	m.AddMesh(door)
 
