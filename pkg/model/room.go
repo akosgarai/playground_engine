@@ -163,7 +163,7 @@ func (b *RoomBuilder) fullRightWallPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{-(b.width - b.wallWidth) / 2, b.height / 2, 0.0}, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) frontDoorOpenedPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{0.0, b.doorWidth / 2, 0.0}, b.rotationTransformationMatrix())
+	return mgl32.TransformCoordinate(mgl32.Vec3{0.0, 0.0, b.doorWidth / 2}, b.rotationTransformationMatrix())
 }
 func (b *RoomBuilder) frontDoorClosedPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{-b.doorWidth / 2, 0.0, 0.0}, b.rotationTransformationMatrix())
