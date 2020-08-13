@@ -1,7 +1,6 @@
 package model
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
@@ -546,7 +545,6 @@ func (r *Room) animateDoor(dt float64) {
 
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
-	// what if i transform the robv with the rotation of the parent mesh. in this case it will be the fine position of the stuff.
 	attachPointRotationMatrix := r.doorWallAttachPoint.RotationTransformation()
 	transformedVector := mgl32.TransformNormal(rotatedOrigoBasedVector, attachPointRotationMatrix)
 	// rotation weight form the components of the rotated up vector
@@ -554,26 +552,15 @@ func (r *Room) animateDoor(dt float64) {
 
 	// the new position of the door.
 	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
-	fmt.Printf("------------\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t\t%v\n",
-		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector, transformedUp)
-
-	// get rotation euler angles. transformedUp is the axis of our transformation. The angle is rotationDegY.
-	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
-	rX, rY, rZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp))
-	fmt.Printf("----------------\nrotationDegY: %f\n", rotationDegY)
-	fmt.Printf("---------------\nApplyed rotation angles:\nRx: %f Ry: %f Rz: %f\n", rX, rY, rZ)
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
 	// current rotation angles of the door:
 	dX, dY, dZ := matrixToAngles(door.RotationTransformation())
-	fmt.Printf("---------------\nDoor current rotation angles:\nRx: %f Ry: %f Rz: %f\n", dX, dY, dZ)
 	// the rotation angles for the given full angle:
 	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90.0-r.doorAnimationonAngle), transformedUp).Mul4(attachPointRotationMatrix))
-	fmt.Printf("---------------\nDoor expected rotation angles:\nRx: %f Ry: %f Rz: %f\n", eX, eY, eZ)
-	fmt.Printf("---------------\nDoor diff angles:\nx: %f y: %f z: %f\n", eX-dX, eY-dY, eZ-dZ)
 	door.SetPosition(doorPosFromAttachPoint)
-	// Apply the rotation on the y axis.
+	// Apply the rotation on the axises.
 	door.RotateZ(eZ - dZ)
 	door.RotateX(eX - dX)
 	door.RotateY(eY - dY)
@@ -583,6 +570,8 @@ func (r *Room) animateDoor(dt float64) {
 	}
 }
 
+// From the HomogRotate3D matrix, the euler angle could be computed.
+// see: https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
 // returns angles
 func matrixToAngles(m mgl32.Mat4) (float32, float32, float32) {
 	var x, y, z float32
@@ -613,7 +602,4 @@ func (r *Room) Update(dt float64) {
 }
 func (r *Room) GetDoor() interfaces.Mesh {
 	return r.meshes[2]
-}
-func (r *Room) GetFloor() interfaces.Mesh {
-	return r.meshes[0]
 }

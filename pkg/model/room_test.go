@@ -249,12 +249,6 @@ func CheckDefaultRoomOptions(room *Room, t *testing.T) {
 	if room.doorState != _DOOR_OPENED {
 		t.Errorf("Invalid next door state. Instead of '%d', we have '%d'.", _DOOR_OPENED, room.doorState)
 	}
-	/*
-		doorOpenedPosition := mgl32.Vec3{0, 0, 0}
-		if room.GetDoor().GetPosition() != doorOpenedPosition {
-			t.Errorf("Invalid opened door poisiton. Instead of '%v', it is '%v'.", doorOpenedPosition, room.GetDoor().GetPosition())
-		}
-	*/
 	room.PushDoorState()
 	room.animateDoor(100)
 	if room.currentAnimationTime != 100.0 {
@@ -279,6 +273,7 @@ func TestMaterialRoom(t *testing.T) {
 	b := NewRoomBuilder()
 	b.SetWrapper(wrapperMock)
 	b.SetPosition(position)
+	b.WithClosedDoor()
 	room := b.BuildMaterial()
 
 	CheckDefaultRoomOptions(room, t)
@@ -289,7 +284,34 @@ func TestTexturedRoom(t *testing.T) {
 	b := NewRoomBuilder()
 	b.SetWrapper(wrapperMock)
 	b.SetPosition(position)
+	b.WithClosedDoor()
 	room := b.BuildTexture()
 
 	CheckDefaultRoomOptions(room, t)
+}
+func TestMaterialRoomOpened(t *testing.T) {
+	position := mgl32.Vec3{0.0, 0.0, 0.0}
+
+	b := NewRoomBuilder()
+	b.SetWrapper(wrapperMock)
+	b.SetPosition(position)
+	b.WithOpenedDoor()
+	room := b.BuildMaterial()
+	doorPosition := mgl32.Vec3{0.0, 0.0, 0.2}
+	if room.GetDoor().GetPosition() != doorPosition {
+		t.Errorf("Invalid door position. Instead of '%v', we have '%v'.", doorPosition, room.GetDoor().GetPosition())
+	}
+}
+func TestTexturedRoomOpened(t *testing.T) {
+	position := mgl32.Vec3{0.0, 0.0, 0.0}
+
+	b := NewRoomBuilder()
+	b.SetWrapper(wrapperMock)
+	b.SetPosition(position)
+	b.WithOpenedDoor()
+	room := b.BuildTexture()
+	doorPosition := mgl32.Vec3{0.0, 0.0, 0.2}
+	if room.GetDoor().GetPosition() != doorPosition {
+		t.Errorf("Invalid door position. Instead of '%v', we have '%v'.", doorPosition, room.GetDoor().GetPosition())
+	}
 }
