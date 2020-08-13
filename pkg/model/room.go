@@ -214,6 +214,10 @@ func (b *RoomBuilder) frontWindowPosition() mgl32.Vec3 {
 	}
 	return mgl32.TransformCoordinate(origPosition, b.rotationTransformationMatrix())
 }
+func (b *RoomBuilder) transformedUpDirection() mgl32.Vec3 {
+	up := mgl32.Vec3{0.0, 1.0, 0.0}
+	return mgl32.TransformNormal(up, b.rotationTransformationMatrix())
+}
 
 // BuildTexture returns a textured material room that is constructed from the given setup.
 func (b *RoomBuilder) BuildTexture() *Room {
@@ -264,7 +268,11 @@ func (b *RoomBuilder) BuildTexture() *Room {
 	door.SetParent(attachPoint)
 	if b.doorOpened {
 		door.SetPosition(b.frontDoorOpenedPosition())
-		door.RotateY(90)
+		transformedUp := b.transformedUpDirection()
+		rX, rY, rZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp))
+		door.RotateZ(rZ)
+		door.RotateX(rX)
+		door.RotateY(rY)
 	} else {
 		door.SetPosition(b.frontDoorClosedPosition())
 	}
@@ -419,7 +427,11 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	door.SetParent(attachPoint)
 	if b.doorOpened {
 		door.SetPosition(b.frontDoorOpenedPosition())
-		door.RotateY(90)
+		transformedUp := b.transformedUpDirection()
+		rX, rY, rZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp))
+		door.RotateZ(rZ)
+		door.RotateX(rX)
+		door.RotateY(rY)
 	} else {
 		door.SetPosition(b.frontDoorClosedPosition())
 	}
@@ -548,7 +560,7 @@ func (r *Room) animateDoor(dt float64) {
 
 	// get rotation euler angles. transformedUp is the axis of our transformation. The angle is rotationDegY.
 	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
-	rX, rY, rZ := r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp))
+	rX, rY, rZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(rotationDegY), transformedUp))
 	fmt.Printf("----------------\nrotationDegY: %f\n", rotationDegY)
 	fmt.Printf("---------------\nApplyed rotation angles:\nRx: %f Ry: %f Rz: %f\n", rX, rY, rZ)
 
@@ -561,10 +573,10 @@ func (r *Room) animateDoor(dt float64) {
 	door.RotateY(rY)
 
 	// Door rotation angles:
-	dx, dy, dz := r.matrixToAngles(door.RotationTransformation())
+	dx, dy, dz := matrixToAngles(door.RotationTransformation())
 	fmt.Printf("---------------\nDoor Rotation angles:\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
 	// Expected rotation angles:
-	dx, dy, dz = r.matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), transformedUp).Mul4(attachPointRotationMatrix))
+	dx, dy, dz = matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), transformedUp).Mul4(attachPointRotationMatrix))
 	fmt.Printf("---------------\nExpected Rotation angles:\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
 
 	if r.currentAnimationTime >= doorAnimationTime {
@@ -573,7 +585,7 @@ func (r *Room) animateDoor(dt float64) {
 }
 
 // returns angles
-func (r *Room) matrixToAngles(m mgl32.Mat4) (float32, float32, float32) {
+func matrixToAngles(m mgl32.Mat4) (float32, float32, float32) {
 	var x, y, z float32
 	if m.At(1, 2) < 1 {
 		if m.At(1, 2) > -1 {
