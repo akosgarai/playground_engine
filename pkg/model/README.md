@@ -13,7 +13,33 @@ This predefined model represents a "composite object". This model contains 2 cub
 
 ## Room model
 
-This predefined model represents a "composite object". This model contains 8 cuboids, floor, ceiling, 3 full wall, 1 door, a half wall next to the door, and a half wall above the door. It has 2 implementation. One is from plane materials and another one that is textured.
+It is a cuboid object that contains a door like surface. The door could be opened and closed. It's movement is animated.
+
+### RoomBuilder
+
+This is a builder for the room model.
+
+- `position` - the position of the room (center point of the floor mesh)
+- `width` - the length of the usable area in the x axis
+- `height` - the length of the usable area in the y axis
+- `length` - the length of the usable area in the z axis
+- `wallWidth` - the width of the walls
+- `doorWidth` - the width of the door that is on the right side of the front wall.
+- `doorHeight` - the height of the door that is on the right side of the front wall.
+- `rotationX` - the rotation (x axis) of the floor mesh.
+- `rotationY` - the rotation (y axis) of the floor mesh.
+- `rotationZ` - the rotation (z axis) of the floor mesh.
+- `assetsBaseDir` - In case of textured room, we have to know where are the assets.
+- `frontWindow` - if this flag is set, the room will contain a window on the front wall.
+- `backWindow` - if this flag is set, the room will contain a window on the back wall. currently this feature is unimplemented.
+- `leftWindow` - if this flag is set, the room will contain a window on the left wall. currently this feature is unimplemented.
+- `rightWindow` - if this flag is set, the room will contain a window on the right wall. currently this feature is unimplemented.
+- `doorOpened` - if this flag is set, the front door will be in opened state.
+- `windowWidth` - the width of the windows that we could set on the textured rooms.
+- `windowHeight` - the height of the windows that we could set on the textured rooms.
+- `wrapper` the wrapper pkg (interfaces.GLWrapper) for the gl functions. It can be set with the `SetGlWrapper` function.
+
+The Builder provides material (BuildMaterial) or textured (BuildTexture) room solutions. The window feature only works with the textured rooms.
 
 ## Terrain model
 
