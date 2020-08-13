@@ -551,12 +551,11 @@ func (r *Room) animateDoor(dt float64) {
 	transformedVector := mgl32.TransformNormal(rotatedOrigoBasedVector, attachPointRotationMatrix)
 	// rotation weight form the components of the rotated up vector
 	transformedUp := mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, attachPointRotationMatrix)
-	transformedUpInvert := mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, attachPointRotationMatrix.Inv())
 
 	// the new position of the door.
 	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
-	fmt.Printf("------------\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t\t%v\nTransformedUpInv:\t%v\n",
-		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector, transformedUp, transformedUpInvert)
+	fmt.Printf("------------\nDoorNewPosition:\t%v\nDoorAttachPoint:\t%v\nRotatedUnitVector:\t%v\nTransformedVector:\t%v\nTransformedUp:\t\t%v\n",
+		doorPosFromAttachPoint, r.doorWallAttachPoint.GetPosition(), rotatedOrigoBasedVector, transformedVector, transformedUp)
 
 	// get rotation euler angles. transformedUp is the axis of our transformation. The angle is rotationDegY.
 	// From the HomogRotate3D matrix, the euler angle could be computed. https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
@@ -566,6 +565,13 @@ func (r *Room) animateDoor(dt float64) {
 
 	// Update door position to the newly calculated one.
 	door := r.GetDoor()
+	// current rotation angles of the door:
+	dX, dY, dZ := matrixToAngles(door.RotationTransformation())
+	fmt.Printf("---------------\nDoor current rotation angles:\nRx: %f Ry: %f Rz: %f\n", dX, dY, dZ)
+	// the rotation angles for the given full angle:
+	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), transformedUp))
+	fmt.Printf("---------------\nDoor expected rotation angles:\nRx: %f Ry: %f Rz: %f\n", eX, eY, eZ)
+	fmt.Printf("---------------\nDoor diff angles:\nx: %f y: %f z: %f\n", eX-dX, eY-dY, eZ-dZ)
 	door.SetPosition(doorPosFromAttachPoint)
 	// Apply the rotation on the y axis.
 	door.RotateZ(rZ)
