@@ -264,6 +264,7 @@ func (b *RoomBuilder) BuildTexture() *Room {
 	door.SetParent(attachPoint)
 	if b.doorOpened {
 		door.SetPosition(b.frontDoorOpenedPosition())
+		door.RotateY(90)
 	} else {
 		door.SetPosition(b.frontDoorClosedPosition())
 	}
@@ -418,6 +419,7 @@ func (b *RoomBuilder) BuildMaterial() *Room {
 	door.SetParent(attachPoint)
 	if b.doorOpened {
 		door.SetPosition(b.frontDoorOpenedPosition())
+		door.RotateY(90)
 	} else {
 		door.SetPosition(b.frontDoorClosedPosition())
 	}
