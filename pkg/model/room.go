@@ -569,7 +569,7 @@ func (r *Room) animateDoor(dt float64) {
 	dX, dY, dZ := matrixToAngles(door.RotationTransformation())
 	fmt.Printf("---------------\nDoor current rotation angles:\nRx: %f Ry: %f Rz: %f\n", dX, dY, dZ)
 	// the rotation angles for the given full angle:
-	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), transformedUp))
+	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(-r.doorAnimationonAngle), transformedUp))
 	fmt.Printf("---------------\nDoor expected rotation angles:\nRx: %f Ry: %f Rz: %f\n", eX, eY, eZ)
 	fmt.Printf("---------------\nDoor diff angles:\nx: %f y: %f z: %f\n", eX-dX, eY-dY, eZ-dZ)
 	door.SetPosition(doorPosFromAttachPoint)
@@ -577,13 +577,6 @@ func (r *Room) animateDoor(dt float64) {
 	door.RotateZ(rZ)
 	door.RotateX(rX)
 	door.RotateY(rY)
-
-	// Door rotation angles:
-	dx, dy, dz := matrixToAngles(door.RotationTransformation())
-	fmt.Printf("---------------\nDoor Rotation angles:\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
-	// Expected rotation angles:
-	dx, dy, dz = matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(r.doorAnimationonAngle), transformedUp).Mul4(attachPointRotationMatrix))
-	fmt.Printf("---------------\nExpected Rotation angles:\ndx: %f dy: %f dz: %f\n", dx, dy, dz)
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
