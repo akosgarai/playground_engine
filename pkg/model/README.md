@@ -11,6 +11,27 @@ This predefined model represents a "composite object". This model contains 4 mat
 
 This predefined model represents a "composite object". This model contains 2 cuboids or cylinders, 'Pole' and 'Top' and a sphere 'Bulb'. It has 2 implementation. One is from plane materials, and another one that is textured. In the material version, the pole and the top is cuboid, in the textured one, they are cylinders.
 
+### StreetLampBuilder
+
+This is a builder for the StreetLamp model.
+
+- `position` - the bottom position of the pole mesh.
+- `poleLength` - the length of the pole mesh.
+- `rotationX` - the rotation (x axis) of the pole mesh.
+- `rotationY` - the rotation (y axis) of the pole mesh.
+- `rotationZ` - the rotation (z axis) of the pole mesh.
+- `assetsBaseDir` - In case of textured room, we have to know where are the assets.
+- `wrapper` the wrapper pkg (interfaces.GLWrapper) for the gl functions. It can be set with the `SetGlWrapper` function.
+- `bulbMaterial` - the material of the bulb. It is also used as the color componenets of the spot lightsource.
+- `constantTerm` - the constant term of the lightsource.
+- `linearTerm` - the linear term of the lightsource.
+- `quadraticTerm` - the quadratic term of the lightsource.
+- `cutoff` - the cutoff parameter of the spot lightsource.
+- `outerCutOff` - the outer cutoff parameter of the spot lightsource.
+- `lampOn` - if this flag is on, the lamp will be turned on.
+
+For modeling a spotlight, we need to know the position and the direction of the lightsource. The position could be calculated from the position and the length of the pole mesh, and it's rotations. The direction could be also calculated from the rotations.
+
 ## Room model
 
 It is a cuboid object that contains a door like surface. The door could be opened and closed. It's movement is animated.
