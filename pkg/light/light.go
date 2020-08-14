@@ -86,22 +86,37 @@ func (l *Light) Log() string {
 	return logString
 }
 
-// GetDiffuse returns the diffuse color of the material
+// GetAmbient returns the ambient color component of the light
 func (l *Light) GetAmbient() mgl32.Vec3 {
 	return l.ambient
 }
 
-// GetDiffuse returns the diffuse color of the material
+// SetAmbient updates the ambient color component of the light
+func (l *Light) SetAmbient(a mgl32.Vec3) {
+	l.ambient = a
+}
+
+// GetDiffuse returns the diffuse color component of the light
 func (l *Light) GetDiffuse() mgl32.Vec3 {
 	return l.diffuse
 }
 
-// GetSpecular returns the specular color of the material
+// SetDiffuse updates the diffuse color component of the light
+func (l *Light) SetDiffuse(d mgl32.Vec3) {
+	l.diffuse = d
+}
+
+// GetSpecular returns the specular color component of the light
 func (l *Light) GetSpecular() mgl32.Vec3 {
 	return l.specular
 }
 
-// GetPosition returns the shininess of the material
+// SetSpecular updates the specular color component of the light
+func (l *Light) SetSpecular(s mgl32.Vec3) {
+	l.specular = s
+}
+
+// GetPosition returns the position of the light
 func (l *Light) GetPosition() mgl32.Vec3 {
 	return l.position
 }
@@ -116,9 +131,19 @@ func (l *Light) GetConstantTerm() float32 {
 	return l.constantTerm
 }
 
+// SetConstantTerm updates the constant term component of the light
+func (l *Light) SetConstantTerm(c float32) {
+	l.constantTerm = c
+}
+
 // GetLinearTerm returns the linear term component of the light
 func (l *Light) GetLinearTerm() float32 {
 	return l.linearTerm
+}
+
+// SetLinearTerm updates the linear term component of the light
+func (l *Light) SetLinearTerm(lt float32) {
+	l.linearTerm = lt
 }
 
 // GetQuadraticTerm returns the quadratic term component of the light
@@ -126,9 +151,19 @@ func (l *Light) GetQuadraticTerm() float32 {
 	return l.quadraticTerm
 }
 
+// SetQuadraticTerm updates the quadratic term component of the light
+func (l *Light) SetQuadraticTerm(q float32) {
+	l.quadraticTerm = q
+}
+
 // GetDirection returns the direction of the light
 func (l *Light) GetDirection() mgl32.Vec3 {
 	return l.direction
+}
+
+// SetDirection updates the direction of the light
+func (l *Light) SetDirection(d mgl32.Vec3) {
+	l.direction = d
 }
 
 // GetCutoff returns the cutoff component of the light
@@ -136,7 +171,17 @@ func (l *Light) GetCutoff() float32 {
 	return l.cutoff
 }
 
+// SetCutoff updates the cutoff component of the light
+func (l *Light) SetCutoff(c float32) {
+	l.cutoff = c
+}
+
 // GetOuterCutoff returns the outerCutoff component of the light
 func (l *Light) GetOuterCutoff() float32 {
 	return l.outerCutoff
+}
+
+// SetOuterCutoff updates the outerCutoff component of the light
+func (l *Light) SetOuterCutoff(oc float32) {
+	l.outerCutoff = oc
 }

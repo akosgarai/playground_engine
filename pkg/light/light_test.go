@@ -44,11 +44,29 @@ func TestLog(t *testing.T) {
 		t.Error("Log too short")
 	}
 }
+func TestSetAmbient(t *testing.T) {
+	vectorComponent := [4]mgl32.Vec3{DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	l := NewDirectionalLight(vectorComponent)
+	component := DefaultAmbientComponent.Mul(0.1)
+	l.SetAmbient(component)
+	if l.GetAmbient() != component {
+		t.Error("Invalid ambient color")
+	}
+}
 func TestGetAmbient(t *testing.T) {
 	vectorComponent := [4]mgl32.Vec3{DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
 	l := NewDirectionalLight(vectorComponent)
 	if l.GetAmbient() != DefaultAmbientComponent {
 		t.Error("Invalid ambient color")
+	}
+}
+func TestSetDiffuse(t *testing.T) {
+	vectorComponent := [4]mgl32.Vec3{DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	l := NewDirectionalLight(vectorComponent)
+	component := DefaultDiffuseComponent.Mul(0.1)
+	l.SetDiffuse(component)
+	if l.GetDiffuse() != component {
+		t.Error("Invalid diffuse color")
 	}
 }
 func TestGetDiffuse(t *testing.T) {
@@ -62,6 +80,15 @@ func TestGetSpecular(t *testing.T) {
 	vectorComponent := [4]mgl32.Vec3{DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
 	l := NewDirectionalLight(vectorComponent)
 	if l.GetSpecular() != DefaultSpecularComponent {
+		t.Error("Invalid specular color")
+	}
+}
+func TestSetSpecular(t *testing.T) {
+	vectorComponent := [4]mgl32.Vec3{DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	l := NewDirectionalLight(vectorComponent)
+	component := DefaultSpecularComponent.Mul(0.1)
+	l.SetSpecular(component)
+	if l.GetSpecular() != component {
 		t.Error("Invalid specular color")
 	}
 }
@@ -88,12 +115,31 @@ func TestGetDirection(t *testing.T) {
 		t.Error("Invalid direction component")
 	}
 }
+func TestSetDirection(t *testing.T) {
+	vectorComponent := [4]mgl32.Vec3{DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	l := NewDirectionalLight(vectorComponent)
+	newdir := DefaultLightDirection.Mul(-1)
+	l.SetDirection(newdir)
+	if l.GetDirection() != newdir {
+		t.Error("Invalid direction component")
+	}
+}
 func TestGetConstantTerm(t *testing.T) {
 	vectorComponent := [4]mgl32.Vec3{DefaultLightPosition, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
 	termComponent := [3]float32{DefaultConstantTerm, DefaultLinearTerm, DefaultQuadraticTerm}
 	l := NewPointLight(vectorComponent, termComponent)
 	if l.GetConstantTerm() != DefaultConstantTerm {
 		t.Errorf("Invalid constant term component. Instead of '%f', We have '%f'.", DefaultConstantTerm, l.GetConstantTerm())
+	}
+}
+func TestSetConstantTerm(t *testing.T) {
+	vectorComponent := [4]mgl32.Vec3{DefaultLightPosition, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	termComponent := [3]float32{DefaultConstantTerm, DefaultLinearTerm, DefaultQuadraticTerm}
+	l := NewPointLight(vectorComponent, termComponent)
+	newTerm := DefaultConstantTerm * 2.0
+	l.SetConstantTerm(newTerm)
+	if l.GetConstantTerm() != newTerm {
+		t.Errorf("Invalid constant term component. Instead of '%f', We have '%f'.", newTerm, l.GetConstantTerm())
 	}
 }
 func TestGetLinearTerm(t *testing.T) {
@@ -104,12 +150,32 @@ func TestGetLinearTerm(t *testing.T) {
 		t.Errorf("Invalid linear term component. Instead of '%f', We have '%f'.", DefaultLinearTerm, l.GetLinearTerm())
 	}
 }
+func TestSetLinearTerm(t *testing.T) {
+	vectorComponent := [4]mgl32.Vec3{DefaultLightPosition, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	termComponent := [3]float32{DefaultConstantTerm, DefaultLinearTerm, DefaultQuadraticTerm}
+	l := NewPointLight(vectorComponent, termComponent)
+	newTerm := DefaultLinearTerm * 2.0
+	l.SetLinearTerm(newTerm)
+	if l.GetLinearTerm() != newTerm {
+		t.Errorf("Invalid linear term component. Instead of '%f', We have '%f'.", newTerm, l.GetLinearTerm())
+	}
+}
 func TestGetQuadraticTerm(t *testing.T) {
 	vectorComponent := [4]mgl32.Vec3{DefaultLightPosition, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
 	termComponent := [3]float32{DefaultConstantTerm, DefaultLinearTerm, DefaultQuadraticTerm}
 	l := NewPointLight(vectorComponent, termComponent)
 	if l.GetQuadraticTerm() != DefaultQuadraticTerm {
 		t.Errorf("Invalid quadratic term component. Instead of '%f', We have '%f'.", DefaultQuadraticTerm, l.GetQuadraticTerm())
+	}
+}
+func TestSetQuadraticTerm(t *testing.T) {
+	vectorComponent := [4]mgl32.Vec3{DefaultLightPosition, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	termComponent := [3]float32{DefaultConstantTerm, DefaultLinearTerm, DefaultQuadraticTerm}
+	l := NewPointLight(vectorComponent, termComponent)
+	newTerm := DefaultQuadraticTerm * 2.0
+	l.SetQuadraticTerm(newTerm)
+	if l.GetQuadraticTerm() != newTerm {
+		t.Errorf("Invalid quadratic term component. Instead of '%f', We have '%f'.", newTerm, l.GetQuadraticTerm())
 	}
 }
 func TestGetCutOff(t *testing.T) {
@@ -120,12 +186,32 @@ func TestGetCutOff(t *testing.T) {
 		t.Errorf("Invalid cutoff component. Instead of '%f', We have '%f'.", DefaultCutoff, l.GetCutoff())
 	}
 }
+func TestSetCutOff(t *testing.T) {
+	vectorComponent := [5]mgl32.Vec3{DefaultLightPosition, DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	termComponent := [5]float32{DefaultConstantTerm, DefaultLinearTerm, DefaultQuadraticTerm, DefaultCutoff}
+	l := NewSpotLight(vectorComponent, termComponent)
+	newTerm := DefaultCutoff * 2.0
+	l.SetCutoff(newTerm)
+	if l.GetCutoff() != newTerm {
+		t.Errorf("Invalid cutoff component. Instead of '%f', We have '%f'.", newTerm, l.GetCutoff())
+	}
+}
 func TestGetOuterCutOff(t *testing.T) {
 	vectorComponent := [5]mgl32.Vec3{DefaultLightPosition, DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
 	termComponent := [5]float32{DefaultConstantTerm, DefaultLinearTerm, DefaultQuadraticTerm, DefaultCutoff, DefaultOuterCutoff}
 	l := NewSpotLight(vectorComponent, termComponent)
 	if l.GetOuterCutoff() != DefaultOuterCutoff {
 		t.Errorf("Invalid cutoff component. Instead of '%f', We have '%f'.", DefaultOuterCutoff, l.GetOuterCutoff())
+	}
+}
+func TestSetOuterCutOff(t *testing.T) {
+	vectorComponent := [5]mgl32.Vec3{DefaultLightPosition, DefaultLightDirection, DefaultAmbientComponent, DefaultDiffuseComponent, DefaultSpecularComponent}
+	termComponent := [5]float32{DefaultConstantTerm, DefaultLinearTerm, DefaultQuadraticTerm, DefaultCutoff, DefaultOuterCutoff}
+	l := NewSpotLight(vectorComponent, termComponent)
+	newTerm := DefaultOuterCutoff * 2.0
+	l.SetOuterCutoff(newTerm)
+	if l.GetOuterCutoff() != newTerm {
+		t.Errorf("Invalid cutoff component. Instead of '%f', We have '%f'.", newTerm, l.GetOuterCutoff())
 	}
 }
 func TestNewDirectionalLight(t *testing.T) {
