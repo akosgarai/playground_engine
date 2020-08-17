@@ -121,6 +121,10 @@ func (b *StreetLampBuilder) BuildMaterial() *StreetLamp {
 		panic("Wrapper is missing")
 	}
 	pole := b.materialPole()
+	pole.RotateX(b.rotationX)
+	pole.RotateY(b.rotationY)
+	pole.RotateZ(b.rotationZ)
+
 	top := b.materialTop()
 	top.SetParent(pole)
 	bulb := b.materialBulb()
@@ -164,6 +168,10 @@ func (b *StreetLampBuilder) BuildTexture() *StreetLamp {
 	metalTexture.AddTexture(b.assetsBaseDir+"/assets/metal.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", b.wrapper)
 
 	pole := b.texturePole(metalTexture)
+	pole.RotateX(b.rotationX)
+	pole.RotateY(b.rotationY)
+	pole.RotateZ(b.rotationZ)
+
 	top := b.textureTop(metalTexture)
 	top.SetParent(pole)
 
