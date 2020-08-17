@@ -121,7 +121,7 @@ func (b *StreetLampBuilder) transformedUpDirection() mgl32.Vec3 {
 	return mgl32.TransformNormal(up, b.rotationTransformationMatrix())
 }
 func (b *StreetLampBuilder) transformedLeftDirection() mgl32.Vec3 {
-	up := mgl32.Vec3{1.0, 0.0, 0.0}
+	up := mgl32.Vec3{-1.0, 0.0, 0.0}
 	return mgl32.TransformNormal(up, b.rotationTransformationMatrix())
 }
 
