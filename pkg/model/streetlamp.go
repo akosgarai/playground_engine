@@ -111,6 +111,25 @@ func (b *StreetLampBuilder) SetCutoff(cutoff, outerCutoff float32) {
 func (b *StreetLampBuilder) SetLampOn(v bool) {
 	b.lampOn = v
 }
+func (b *StreetLampBuilder) rotationTransformationMatrix() mgl32.Mat4 {
+	return mgl32.HomogRotate3DY(mgl32.DegToRad(b.rotationY)).Mul4(
+		mgl32.HomogRotate3DX(mgl32.DegToRad(b.rotationX))).Mul4(
+		mgl32.HomogRotate3DZ(mgl32.DegToRad(b.rotationZ)))
+}
+
+// materialTopPosition returns the position of the top mesh
+func (b *StreetLampBuilder) materialTopPosition() mgl32.Vec3 {
+	height, width, length, _ := b.getSizes()
+	defaultPos := mgl32.Vec3{(length - width) / 2, 0, (height + width) / 2}
+	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrix())
+}
+
+// materialBulbPosition returns the position of the top mesh
+func (b *StreetLampBuilder) materialBulbPosition() mgl32.Vec3 {
+	_, width, length, bulbRadius := b.getSizes()
+	defaultPos := mgl32.Vec3{length/2 - 4*bulbRadius, 0, -width / 2}
+	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrix())
+}
 
 // BuildMaterial returns a street lamp like model. The StreetLamp is a mesh system.
 // The 'position' input is the bottom center point of the 'pole' of the lamp. The top of the pole
@@ -207,12 +226,6 @@ func (b *StreetLampBuilder) BuildTexture() *StreetLamp {
 	return sl
 }
 
-func (b *StreetLampBuilder) rotationTransformationMatrix() mgl32.Mat4 {
-	return mgl32.HomogRotate3DY(mgl32.DegToRad(b.rotationY)).Mul4(
-		mgl32.HomogRotate3DX(mgl32.DegToRad(b.rotationX))).Mul4(
-		mgl32.HomogRotate3DZ(mgl32.DegToRad(b.rotationZ)))
-}
-
 // It returns the size of the streetlamp components. They are calculated from the inputs and a couple of
 // constant ratios.
 func (b *StreetLampBuilder) getSizes() (float32, float32, float32, float32) {
@@ -232,21 +245,21 @@ func (b *StreetLampBuilder) materialPole() *mesh.MaterialMesh {
 	return pole
 }
 func (b *StreetLampBuilder) materialTop() *mesh.MaterialMesh {
-	height, width, length, _ := b.getSizes()
+	_, width, length, _ := b.getSizes()
 	topCuboid := cuboid.New(length, width, width)
 	V, I, bo := topCuboid.MaterialMeshInput()
 	top := mesh.NewMaterialMesh(V, I, material.Chrome, b.wrapper)
-	top.SetPosition(mgl32.Vec3{(length - width) / 2, 0, (height + width) / 2})
+	top.SetPosition(b.materialTopPosition())
 	top.SetBoundingObject(bo)
 
 	return top
 }
 func (b *StreetLampBuilder) materialBulb() *mesh.MaterialMesh {
-	_, width, length, bulbRadius := b.getSizes()
+	_, _, _, bulbRadius := b.getSizes()
 	sph := sphere.New(15)
 	V, I, bo := sph.TexturedMeshInput()
 	bulb := mesh.NewMaterialMesh(V, I, b.bulbMaterial, b.wrapper)
-	bulb.SetPosition(mgl32.Vec3{length/2 - 4*bulbRadius, 0, -width / 2})
+	bulb.SetPosition(b.materialBulbPosition())
 	bulb.SetScale(mgl32.Vec3{1.0, 1.0, 1.0}.Mul(bulbRadius))
 	bulb.SetBoundingObject(bo)
 	return bulb
