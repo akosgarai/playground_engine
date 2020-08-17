@@ -116,8 +116,16 @@ func (b *StreetLampBuilder) rotationTransformationMatrix() mgl32.Mat4 {
 		mgl32.HomogRotate3DX(mgl32.DegToRad(b.rotationX))).Mul4(
 		mgl32.HomogRotate3DZ(mgl32.DegToRad(b.rotationZ)))
 }
+func (b *StreetLampBuilder) transformedUpDirection() mgl32.Vec3 {
+	up := mgl32.Vec3{0.0, 1.0, 0.0}
+	return mgl32.TransformNormal(up, b.rotationTransformationMatrix())
+}
+func (b *StreetLampBuilder) transformedLeftDirection() mgl32.Vec3 {
+	up := mgl32.Vec3{1.0, 0.0, 0.0}
+	return mgl32.TransformNormal(up, b.rotationTransformationMatrix())
+}
 
-// materialTopPosition returns the position of the top mesh
+// materialTopPosition returns the position of the top mesh for a material street lamp
 func (b *StreetLampBuilder) materialTopPosition() mgl32.Vec3 {
 	height, width, length, _ := b.getSizes()
 	defaultPos := mgl32.Vec3{(length - width) / 2, 0, (height + width) / 2}
@@ -128,6 +136,13 @@ func (b *StreetLampBuilder) materialTopPosition() mgl32.Vec3 {
 func (b *StreetLampBuilder) materialBulbPosition() mgl32.Vec3 {
 	_, width, length, bulbRadius := b.getSizes()
 	defaultPos := mgl32.Vec3{length/2 - 4*bulbRadius, 0, -width / 2}
+	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrix())
+}
+
+// textureTopPosition returns the position of the top mesh for a texture street lamp
+func (b *StreetLampBuilder) textureTopPosition() mgl32.Vec3 {
+	height, width, length, _ := b.getSizes()
+	defaultPos := mgl32.Vec3{(length - width) / 2, 0, (height) / 2}
 	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrix())
 }
 
@@ -274,13 +289,21 @@ func (b *StreetLampBuilder) texturePole(tex texture.Textures) *mesh.TexturedMesh
 	return pole
 }
 func (b *StreetLampBuilder) textureTop(tex texture.Textures) *mesh.TexturedMesh {
-	height, width, length, _ := b.getSizes()
+	_, width, length, _ := b.getSizes()
 	topCylinder := cylinder.NewHalfCircleBased(width/2, 20, length)
 	V, I, bo := topCylinder.TexturedMeshInput()
 	top := mesh.NewTexturedMesh(V, I, tex, b.wrapper)
-	top.SetPosition(mgl32.Vec3{(length - width) / 2, 0, (height) / 2})
-	top.RotateZ(90)
-	top.RotateY(90)
+	top.SetPosition(b.textureTopPosition())
+	transformedUp := b.transformedUpDirection()
+	transformedLeft := b.transformedLeftDirection()
+	rX, rY, rZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp))
+	top.RotateZ(rZ)
+	top.RotateX(rX)
+	top.RotateY(rY)
+	rX, rY, rZ = matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedLeft))
+	top.RotateZ(rZ)
+	top.RotateX(rX)
+	top.RotateY(rY)
 	top.SetBoundingObject(bo)
 	return top
 }

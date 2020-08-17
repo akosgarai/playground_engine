@@ -230,9 +230,9 @@ func TestMaterialStreetLampWithoutLight(t *testing.T) {
 }
 func TestTexturedStreetLamp(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
-	bulbPosition := mgl32.Vec3{0.9, 3.035, 3.0}
+	bulbPosition := mgl32.Vec3{0.8999999, 3, 2.965}
 	polePosition := mgl32.Vec3{0.0, 3.0, 0.0}
-	topPosition := mgl32.Vec3{3.55, 3.55, 3.0}
+	topPosition := mgl32.Vec3{0.5499998, 0, 2.45}
 	scale := float32(6.0)
 
 	builder := NewStreetLampBuilder()
@@ -270,9 +270,9 @@ func TestTexturedStreetLamp(t *testing.T) {
 }
 func TestTexturedStreetLampWithoutLight(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
-	bulbPosition := mgl32.Vec3{0.9, 3.035, 3.0}
+	bulbPosition := mgl32.Vec3{0.8999999, 3, 2.965}
 	polePosition := mgl32.Vec3{0.0, 3.0, 0.0}
-	topPosition := mgl32.Vec3{3.55, 3.55, 3.0}
+	topPosition := mgl32.Vec3{0.5499998, 0, 2.45}
 	scale := float32(6.0)
 
 	builder := NewStreetLampBuilder()
