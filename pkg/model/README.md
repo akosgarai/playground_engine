@@ -22,7 +22,7 @@ This is a builder for the StreetLamp model.
 - `rotationZ` - the rotation (z axis) of the pole mesh.
 - `assetsBaseDir` - In case of textured room, we have to know where are the assets.
 - `wrapper` the wrapper pkg (interfaces.GLWrapper) for the gl functions. It can be set with the `SetGlWrapper` function.
-- `bulbMaterial` - the material of the bulb. It is also used as the color componenets of the spot lightsource.
+- `bulbMaterial` - the material of the bulb. It is also used as the color components of the spot lightsource.
 - `constantTerm` - the constant term of the lightsource.
 - `linearTerm` - the linear term of the lightsource.
 - `quadraticTerm` - the quadratic term of the lightsource.
