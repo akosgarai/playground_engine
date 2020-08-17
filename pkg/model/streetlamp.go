@@ -1,9 +1,6 @@
 package model
 
 import (
-	"path"
-	"runtime"
-
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
@@ -36,13 +33,32 @@ type StreetLampBuilder struct {
 	rotationZ     float32
 	assetsBaseDir string
 	poleLength    float32
-	bulbMaterial  material.Material
+	bulbMaterial  *material.Material
 	constantTerm  float32
 	linearTerm    float32
 	quadraticTerm float32
 	cutoff        float32
 	outerCutoff   float32
 	lampOn        bool
+}
+
+func NewStreetLampBuilder() *StreetLampBuilder {
+	return &StreetLampBuilder{
+		position:      mgl32.Vec3{0.0, 0.0, 0.0},
+		wrapper:       nil,
+		rotationX:     0,
+		rotationY:     0,
+		rotationZ:     0,
+		assetsBaseDir: baseDirModel(),
+		poleLength:    1,
+		bulbMaterial:  bulbMaterial,
+		constantTerm:  0.0,
+		linearTerm:    0.0,
+		quadraticTerm: 0.0,
+		cutoff:        0.0,
+		outerCutoff:   0.0,
+		lampOn:        true,
+	}
 }
 
 // SetPosition sets the position.
@@ -74,7 +90,7 @@ func (b *StreetLampBuilder) SetPoleLength(x float32) {
 
 // SetBulbMaterial sets the bulbMaterial. This ambient, diffuse, specular color components
 // are also used as the components of the lightsource.
-func (b *StreetLampBuilder) SetBulbMaterial(mat material.Material) {
+func (b *StreetLampBuilder) SetBulbMaterial(mat *material.Material) {
 	b.bulbMaterial = mat
 }
 
@@ -86,9 +102,14 @@ func (b *StreetLampBuilder) SetLightTerms(c, l, q float32) {
 }
 
 // SetCutoff sets the cutoff, outerCutoff params of the spot lightsource.
-func (b *StreetLampBuilder) SetLightTerms(cutoff, outerCutoff float32) {
+func (b *StreetLampBuilder) SetCutoff(cutoff, outerCutoff float32) {
 	b.cutoff = cutoff
 	b.outerCutoff = outerCutoff
+}
+
+// SetLampOn sets the lampOn flag.
+func (b *StreetLampBuilder) SetLampOn(v bool) {
+	b.lampOn = v
 }
 
 // BuildMaterial returns a street lamp like model. The StreetLamp is a mesh system.
@@ -96,6 +117,9 @@ func (b *StreetLampBuilder) SetLightTerms(cutoff, outerCutoff float32) {
 // points to the +Z axis. The 'top' is the head of the lamp. Its position is relative to the pole.
 // The 'bulb' is positioned relative to the 'top'.
 func (b *StreetLampBuilder) BuildMaterial() *StreetLamp {
+	if b.wrapper == nil {
+		panic("Wrapper is missing")
+	}
 	pole := b.materialPole()
 	top := b.materialTop()
 	top.SetParent(pole)
@@ -106,8 +130,25 @@ func (b *StreetLampBuilder) BuildMaterial() *StreetLamp {
 	m.AddMesh(pole)
 	m.AddMesh(top)
 	m.AddMesh(bulb)
+	ls := light.NewSpotLight([5]mgl32.Vec3{
+		mgl32.TransformCoordinate(bulb.GetPosition(), bulb.ModelTransformation()),
+		mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, b.rotationTransformationMatrix()),
+		b.bulbMaterial.GetAmbient(),
+		b.bulbMaterial.GetDiffuse(),
+		b.bulbMaterial.GetSpecular(),
+	}, [5]float32{
+		b.constantTerm,
+		b.linearTerm,
+		b.quadraticTerm,
+		b.cutoff,
+		b.outerCutoff,
+	})
 
-	return &StreetLamp{BaseCollisionDetectionModel: *m}
+	sl := &StreetLamp{BaseCollisionDetectionModel: *m, lightSource: ls}
+	if !b.lampOn {
+		sl.TurnLampOff()
+	}
+	return sl
 }
 
 // NewTexturedStreetLamp returns a StreetLamp model that uses textured and textured material meshes.
@@ -115,6 +156,9 @@ func (b *StreetLampBuilder) BuildMaterial() *StreetLamp {
 // points to the +Z axis. The 'top' is the head of the lamp. Its position is relative to the pole.
 // The 'bulb' is positioned relative to the 'top'.
 func (b *StreetLampBuilder) BuildTexture() *StreetLamp {
+	if b.wrapper == nil {
+		panic("Wrapper is missing")
+	}
 	var metalTexture texture.Textures
 	metalTexture.AddTexture(b.assetsBaseDir+"/assets/metal.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", b.wrapper)
 	metalTexture.AddTexture(b.assetsBaseDir+"/assets/metal.jpg", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", b.wrapper)
@@ -124,8 +168,8 @@ func (b *StreetLampBuilder) BuildTexture() *StreetLamp {
 	top.SetParent(pole)
 
 	var bulbTexture texture.Textures
-	bulbTexture.AddTexture(b.assetsBaseDir+"/assets/crystal-ball.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", glWrapper)
-	bulbTexture.AddTexture(b.assetsBaseDir+"/assets/crystal-ball.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", glWrapper)
+	bulbTexture.AddTexture(b.assetsBaseDir+"/assets/crystal-ball.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.diffuse", b.wrapper)
+	bulbTexture.AddTexture(b.assetsBaseDir+"/assets/crystal-ball.png", glwrapper.CLAMP_TO_EDGE, glwrapper.CLAMP_TO_EDGE, glwrapper.LINEAR, glwrapper.LINEAR, "material.specular", b.wrapper)
 	bulb := b.textureBulb(bulbTexture)
 	bulb.SetParent(top)
 
@@ -134,19 +178,43 @@ func (b *StreetLampBuilder) BuildTexture() *StreetLamp {
 	m.AddMesh(top)
 	m.AddMesh(bulb)
 
-	return &StreetLamp{BaseCollisionDetectionModel: *m}
+	ls := light.NewSpotLight([5]mgl32.Vec3{
+		mgl32.TransformCoordinate(bulb.GetPosition(), bulb.ModelTransformation()),
+		mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, b.rotationTransformationMatrix()),
+		b.bulbMaterial.GetAmbient(),
+		b.bulbMaterial.GetDiffuse(),
+		b.bulbMaterial.GetSpecular(),
+	}, [5]float32{
+		b.constantTerm,
+		b.linearTerm,
+		b.quadraticTerm,
+		b.cutoff,
+		b.outerCutoff,
+	})
+
+	sl := &StreetLamp{BaseCollisionDetectionModel: *m, lightSource: ls}
+	if !b.lampOn {
+		sl.TurnLampOff()
+	}
+	return sl
+}
+
+func (b *StreetLampBuilder) rotationTransformationMatrix() mgl32.Mat4 {
+	return mgl32.HomogRotate3DY(mgl32.DegToRad(b.rotationY)).Mul4(
+		mgl32.HomogRotate3DX(mgl32.DegToRad(b.rotationX))).Mul4(
+		mgl32.HomogRotate3DZ(mgl32.DegToRad(b.rotationZ)))
 }
 
 // It returns the size of the streetlamp components. They are calculated from the inputs and a couple of
 // constant ratios.
-func (b.StreetLampBuilder) getSizes() (float32, float32, float32, float32) {
-	height := defaultPoleHeight * poleLength
+func (b *StreetLampBuilder) getSizes() (float32, float32, float32, float32) {
+	height := defaultPoleHeight * b.poleLength
 	width := height * widthHeightRatio
 	length := height * lengthHeightRatio
 	bulbRadius := height * bulbRadiusHeightRatio
 	return height, width, length, bulbRadius
 }
-func (b.StreetLampBuilder) materialPole() mesh.MaterialMesh {
+func (b *StreetLampBuilder) materialPole() *mesh.MaterialMesh {
 	height, width, _, _ := b.getSizes()
 	poleCuboid := cuboid.New(width, height, width)
 	V, I, bo := poleCuboid.MaterialMeshInput()
@@ -155,7 +223,7 @@ func (b.StreetLampBuilder) materialPole() mesh.MaterialMesh {
 	pole.SetBoundingObject(bo)
 	return pole
 }
-func (b.StreetLampBuilder) materialTop() mesh.MaterialMesh {
+func (b *StreetLampBuilder) materialTop() *mesh.MaterialMesh {
 	height, width, length, _ := b.getSizes()
 	topCuboid := cuboid.New(length, width, width)
 	V, I, bo := topCuboid.MaterialMeshInput()
@@ -165,7 +233,7 @@ func (b.StreetLampBuilder) materialTop() mesh.MaterialMesh {
 
 	return top
 }
-func (b.StreetLampBuilder) materialBulb() mesh.MaterialMesh {
+func (b *StreetLampBuilder) materialBulb() *mesh.MaterialMesh {
 	_, width, length, bulbRadius := b.getSizes()
 	sph := sphere.New(15)
 	V, I, bo := sph.TexturedMeshInput()
@@ -175,7 +243,7 @@ func (b.StreetLampBuilder) materialBulb() mesh.MaterialMesh {
 	bulb.SetBoundingObject(bo)
 	return bulb
 }
-func (b.StreetLampBuilder) texturePole(tex texture.Textures) mesh.TexturedMesh {
+func (b *StreetLampBuilder) texturePole(tex texture.Textures) *mesh.TexturedMesh {
 	height, width, _, _ := b.getSizes()
 	poleCylinder := cylinder.New(width/2, 20, height)
 	V, I, bo := poleCylinder.TexturedMeshInput()
@@ -184,7 +252,7 @@ func (b.StreetLampBuilder) texturePole(tex texture.Textures) mesh.TexturedMesh {
 	pole.SetBoundingObject(bo)
 	return pole
 }
-func (b.StreetLampBuilder) textureTop(tex texture.Textures) mesh.TexturedMesh {
+func (b *StreetLampBuilder) textureTop(tex texture.Textures) *mesh.TexturedMesh {
 	height, width, length, _ := b.getSizes()
 	topCylinder := cylinder.NewHalfCircleBased(width/2, 20, length)
 	V, I, bo := topCylinder.TexturedMeshInput()
@@ -195,24 +263,51 @@ func (b.StreetLampBuilder) textureTop(tex texture.Textures) mesh.TexturedMesh {
 	top.SetBoundingObject(bo)
 	return top
 }
-func (b.StreetLampBuilder) textureBulb(tex texture.Textures) mesh.TexturedMesh {
-	_, width, length, bulbRadius := b.getSizes()
+func (b *StreetLampBuilder) textureBulb(tex texture.Textures) *mesh.TexturedMaterialMesh {
+	_, _, length, bulbRadius := b.getSizes()
 	sph := sphere.New(15)
 	V, I, bo := sph.TexturedMeshInput()
 	bulb := mesh.NewTexturedMaterialMesh(V, I, tex, b.bulbMaterial, b.wrapper)
 	bulb.SetPosition(mgl32.Vec3{length/2 - 4*bulbRadius, 0, 0})
-	bulb.SetScale(mgl32.Vec3{1.0, 1.0, 1.0}.Mul(b.bulbRadius))
+	bulb.SetScale(mgl32.Vec3{1.0, 1.0, 1.0}.Mul(bulbRadius))
 	bulb.SetBoundingObject(bo)
 	return bulb
 }
 
 type StreetLamp struct {
 	BaseCollisionDetectionModel
-	lightSource *light.SpotLightSource
+	lightSource *light.Light
+}
+
+// TurnLampOn sets the lisghtsource color to the bulb material color
+func (s *StreetLamp) TurnLampOn() {
+	bulb := s.getBulb()
+	switch bulb.(type) {
+	case *mesh.MaterialMesh:
+		b := bulb.(*mesh.MaterialMesh)
+		s.lightSource.SetAmbient(b.Material.GetAmbient())
+		s.lightSource.SetDiffuse(b.Material.GetDiffuse())
+		s.lightSource.SetSpecular(b.Material.GetSpecular())
+		break
+	case *mesh.TexturedMaterialMesh:
+		b := bulb.(*mesh.TexturedMaterialMesh)
+		s.lightSource.SetAmbient(b.Material.GetAmbient())
+		s.lightSource.SetDiffuse(b.Material.GetDiffuse())
+		s.lightSource.SetSpecular(b.Material.GetSpecular())
+		break
+	}
+}
+
+// TurnLampOff sets the lisghtsource color to dark color
+func (s *StreetLamp) TurnLampOff() {
+	dark := mgl32.Vec3{0.0, 0.0, 0.0}
+	s.lightSource.SetAmbient(dark)
+	s.lightSource.SetDiffuse(dark)
+	s.lightSource.SetSpecular(dark)
 }
 
 // GetLightSource returns the lightsource of the lamp.
-func (s *StreetLamp) GetLightSource() *light.SpotLightSource {
+func (s *StreetLamp) GetLightSource() *light.Light {
 	return s.lightSource
 }
 
@@ -238,4 +333,7 @@ func (s *StreetLamp) Update(dt float64) {
 	for i, _ := range s.meshes {
 		s.meshes[i].Update(dt)
 	}
+}
+func (s *StreetLamp) getBulb() interfaces.Mesh {
+	return s.meshes[2]
 }
