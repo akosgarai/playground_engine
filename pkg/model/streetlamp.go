@@ -294,16 +294,18 @@ func (b *StreetLampBuilder) textureTop(tex texture.Textures) *mesh.TexturedMesh 
 	V, I, bo := topCylinder.TexturedMeshInput()
 	top := mesh.NewTexturedMesh(V, I, tex, b.wrapper)
 	top.SetPosition(b.textureTopPosition())
-	transformedUp := b.transformedUpDirection()
-	transformedLeft := b.transformedLeftDirection()
-	rX, rY, rZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp))
-	top.RotateZ(rZ)
-	top.RotateX(rX)
-	top.RotateY(rY)
-	rX, rY, rZ = matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedLeft))
-	top.RotateZ(rZ)
-	top.RotateX(rX)
-	top.RotateY(rY)
+	/*
+		transformedUp := b.transformedUpDirection()
+		transformedLeft := b.transformedLeftDirection()
+		rX, rY, rZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp))
+		top.RotateZ(rZ)
+		top.RotateX(rX)
+		top.RotateY(rY)
+		rX, rY, rZ = matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedLeft))
+		top.RotateZ(rZ)
+		top.RotateX(rX)
+		top.RotateY(rY)
+	*/
 	top.SetBoundingObject(bo)
 	return top
 }
