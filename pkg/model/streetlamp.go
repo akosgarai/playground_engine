@@ -116,6 +116,14 @@ func (b *StreetLampBuilder) rotationTransformationMatrix() mgl32.Mat4 {
 		mgl32.HomogRotate3DX(mgl32.DegToRad(b.rotationX))).Mul4(
 		mgl32.HomogRotate3DZ(mgl32.DegToRad(b.rotationZ)))
 }
+func (b *StreetLampBuilder) rotationTransformationMatrixTextureTop() mgl32.Mat4 {
+	transformedUp := b.transformedUpDirection()
+	transformedFront := b.transformedFrontDirection()
+	rotationMatrixUp := mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp)
+	rotationMatrixFront := mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedFront)
+	return rotationMatrixUp.Mul4(rotationMatrixFront)
+}
+
 func (b *StreetLampBuilder) transformedUpDirection() mgl32.Vec3 {
 	up := mgl32.Vec3{0.0, 1.0, 0.0}
 	return mgl32.TransformNormal(up, b.rotationTransformationMatrix())
@@ -132,7 +140,7 @@ func (b *StreetLampBuilder) materialTopPosition() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrix())
 }
 
-// materialBulbPosition returns the position of the top mesh
+// materialBulbPosition returns the position of the bulb mesh
 func (b *StreetLampBuilder) materialBulbPosition() mgl32.Vec3 {
 	_, width, length, bulbRadius := b.getSizes()
 	defaultPos := mgl32.Vec3{length/2 - 4*bulbRadius, 0, -width / 2}
@@ -144,6 +152,13 @@ func (b *StreetLampBuilder) textureTopPosition() mgl32.Vec3 {
 	height, width, length, _ := b.getSizes()
 	defaultPos := mgl32.Vec3{(length - width) / 2, 0, (height) / 2}
 	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrix())
+}
+
+// textureBulbPosition returns the position of the bulb mesh
+func (b *StreetLampBuilder) textureBulbPosition() mgl32.Vec3 {
+	_, _, length, bulbRadius := b.getSizes()
+	defaultPos := mgl32.Vec3{length/2 - 4*bulbRadius, 0, 0}
+	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrixTextureTop())
 }
 
 // BuildMaterial returns a street lamp like model. The StreetLamp is a mesh system.
@@ -294,11 +309,7 @@ func (b *StreetLampBuilder) textureTop(tex texture.Textures) *mesh.TexturedMesh 
 	V, I, bo := topCylinder.TexturedMeshInput()
 	top := mesh.NewTexturedMesh(V, I, tex, b.wrapper)
 	top.SetPosition(b.textureTopPosition())
-	transformedUp := b.transformedUpDirection()
-	transformedFront := b.transformedFrontDirection()
-	rotationMatrixUp := mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp)
-	rotationMatrixFront := mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedFront)
-	rX, rY, rZ := matrixToAngles(rotationMatrixUp.Mul4(rotationMatrixFront))
+	rX, rY, rZ := matrixToAngles(b.rotationTransformationMatrixTextureTop())
 	top.RotateZ(rZ)
 	top.RotateX(rX)
 	top.RotateY(rY)
@@ -306,11 +317,11 @@ func (b *StreetLampBuilder) textureTop(tex texture.Textures) *mesh.TexturedMesh 
 	return top
 }
 func (b *StreetLampBuilder) textureBulb(tex texture.Textures) *mesh.TexturedMaterialMesh {
-	_, _, length, bulbRadius := b.getSizes()
+	_, _, _, bulbRadius := b.getSizes()
 	sph := sphere.New(15)
 	V, I, bo := sph.TexturedMeshInput()
 	bulb := mesh.NewTexturedMaterialMesh(V, I, tex, b.bulbMaterial, b.wrapper)
-	bulb.SetPosition(mgl32.Vec3{length/2 - 4*bulbRadius, 0, 0})
+	bulb.SetPosition(b.textureBulbPosition())
 	bulb.SetScale(mgl32.Vec3{1.0, 1.0, 1.0}.Mul(bulbRadius))
 	bulb.SetBoundingObject(bo)
 	return bulb
