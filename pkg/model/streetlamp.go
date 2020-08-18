@@ -296,11 +296,9 @@ func (b *StreetLampBuilder) textureTop(tex texture.Textures) *mesh.TexturedMesh 
 	top.SetPosition(b.textureTopPosition())
 	transformedUp := b.transformedUpDirection()
 	transformedLeft := b.transformedLeftDirection()
-	rX, rY, rZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp))
-	top.RotateZ(rZ)
-	top.RotateX(rX)
-	top.RotateY(rY)
-	rX, rY, rZ = matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedLeft.Mul4(top.RotationTransformation())))
+	rotationMatrixUp := mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp)
+	rotationMatrixLeft := mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedLeft)
+	rX, rY, rZ := matrixToAngles(rotationMatrixUp.Mul4(rotationMatrixLeft))
 	top.RotateZ(rZ)
 	top.RotateX(rX)
 	top.RotateY(rY)
@@ -353,23 +351,6 @@ func (s *StreetLamp) TurnLampOff() {
 // GetLightSource returns the lightsource of the lamp.
 func (s *StreetLamp) GetLightSource() *light.Light {
 	return s.lightSource
-}
-
-// GetPolePosition returns the current position of the pole mesh.
-func (s *StreetLamp) GetPolePosition() mgl32.Vec3 {
-	return s.meshes[0].GetPosition()
-}
-
-// GetTopPosition returns the current position of the top mesh.
-// Transformations are applied, due to the relative position.
-func (s *StreetLamp) GetTopPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(s.meshes[1].GetPosition(), s.meshes[1].ModelTransformation())
-}
-
-// GetBulbPosition returns the current position of the bulb mesh.
-// Transformations are applied, due to the relative position.
-func (s *StreetLamp) GetBulbPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(s.meshes[2].GetPosition(), s.meshes[2].ModelTransformation())
 }
 
 // Update function loops over each of the meshes and calls their Update function.

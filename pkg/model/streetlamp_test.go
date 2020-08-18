@@ -116,9 +116,9 @@ func TestStreetLampBuilderSetCutoff(t *testing.T) {
 }
 func TestMaterialStreetLamp(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
-	bulbPosition := mgl32.Vec3{0.9349, 3.0, 2.98}
+	bulbPosition := mgl32.Vec3{0.34999996, 0, -0.20000002}
 	polePosition := mgl32.Vec3{0.0, 3.0, 0.0}
-	topPosition := mgl32.Vec3{1.1, 3.0, 6.4}
+	topPosition := mgl32.Vec3{0.54999995, 0, 3.2}
 	scale := float32(6.0)
 	builder := NewStreetLampBuilder()
 	builder.SetPosition(position)
@@ -135,14 +135,14 @@ func TestMaterialStreetLamp(t *testing.T) {
 
 	lamp := builder.BuildMaterial()
 
-	if lamp.GetPolePosition() != polePosition {
-		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.GetPolePosition())
+	if lamp.meshes[0].GetPosition() != polePosition {
+		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.meshes[0].GetPosition())
 	}
-	if !lamp.GetTopPosition().ApproxEqualThreshold(topPosition, 0.0001) {
-		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.GetTopPosition())
+	if !lamp.meshes[1].GetPosition().ApproxEqualThreshold(topPosition, 0.0001) {
+		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.meshes[1].GetPosition())
 	}
-	if !lamp.GetBulbPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
-		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.GetBulbPosition())
+	if !lamp.meshes[2].GetPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
+		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.meshes[2].GetPosition())
 	}
 	func() {
 		defer func() {
@@ -172,9 +172,9 @@ func TestMaterialStreetLamp(t *testing.T) {
 }
 func TestMaterialStreetLampWithoutLight(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
-	bulbPosition := mgl32.Vec3{0.9349, 3.0, 2.98}
+	bulbPosition := mgl32.Vec3{0.34999996, 0, -0.20000002}
 	polePosition := mgl32.Vec3{0.0, 3.0, 0.0}
-	topPosition := mgl32.Vec3{1.1, 3.0, 6.4}
+	topPosition := mgl32.Vec3{0.54999995, 0, 3.2}
 	scale := float32(6.0)
 	builder := NewStreetLampBuilder()
 	builder.SetPosition(position)
@@ -193,14 +193,14 @@ func TestMaterialStreetLampWithoutLight(t *testing.T) {
 	lamp := builder.BuildMaterial()
 	lamp.TurnLampOn()
 
-	if lamp.GetPolePosition() != polePosition {
-		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.GetPolePosition())
+	if lamp.meshes[0].GetPosition() != polePosition {
+		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.meshes[0].GetPosition())
 	}
-	if !lamp.GetTopPosition().ApproxEqualThreshold(topPosition, 0.0001) {
-		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.GetTopPosition())
+	if !lamp.meshes[1].GetPosition().ApproxEqualThreshold(topPosition, 0.0001) {
+		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.meshes[1].GetPosition())
 	}
-	if !lamp.GetBulbPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
-		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.GetBulbPosition())
+	if !lamp.meshes[2].GetPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
+		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.meshes[2].GetPosition())
 	}
 	func() {
 		defer func() {
@@ -230,9 +230,9 @@ func TestMaterialStreetLampWithoutLight(t *testing.T) {
 }
 func TestTexturedStreetLamp(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
-	bulbPosition := mgl32.Vec3{0.8999999, 3, 2.965}
+	bulbPosition := mgl32.Vec3{0.34999996, 0, 0}
 	polePosition := mgl32.Vec3{0.0, 3.0, 0.0}
-	topPosition := mgl32.Vec3{0.5499998, 0, 2.45}
+	topPosition := mgl32.Vec3{0.54999995, 0, 3}
 	scale := float32(6.0)
 
 	builder := NewStreetLampBuilder()
@@ -250,14 +250,14 @@ func TestTexturedStreetLamp(t *testing.T) {
 
 	lamp := builder.BuildTexture()
 
-	if lamp.GetPolePosition() != polePosition {
-		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.GetPolePosition())
+	if lamp.meshes[0].GetPosition() != polePosition {
+		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.meshes[0].GetPosition())
 	}
-	if !lamp.GetTopPosition().ApproxEqualThreshold(topPosition, 0.0001) {
-		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.GetTopPosition())
+	if !lamp.meshes[1].GetPosition().ApproxEqualThreshold(topPosition, 0.0001) {
+		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.meshes[1].GetPosition())
 	}
-	if !lamp.GetBulbPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
-		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.GetBulbPosition())
+	if !lamp.meshes[2].GetPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
+		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.meshes[2].GetPosition())
 	}
 	func() {
 		defer func() {
@@ -270,9 +270,9 @@ func TestTexturedStreetLamp(t *testing.T) {
 }
 func TestTexturedStreetLampWithoutLight(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
-	bulbPosition := mgl32.Vec3{0.8999999, 3, 2.965}
+	bulbPosition := mgl32.Vec3{0.34999996, 0, 0}
 	polePosition := mgl32.Vec3{0.0, 3.0, 0.0}
-	topPosition := mgl32.Vec3{0.5499998, 0, 2.45}
+	topPosition := mgl32.Vec3{0.54999995, 0, 3}
 	scale := float32(6.0)
 
 	builder := NewStreetLampBuilder()
@@ -292,14 +292,14 @@ func TestTexturedStreetLampWithoutLight(t *testing.T) {
 	lamp := builder.BuildTexture()
 	lamp.TurnLampOn()
 
-	if lamp.GetPolePosition() != polePosition {
-		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.GetPolePosition())
+	if lamp.meshes[0].GetPosition() != polePosition {
+		t.Errorf("Invalid pole position. Instead of '%v', we have '%v'.", polePosition, lamp.meshes[0].GetPosition())
 	}
-	if !lamp.GetTopPosition().ApproxEqualThreshold(topPosition, 0.0001) {
-		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.GetTopPosition())
+	if !lamp.meshes[1].GetPosition().ApproxEqualThreshold(topPosition, 0.0001) {
+		t.Errorf("Invalid top position. Instead of '%v', we have '%v'.", topPosition, lamp.meshes[1].GetPosition())
 	}
-	if !lamp.GetBulbPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
-		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.GetBulbPosition())
+	if !lamp.meshes[2].GetPosition().ApproxEqualThreshold(bulbPosition, 0.0001) {
+		t.Errorf("Invalid bulb position. Instead of '%v', we have '%v'.", bulbPosition, lamp.meshes[2].GetPosition())
 	}
 	func() {
 		defer func() {
