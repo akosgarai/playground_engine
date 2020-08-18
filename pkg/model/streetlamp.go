@@ -158,7 +158,7 @@ func (b *StreetLampBuilder) textureTopPosition() mgl32.Vec3 {
 func (b *StreetLampBuilder) textureBulbPosition() mgl32.Vec3 {
 	_, _, length, bulbRadius := b.getSizes()
 	defaultPos := mgl32.Vec3{0, 0, length/2 - 4*bulbRadius}
-	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrix().Mul4(b.rotationTransformationMatrixTextureTop()))
+	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrixTextureTop())
 }
 
 // BuildMaterial returns a street lamp like model. The StreetLamp is a mesh system.
