@@ -236,7 +236,7 @@ func (b *StreetLampBuilder) BuildTexture() *StreetLamp {
 	m.AddMesh(bulb)
 
 	ls := light.NewSpotLight([5]mgl32.Vec3{
-		mgl32.TransformCoordinate(bulb.GetPosition(), bulb.ModelTransformation()),
+		mgl32.TransformCoordinate(mgl32.Vec3{0.0, 0.0, 0.0}, bulb.ModelTransformation()),
 		mgl32.TransformNormal(mgl32.Vec3{0.0, 0.0, 1.0}, b.rotationTransformationMatrixTextureTop().Mul4(b.rotationTransformationMatrix())),
 		b.bulbMaterial.GetAmbient(),
 		b.bulbMaterial.GetDiffuse(),
