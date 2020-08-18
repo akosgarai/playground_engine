@@ -156,8 +156,8 @@ func (b *StreetLampBuilder) textureTopPosition() mgl32.Vec3 {
 
 // textureBulbPosition returns the position of the bulb mesh
 func (b *StreetLampBuilder) textureBulbPosition() mgl32.Vec3 {
-	_, width, length, bulbRadius := b.getSizes()
-	defaultPos := mgl32.Vec3{length/2 - 4*bulbRadius, 0, -width / 2}
+	_, _, length, bulbRadius := b.getSizes()
+	defaultPos := mgl32.Vec3{0, 0, length/2 - 4*bulbRadius}
 	return mgl32.TransformCoordinate(defaultPos, b.rotationTransformationMatrix().Mul4(b.rotationTransformationMatrixTextureTop()))
 }
 
