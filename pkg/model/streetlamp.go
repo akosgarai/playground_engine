@@ -120,8 +120,8 @@ func (b *StreetLampBuilder) transformedUpDirection() mgl32.Vec3 {
 	up := mgl32.Vec3{0.0, 1.0, 0.0}
 	return mgl32.TransformNormal(up, b.rotationTransformationMatrix())
 }
-func (b *StreetLampBuilder) transformedLeftDirection() mgl32.Vec3 {
-	up := mgl32.Vec3{-1.0, 0.0, 0.0}
+func (b *StreetLampBuilder) transformedFrontDirection() mgl32.Vec3 {
+	up := mgl32.Vec3{0.0, 0.0, 1.0}
 	return mgl32.TransformNormal(up, b.rotationTransformationMatrix())
 }
 
@@ -294,10 +294,10 @@ func (b *StreetLampBuilder) textureTop(tex texture.Textures) *mesh.TexturedMesh 
 	V, I, bo := topCylinder.TexturedMeshInput()
 	top := mesh.NewTexturedMesh(V, I, tex, b.wrapper)
 	top.SetPosition(b.textureTopPosition())
-	//transformedUp := b.transformedUpDirection()
-	//transformedLeft := b.transformedLeftDirection()
-	rotationMatrixUp := mgl32.HomogRotate3D(mgl32.DegToRad(90), mgl32.Vec3{0.0, 1.0, 0.0})
-	rotationMatrixFront := mgl32.HomogRotate3D(mgl32.DegToRad(90), mgl32.Vec3{0.0, 0.0, 1.0})
+	transformedUp := b.transformedUpDirection()
+	transformedFront := b.transformedFrontDirection()
+	rotationMatrixUp := mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedUp)
+	rotationMatrixFront := mgl32.HomogRotate3D(mgl32.DegToRad(90), transformedFront)
 	rX, rY, rZ := matrixToAngles(rotationMatrixUp.Mul4(rotationMatrixFront))
 	top.RotateZ(rZ)
 	top.RotateX(rX)
