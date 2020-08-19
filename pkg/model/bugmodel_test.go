@@ -16,6 +16,8 @@ func TestNewBugBuilder(t *testing.T) {
 	defaultLightCC := mgl32.Vec3{1, 1, 1}
 	defaultBodyMaterial := material.Greenrubber
 	defaultBottomMaterial := material.Emerald
+	defaultDirection := mgl32.Vec3{0, 0, 0}
+	defaultRotationAxis := mgl32.Vec3{0, 0, 0}
 	builder := NewBugBuilder()
 	if builder.position != defaultPosition {
 		t.Errorf("Invalid position. Instead of '%v', it is '%v'.", defaultPosition, builder.position)
@@ -64,6 +66,18 @@ func TestNewBugBuilder(t *testing.T) {
 	}
 	if !builder.withLight {
 		t.Error("Invalid initial value of withLight")
+	}
+	if builder.velocity != 0.0 {
+		t.Errorf("Invalid velocity. Instead of '0.0', it is '%f'.", builder.velocity)
+	}
+	if builder.movementRotationAngle != 0.0 {
+		t.Errorf("Invalid movementRotationAngle. Instead of '0.0', it is '%f'.", builder.movementRotationAngle)
+	}
+	if builder.direction != defaultDirection {
+		t.Errorf("Invalid direction. Instead of '%v', it is '%v'.", defaultDirection, builder.direction)
+	}
+	if builder.movementRotationAxis != defaultRotationAxis {
+		t.Errorf("Invalid movementRotationAxis. Instead of '%v', it is '%v'.", defaultRotationAxis, builder.movementRotationAxis)
 	}
 }
 func TestBugBuilderSetPosition(t *testing.T) {
@@ -177,6 +191,46 @@ func TestBugBuilderSetWithLight(t *testing.T) {
 		if builder.withLight != v {
 			t.Errorf("Invalid withLight flag. it supposed to be '%v'.", v)
 		}
+	}
+}
+func TestBugBuilderSetDirection(t *testing.T) {
+	newDirection := mgl32.Vec3{0, 1, 0}
+	builder := NewBugBuilder()
+	builder.SetDirection(newDirection)
+	if builder.direction != newDirection {
+		t.Errorf("Invalid direction. Instead of '%v', it is '%v'.", newDirection, builder.direction)
+	}
+}
+func TestBugBuilderSetMovementRotationAxis(t *testing.T) {
+	newAxis := mgl32.Vec3{0, 1, 0}
+	builder := NewBugBuilder()
+	builder.SetMovementRotationAxis(newAxis)
+	if builder.movementRotationAxis != newAxis {
+		t.Errorf("Invalid movementRotationAxis. Instead of '%v', it is '%v'.", newAxis, builder.movementRotationAxis)
+	}
+}
+func TestBugBuilderSetMovementRotationAngle(t *testing.T) {
+	newAngle := float32(30.0)
+	builder := NewBugBuilder()
+	builder.SetMovementRotationAngle(newAngle)
+	if builder.movementRotationAngle != newAngle {
+		t.Errorf("Invalid movementRotationAngle. Instead of '%f', it is '%f'.", newAngle, builder.movementRotationAngle)
+	}
+}
+func TestBugBuilderSetVelocity(t *testing.T) {
+	newVelocity := float32(30.0)
+	builder := NewBugBuilder()
+	builder.SetVelocity(newVelocity)
+	if builder.velocity != newVelocity {
+		t.Errorf("Invalid velocity. Instead of '%f', it is '%f'.", newVelocity, builder.velocity)
+	}
+}
+func TestBugBuilderSetSameDirectionTime(t *testing.T) {
+	newTime := float32(30.0)
+	builder := NewBugBuilder()
+	builder.SetSameDirectionTime(newTime)
+	if builder.sameDirectionTime != newTime {
+		t.Errorf("Invalid sameDirectionTime. Instead of '%f', it is '%f'.", newTime, builder.sameDirectionTime)
 	}
 }
 func TestBugBuilderBuildMaterialWithoutWrapper(t *testing.T) {
@@ -297,7 +351,9 @@ func TestBugWithoutLight(t *testing.T) {
 				t.Error("Update shouldn't have panic.")
 			}
 		}()
-		bug.Update(10)
+		for i := 0; i < 15; i++ {
+			bug.Update(float64(i * 100))
+		}
 	}()
 	testData := []struct {
 		position  [3]float32

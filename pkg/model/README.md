@@ -23,6 +23,10 @@ This is a builder for the Bug model.
 - `constantTerm` - the constant term of the lightsource.
 - `linearTerm` - the linear term of the lightsource.
 - `quadraticTerm` - the quadratic term of the lightsource.
+- `velocity` - the initial speed of the bug.
+- `direction` - the direction of the bug.
+- `movementRotationAngle` - the rotation angle of the movement.
+- `movementRotationAxis` - the rotation axis of the movement.
 
 ## StreetLamp model
 

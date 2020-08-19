@@ -11,44 +11,54 @@ import (
 )
 
 type BugBuilder struct {
-	position        mgl32.Vec3
-	scale           mgl32.Vec3
-	wrapper         interfaces.GLWrapper
-	bodyMaterial    *material.Material
-	bottomMaterial  *material.Material
-	eyeMaterial     *material.Material
-	rotationX       float32
-	rotationY       float32
-	rotationZ       float32
-	spherePrecision int
-	lightAmbient    mgl32.Vec3
-	lightDiffuse    mgl32.Vec3
-	lightSpecular   mgl32.Vec3
-	constantTerm    float32
-	linearTerm      float32
-	quadraticTerm   float32
-	withLight       bool
+	position              mgl32.Vec3
+	scale                 mgl32.Vec3
+	wrapper               interfaces.GLWrapper
+	bodyMaterial          *material.Material
+	bottomMaterial        *material.Material
+	eyeMaterial           *material.Material
+	rotationX             float32
+	rotationY             float32
+	rotationZ             float32
+	spherePrecision       int
+	lightAmbient          mgl32.Vec3
+	lightDiffuse          mgl32.Vec3
+	lightSpecular         mgl32.Vec3
+	constantTerm          float32
+	linearTerm            float32
+	quadraticTerm         float32
+	withLight             bool
+	velocity              float32
+	direction             mgl32.Vec3
+	movementRotationAngle float32
+	movementRotationAxis  mgl32.Vec3
+	sameDirectionTime     float32
 }
 
 func NewBugBuilder() *BugBuilder {
 	return &BugBuilder{
-		position:        mgl32.Vec3{0.0, 0.0, 0.0},
-		scale:           mgl32.Vec3{1.0, 1.0, 1.0},
-		wrapper:         nil,
-		bodyMaterial:    material.Greenrubber,
-		bottomMaterial:  material.Emerald,
-		eyeMaterial:     material.Ruby,
-		rotationX:       0,
-		rotationY:       0,
-		rotationZ:       0,
-		spherePrecision: 20,
-		lightAmbient:    mgl32.Vec3{1.0, 1.0, 1.0},
-		lightDiffuse:    mgl32.Vec3{1.0, 1.0, 1.0},
-		lightSpecular:   mgl32.Vec3{1.0, 1.0, 1.0},
-		constantTerm:    1.0,
-		linearTerm:      0.14,
-		quadraticTerm:   0.07,
-		withLight:       true,
+		position:              mgl32.Vec3{0.0, 0.0, 0.0},
+		scale:                 mgl32.Vec3{1.0, 1.0, 1.0},
+		wrapper:               nil,
+		bodyMaterial:          material.Greenrubber,
+		bottomMaterial:        material.Emerald,
+		eyeMaterial:           material.Ruby,
+		rotationX:             0,
+		rotationY:             0,
+		rotationZ:             0,
+		spherePrecision:       20,
+		lightAmbient:          mgl32.Vec3{1.0, 1.0, 1.0},
+		lightDiffuse:          mgl32.Vec3{1.0, 1.0, 1.0},
+		lightSpecular:         mgl32.Vec3{1.0, 1.0, 1.0},
+		constantTerm:          1.0,
+		linearTerm:            0.14,
+		quadraticTerm:         0.07,
+		withLight:             true,
+		velocity:              0.0,
+		direction:             mgl32.Vec3{0, 0, 0},
+		movementRotationAngle: 0.0,
+		movementRotationAxis:  mgl32.Vec3{0, 0, 0},
+		sameDirectionTime:     1000.0,
 	}
 }
 
@@ -121,6 +131,31 @@ func (b *BugBuilder) SetWithLight(l bool) {
 	b.withLight = l
 }
 
+// SetVelocity updates the velocity.
+func (b *BugBuilder) SetVelocity(v float32) {
+	b.velocity = v
+}
+
+// SetMovementRotationAngle updates the movementRotationAngle.
+func (b *BugBuilder) SetMovementRotationAngle(v float32) {
+	b.movementRotationAngle = v
+}
+
+// SetMovementRotationAxis updates the movementRotationAxis.
+func (b *BugBuilder) SetMovementRotationAxis(v mgl32.Vec3) {
+	b.movementRotationAxis = v
+}
+
+// SetDirection updates the direction.
+func (b *BugBuilder) SetDirection(v mgl32.Vec3) {
+	b.direction = v
+}
+
+// SetSameDirectionTime updates the sameDirectionTime.
+func (b *BugBuilder) SetSameDirectionTime(v float32) {
+	b.sameDirectionTime = v
+}
+
 func (b *BugBuilder) BuildMaterial() *Bug {
 	sphereBase := sphere.New(b.spherePrecision)
 	V, I, bo := sphereBase.MaterialMeshInput()
@@ -153,11 +188,20 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 	Eye2.SetBoundingObject(bo)
 
 	m := newCDModel()
-	m.AddMesh(Bottom)
 	m.AddMesh(Body)
+	m.AddMesh(Bottom)
 	m.AddMesh(Eye1)
 	m.AddMesh(Eye2)
-	bug := &Bug{BaseCollisionDetectionModel: *m}
+	m.SetSpeed(b.velocity)
+	m.SetDirection(b.direction)
+
+	bug := &Bug{
+		BaseCollisionDetectionModel: *m,
+		movementRotationAngle:       b.movementRotationAngle,
+		movementRotationAxis:        b.movementRotationAxis,
+		sinceLastRotate:             0.0,
+		sameDirectionTime:           b.sameDirectionTime,
+	}
 	if b.withLight {
 		l := light.NewPointLight([4]mgl32.Vec3{
 			b.bottomPosition(), // position
@@ -205,18 +249,22 @@ func (b *BugBuilder) eyePosition(basePos mgl32.Vec3) mgl32.Vec3 {
 
 type Bug struct {
 	BaseCollisionDetectionModel
-	lightSource *light.Light
+	lightSource           *light.Light
+	movementRotationAngle float32
+	movementRotationAxis  mgl32.Vec3
+	sinceLastRotate       float32
+	sameDirectionTime     float32
 }
 
 // GetBottomPosition returns the current position of the bottom mesh.
 // Transformations are applied, due to the relative position.
 func (b *Bug) GetBottomPosition() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{0, 0, 0}, b.meshes[0].ModelTransformation())
+	return mgl32.TransformCoordinate(mgl32.Vec3{0, 0, 0}, b.meshes[1].ModelTransformation())
 }
 
 // GetBodyPosition returns the current position of the body mesh.
 func (b *Bug) GetBodyPosition() mgl32.Vec3 {
-	return b.meshes[1].GetPosition()
+	return b.meshes[0].GetPosition()
 }
 
 // GetEye1Position returns the current position of the eye1 mesh.
@@ -237,7 +285,16 @@ func (b *Bug) GetLightSource() *light.Light {
 }
 
 // Update function loops over each of the meshes and calls their Update function.
+// It also updates the direction of the bug, if necessary.
 func (b *Bug) Update(dt float64) {
+	b.sinceLastRotate = b.sinceLastRotate + float32(dt)
+	if b.sinceLastRotate >= b.sameDirectionTime {
+		b.sinceLastRotate = 0.0
+		x, y, z := matrixToAngles(mgl32.HomogRotate3D(b.movementRotationAngle, b.movementRotationAxis))
+		b.RotateY(y)
+		b.RotateX(x)
+		b.RotateZ(z)
+	}
 	for i, _ := range b.meshes {
 		b.meshes[i].Update(dt)
 	}
