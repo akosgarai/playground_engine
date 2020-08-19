@@ -216,7 +216,7 @@ func TestBug(t *testing.T) {
 	eye2Position := mgl32.Vec3{eyeBase, eyeBase, -eyeBase}
 
 	bug := builder.BuildMaterial()
-	if bug.lightSource == nil {
+	if bug.GetLightSource() == nil {
 		t.Error("Invalid lightsource")
 	}
 
@@ -274,7 +274,7 @@ func TestBugWithoutLight(t *testing.T) {
 	eye2Position := mgl32.Vec3{eyeBase, eyeBase, -eyeBase}
 
 	bug := builder.BuildMaterial()
-	if bug.lightSource != nil {
+	if bug.GetLightSource() != nil {
 		t.Error("Invalid lightsource")
 	}
 

@@ -231,6 +231,11 @@ func (b *Bug) GetEye2Position() mgl32.Vec3 {
 	return mgl32.TransformCoordinate(mgl32.Vec3{0, 0, 0}, b.meshes[3].ModelTransformation())
 }
 
+// GetLightSource returns the lightsource of the lamp.
+func (b *Bug) GetLightSource() *light.Light {
+	return b.lightSource
+}
+
 // Update function loops over each of the meshes and calls their Update function.
 func (b *Bug) Update(dt float64) {
 	for i, _ := range b.meshes {
