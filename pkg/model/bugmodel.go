@@ -94,18 +94,18 @@ func (b *BugBuilder) SetSpherePrecision(p int) {
 	b.spherePrecision = p
 }
 
-// SetLigthAmbient updates the ambient light component.
-func (b *BugBuilder) SetLigthAmbient(a mgl32.Vec3) {
+// SetLightAmbient updates the ambient light component.
+func (b *BugBuilder) SetLightAmbient(a mgl32.Vec3) {
 	b.lightAmbient = a
 }
 
-// SetLigthDiffuse updates the diffuse light component.
-func (b *BugBuilder) SetLigthDiffuse(d mgl32.Vec3) {
+// SetLightDiffuse updates the diffuse light component.
+func (b *BugBuilder) SetLightDiffuse(d mgl32.Vec3) {
 	b.lightDiffuse = d
 }
 
-// SetLigthSpecular updates the specular light component.
-func (b *BugBuilder) SetLigthSpecular(s mgl32.Vec3) {
+// SetLightSpecular updates the specular light component.
+func (b *BugBuilder) SetLightSpecular(s mgl32.Vec3) {
 	b.lightSpecular = s
 }
 

@@ -129,26 +129,26 @@ func TestBugBuilderSetRotation(t *testing.T) {
 		t.Errorf("Invalid rotationZ. Instead of '30.0', it is '%f'.", builder.rotationZ)
 	}
 }
-func TestBugBuilderSetLigthAmbient(t *testing.T) {
+func TestBugBuilderSetLightAmbient(t *testing.T) {
 	newAmbient := mgl32.Vec3{0, 0.5, 0}
 	builder := NewBugBuilder()
-	builder.SetLigthAmbient(newAmbient)
+	builder.SetLightAmbient(newAmbient)
 	if builder.lightAmbient != newAmbient {
 		t.Errorf("Invalid lightAmbient. Instead of '%v', it is '%v'.", newAmbient, builder.lightAmbient)
 	}
 }
-func TestBugBuilderSetLigthDiffuse(t *testing.T) {
+func TestBugBuilderSetLightDiffuse(t *testing.T) {
 	newDiffuse := mgl32.Vec3{0, 0.5, 0}
 	builder := NewBugBuilder()
-	builder.SetLigthDiffuse(newDiffuse)
+	builder.SetLightDiffuse(newDiffuse)
 	if builder.lightDiffuse != newDiffuse {
 		t.Errorf("Invalid lightDiffuse. Instead of '%v', it is '%v'.", newDiffuse, builder.lightDiffuse)
 	}
 }
-func TestBugBuilderSetLigthSpecular(t *testing.T) {
+func TestBugBuilderSetLightSpecular(t *testing.T) {
 	newSpecular := mgl32.Vec3{0, 0.5, 0}
 	builder := NewBugBuilder()
-	builder.SetLigthSpecular(newSpecular)
+	builder.SetLightSpecular(newSpecular)
 	if builder.lightSpecular != newSpecular {
 		t.Errorf("Invalid lightSpecular. Instead of '%v', it is '%v'.", newSpecular, builder.lightSpecular)
 	}
