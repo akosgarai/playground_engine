@@ -5,7 +5,24 @@ The base model has been extended with collision detection support. Now it can re
 
 ## Bug model
 
-This predefined model represents a "composite object". This model contains 4 material squere, one for the bottom, one for the body and 2 for the eyes. It has getter functions for the center point of the body parts. It's initial position, and scale are set during it's construction with the NewBug function.
+This predefined model represents a "composite object". This model contains 4 material squere, one for the bottom, one for the body and 2 for the eyes. It has getter functions for the center point of the body parts. 
+
+### BugBuilder
+
+This is a builder for the Bug model.
+
+- `position` - the position of the body mesh.
+- `scale` - the scale of the body mesh.
+- `wrapper` the wrapper pkg (interfaces.GLWrapper) for the gl functions. It can be set with the `SetWrapper` function.
+- `rotationX` - the rotation (x axis) of the pole mesh.
+- `rotationY` - the rotation (y axis) of the pole mesh.
+- `rotationZ` - the rotation (z axis) of the pole mesh.
+- `lightAmbient` - the ambient color component of the lightsource.
+- `lightDiffuse` - the diffuse color component of the lightsource.
+- `lightSpecular` - the specular color component of the lightsource.
+- `constantTerm` - the constant term of the lightsource.
+- `linearTerm` - the linear term of the lightsource.
+- `quadraticTerm` - the quadratic term of the lightsource.
 
 ## StreetLamp model
 
