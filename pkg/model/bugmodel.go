@@ -295,6 +295,7 @@ func (b *Bug) Update(dt float64) {
 		b.RotateX(x)
 		b.RotateZ(z)
 	}
+	b.lightSource.SetPosition(b.GetBottomPosition())
 	for i, _ := range b.meshes {
 		b.meshes[i].Update(dt)
 	}
