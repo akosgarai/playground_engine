@@ -5,6 +5,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
+	"github.com/akosgarai/playground_engine/pkg/primitives/rectangle"
 	"github.com/akosgarai/playground_engine/pkg/primitives/sphere"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -202,6 +203,21 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 	m.SetSpeed(b.velocity)
 	m.SetDirection(b.direction)
 
+	if b.withWings {
+		wingBase := rectangle.NewExact(1.0, 1.0)
+		V, I, bo := wingBase.MeshInput()
+		wing1 := mesh.NewMaterialMesh(V, I, b.bottomMaterial, b.wrapper)
+		wing1.SetPosition(b.wing1Position())
+		wing1.SetParent(Body)
+		wing1.SetBoundingObject(bo)
+		m.AddMesh(wing1)
+		wing2 := mesh.NewMaterialMesh(V, I, b.bottomMaterial, b.wrapper)
+		wing2.SetPosition(b.wing2Position())
+		wing2.SetParent(Body)
+		wing2.SetBoundingObject(bo)
+		m.AddMesh(wing2)
+	}
+
 	bug := &Bug{
 		BaseCollisionDetectionModel: *m,
 		movementRotationAngle:       b.movementRotationAngle,
@@ -251,6 +267,17 @@ func (b *BugBuilder) eye2Position() mgl32.Vec3 {
 func (b *BugBuilder) eyePosition(basePos mgl32.Vec3) mgl32.Vec3 {
 	normalBase := basePos.Normalize()
 	baseScaled := mgl32.Vec3{normalBase.X() * b.scale.X(), normalBase.Y() * b.scale.Y(), normalBase.Z() * b.scale.Z()}
+	return mgl32.TransformCoordinate(baseScaled, b.rotationTransformationMatrix())
+}
+func (b *BugBuilder) wing1Position() mgl32.Vec3 {
+	return b.wingPosition((mgl32.Vec3{1, -1, 1}).Normalize())
+}
+func (b *BugBuilder) wing2Position() mgl32.Vec3 {
+	return b.wingPosition((mgl32.Vec3{1, -1, -1}).Normalize())
+}
+func (b *BugBuilder) wingPosition(basePos mgl32.Vec3) mgl32.Vec3 {
+	normalBase := basePos.Normalize()
+	baseScaled := mgl32.Vec3{normalBase.X()*b.scale.X() + 0.4, normalBase.Y() * b.scale.Y(), normalBase.Z()*b.scale.Z() + basePos.Z()*0.4}
 	return mgl32.TransformCoordinate(baseScaled, b.rotationTransformationMatrix())
 }
 

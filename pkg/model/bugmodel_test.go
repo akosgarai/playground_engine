@@ -269,6 +269,19 @@ func TestBugBuilderBuildMaterial(t *testing.T) {
 		builder.BuildMaterial()
 	}()
 }
+func TestBugBuilderBuildMaterialWithWings(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("Shouldn't have panic. '%v'.", r)
+			}
+		}()
+		builder := NewBugBuilder()
+		builder.SetWrapper(wrapperMock)
+		builder.SetWithWings(true)
+		builder.BuildMaterial()
+	}()
+}
 
 func TestBug(t *testing.T) {
 	position := mgl32.Vec3{0.0, 0.0, 0.0}
