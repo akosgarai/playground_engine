@@ -246,6 +246,14 @@ func TestBugBuilderSetWithWings(t *testing.T) {
 		}
 	}
 }
+func TestBugBuilderSetSpherePrecision(t *testing.T) {
+	newPrec := 30
+	builder := NewBugBuilder()
+	builder.SetSpherePrecision(newPrec)
+	if builder.spherePrecision != newPrec {
+		t.Errorf("Invalid spherePrecision. Instead of '%d', it is '%d'.", newPrec, builder.spherePrecision)
+	}
+}
 func TestBugBuilderBuildMaterialWithoutWrapper(t *testing.T) {
 	func() {
 		defer func() {
@@ -379,6 +387,66 @@ func TestBugWithoutLight(t *testing.T) {
 		}()
 		for i := 0; i < 15; i++ {
 			bug.Update(float64(i * 100))
+		}
+	}()
+	testData := []struct {
+		position  [3]float32
+		radius    float32
+		intersect bool
+		msg       string
+	}{
+		{[3]float32{0, 0, 0}, 0.5, true, "Should intersect at x=-0.5."},
+		{[3]float32{-1.5, 1.3, 0.0}, 1.0, true, "Should intersect at y=1."},
+		{[3]float32{-2, -2, -2}, 1.5, false, "Shouldn't intersect."},
+	}
+
+	for _, tt := range testData {
+		base := coldet.NewBoundingSphere(tt.position, tt.radius)
+		result := bug.CollideTestWithSphere(base)
+		if result != tt.intersect {
+			t.Errorf("%s expected: '%v', result: '%v'.", tt.msg, tt.intersect, result)
+		}
+	}
+}
+func TestBugWithWings(t *testing.T) {
+	position := mgl32.Vec3{0.0, 0.0, 0.0}
+	scale := mgl32.Vec3{1.0, 1.0, 1.0}
+	builder := NewBugBuilder()
+	builder.SetPosition(position)
+	builder.SetScale(scale)
+	builder.SetWrapper(wrapperMock)
+	builder.SetWithWings(true)
+	bottomPosition := mgl32.Vec3{-1.0, 0.0, 0.0}
+	eyeBase := float32(0.5773503)
+	eye1Position := mgl32.Vec3{eyeBase, eyeBase, eyeBase}
+	eye2Position := mgl32.Vec3{eyeBase, eyeBase, -eyeBase}
+
+	bug := builder.BuildMaterial()
+	if bug.GetLightSource() == nil {
+		t.Error("Invalid lightsource")
+	}
+
+	if bug.GetBodyPosition() != position {
+		t.Errorf("Invalid body position. Instead of '%v', we have '%v'.", position, bug.GetBodyPosition())
+	}
+	if bug.GetBottomPosition() != bottomPosition {
+		t.Errorf("Invalid bottom position. Instead of '%v', we have '%v'.", bottomPosition, bug.GetBottomPosition())
+	}
+	if bug.GetEye1Position() != eye1Position {
+		t.Errorf("Invalid eye1 position. Instead of '%v', we have '%v'.", eye1Position, bug.GetEye1Position())
+	}
+	if bug.GetEye2Position() != eye2Position {
+		t.Errorf("Invalid eye2 position. Instead of '%v', we have '%v'.", eye2Position, bug.GetEye2Position())
+	}
+
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("Update shouldn't have panic.")
+			}
+		}()
+		for i := 0; i < 400; i++ {
+			bug.Update(float64(10 * i))
 		}
 	}()
 	testData := []struct {

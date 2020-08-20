@@ -1,6 +1,8 @@
 package model
 
 import (
+	"math"
+
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/material"
@@ -9,6 +11,13 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/primitives/sphere"
 
 	"github.com/go-gl/mathgl/mgl32"
+)
+
+const (
+	_WING_BOTTOM = 0
+	_WING_UP     = 1
+	_WING_TOP    = 2
+	_WING_DOWN   = 3
 )
 
 type BugBuilder struct {
@@ -203,6 +212,7 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 	m.SetSpeed(b.velocity)
 	m.SetDirection(b.direction)
 
+	wingStrikeTime := float64(0.0)
 	if b.withWings {
 		wingBase := rectangle.NewExact(1.0, 1.0)
 		V, I, bo := wingBase.MeshInput()
@@ -216,6 +226,7 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 		wing2.SetParent(Body)
 		wing2.SetBoundingObject(bo)
 		m.AddMesh(wing2)
+		wingStrikeTime = 3000
 	}
 
 	bug := &Bug{
@@ -224,6 +235,11 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 		movementRotationAxis:        b.movementRotationAxis,
 		sinceLastRotate:             0.0,
 		sameDirectionTime:           b.sameDirectionTime,
+		wingStrikeTime:              wingStrikeTime,
+		wingState:                   _WING_BOTTOM,
+		currentWingAnimationTime:    0.0,
+		maxWingRotationAngle:        75.0,
+		currentWingRotationAngle:    0.0,
 	}
 	if b.withLight {
 		l := light.NewPointLight([4]mgl32.Vec3{
@@ -288,6 +304,15 @@ type Bug struct {
 	movementRotationAxis  mgl32.Vec3
 	sinceLastRotate       float32
 	sameDirectionTime     float32
+	wingStrikeTime        float64
+	// current wing animation time
+	currentWingAnimationTime float64
+	// wing state (going up or down or edge position)
+	wingState int
+	// maximum rotation angle of the wings
+	maxWingRotationAngle float32
+	// current rotation angle of the wings
+	currentWingRotationAngle float32
 }
 
 // GetBottomPosition returns the current position of the bottom mesh.
@@ -333,7 +358,77 @@ func (b *Bug) Update(dt float64) {
 	if b.lightSource != nil {
 		b.lightSource.SetPosition(b.GetBottomPosition())
 	}
+	if b.wingStrikeTime > 0.0 {
+		b.animateWings(dt)
+	}
 	for i, _ := range b.meshes {
 		b.meshes[i].Update(dt)
 	}
+}
+
+// keep the wings in the edge states for a while, the rest of the time is for the movement.
+func (b *Bug) animateWings(dt float64) {
+	// calculate the current delta time. If dt is gt than the remaining
+	// animation time, it is decresed.
+	maxDelta := math.Min(dt, b.wingStrikeTime-b.currentWingAnimationTime+dt)
+	b.currentWingAnimationTime += maxDelta
+
+	// calculate the rotation angle. It depends on the wingState.
+	var rotationDeg float32
+	animationTime := b.wingStrikeTime/2.0 - b.wingStrikeTime/5.0
+	if b.wingState == _WING_UP {
+		rotationDeg = b.maxWingRotationAngle / float32(animationTime*maxDelta)
+	} else if b.wingState == _WING_DOWN {
+		rotationDeg = -b.maxWingRotationAngle / float32(animationTime*maxDelta)
+	}
+
+	if b.currentWingAnimationTime < b.wingStrikeTime/5.0 {
+		// bottom position in this state, we don't need to change the stuff.
+		b.wingState = _WING_BOTTOM
+	} else if b.currentWingAnimationTime < b.wingStrikeTime/2.0 {
+		// animate up direction
+		b.wingState = _WING_UP
+		// The current animation angle is increased with the current rotation deg.
+		b.currentWingRotationAngle = b.currentWingRotationAngle - rotationDeg
+
+	} else if b.currentWingAnimationTime < b.wingStrikeTime/2.0+b.wingStrikeTime/5.0 {
+		// top position in this state, we don't need to change the stuff.
+		b.wingState = _WING_TOP
+	} else if b.currentWingAnimationTime < b.wingStrikeTime {
+		// animate down direction
+		// The current animation angle is increased with the current rotation deg.
+		b.wingState = _WING_DOWN
+		b.currentWingRotationAngle = b.currentWingRotationAngle - rotationDeg
+	} else {
+		b.currentWingAnimationTime = 0.0
+	}
+	// sin, cos of the current angle.
+	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
+	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
+
+	// rotation matrix of the base mesh.
+	rotationMatrix := b.meshes[0].RotationTransformation()
+	// current rotation angles of the w1:
+	w1X, w1Y, w1Z := matrixToAngles(b.meshes[4].RotationTransformation())
+	// current rotation angles of the w1:
+	w2X, w2Y, w2Z := matrixToAngles(b.meshes[5].RotationTransformation())
+	// calculate the rotation vector of the door.
+	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
+	transformedVectorW1 := mgl32.TransformNormal(rotatedOrigoBasedVector, rotationMatrix)
+	transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVector.Mul(-1), rotationMatrix)
+	b.meshes[4].SetPosition(transformedVectorW1)
+	b.meshes[5].SetPosition(transformedVectorW2)
+
+	// the rotation angles for the given full angle:
+	transformedForward := mgl32.TransformNormal(mgl32.Vec3{-1.0, 0.0, 0.0}, rotationMatrix)
+	e1X, e1Y, e1Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.maxWingRotationAngle-b.currentWingRotationAngle), transformedForward).Mul4(rotationMatrix))
+	e2X, e2Y, e2Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(-b.maxWingRotationAngle+b.currentWingRotationAngle), transformedForward).Mul4(rotationMatrix))
+
+	b.meshes[4].RotateZ(e1Z - w1Z)
+	b.meshes[4].RotateX(e1X - w1X)
+	b.meshes[4].RotateY(e1Y - w1Y)
+
+	b.meshes[5].RotateZ(e2Z - w2Z)
+	b.meshes[5].RotateX(e2X - w2X)
+	b.meshes[5].RotateY(e2Y - w2Y)
 }
