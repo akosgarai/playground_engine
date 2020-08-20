@@ -374,13 +374,7 @@ func (b *Bug) animateWings(dt float64) {
 	b.currentWingAnimationTime += maxDelta
 
 	// calculate the rotation angle. It depends on the wingState.
-	var rotationDeg float32
 	animationTime := b.wingStrikeTime/2.0 - b.wingStrikeTime/5.0
-	if b.wingState == _WING_UP {
-		rotationDeg = b.maxWingRotationAngle / float32(animationTime*maxDelta)
-	} else if b.wingState == _WING_DOWN {
-		rotationDeg = -b.maxWingRotationAngle / float32(animationTime*maxDelta)
-	}
 
 	if b.currentWingAnimationTime < b.wingStrikeTime/5.0 {
 		// bottom position in this state, we don't need to change the stuff.
@@ -389,7 +383,7 @@ func (b *Bug) animateWings(dt float64) {
 		// animate up direction
 		b.wingState = _WING_UP
 		// The current animation angle is increased with the current rotation deg.
-		b.currentWingRotationAngle = b.currentWingRotationAngle - rotationDeg
+		b.currentWingRotationAngle = b.currentWingRotationAngle - (b.maxWingRotationAngle / float32(animationTime*maxDelta))
 
 	} else if b.currentWingAnimationTime < b.wingStrikeTime/2.0+b.wingStrikeTime/5.0 {
 		// top position in this state, we don't need to change the stuff.
@@ -398,9 +392,10 @@ func (b *Bug) animateWings(dt float64) {
 		// animate down direction
 		// The current animation angle is increased with the current rotation deg.
 		b.wingState = _WING_DOWN
-		b.currentWingRotationAngle = b.currentWingRotationAngle + rotationDeg
+		b.currentWingRotationAngle = b.currentWingRotationAngle + (b.maxWingRotationAngle / float32(animationTime*maxDelta))
 	} else {
 		b.currentWingAnimationTime = 0.0
+		b.currentWingRotationAngle = 0.0
 	}
 	// sin, cos of the current angle.
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
@@ -421,14 +416,13 @@ func (b *Bug) animateWings(dt float64) {
 
 	// the rotation angles for the given full angle:
 	transformedForward := mgl32.TransformNormal(mgl32.Vec3{-1.0, 0.0, 0.0}, rotationMatrix)
-	e1X, e1Y, e1Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.maxWingRotationAngle-b.currentWingRotationAngle), transformedForward).Mul4(rotationMatrix))
-	e2X, e2Y, e2Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(-b.maxWingRotationAngle+b.currentWingRotationAngle), transformedForward).Mul4(rotationMatrix))
+	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.maxWingRotationAngle-b.currentWingRotationAngle), transformedForward).Mul4(rotationMatrix))
 
-	b.meshes[4].RotateZ(e1Z - w1Z)
-	b.meshes[4].RotateX(e1X - w1X)
-	b.meshes[4].RotateY(e1Y - w1Y)
+	b.meshes[4].RotateZ(eZ - w1Z)
+	b.meshes[4].RotateX(eX - w1X)
+	b.meshes[4].RotateY(eY - w1Y)
 
-	b.meshes[5].RotateZ(e2Z - w2Z)
-	b.meshes[5].RotateX(e2X - w2X)
-	b.meshes[5].RotateY(e2Y - w2Y)
+	b.meshes[5].RotateZ(-eZ - w2Z)
+	b.meshes[5].RotateX(-eX - w2X)
+	b.meshes[5].RotateY(-eY - w2Y)
 }
