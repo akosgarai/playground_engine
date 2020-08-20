@@ -79,6 +79,9 @@ func TestNewBugBuilder(t *testing.T) {
 	if builder.movementRotationAxis != defaultRotationAxis {
 		t.Errorf("Invalid movementRotationAxis. Instead of '%v', it is '%v'.", defaultRotationAxis, builder.movementRotationAxis)
 	}
+	if builder.withWings {
+		t.Error("Invalid initial value of withWings.")
+	}
 }
 func TestBugBuilderSetPosition(t *testing.T) {
 	newPosition := mgl32.Vec3{0, 0, 0}
@@ -233,6 +236,16 @@ func TestBugBuilderSetSameDirectionTime(t *testing.T) {
 		t.Errorf("Invalid sameDirectionTime. Instead of '%f', it is '%f'.", newTime, builder.sameDirectionTime)
 	}
 }
+func TestBugBuilderSetWithWings(t *testing.T) {
+	builder := NewBugBuilder()
+	values := []bool{true, true, false, true, false, false}
+	for _, v := range values {
+		builder.SetWithWings(v)
+		if builder.withWings != v {
+			t.Errorf("Invalid withWings flag. it supposed to be '%v'.", v)
+		}
+	}
+}
 func TestBugBuilderBuildMaterialWithoutWrapper(t *testing.T) {
 	func() {
 		defer func() {
@@ -348,7 +361,7 @@ func TestBugWithoutLight(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
-				t.Error("Update shouldn't have panic.")
+				t.Errorf("Update shouldn't have panic. %v", r)
 			}
 		}()
 		for i := 0; i < 15; i++ {

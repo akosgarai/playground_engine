@@ -33,6 +33,7 @@ type BugBuilder struct {
 	movementRotationAngle float32
 	movementRotationAxis  mgl32.Vec3
 	sameDirectionTime     float32
+	withWings             bool
 }
 
 func NewBugBuilder() *BugBuilder {
@@ -59,6 +60,7 @@ func NewBugBuilder() *BugBuilder {
 		movementRotationAngle: 0.0,
 		movementRotationAxis:  mgl32.Vec3{0, 0, 0},
 		sameDirectionTime:     1000.0,
+		withWings:             false,
 	}
 }
 
@@ -154,6 +156,11 @@ func (b *BugBuilder) SetDirection(v mgl32.Vec3) {
 // SetSameDirectionTime updates the sameDirectionTime.
 func (b *BugBuilder) SetSameDirectionTime(v float32) {
 	b.sameDirectionTime = v
+}
+
+// SetWithWings updates the withWings flag.
+func (b *BugBuilder) SetWithWings(w bool) {
+	b.withWings = w
 }
 
 func (b *BugBuilder) BuildMaterial() *Bug {
@@ -285,7 +292,8 @@ func (b *Bug) GetLightSource() *light.Light {
 }
 
 // Update function loops over each of the meshes and calls their Update function.
-// It also updates the direction of the bug, if necessary.
+// It also updates the direction of the bug, if necessary. The lighstource position
+// also sync'd with the bottom mesh.
 func (b *Bug) Update(dt float64) {
 	b.sinceLastRotate = b.sinceLastRotate + float32(dt)
 	if b.sinceLastRotate >= b.sameDirectionTime {
@@ -295,7 +303,9 @@ func (b *Bug) Update(dt float64) {
 		b.RotateX(x)
 		b.RotateZ(z)
 	}
-	b.lightSource.SetPosition(b.GetBottomPosition())
+	if b.lightSource != nil {
+		b.lightSource.SetPosition(b.GetBottomPosition())
+	}
 	for i, _ := range b.meshes {
 		b.meshes[i].Update(dt)
 	}
