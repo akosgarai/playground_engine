@@ -407,7 +407,7 @@ func (b *Bug) animateWings(dt float64) {
 	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
 	transformedVectorW1 := mgl32.TransformNormal(rotatedOrigoBasedVector, rotationMatrix)
 	//transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVector.Mul(-1), rotationMatrix)
-	b.meshes[4].SetPosition(b.wing1Position.Add(transformedVectorW1))
+	b.meshes[4].SetPosition(b.wing1Position.Sub(transformedVectorW1))
 	//b.meshes[5].SetPosition(transformedVectorW2)
 
 	// the rotation angles for the given full angle:
