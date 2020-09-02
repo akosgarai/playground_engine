@@ -394,13 +394,13 @@ func (b *Bug) animateWings(dt float64) {
 	// current rotation angles of the w1:
 	w1X, w1Y, w1Z := matrixToAngles(b.meshes[4].RotationTransformation())
 	// current rotation angles of the w1:
-	w2X, w2Y, w2Z := matrixToAngles(b.meshes[5].RotationTransformation())
+	//w2X, w2Y, w2Z := matrixToAngles(b.meshes[5].RotationTransformation())
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
 	transformedVectorW1 := mgl32.TransformNormal(rotatedOrigoBasedVector, rotationMatrix)
-	transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVector.Mul(-1), rotationMatrix)
+	//transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVector.Mul(-1), rotationMatrix)
 	b.meshes[4].SetPosition(transformedVectorW1)
-	b.meshes[5].SetPosition(transformedVectorW2)
+	//b.meshes[5].SetPosition(transformedVectorW2)
 
 	// the rotation angles for the given full angle:
 	transformedForward := mgl32.TransformNormal(mgl32.Vec3{0.0, 0.0, 1.0}, rotationMatrix)
@@ -410,9 +410,11 @@ func (b *Bug) animateWings(dt float64) {
 	b.meshes[4].RotateX(eX - w1X)
 	b.meshes[4].RotateY(eY - w1Y)
 
-	b.meshes[5].RotateZ(-eZ - w2Z)
-	b.meshes[5].RotateX(-eX - w2X)
-	b.meshes[5].RotateY(-eY - w2Y)
+	/*
+		b.meshes[5].RotateZ(-eZ - w2Z)
+		b.meshes[5].RotateX(-eX - w2X)
+		b.meshes[5].RotateY(-eY - w2Y)
+	*/
 	if b.currentWingAnimationTime >= b.wingStrikeTime {
 		b.pushState()
 	}
