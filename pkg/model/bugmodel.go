@@ -213,6 +213,8 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 	m.SetDirection(b.direction)
 
 	wingStrikeTime := float64(0.0)
+	wing1Position := mgl32.Vec3{0, 0, 0}
+	wing2Position := mgl32.Vec3{0, 0, 0}
 	if b.withWings {
 		wingBase := rectangle.NewExact(1.0, 1.0)
 		V, I, bo := wingBase.MeshInput()
@@ -227,6 +229,8 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 		wing2.SetBoundingObject(bo)
 		m.AddMesh(wing2)
 		wingStrikeTime = 3000
+		wing1Position = b.wing1Position()
+		wing2Position = b.wing2Position()
 	}
 
 	bug := &Bug{
@@ -240,6 +244,8 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 		currentWingAnimationTime:    0.0,
 		maxWingRotationAngle:        75.0,
 		currentWingRotationAngle:    0.0,
+		wing1Position:               wing1Position,
+		wing2Position:               wing2Position,
 	}
 	if b.withLight {
 		l := light.NewPointLight([4]mgl32.Vec3{
@@ -305,6 +311,8 @@ type Bug struct {
 	sinceLastRotate       float32
 	sameDirectionTime     float32
 	wingStrikeTime        float64
+	wing1Position         mgl32.Vec3
+	wing2Position         mgl32.Vec3
 	// current wing animation time
 	currentWingAnimationTime float64
 	// wing state (going up or down or edge position)
@@ -399,7 +407,7 @@ func (b *Bug) animateWings(dt float64) {
 	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
 	transformedVectorW1 := mgl32.TransformNormal(rotatedOrigoBasedVector, rotationMatrix)
 	//transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVector.Mul(-1), rotationMatrix)
-	b.meshes[4].SetPosition(transformedVectorW1)
+	b.meshes[4].SetPosition(b.wing1Position.Add(transformedVectorW1))
 	//b.meshes[5].SetPosition(transformedVectorW2)
 
 	// the rotation angles for the given full angle:
