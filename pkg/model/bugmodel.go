@@ -368,6 +368,8 @@ func (b *Bug) Update(dt float64) {
 		b.sinceLastRotate = 0.0
 		mra := mgl32.TransformNormal(b.movementRotationAxis, b.Body().RotationTransformation())
 		x, y, z := matrixToAngles(mgl32.HomogRotate3D(b.movementRotationAngle, mra))
+		// Currently the issue here: i need to track the current rotation angle (modulo 360),
+		// and rotate ot nased on the diff of this and the current value.
 		b.RotateY(y)
 		b.RotateX(x)
 		b.RotateZ(z)
