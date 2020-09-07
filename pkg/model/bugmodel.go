@@ -366,7 +366,8 @@ func (b *Bug) Update(dt float64) {
 	b.sinceLastRotate = b.sinceLastRotate + float32(dt)
 	if b.sinceLastRotate >= b.sameDirectionTime {
 		b.sinceLastRotate = 0.0
-		x, y, z := matrixToAngles(mgl32.HomogRotate3D(b.movementRotationAngle, b.movementRotationAxis))
+		mra := mgl32.TransformNormal(b.movementRotationAxis, b.Body().RotationTransformation())
+		x, y, z := matrixToAngles(mgl32.HomogRotate3D(b.movementRotationAngle, mra))
 		b.RotateY(y)
 		b.RotateX(x)
 		b.RotateZ(z)
