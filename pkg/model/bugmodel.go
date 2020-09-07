@@ -419,7 +419,7 @@ func (b *Bug) animateWings(dt float64) {
 	// current rotation angles of the w1:
 	//w2X, w2Y, w2Z := matrixToAngles(b.meshes[5].RotationTransformation())
 	// calculate the rotation vector of the door.
-	rotatedOrigoBasedVector := mgl32.Vec3{0.0, sinDeg, -cosDeg}
+	rotatedOrigoBasedVector := mgl32.Vec3{0.0, -sinDeg, cosDeg}
 	transformedVectorW1 := mgl32.TransformCoordinate(rotatedOrigoBasedVector, rotationMatrix)
 	//transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVector.Mul(-1), rotationMatrix)
 	b.meshes[6].SetPosition(transformedVectorW1.Mul(0.5))
