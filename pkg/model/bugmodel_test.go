@@ -308,17 +308,17 @@ func TestBug(t *testing.T) {
 		t.Error("Invalid lightsource")
 	}
 
-	if bug.GetBodyPosition() != position {
-		t.Errorf("Invalid body position. Instead of '%v', we have '%v'.", position, bug.GetBodyPosition())
+	if bug.Body().GetPosition() != position {
+		t.Errorf("Invalid body position. Instead of '%v', we have '%v'.", position, bug.Body().GetPosition())
 	}
-	if bug.GetBottomPosition() != bottomPosition {
-		t.Errorf("Invalid bottom position. Instead of '%v', we have '%v'.", bottomPosition, bug.GetBottomPosition())
+	if bug.Bottom().GetPosition() != bottomPosition {
+		t.Errorf("Invalid bottom position. Instead of '%v', we have '%v'.", bottomPosition, bug.Bottom().GetPosition())
 	}
-	if bug.GetEye1Position() != eye1Position {
-		t.Errorf("Invalid eye1 position. Instead of '%v', we have '%v'.", eye1Position, bug.GetEye1Position())
+	if bug.Eye1().GetPosition() != eye1Position {
+		t.Errorf("Invalid eye1 position. Instead of '%v', we have '%v'.", eye1Position, bug.Eye1().GetPosition())
 	}
-	if bug.GetEye2Position() != eye2Position {
-		t.Errorf("Invalid eye2 position. Instead of '%v', we have '%v'.", eye2Position, bug.GetEye2Position())
+	if bug.Eye2().GetPosition() != eye2Position {
+		t.Errorf("Invalid eye2 position. Instead of '%v', we have '%v'.", eye2Position, bug.Eye2().GetPosition())
 	}
 
 	func() {
@@ -366,17 +366,17 @@ func TestBugWithoutLight(t *testing.T) {
 		t.Error("Invalid lightsource")
 	}
 
-	if bug.GetBodyPosition() != position {
-		t.Errorf("Invalid body position. Instead of '%v', we have '%v'.", position, bug.GetBodyPosition())
+	if bug.Body().GetPosition() != position {
+		t.Errorf("Invalid body position. Instead of '%v', we have '%v'.", position, bug.Body().GetPosition())
 	}
-	if bug.GetBottomPosition() != bottomPosition {
-		t.Errorf("Invalid bottom position. Instead of '%v', we have '%v'.", bottomPosition, bug.GetBottomPosition())
+	if bug.Bottom().GetPosition() != bottomPosition {
+		t.Errorf("Invalid bottom position. Instead of '%v', we have '%v'.", bottomPosition, bug.Bottom().GetPosition())
 	}
-	if bug.GetEye1Position() != eye1Position {
-		t.Errorf("Invalid eye1 position. Instead of '%v', we have '%v'.", eye1Position, bug.GetEye1Position())
+	if bug.Eye1().GetPosition() != eye1Position {
+		t.Errorf("Invalid eye1 position. Instead of '%v', we have '%v'.", eye1Position, bug.Eye1().GetPosition())
 	}
-	if bug.GetEye2Position() != eye2Position {
-		t.Errorf("Invalid eye2 position. Instead of '%v', we have '%v'.", eye2Position, bug.GetEye2Position())
+	if bug.Eye2().GetPosition() != eye2Position {
+		t.Errorf("Invalid eye2 position. Instead of '%v', we have '%v'.", eye2Position, bug.Eye2().GetPosition())
 	}
 
 	func() {
@@ -426,17 +426,17 @@ func TestBugWithWings(t *testing.T) {
 		t.Error("Invalid lightsource")
 	}
 
-	if bug.GetBodyPosition() != position {
-		t.Errorf("Invalid body position. Instead of '%v', we have '%v'.", position, bug.GetBodyPosition())
+	if bug.Body().GetPosition() != position {
+		t.Errorf("Invalid body position. Instead of '%v', we have '%v'.", position, bug.Body().GetPosition())
 	}
-	if bug.GetBottomPosition() != bottomPosition {
-		t.Errorf("Invalid bottom position. Instead of '%v', we have '%v'.", bottomPosition, bug.GetBottomPosition())
+	if bug.Bottom().GetPosition() != bottomPosition {
+		t.Errorf("Invalid bottom position. Instead of '%v', we have '%v'.", bottomPosition, bug.Bottom().GetPosition())
 	}
-	if bug.GetEye1Position() != eye1Position {
-		t.Errorf("Invalid eye1 position. Instead of '%v', we have '%v'.", eye1Position, bug.GetEye1Position())
+	if bug.Eye1().GetPosition() != eye1Position {
+		t.Errorf("Invalid eye1 position. Instead of '%v', we have '%v'.", eye1Position, bug.Eye1().GetPosition())
 	}
-	if bug.GetEye2Position() != eye2Position {
-		t.Errorf("Invalid eye2 position. Instead of '%v', we have '%v'.", eye2Position, bug.GetEye2Position())
+	if bug.Eye2().GetPosition() != eye2Position {
+		t.Errorf("Invalid eye2 position. Instead of '%v', we have '%v'.", eye2Position, bug.Eye2().GetPosition())
 	}
 
 	func() {
