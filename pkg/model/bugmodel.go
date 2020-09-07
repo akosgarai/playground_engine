@@ -372,7 +372,7 @@ func (b *Bug) Update(dt float64) {
 		// current values
 		cX, cY, cZ := matrixToAngles(b.Body().RotationTransformation())
 		// expected values
-		tX, tY, tZ := matrixToAngles(mgl32.HomogRotate3D(b.currentMovementRotationAngle, mgl32.TransformNormal(b.movementRotationAxis, b.Body().RotationTransformation())))
+		tX, tY, tZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentMovementRotationAngle), mgl32.TransformNormal(b.movementRotationAxis, b.Body().RotationTransformation())))
 		// rotate with the diff
 		b.RotateY(tY - cY)
 		b.RotateX(tX - cX)
