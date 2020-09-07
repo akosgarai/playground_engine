@@ -427,7 +427,7 @@ func (b *Bug) animateWings(dt float64) {
 
 	// the rotation angles for the given full angle:
 	transformedForward := mgl32.TransformNormal(mgl32.Vec3{-1.0, 0.0, 0.0}, rotationMatrix)
-	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(270-(b.maxWingRotationAngle-b.currentWingRotationAngle)), transformedForward).Mul4(rotationMatrix))
+	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90-(b.maxWingRotationAngle-b.currentWingRotationAngle)), transformedForward).Mul4(rotationMatrix))
 
 	b.meshes[6].RotateZ(eZ - w1Z)
 	b.meshes[6].RotateX(eX - w1X)
