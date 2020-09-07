@@ -407,7 +407,7 @@ func (b *Bug) animateWings(dt float64) {
 		return
 	}
 	currentRotationAngle := float32(b.wingState-2) * b.maxWingRotationAngle / float32(b.wingStrikeTime) * float32(maxDelta)
-	b.currentWingRotationAngle = b.currentWingRotationAngle - currentRotationAngle
+	b.currentWingRotationAngle = b.currentWingRotationAngle + currentRotationAngle
 	// sin, cos of the current angle.
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
