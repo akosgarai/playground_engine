@@ -218,6 +218,8 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 	attachPointWing1.SetParent(Body)
 	attachPointWing2 := mesh.NewPointMesh(b.wrapper)
 	attachPointWing2.SetParent(Body)
+	m.AddMesh(attachPointWing1)
+	m.AddMesh(attachPointWing2)
 	if b.withWings {
 		wingBase := rectangle.NewExact(1.0, 1.0)
 		V, I, bo := wingBase.MeshInput()
