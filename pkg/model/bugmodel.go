@@ -1,7 +1,7 @@
 package model
 
 import (
-	_ "math"
+	"math"
 
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
@@ -239,18 +239,19 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 	}
 
 	bug := &Bug{
-		BaseCollisionDetectionModel: *m,
-		movementRotationAngle:       b.movementRotationAngle,
-		movementRotationAxis:        b.movementRotationAxis,
-		sinceLastRotate:             0.0,
-		sameDirectionTime:           b.sameDirectionTime,
-		wingStrikeTime:              wingStrikeTime,
-		wingState:                   _WING_BOTTOM,
-		currentWingAnimationTime:    0.0,
-		maxWingRotationAngle:        75.0,
-		currentWingRotationAngle:    0.0,
-		wing1AttachPoint:            attachPointWing1,
-		wing2AttachPoint:            attachPointWing2,
+		BaseCollisionDetectionModel:  *m,
+		movementRotationAngle:        b.movementRotationAngle,
+		currentMovementRotationAngle: float32(0.0),
+		movementRotationAxis:         b.movementRotationAxis,
+		sinceLastRotate:              0.0,
+		sameDirectionTime:            b.sameDirectionTime,
+		wingStrikeTime:               wingStrikeTime,
+		wingState:                    _WING_BOTTOM,
+		currentWingAnimationTime:     0.0,
+		maxWingRotationAngle:         75.0,
+		currentWingRotationAngle:     0.0,
+		wing1AttachPoint:             attachPointWing1,
+		wing2AttachPoint:             attachPointWing2,
 	}
 	if b.withLight {
 		l := light.NewPointLight([4]mgl32.Vec3{
@@ -316,14 +317,15 @@ func (b *BugBuilder) wing2Position() mgl32.Vec3 {
 
 type Bug struct {
 	BaseCollisionDetectionModel
-	lightSource           *light.Light
-	movementRotationAngle float32
-	movementRotationAxis  mgl32.Vec3
-	sinceLastRotate       float32
-	sameDirectionTime     float32
-	wingStrikeTime        float64
-	wing1AttachPoint      interfaces.Mesh
-	wing2AttachPoint      interfaces.Mesh
+	lightSource                  *light.Light
+	movementRotationAngle        float32
+	currentMovementRotationAngle float32
+	movementRotationAxis         mgl32.Vec3
+	sinceLastRotate              float32
+	sameDirectionTime            float32
+	wingStrikeTime               float64
+	wing1AttachPoint             interfaces.Mesh
+	wing2AttachPoint             interfaces.Mesh
 	// current wing animation time
 	currentWingAnimationTime float64
 	// wing state (going up or down or edge position)
@@ -366,13 +368,15 @@ func (b *Bug) Update(dt float64) {
 	b.sinceLastRotate = b.sinceLastRotate + float32(dt)
 	if b.sinceLastRotate >= b.sameDirectionTime {
 		b.sinceLastRotate = 0.0
-		mra := mgl32.TransformNormal(b.movementRotationAxis, b.Body().RotationTransformation())
-		x, y, z := matrixToAngles(mgl32.HomogRotate3D(b.movementRotationAngle, mra))
-		// Currently the issue here: i need to track the current rotation angle (modulo 360),
-		// and rotate ot nased on the diff of this and the current value.
-		b.RotateY(y)
-		b.RotateX(x)
-		b.RotateZ(z)
+		b.currentMovementRotationAngle = float32(math.Mod(float64(b.currentMovementRotationAngle+b.movementRotationAngle), 360))
+		// current values
+		cX, cY, cZ := matrixToAngles(b.Body().RotationTransformation())
+		// expected values
+		tX, tY, tZ := matrixToAngles(mgl32.HomogRotate3D(b.currentMovementRotationAngle, mgl32.TransformNormal(b.movementRotationAxis, b.Body().RotationTransformation())))
+		// rotate with the diff
+		b.RotateY(tY - cY)
+		b.RotateX(tX - cX)
+		b.RotateZ(tZ - cZ)
 	}
 	if b.lightSource != nil {
 		b.lightSource.SetPosition(mgl32.TransformCoordinate(mgl32.Vec3{0, 0, 0}, b.Bottom().ModelTransformation()))
