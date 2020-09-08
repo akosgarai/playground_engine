@@ -436,7 +436,7 @@ func (b *Bug) animateWings(dt float64) {
 	b.meshes[6].RotateY(e1Y - w1Y)
 
 	transformedForwardRightWing := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrixRightWing)
-	e2X, e2Y, e2Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), transformedForwardRightWing).Mul4(rotationMatrixRightWing))
+	e2X, e2Y, e2Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90-b.currentWingRotationAngle), transformedForwardRightWing).Mul4(rotationMatrixRightWing))
 	b.meshes[7].RotateZ(e2Z - w2Z)
 	b.meshes[7].RotateX(e2X - w2X)
 	b.meshes[7].RotateY(e2Y - w2Y)
