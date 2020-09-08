@@ -361,6 +361,26 @@ func (b *Bug) Eye2() interfaces.Mesh {
 	return b.meshes[3]
 }
 
+// LeftWingAttachPoint returns the left wing attach point mesh.
+func (b *Bug) LeftWingAttachPoint() interfaces.Mesh {
+	return b.meshes[4]
+}
+
+// RightWingAttachPoint returns the right wing attach point mesh.
+func (b *Bug) RightWingAttachPoint() interfaces.Mesh {
+	return b.meshes[5]
+}
+
+// LeftWing returns the left wing mesh.
+func (b *Bug) LeftWing() interfaces.Mesh {
+	return b.meshes[6]
+}
+
+// RightWing returns the right wing mesh.
+func (b *Bug) RightWing() interfaces.Mesh {
+	return b.meshes[7]
+}
+
 // GetLightSource returns the lightsource of the lamp.
 func (b *Bug) GetLightSource() *light.Light {
 	return b.lightSource
@@ -418,12 +438,12 @@ func (b *Bug) animateWings(dt float64) {
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
 
 	// rotation matrix of the base mesh.
-	rotationMatrixLeftWing := b.meshes[4].RotationTransformation()
-	rotationMatrixRightWing := b.meshes[5].RotationTransformation()
+	rotationMatrixLeftWing := b.LeftWingAttachPoint().RotationTransformation()
+	rotationMatrixRightWing := b.RightWingAttachPoint().RotationTransformation()
 	// current rotation angles of the w1:
-	w1X, w1Y, w1Z := matrixToAngles(b.meshes[6].RotationTransformation().Mul4(rotationMatrixLeftWing.Inv()))
+	w1X, w1Y, w1Z := matrixToAngles(b.LeftWing().RotationTransformation().Mul4(rotationMatrixLeftWing.Inv()))
 	// current rotation angles of the w2 without the attachpoint:
-	w2X, w2Y, w2Z := matrixToAngles(b.meshes[7].RotationTransformation().Mul4(rotationMatrixRightWing.Inv()))
+	w2X, w2Y, w2Z := matrixToAngles(b.RightWing().RotationTransformation().Mul4(rotationMatrixRightWing.Inv()))
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVectorLeftWing := mgl32.Vec3{0.0, -sinDeg, cosDeg}
 	rotatedOrigoBasedVectorRightWing := mgl32.Vec3{0.0, -sinDeg, -cosDeg}
@@ -436,14 +456,14 @@ func (b *Bug) animateWings(dt float64) {
 	forward := mgl32.Vec3{1.0, 0.0, 0.0}
 	e1X, e1Y, e1Z := matrixToAngles(rotationMatrixLeftWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), forward)).Mul4(rotationMatrixLeftWing.Inv()))
 
-	b.meshes[6].RotateZ(e1Z - w1Z)
-	b.meshes[6].RotateX(e1X - w1X)
-	b.meshes[6].RotateY(e1Y - w1Y)
+	b.LeftWing().RotateZ(e1Z - w1Z)
+	b.LeftWing().RotateX(e1X - w1X)
+	b.LeftWing().RotateY(e1Y - w1Y)
 
 	e2X, e2Y, e2Z := matrixToAngles(rotationMatrixRightWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(-b.currentWingRotationAngle), forward)).Mul4(rotationMatrixRightWing.Inv()))
-	b.meshes[7].RotateZ(e2Z - w2Z)
-	b.meshes[7].RotateX(e2X - w2X)
-	b.meshes[7].RotateY(e2Y - w2Y)
+	b.RightWing().RotateZ(e2Z - w2Z)
+	b.RightWing().RotateX(e2X - w2X)
+	b.RightWing().RotateY(e2Y - w2Y)
 
 	if b.currentWingAnimationTime >= b.wingStrikeTime {
 		b.pushState()
