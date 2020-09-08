@@ -314,10 +314,10 @@ func (b *BugBuilder) wingAttachPointPosition(basePos mgl32.Vec3) mgl32.Vec3 {
 	return mgl32.TransformCoordinate(baseScaled, b.rotationTransformationMatrix())
 }
 func (b *BugBuilder) wing1Position() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{0.0, 0.0, 0.5}, b.rotationTransformationMatrix())
+	return mgl32.TransformCoordinate(mgl32.Vec3{0.0, 0.0, 0.5 * b.scale.Z()}, b.rotationTransformationMatrix())
 }
 func (b *BugBuilder) wing2Position() mgl32.Vec3 {
-	return mgl32.TransformCoordinate(mgl32.Vec3{0.0, 0.0, -0.5}, b.rotationTransformationMatrix())
+	return mgl32.TransformCoordinate(mgl32.Vec3{0.0, 0.0, -0.5 * b.scale.Z()}, b.rotationTransformationMatrix())
 }
 
 type Bug struct {
@@ -449,8 +449,9 @@ func (b *Bug) animateWings(dt float64) {
 	rotatedOrigoBasedVectorRightWing := mgl32.Vec3{0.0, -sinDeg, -cosDeg}
 	transformedVectorW1 := mgl32.TransformCoordinate(rotatedOrigoBasedVectorLeftWing, rotationMatrixLeftWing)
 	transformedVectorW2 := mgl32.TransformCoordinate(rotatedOrigoBasedVectorRightWing, rotationMatrixRightWing)
-	b.meshes[6].SetPosition(transformedVectorW1.Mul(0.5))
-	b.meshes[7].SetPosition(transformedVectorW2.Mul(0.5))
+	scale := b.Body().ScaleTransformation().At(2, 2)
+	b.LeftWing().SetPosition(transformedVectorW1.Mul(scale / 2.0))
+	b.RightWing().SetPosition(transformedVectorW2.Mul(scale / 2.0))
 
 	// the rotation angles for the given full angle:
 	forward := mgl32.Vec3{1.0, 0.0, 0.0}
