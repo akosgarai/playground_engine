@@ -214,8 +214,7 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 
 	wingStrikeTime := float64(0.0)
 	// attach point mesh
-	attachPointWing1 := mesh.NewMaterialMesh(V, I, material.Gold, b.wrapper)
-	attachPointWing1.SetScale(mgl32.Vec3{0.1, 0.1, 0.1})
+	attachPointWing1 := mesh.NewPointMesh(b.wrapper)
 	attachPointWing1.SetParent(Body)
 	attachPointWing2 := mesh.NewPointMesh(b.wrapper)
 	attachPointWing2.SetParent(Body)
@@ -420,7 +419,7 @@ func (b *Bug) animateWings(dt float64) {
 	// current rotation angles of the w1:
 	//w2X, w2Y, w2Z := matrixToAngles(b.meshes[5].RotationTransformation())
 	// calculate the rotation vector of the door.
-	rotatedOrigoBasedVector := mgl32.Vec3{0.0, -sinDeg, cosDeg}
+	rotatedOrigoBasedVector := mgl32.Vec3{0.0, cosDeg, -sinDeg}
 	transformedVectorW1 := mgl32.TransformCoordinate(rotatedOrigoBasedVector, rotationMatrix)
 	//transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVector.Mul(-1), rotationMatrix)
 	b.meshes[6].SetPosition(transformedVectorW1.Mul(0.5))
@@ -428,7 +427,7 @@ func (b *Bug) animateWings(dt float64) {
 
 	// the rotation angles for the given full angle:
 	transformedForward := mgl32.TransformNormal(mgl32.Vec3{-1.0, 0.0, 0.0}, rotationMatrix)
-	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.maxWingRotationAngle-b.currentWingRotationAngle), transformedForward).Mul4(rotationMatrix))
+	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90-(b.maxWingRotationAngle-b.currentWingRotationAngle)), transformedForward).Mul4(rotationMatrix))
 
 	b.meshes[6].RotateZ(eZ - w1Z)
 	b.meshes[6].RotateX(eX - w1X)
