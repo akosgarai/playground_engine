@@ -214,7 +214,8 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 
 	wingStrikeTime := float64(0.0)
 	// attach point mesh
-	attachPointWing1 := mesh.NewPointMesh(b.wrapper)
+	attachPointWing1 := mesh.NewMaterialMesh(V, I, material.Gold, b.wrapper)
+	attachPointWing1.SetScale(mgl32.Vec3{0.1, 0.1, 0.1})
 	attachPointWing1.SetParent(Body)
 	attachPointWing2 := mesh.NewPointMesh(b.wrapper)
 	attachPointWing2.SetParent(Body)
@@ -407,7 +408,7 @@ func (b *Bug) animateWings(dt float64) {
 		return
 	}
 	currentRotationAngle := float32(b.wingState-2) * b.maxWingRotationAngle / float32(b.wingStrikeTime) * float32(maxDelta)
-	b.currentWingRotationAngle = b.currentWingRotationAngle + currentRotationAngle
+	b.currentWingRotationAngle = b.currentWingRotationAngle - currentRotationAngle
 	// sin, cos of the current angle.
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
