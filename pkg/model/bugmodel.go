@@ -436,15 +436,15 @@ func (b *Bug) animateWings(dt float64) {
 	transformedForwardLeftWing := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrixLeftWing)
 	e1X, e1Y, e1Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), transformedForwardLeftWing).Mul4(rotationMatrixLeftWing))
 
-	b.meshes[6].RotateZ(mgl32.RadToDeg(mgl32.DegToRad(e1Z - w1Z)))
-	b.meshes[6].RotateX(mgl32.RadToDeg(mgl32.DegToRad(e1X - w1X)))
-	b.meshes[6].RotateY(mgl32.RadToDeg(mgl32.DegToRad(e1Y - w1Y)))
+	b.meshes[6].RotateZ(e1Z - w1Z)
+	b.meshes[6].RotateX(e1X - w1X)
+	b.meshes[6].RotateY(e1Y - w1Y)
 
 	transformedForwardRightWing := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrixRightWing)
-	e2X, e2Y, e2Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(-b.currentWingRotationAngle), transformedForwardRightWing).Mul4(rotationMatrixRightWing))
-	b.meshes[7].RotateZ(mgl32.RadToDeg(mgl32.DegToRad(e2Z - w2Z)))
-	b.meshes[7].RotateX(mgl32.RadToDeg(mgl32.DegToRad(e2X - w2X)))
-	b.meshes[7].RotateY(mgl32.RadToDeg(mgl32.DegToRad(e2Y - w2Y)))
+	e2X, e2Y, e2Z := matrixToAngles(rotationMatrixRightWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(-b.currentWingRotationAngle), transformedForwardRightWing)))
+	b.meshes[7].RotateZ(e2Z - w2Z)
+	b.meshes[7].RotateX(e2X - w2X)
+	b.meshes[7].RotateY(e2Y - w2Y)
 
 	if b.currentWingAnimationTime >= b.wingStrikeTime {
 		b.pushState()
