@@ -428,7 +428,7 @@ func (b *Bug) animateWings(dt float64) {
 	rotatedOrigoBasedVectorLeftWing := mgl32.Vec3{0.0, -sinDeg, cosDeg}
 	rotatedOrigoBasedVectorRightWing := mgl32.Vec3{0.0, -sinDeg, -cosDeg}
 	transformedVectorW1 := mgl32.TransformCoordinate(rotatedOrigoBasedVectorLeftWing, rotationMatrixLeftWing)
-	transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVectorRightWing, rotationMatrixRightWing)
+	transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVectorRightWing, rotationMatrixRightWing.Inv())
 	b.meshes[6].SetPosition(transformedVectorW1.Mul(0.5))
 	b.meshes[7].SetPosition(transformedVectorW2.Mul(0.5))
 
@@ -440,7 +440,7 @@ func (b *Bug) animateWings(dt float64) {
 	b.meshes[6].RotateX(e1X - w1X)
 	b.meshes[6].RotateY(e1Y - w1Y)
 
-	transformedForwardRightWing := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrixRightWing)
+	transformedForwardRightWing := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrixRightWing.Inv())
 	e2X, e2Y, e2Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(-b.currentWingRotationAngle), transformedForwardRightWing).Mul4(rotationMatrixRightWing.Inv()))
 	b.meshes[7].RotateZ(e2Z - w2Z)
 	b.meshes[7].RotateX(e2X - w2X)
