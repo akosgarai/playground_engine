@@ -413,31 +413,34 @@ func (b *Bug) animateWings(dt float64) {
 	sinDeg := float32(math.Sin(float64(mgl32.DegToRad(b.currentWingRotationAngle))))
 
 	// rotation matrix of the base mesh.
-	rotationMatrix := b.meshes[4].RotationTransformation()
+	rotationMatrixLeftWing := b.meshes[4].RotationTransformation()
+	rotationMatrixRightWing := b.meshes[5].RotationTransformation()
 	// current rotation angles of the w1:
 	w1X, w1Y, w1Z := matrixToAngles(b.meshes[6].RotationTransformation())
-	// current rotation angles of the w1:
-	//w2X, w2Y, w2Z := matrixToAngles(b.meshes[5].RotationTransformation())
+	// current rotation angles of the w2:
+	w2X, w2Y, w2Z := matrixToAngles(b.meshes[7].RotationTransformation())
 	// calculate the rotation vector of the door.
-	rotatedOrigoBasedVector := mgl32.Vec3{0.0, -sinDeg, cosDeg}
-	transformedVectorW1 := mgl32.TransformCoordinate(rotatedOrigoBasedVector, rotationMatrix)
-	//transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVector.Mul(-1), rotationMatrix)
+	rotatedOrigoBasedVectorLeftWing := mgl32.Vec3{0.0, -sinDeg, cosDeg}
+	rotatedOrigoBasedVectorRightWing := mgl32.Vec3{0.0, -sinDeg, -cosDeg}
+	transformedVectorW1 := mgl32.TransformCoordinate(rotatedOrigoBasedVectorLeftWing, rotationMatrixLeftWing)
+	transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVectorRightWing, rotationMatrixRightWing)
 	b.meshes[6].SetPosition(transformedVectorW1.Mul(0.5))
-	//b.meshes[5].SetPosition(transformedVectorW2)
+	b.meshes[7].SetPosition(transformedVectorW2.Mul(0.5))
 
 	// the rotation angles for the given full angle:
-	transformedForward := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrix)
-	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), transformedForward).Mul4(rotationMatrix))
+	transformedForwardLeftWing := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrixLeftWing)
+	e1X, e1Y, e1Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), transformedForwardLeftWing).Mul4(rotationMatrixLeftWing))
 
-	b.meshes[6].RotateZ(eZ - w1Z)
-	b.meshes[6].RotateX(eX - w1X)
-	b.meshes[6].RotateY(eY - w1Y)
-	/*
+	b.meshes[6].RotateZ(e1Z - w1Z)
+	b.meshes[6].RotateX(e1X - w1X)
+	b.meshes[6].RotateY(e1Y - w1Y)
 
-		b.meshes[5].RotateZ(-eZ - w2Z)
-		b.meshes[5].RotateX(-eX - w2X)
-		b.meshes[5].RotateY(-eY - w2Y)
-	*/
+	transformedForwardRightWing := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrixRightWing)
+	e2X, e2Y, e2Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), transformedForwardRightWing).Mul4(rotationMatrixRightWing))
+	b.meshes[7].RotateZ(e2Z - w2Z)
+	b.meshes[7].RotateX(e2X - w2X)
+	b.meshes[7].RotateY(e2Y - w2Y)
+
 	if b.currentWingAnimationTime >= b.wingStrikeTime {
 		b.pushState()
 	}
