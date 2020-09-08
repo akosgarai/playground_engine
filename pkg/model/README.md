@@ -5,7 +5,36 @@ The base model has been extended with collision detection support. Now it can re
 
 ## Bug model
 
-This predefined model represents a "composite object". This model contains 4 material squere, one for the bottom, one for the body and 2 for the eyes. It has getter functions for the center point of the body parts. It's initial position, and scale are set during it's construction with the NewBug function.
+This predefined model represents a "composite object". This model contains 4 material squere, one for the bottom, one for the body and 2 for the eyes. It could contain attach points (point meshes) and wings. It has getter functions for the body parts. The wings are moving up-down direction.
+
+### BugBuilder
+
+This is a builder for the Bug model.
+
+- `position` - the position of the body mesh.
+- `scale` - the scale of the body mesh.
+- `wrapper` - the wrapper pkg (interfaces.GLWrapper) for the gl functions. It can be set with the `SetWrapper` function.
+- `bodyMaterial` - the material of the body mesh.
+- `bottomMaterial` - the material of the bottom mesh.
+- `eyeMaterial` - the material of the eye meshes.
+- `rotationX` - the rotation (x axis) of the pole mesh.
+- `rotationY` - the rotation (y axis) of the pole mesh.
+- `rotationZ` - the rotation (z axis) of the pole mesh.
+- `spherePrecision` - the precision of the spheres.
+- `lightAmbient` - the ambient color component of the lightsource.
+- `lightDiffuse` - the diffuse color component of the lightsource.
+- `lightSpecular` - the specular color component of the lightsource.
+- `constantTerm` - the constant term of the lightsource.
+- `linearTerm` - the linear term of the lightsource.
+- `quadraticTerm` - the quadratic term of the lightsource.
+- `withLight` - if this flag set, the bug will contain a point lightsource.
+- `velocity` - the initial speed of the bug.
+- `direction` - the direction of the bug.
+- `movementRotationAngle` - the rotation angle of the movement.
+- `movementRotationAxis` - the rotation axis of the movement.
+- `sameDirectionTime` - the bug goes to the same direction this time (ms).
+- `withWings` - if this flag set true, the bug will contain wing meshes.
+- `wingStrikeTime` - the wings strike time (ms).
 
 ## StreetLamp model
 
