@@ -180,19 +180,19 @@ func (m *Mesh) RotationTransformation() mgl32.Mat4 {
 
 // RotateY adds the given input angle to the yaw. It also updates the direction vector.
 func (m *Mesh) RotateY(angleDeg float32) {
-	m.yaw = mgl32.RadToDeg(mgl32.DegToRad(m.yaw + angleDeg))
+	m.yaw = m.yaw + angleDeg
 	m.rotateDirection(angleDeg, mgl32.Vec3{0.0, 1.0, 0.0})
 }
 
 // RotateX adds the given input angle to the pitch. It also updates the direction vector.
 func (m *Mesh) RotateX(angleDeg float32) {
-	m.pitch = mgl32.RadToDeg(mgl32.DegToRad(m.pitch + angleDeg))
+	m.pitch = m.pitch + angleDeg
 	m.rotateDirection(angleDeg, mgl32.Vec3{1.0, 0.0, 0.0})
 }
 
 // RotateZ adds the given input angle to the roll. It also updates the direction vector.
 func (m *Mesh) RotateZ(angleDeg float32) {
-	m.roll = mgl32.RadToDeg(mgl32.DegToRad(m.roll + angleDeg))
+	m.roll = m.roll + angleDeg
 	m.rotateDirection(angleDeg, mgl32.Vec3{0.0, 0.0, 1.0})
 }
 
