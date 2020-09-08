@@ -5,7 +5,7 @@ The base model has been extended with collision detection support. Now it can re
 
 ## Bug model
 
-    This predefined model represents a "composite object". This model contains 4 material squere, one for the bottom, one for the body and 2 for the eyes. It could contaion attach points (point meshes) and wings. It has getter functions for the body parts. The wings are moving up-down direction.
+This predefined model represents a "composite object". This model contains 4 material squere, one for the bottom, one for the body and 2 for the eyes. It could contaion attach points (point meshes) and wings. It has getter functions for the body parts. The wings are moving up-down direction.
 
 ### BugBuilder
 
