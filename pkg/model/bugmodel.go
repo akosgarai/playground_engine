@@ -421,26 +421,26 @@ func (b *Bug) animateWings(dt float64) {
 	rotationMatrixLeftWing := b.meshes[4].RotationTransformation()
 	rotationMatrixRightWing := b.meshes[5].RotationTransformation()
 	// current rotation angles of the w1:
-	w1X, w1Y, w1Z := matrixToAngles(b.meshes[6].RotationTransformation())
+	w1X, w1Y, w1Z := matrixToAngles(b.meshes[6].RotationTransformation().Mul4(rotationMatrixLeftWing.Inv()))
 	// current rotation angles of the w2 without the attachpoint:
 	w2X, w2Y, w2Z := matrixToAngles(b.meshes[7].RotationTransformation().Mul4(rotationMatrixRightWing.Inv()))
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVectorLeftWing := mgl32.Vec3{0.0, -sinDeg, cosDeg}
 	rotatedOrigoBasedVectorRightWing := mgl32.Vec3{0.0, -sinDeg, -cosDeg}
 	transformedVectorW1 := mgl32.TransformCoordinate(rotatedOrigoBasedVectorLeftWing, rotationMatrixLeftWing)
-	transformedVectorW2 := mgl32.TransformNormal(rotatedOrigoBasedVectorRightWing, rotationMatrixRightWing)
+	transformedVectorW2 := mgl32.TransformCoordinate(rotatedOrigoBasedVectorRightWing, rotationMatrixRightWing)
 	b.meshes[6].SetPosition(transformedVectorW1.Mul(0.5))
 	b.meshes[7].SetPosition(transformedVectorW2.Mul(0.5))
 
 	// the rotation angles for the given full angle:
-	transformedForwardLeftWing := mgl32.TransformNormal(mgl32.Vec3{1.0, 0.0, 0.0}, rotationMatrixLeftWing)
-	e1X, e1Y, e1Z := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), transformedForwardLeftWing).Mul4(rotationMatrixLeftWing))
+	forward := mgl32.Vec3{1.0, 0.0, 0.0}
+	e1X, e1Y, e1Z := matrixToAngles(rotationMatrixLeftWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), forward)).Mul4(rotationMatrixLeftWing.Inv()))
 
 	b.meshes[6].RotateZ(e1Z - w1Z)
 	b.meshes[6].RotateX(e1X - w1X)
 	b.meshes[6].RotateY(e1Y - w1Y)
 
-	e2X, e2Y, e2Z := matrixToAngles(rotationMatrixRightWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(-b.currentWingRotationAngle), mgl32.Vec3{1.0, 0.0, 0.0})).Mul4(rotationMatrixRightWing.Inv()))
+	e2X, e2Y, e2Z := matrixToAngles(rotationMatrixRightWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(-b.currentWingRotationAngle), forward)).Mul4(rotationMatrixRightWing.Inv()))
 	b.meshes[7].RotateZ(e2Z - w2Z)
 	b.meshes[7].RotateX(e2X - w2X)
 	b.meshes[7].RotateY(e2Y - w2Y)
