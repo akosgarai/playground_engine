@@ -82,6 +82,9 @@ func TestNewBugBuilder(t *testing.T) {
 	if builder.withWings {
 		t.Error("Invalid initial value of withWings.")
 	}
+	if builder.wingStrikeTime != 0 {
+		t.Error("Invalid initial value of wingStrikeTime.")
+	}
 }
 func TestBugBuilderSetPosition(t *testing.T) {
 	newPosition := mgl32.Vec3{0, 0, 0}
@@ -244,6 +247,14 @@ func TestBugBuilderSetWithWings(t *testing.T) {
 		if builder.withWings != v {
 			t.Errorf("Invalid withWings flag. it supposed to be '%v'.", v)
 		}
+	}
+}
+func TestBugBuilderSetWingStrikeTime(t *testing.T) {
+	newTime := float64(30.0)
+	builder := NewBugBuilder()
+	builder.SetWingStrikeTime(newTime)
+	if builder.wingStrikeTime != newTime {
+		t.Errorf("Invalid wingStrikeTime. Instead of '%f', it is '%f'.", newTime, builder.wingStrikeTime)
 	}
 }
 func TestBugBuilderSetSpherePrecision(t *testing.T) {
@@ -416,6 +427,7 @@ func TestBugWithWings(t *testing.T) {
 	builder.SetScale(scale)
 	builder.SetWrapper(wrapperMock)
 	builder.SetWithWings(true)
+	builder.SetWingStrikeTime(300)
 	bottomPosition := mgl32.Vec3{-1.0, 0.0, 0.0}
 	eyeBase := float32(0.5773503)
 	eye1Position := mgl32.Vec3{eyeBase, eyeBase, eyeBase}

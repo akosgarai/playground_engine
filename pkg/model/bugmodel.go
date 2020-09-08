@@ -44,6 +44,7 @@ type BugBuilder struct {
 	movementRotationAxis  mgl32.Vec3
 	sameDirectionTime     float32
 	withWings             bool
+	wingStrikeTime        float64
 }
 
 func NewBugBuilder() *BugBuilder {
@@ -71,6 +72,7 @@ func NewBugBuilder() *BugBuilder {
 		movementRotationAxis:  mgl32.Vec3{0, 0, 0},
 		sameDirectionTime:     1000.0,
 		withWings:             false,
+		wingStrikeTime:        0,
 	}
 }
 
@@ -173,6 +175,11 @@ func (b *BugBuilder) SetWithWings(w bool) {
 	b.withWings = w
 }
 
+// SetWingStrikeTime updates the sameDirectionTime.
+func (b *BugBuilder) SetWingStrikeTime(v float64) {
+	b.wingStrikeTime = v
+}
+
 func (b *BugBuilder) BuildMaterial() *Bug {
 	sphereBase := sphere.New(b.spherePrecision)
 	V, I, bo := sphereBase.MaterialMeshInput()
@@ -212,7 +219,6 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 	m.SetSpeed(b.velocity)
 	m.SetDirection(b.direction)
 
-	wingStrikeTime := float64(0.0)
 	// attach point mesh
 	attachPointWing1 := mesh.NewPointMesh(b.wrapper)
 	attachPointWing1.SetParent(Body)
@@ -233,7 +239,6 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 		wing2.SetParent(attachPointWing2)
 		wing2.SetBoundingObject(bo)
 		m.AddMesh(wing2)
-		wingStrikeTime = 3000
 		attachPointWing1.SetPosition(b.wing1AttachPointPosition())
 		attachPointWing2.SetPosition(b.wing2AttachPointPosition())
 	}
@@ -245,7 +250,7 @@ func (b *BugBuilder) BuildMaterial() *Bug {
 		movementRotationAxis:         b.movementRotationAxis,
 		sinceLastRotate:              0.0,
 		sameDirectionTime:            b.sameDirectionTime,
-		wingStrikeTime:               wingStrikeTime,
+		wingStrikeTime:               b.wingStrikeTime,
 		wingState:                    _WING_BOTTOM,
 		currentWingAnimationTime:     0.0,
 		maxWingRotationAngle:         75.0,
