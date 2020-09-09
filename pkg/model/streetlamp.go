@@ -10,6 +10,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/primitives/cylinder"
 	"github.com/akosgarai/playground_engine/pkg/primitives/sphere"
 	"github.com/akosgarai/playground_engine/pkg/texture"
+	"github.com/akosgarai/playground_engine/pkg/transformations"
 
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -309,7 +310,7 @@ func (b *StreetLampBuilder) textureTop(tex texture.Textures) *mesh.TexturedMesh 
 	V, I, bo := topCylinder.TexturedMeshInput()
 	top := mesh.NewTexturedMesh(V, I, tex, b.wrapper)
 	top.SetPosition(b.textureTopPosition())
-	rX, rY, rZ := matrixToAngles(b.rotationTransformationMatrixTextureTop())
+	rX, rY, rZ := transformations.ExtractAngles(b.rotationTransformationMatrixTextureTop())
 	top.RotateZ(rZ)
 	top.RotateX(rX)
 	top.RotateY(rY)

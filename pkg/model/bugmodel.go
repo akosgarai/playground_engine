@@ -9,6 +9,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/primitives/rectangle"
 	"github.com/akosgarai/playground_engine/pkg/primitives/sphere"
+	"github.com/akosgarai/playground_engine/pkg/transformations"
 
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -395,9 +396,9 @@ func (b *Bug) Update(dt float64) {
 		b.sinceLastRotate = 0.0
 		b.currentMovementRotationAngle = float32(math.Mod(float64(b.currentMovementRotationAngle+b.movementRotationAngle), 360))
 		// current values
-		cX, cY, cZ := matrixToAngles(b.Body().RotationTransformation())
+		cX, cY, cZ := transformations.ExtractAngles(b.Body().RotationTransformation())
 		// expected values
-		tX, tY, tZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentMovementRotationAngle), mgl32.TransformNormal(b.movementRotationAxis, b.Body().RotationTransformation())))
+		tX, tY, tZ := transformations.ExtractAngles(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentMovementRotationAngle), mgl32.TransformNormal(b.movementRotationAxis, b.Body().RotationTransformation())))
 		// rotate with the diff
 		b.RotateY(tY - cY)
 		b.RotateX(tX - cX)
@@ -440,9 +441,9 @@ func (b *Bug) animateWings(dt float64) {
 	rotationMatrixLeftWing := b.LeftWingAttachPoint().RotationTransformation()
 	rotationMatrixRightWing := b.RightWingAttachPoint().RotationTransformation()
 	// current rotation angles of the w1 without the attachpoint:
-	w1X, w1Y, w1Z := matrixToAngles(b.LeftWing().RotationTransformation().Mul4(rotationMatrixLeftWing.Inv()))
+	w1X, w1Y, w1Z := transformations.ExtractAngles(b.LeftWing().RotationTransformation().Mul4(rotationMatrixLeftWing.Inv()))
 	// current rotation angles of the w2 without the attachpoint:
-	w2X, w2Y, w2Z := matrixToAngles(b.RightWing().RotationTransformation().Mul4(rotationMatrixRightWing.Inv()))
+	w2X, w2Y, w2Z := transformations.ExtractAngles(b.RightWing().RotationTransformation().Mul4(rotationMatrixRightWing.Inv()))
 	// calculate the position of the wings:
 	rotatedOrigoBasedVectorLeftWing := mgl32.Vec3{0.0, -sinDeg, cosDeg}
 	rotatedOrigoBasedVectorRightWing := mgl32.Vec3{0.0, -sinDeg, -cosDeg}
@@ -454,8 +455,8 @@ func (b *Bug) animateWings(dt float64) {
 
 	// the rotation angles for the wings:
 	forward := mgl32.Vec3{1.0, 0.0, 0.0}
-	e1X, e1Y, e1Z := matrixToAngles(rotationMatrixLeftWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), forward)).Mul4(rotationMatrixLeftWing.Inv()))
-	e2X, e2Y, e2Z := matrixToAngles(rotationMatrixRightWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(-b.currentWingRotationAngle), forward)).Mul4(rotationMatrixRightWing.Inv()))
+	e1X, e1Y, e1Z := transformations.ExtractAngles(rotationMatrixLeftWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(b.currentWingRotationAngle), forward)).Mul4(rotationMatrixLeftWing.Inv()))
+	e2X, e2Y, e2Z := transformations.ExtractAngles(rotationMatrixRightWing.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(-b.currentWingRotationAngle), forward)).Mul4(rotationMatrixRightWing.Inv()))
 
 	// apply the rotations:
 	b.LeftWing().RotateZ(e1Z - w1Z)
