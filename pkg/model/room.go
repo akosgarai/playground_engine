@@ -541,24 +541,21 @@ func (r *Room) animateDoor(dt float64) {
 	// calculate the rotation vector of the door.
 	rotatedOrigoBasedVector := mgl32.Vec3{-sinDeg, 0.0, cosDeg}
 	attachPointRotationMatrix := r.doorWallAttachPoint.RotationTransformation()
-	transformedVector := mgl32.TransformNormal(rotatedOrigoBasedVector, attachPointRotationMatrix)
-	// rotation weight form the components of the rotated up vector
-	transformedUp := mgl32.TransformNormal(mgl32.Vec3{0.0, 1.0, 0.0}, attachPointRotationMatrix)
+	transformedVector := mgl32.TransformCoordinate(rotatedOrigoBasedVector, attachPointRotationMatrix)
+	// Update door position to the new one.
+	r.GetDoor().SetPosition(transformedVector.Mul(r.doorWidth / 2))
 
-	// the new position of the door.
-	doorPosFromAttachPoint := transformedVector.Mul(r.doorWidth / 2)
-
-	// Update door position to the newly calculated one.
-	door := r.GetDoor()
 	// current rotation angles of the door:
-	dX, dY, dZ := matrixToAngles(door.RotationTransformation())
+	dX, dY, dZ := matrixToAngles(r.GetDoor().RotationTransformation().Mul4(attachPointRotationMatrix.Inv()))
+
 	// the rotation angles for the given full angle:
-	eX, eY, eZ := matrixToAngles(mgl32.HomogRotate3D(mgl32.DegToRad(90.0-r.doorAnimationonAngle), transformedUp).Mul4(attachPointRotationMatrix))
-	door.SetPosition(doorPosFromAttachPoint)
+	up := mgl32.Vec3{0.0, 1.0, 0.0}
+	eX, eY, eZ := matrixToAngles(attachPointRotationMatrix.Mul4(mgl32.HomogRotate3D(mgl32.DegToRad(90.0-r.doorAnimationonAngle), up)).Mul4(attachPointRotationMatrix.Inv()))
+
 	// Apply the rotation on the axises.
-	door.RotateZ(eZ - dZ)
-	door.RotateX(eX - dX)
-	door.RotateY(eY - dY)
+	r.GetDoor().RotateZ(eZ - dZ)
+	r.GetDoor().RotateX(eX - dX)
+	r.GetDoor().RotateY(eY - dY)
 
 	if r.currentAnimationTime >= doorAnimationTime {
 		r.doorState = (r.doorState + 1) % 4
