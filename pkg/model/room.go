@@ -529,15 +529,10 @@ func (r *Room) animateDoor(dt float64) {
 	r.currentAnimationTime += maxDelta
 
 	// calculate the rotation angle. It depends on the doorState.
-	var rotationDegY float32
-	if r.doorState == _DOOR_OPENING {
-		rotationDegY = float32(90.0 / doorAnimationTime * maxDelta)
-	}
-	if r.doorState == _DOOR_CLOSING {
-		rotationDegY = float32(-90.0 / doorAnimationTime * maxDelta)
-	}
-	// The current animation angle is increased with the current rotation deg.
-	r.doorAnimationonAngle = r.doorAnimationonAngle - rotationDegY
+	currentRotationAngle := float32(r.doorState-2) * float32(90.0/doorAnimationTime*maxDelta)
+
+	// The current animation angle is decreased with the current rotation deg.
+	r.doorAnimationonAngle = r.doorAnimationonAngle - currentRotationAngle
 
 	// sin, cos of the current angle.
 	cosDeg := float32(math.Cos(float64(mgl32.DegToRad(r.doorAnimationonAngle))))
