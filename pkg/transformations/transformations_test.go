@@ -3,6 +3,8 @@ package transformations
 import (
 	"testing"
 
+	"github.com/akosgarai/playground_engine/pkg/testhelper"
+
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -174,6 +176,34 @@ func TestFloat32Abs(t *testing.T) {
 		abs := Float32Abs(tt.input)
 		if abs != tt.abs {
 			t.Errorf("Invalid f32 abs. Instead of '%f', got '%f'", tt.abs, abs)
+		}
+	}
+}
+func TestExtractAngles(t *testing.T) {
+	testData := []struct {
+		x float32
+		y float32
+		z float32
+	}{
+		{0.0, 0.0, 0.0},
+		{1.0, 1.0, 1.0},
+		{45.0, 0.0, 45.0},
+		{-45.0, 0.0, 45.0},
+		{30.0, 20.0, 45.0},
+		{-90.0, 0.0, 0.0},
+		{90.0, 0.0, 0.0},
+	}
+	for _, tt := range testData {
+		rotationMatrix := mgl32.HomogRotate3DY(mgl32.DegToRad(tt.y)).Mul4(mgl32.HomogRotate3DX(mgl32.DegToRad(tt.x))).Mul4(mgl32.HomogRotate3DZ(mgl32.DegToRad(tt.z)))
+		x, y, z := ExtractAngles(rotationMatrix)
+		if !testhelper.Float32ApproxEqual(x, tt.x, 0.0001) {
+			t.Errorf("Invalid x component. Instead of '%f', it is '%f'.", tt.x, x)
+		}
+		if !testhelper.Float32ApproxEqual(y, tt.y, 0.0001) {
+			t.Errorf("Invalid y component. Instead of '%f', it is '%f'.", tt.y, y)
+		}
+		if !testhelper.Float32ApproxEqual(z, tt.z, 0.0001) {
+			t.Errorf("Invalid z component. Instead of '%f', it is '%f'.", tt.z, z)
 		}
 	}
 }

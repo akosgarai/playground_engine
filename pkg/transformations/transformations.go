@@ -1,6 +1,7 @@
 package transformations
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -70,4 +71,27 @@ func Float32Abs(a float32) float32 {
 		return -a
 	}
 	return a
+}
+
+// From the HomogRotate3D matrix, the euler angle could be computed.
+// see: https://www.geometrictools.com/Documentation/EulerAngles.pdf (2.3)
+// returns angles
+func ExtractAngles(m mgl32.Mat4) (float32, float32, float32) {
+	var x, y, z float32
+	if m.At(1, 2) < 1 {
+		if m.At(1, 2) > -1 {
+			x = float32(math.Asin(-float64(m.At(1, 2))))
+			y = float32(math.Atan2(float64(m.At(0, 2)), float64(m.At(2, 2))))
+			z = float32(math.Atan2(float64(m.At(1, 0)), float64(m.At(1, 1))))
+		} else {
+			x = math.Pi / 2
+			y = -float32(math.Atan2(-float64(m.At(0, 1)), float64(m.At(0, 0))))
+			z = 0
+		}
+	} else {
+		x = -math.Pi / 2
+		y = float32(math.Atan2(-float64(m.At(0, 1)), float64(m.At(0, 0))))
+		z = 0
+	}
+	return mgl32.RadToDeg(x), mgl32.RadToDeg(y), mgl32.RadToDeg(z)
 }
