@@ -25,3 +25,7 @@ This function transforms an integer type number `int` to it's string representat
 ## Float32Abs
 
 This function returns the abs. value of a float32 number. If the number is less than 0, it returns `-1*number`, otherwise it returns the number itself.
+
+## ExtractAngles
+
+This function gets a matrix type `mgl32.Mat4` as input and extracts the euler rotation angles from the matrix, and returns them.
