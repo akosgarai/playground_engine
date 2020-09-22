@@ -1,15 +1,25 @@
 # Camera
 
 It represents the camera or eye. We see our model world from the camera's point of view. The implementation was based on the [learnopengl.com](https://learnopengl.com/Getting-started/Camera) tutorial.
+Now it supports 2 kind of cameras, the `DefaultCamera` - the one that we already had - and the `FPSCamera` - the one that is similar to the camera that we can see in FPS games.
 
 ## NewCamera
 
-Returns a new camera with the given setup.
+Returns a new DefaultCamera with the given setup.
 
 - `position` - the camera or eye position
 - `worldUp` - the up direction in the world coordinate system
 - `yaw` - the rotation in `Z` axis
 - `pitch` - the rotation in `Y` axis
+
+## NewFPSCamera
+
+Returns a new FPSCamera with the given setup.
+
+- `position` - the camera or eye position
+- `worldUp` - the up direction in the world coordinate system
+- `yaw` - the rotation in `Z` axis
+- `pitch` - the rotation in `Y` axis, also the value of the frontDirPitch.
 
 ## Walk
 
