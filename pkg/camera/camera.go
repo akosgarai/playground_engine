@@ -41,6 +41,13 @@ type Camera struct {
 	rotationStep float32
 }
 
+type DefaultCamera struct {
+	Camera
+}
+type FPSCamera struct {
+	Camera
+}
+
 // Log returns the string representation of this object.
 func (c *Camera) Log() string {
 	logString := "cameraPosition: Vector{" + transformations.Vec3ToString(c.cameraPosition) + "}\n"
@@ -65,7 +72,7 @@ func (c *Camera) Log() string {
 // worldUp - the up direction in the world coordinate system
 // yaw - the rotation in z
 // pitch - the rotation in y
-func NewCamera(position, worldUp mgl32.Vec3, yaw, pitch float32) *Camera {
+func NewCamera(position, worldUp mgl32.Vec3, yaw, pitch float32) *DefaultCamera {
 	cam := Camera{
 		pitch:             pitch,
 		yaw:               yaw,
@@ -77,39 +84,41 @@ func NewCamera(position, worldUp mgl32.Vec3, yaw, pitch float32) *Camera {
 	}
 
 	cam.updateVectors()
-	return &cam
+	return &DefaultCamera{
+		cam,
+	}
 }
 
 // BoundingObjectAfterWalk returns the bounding object of the new position.
-func (c *Camera) BoundingObjectAfterWalk(amount float32) *coldet.Sphere {
+func (c *DefaultCamera) BoundingObjectAfterWalk(amount float32) *coldet.Sphere {
 	np := c.cameraPosition.Add(c.cameraFrontDirection.Mul(amount))
 	return coldet.NewBoundingSphere([3]float32{np.X(), np.Y(), np.Z()}, 0.1)
 }
 
 // BoundingObjectAfterStrafe returns the bounding object of the new position.
-func (c *Camera) BoundingObjectAfterStrafe(amount float32) *coldet.Sphere {
+func (c *DefaultCamera) BoundingObjectAfterStrafe(amount float32) *coldet.Sphere {
 	np := c.cameraPosition.Add(c.cameraRightDirection.Mul(amount))
 	return coldet.NewBoundingSphere([3]float32{np.X(), np.Y(), np.Z()}, 0.1)
 }
 
 // BoundingObjectAfterLift returns the bounding object of the new position.
-func (c *Camera) BoundingObjectAfterLift(amount float32) *coldet.Sphere {
+func (c *DefaultCamera) BoundingObjectAfterLift(amount float32) *coldet.Sphere {
 	np := c.cameraPosition.Add(c.cameraUpDirection.Mul(amount))
 	return coldet.NewBoundingSphere([3]float32{np.X(), np.Y(), np.Z()}, 0.1)
 }
 
 // Walk updates the position (forward, back directions)
-func (c *Camera) Walk(amount float32) {
+func (c *DefaultCamera) Walk(amount float32) {
 	c.cameraPosition = c.cameraPosition.Add(c.cameraFrontDirection.Mul(amount))
 }
 
 // Strafe updates the position (left, right directions)
-func (c *Camera) Strafe(amount float32) {
+func (c *DefaultCamera) Strafe(amount float32) {
 	c.cameraPosition = c.cameraPosition.Add(c.cameraRightDirection.Mul(amount))
 }
 
 // Lift updates the position (up, down directions)
-func (c *Camera) Lift(amount float32) {
+func (c *DefaultCamera) Lift(amount float32) {
 	c.cameraPosition = c.cameraPosition.Add(c.cameraUpDirection.Mul(amount))
 }
 
