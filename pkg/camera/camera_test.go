@@ -57,7 +57,7 @@ func TestLog(t *testing.T) {
 		t.Errorf("Log too short: '%s'", log)
 	}
 }
-func TestWalk(t *testing.T) {
+func TestDefaultCameraWalk(t *testing.T) {
 	amountToMove := float32(2)
 
 	cam := NewCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
@@ -80,7 +80,31 @@ func TestWalk(t *testing.T) {
 		t.Error("Invalid right direction")
 	}
 }
-func TestStrafe(t *testing.T) {
+func TestFPSCameraWalk(t *testing.T) {
+	amountToMove := float32(2)
+
+	cam := NewFPSCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
+	cam.pitch = cam.pitch + 10.0
+	cam.Walk(amountToMove)
+	// the front is +X, amount is 2 -> position {2,0,0}
+	expectedPos := mgl32.Vec3{2, 0, 0}
+	if cam.cameraPosition != expectedPos {
+		t.Errorf("Invalid position. Instead of '%v', it is '%v'.", expectedPos, cam.cameraPosition)
+	}
+	if cam.GetPosition() != expectedPos {
+		t.Errorf("Invalid position")
+	}
+	if cam.cameraFrontDirection != DefaultFront {
+		t.Error("Invalid front direction")
+	}
+	if cam.cameraUpDirection != DefaultUp {
+		t.Error("Invalid up direction")
+	}
+	if cam.cameraRightDirection != DefaultRight {
+		t.Error("Invalid right direction")
+	}
+}
+func TestDefaultCameraStrafe(t *testing.T) {
 	amountToMove := float32(2)
 
 	cam := NewCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
@@ -103,10 +127,56 @@ func TestStrafe(t *testing.T) {
 		t.Error("Invalid right direction")
 	}
 }
-func TestLift(t *testing.T) {
+func TestFPSCameraStrafe(t *testing.T) {
+	amountToMove := float32(2)
+
+	cam := NewFPSCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
+	cam.Strafe(amountToMove)
+	// the right is -Z, amount is 2 -> position {0,0,-2}
+	expectedPos := mgl32.Vec3{0, 0, -2}
+	if cam.cameraPosition != expectedPos {
+		t.Error("Invalid movement")
+	}
+	if cam.GetPosition() != expectedPos {
+		t.Errorf("Invalid position")
+	}
+	if cam.cameraFrontDirection != DefaultFront {
+		t.Error("Invalid front direction")
+	}
+	if cam.cameraUpDirection != DefaultUp {
+		t.Error("Invalid up direction")
+	}
+	if cam.cameraRightDirection != DefaultRight {
+		t.Error("Invalid right direction")
+	}
+}
+func TestDefaultCameraLift(t *testing.T) {
 	amountToMove := float32(2)
 
 	cam := NewCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
+	cam.Lift(amountToMove)
+	// the up is -Y, amount is 2 -> position {0,-2,0}
+	expectedPos := mgl32.Vec3{0, -2, 0}
+	if cam.cameraPosition != expectedPos {
+		t.Error("Invalid movement")
+	}
+	if cam.GetPosition() != expectedPos {
+		t.Errorf("Invalid position")
+	}
+	if cam.cameraFrontDirection != DefaultFront {
+		t.Error("Invalid front direction")
+	}
+	if cam.cameraUpDirection != DefaultUp {
+		t.Error("Invalid up direction")
+	}
+	if cam.cameraRightDirection != DefaultRight {
+		t.Error("Invalid right direction")
+	}
+}
+func TestFPSCameraLift(t *testing.T) {
+	amountToMove := float32(2)
+
+	cam := NewFPSCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
 	cam.Lift(amountToMove)
 	// the up is -Y, amount is 2 -> position {0,-2,0}
 	expectedPos := mgl32.Vec3{0, -2, 0}
@@ -189,7 +259,7 @@ func TestGetBoundingObject(t *testing.T) {
 	}
 
 }
-func TestBoundingObjectAfterWalk(t *testing.T) {
+func TestDefaultCameraBoundingObjectAfterWalk(t *testing.T) {
 	cam := NewCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
 	bo := cam.BoundingObjectAfterWalk(1)
 	if bo.X() != DefaultCameraPosition.X()+1 {
@@ -206,7 +276,24 @@ func TestBoundingObjectAfterWalk(t *testing.T) {
 	}
 
 }
-func TestBoundingObjectAfterStrafe(t *testing.T) {
+func TestFPSCameraBoundingObjectAfterWalk(t *testing.T) {
+	cam := NewFPSCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
+	bo := cam.BoundingObjectAfterWalk(1)
+	if bo.X() != DefaultCameraPosition.X()+1 {
+		t.Errorf("Invalid X coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.X()+1, bo.X())
+	}
+	if bo.Y() != DefaultCameraPosition.Y() {
+		t.Errorf("Invalid Y coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.Y(), bo.Y())
+	}
+	if bo.Z() != DefaultCameraPosition.Z() {
+		t.Errorf("Invalid Z coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.Z(), bo.Z())
+	}
+	if bo.Radius() != 0.1 {
+		t.Errorf("Invalid radius for the bounding sphere. Instead of 0.1, we have '%f'.\n", bo.Radius())
+	}
+
+}
+func TestDefaultCameraBoundingObjectAfterStrafe(t *testing.T) {
 	cam := NewCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
 	bo := cam.BoundingObjectAfterStrafe(-1)
 	if bo.X() != DefaultCameraPosition.X() {
@@ -223,8 +310,41 @@ func TestBoundingObjectAfterStrafe(t *testing.T) {
 	}
 
 }
-func TestBoundingObjectAfterLift(t *testing.T) {
+func TestFPSCameraBoundingObjectAfterStrafe(t *testing.T) {
+	cam := NewFPSCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
+	bo := cam.BoundingObjectAfterStrafe(-1)
+	if bo.X() != DefaultCameraPosition.X() {
+		t.Errorf("Invalid X coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.X(), bo.X())
+	}
+	if bo.Y() != DefaultCameraPosition.Y() {
+		t.Errorf("Invalid Y coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.Y(), bo.Y())
+	}
+	if bo.Z() != DefaultCameraPosition.Z()+1 {
+		t.Errorf("Invalid Z coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.Z()+1, bo.Z())
+	}
+	if bo.Radius() != 0.1 {
+		t.Errorf("Invalid radius for the bounding sphere. Instead of 0.1, we have '%f'.\n", bo.Radius())
+	}
+
+}
+func TestDefaultCameraBoundingObjectAfterLift(t *testing.T) {
 	cam := NewCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
+	bo := cam.BoundingObjectAfterLift(-1)
+	if bo.X() != DefaultCameraPosition.X() {
+		t.Errorf("Invalid X coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.X(), bo.X())
+	}
+	if bo.Y() != DefaultCameraPosition.Y()+1 {
+		t.Errorf("Invalid Y coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.Y()+1, bo.Y())
+	}
+	if bo.Z() != DefaultCameraPosition.Z() {
+		t.Errorf("Invalid Z coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.Z(), bo.Z())
+	}
+	if bo.Radius() != 0.1 {
+		t.Errorf("Invalid radius for the bounding sphere. Instead of 0.1, we have '%f'.\n", bo.Radius())
+	}
+}
+func TestFPSCameraBoundingObjectAfterLift(t *testing.T) {
+	cam := NewFPSCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
 	bo := cam.BoundingObjectAfterLift(-1)
 	if bo.X() != DefaultCameraPosition.X() {
 		t.Errorf("Invalid X coordinate for the bounding sphere. Instead of '%f', we have '%f'.\n", DefaultCameraPosition.X(), bo.X())
