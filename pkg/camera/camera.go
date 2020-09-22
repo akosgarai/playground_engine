@@ -46,6 +46,7 @@ type DefaultCamera struct {
 }
 type FPSCamera struct {
 	Camera
+	frontDirPitch float32
 }
 
 // Log returns the string representation of this object.
@@ -87,6 +88,72 @@ func NewCamera(position, worldUp mgl32.Vec3, yaw, pitch float32) *DefaultCamera 
 	return &DefaultCamera{
 		cam,
 	}
+}
+func NewFPSCamera(position, worldUp mgl32.Vec3, yaw, pitch float32) *FPSCamera {
+	cam := Camera{
+		pitch:             pitch,
+		yaw:               yaw,
+		cameraPosition:    position,
+		cameraUpDirection: mgl32.Vec3{0, 1, 0},
+		worldUp:           worldUp,
+		velocity:          0,
+		rotationStep:      0,
+	}
+
+	cam.updateVectors()
+	return &FPSCamera{
+		cam,
+		pitch,
+	}
+}
+
+// BoundingObjectAfterWalk returns the bounding object of the new position.
+func (c *FPSCamera) BoundingObjectAfterWalk(amount float32) *coldet.Sphere {
+	// Front direction in the world system
+	radPitch := float64(mgl32.DegToRad(c.frontDirPitch))
+	radYaw := float64(mgl32.DegToRad(c.yaw))
+	worldFrontDir := mgl32.Vec3{
+		float32(math.Cos(radPitch) * math.Cos(radYaw)),
+		float32(math.Sin(radPitch)),
+		float32(math.Cos(radPitch) * math.Sin(radYaw)),
+	}.Normalize()
+	np := c.cameraPosition.Add(worldFrontDir.Mul(amount))
+	return coldet.NewBoundingSphere([3]float32{np.X(), np.Y(), np.Z()}, 0.1)
+}
+
+// BoundingObjectAfterStrafe returns the bounding object of the new position.
+func (c *FPSCamera) BoundingObjectAfterStrafe(amount float32) *coldet.Sphere {
+	np := c.cameraPosition.Add(c.cameraRightDirection.Mul(amount))
+	return coldet.NewBoundingSphere([3]float32{np.X(), np.Y(), np.Z()}, 0.1)
+}
+
+// BoundingObjectAfterLift returns the bounding object of the new position.
+func (c *FPSCamera) BoundingObjectAfterLift(amount float32) *coldet.Sphere {
+	np := c.cameraPosition.Add(c.cameraUpDirection.Mul(amount))
+	return coldet.NewBoundingSphere([3]float32{np.X(), np.Y(), np.Z()}, 0.1)
+}
+
+// Walk updates the position (forward, back directions)
+func (c *FPSCamera) Walk(amount float32) {
+	// Front direction in the world system
+	radPitch := float64(mgl32.DegToRad(c.frontDirPitch))
+	radYaw := float64(mgl32.DegToRad(c.yaw))
+	worldFrontDir := mgl32.Vec3{
+		float32(math.Cos(radPitch) * math.Cos(radYaw)),
+		float32(math.Sin(radPitch)),
+		float32(math.Cos(radPitch) * math.Sin(radYaw)),
+	}.Normalize()
+	c.cameraPosition = c.cameraPosition.Add(worldFrontDir.Mul(amount))
+}
+
+// Strafe updates the position (left, right directions)
+func (c *FPSCamera) Strafe(amount float32) {
+	c.cameraPosition = c.cameraPosition.Add(c.cameraRightDirection.Mul(amount))
+}
+
+// Lift updates the position (up, down directions)
+func (c *FPSCamera) Lift(amount float32) {
+	c.cameraPosition = c.cameraPosition.Add(c.cameraUpDirection.Mul(amount))
 }
 
 // BoundingObjectAfterWalk returns the bounding object of the new position.
