@@ -57,7 +57,7 @@ type ScreenBase struct {
 	// Setup function is called right before drawing.
 	setupFunction SetupFunction
 	// window size mostly used for text printing.
-	windowWindth float32
+	windowWidth  float32
 	windowHeight float32
 	// wrapper is mostly used for the text printing.
 	wrapper interfaces.GLWrapper
@@ -76,7 +76,7 @@ func newScreenBase() *ScreenBase {
 		uniformVector:             make(map[string]mgl32.Vec3),
 		closestDistance:           math.MaxFloat32,
 		setupFunction:             nil,
-		windowWindth:              0.0,
+		windowWidth:               0.0,
 		windowHeight:              0.0,
 	}
 }
@@ -594,9 +594,14 @@ func (s *ScreenBase) CleanPointLightSources() {
 	s.pointLightSources = []PointLightSource{}
 }
 
-// SetWindowSize function sets the windowWindth, windowHeight variables.
+// GetWindowSize function returns the windowWidth, windowHeight variables.
+func (s *ScreenBase) GetWindowSize() (float32, float32) {
+	return s.windowWidth, s.windowHeight
+}
+
+// SetWindowSize function sets the windowWidth, windowHeight variables.
 func (s *ScreenBase) SetWindowSize(wW, wH float32) {
-	s.windowWindth = wW
+	s.windowWidth = wW
 	s.windowHeight = wH
 }
 

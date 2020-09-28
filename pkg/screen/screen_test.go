@@ -500,3 +500,115 @@ func TestSetup(t *testing.T) {
 	}
 
 }
+func TestCleanSpotLightSource(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("Shouldn't have panic.")
+				t.Log(r)
+			}
+		}()
+		screen := New()
+		if len(screen.spotLightSources) != 0 {
+			t.Errorf("Invalid number if spot. length. Instead of '0', it is '%d'.", len(screen.spotLightSources))
+		}
+		ss := light.NewSpotLight([5]mgl32.Vec3{
+			mgl32.Vec3{0, 0, 0},
+			mgl32.Vec3{0, 0, 0},
+			mgl32.Vec3{0, 0, 0},
+			mgl32.Vec3{0, 0, 0},
+			mgl32.Vec3{0, 0, 0},
+		},
+			[5]float32{1, 0.5, 0.05, 4, 5},
+		)
+		uniforms := [10]string{"u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9", "u10"}
+		screen.AddSpotLightSource(ss, uniforms)
+		if len(screen.spotLightSources) != 1 {
+			t.Errorf("Invalid number if spot. length. Instead of '1', it is '%d'.", len(screen.spotLightSources))
+		}
+		screen.AddSpotLightSource(ss, uniforms)
+		if len(screen.spotLightSources) != 2 {
+			t.Errorf("Invalid number if spot. length. Instead of '2', it is '%d'.", len(screen.spotLightSources))
+		}
+		screen.CleanSpotLightSources()
+		if len(screen.spotLightSources) != 0 {
+			t.Errorf("Invalid number if spot. length. Instead of '0', it is '%d'.", len(screen.spotLightSources))
+		}
+	}()
+}
+func TestCleanPointLightSource(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("Shouldn't have panic.")
+				t.Log(r)
+			}
+		}()
+		screen := New()
+		if len(screen.pointLightSources) != 0 {
+			t.Errorf("Invalid number if point. length. Instead of '0', it is '%d'.", len(screen.pointLightSources))
+		}
+		ps := light.NewPointLight([4]mgl32.Vec3{
+			mgl32.Vec3{0, 0, 0},
+			mgl32.Vec3{0, 0, 0},
+			mgl32.Vec3{0, 0, 0},
+			mgl32.Vec3{0, 0, 0},
+		},
+			[3]float32{1, 0.5, 0.05},
+		)
+		uniforms := [7]string{"u1", "u2", "u3", "u4", "u5", "u6", "u7"}
+		screen.AddPointLightSource(ps, uniforms)
+		if len(screen.pointLightSources) != 1 {
+			t.Errorf("Invalid number if point. length. Instead of '1', it is '%d'.", len(screen.pointLightSources))
+		}
+		screen.AddPointLightSource(ps, uniforms)
+		if len(screen.pointLightSources) != 2 {
+			t.Errorf("Invalid number if point. length. Instead of '2', it is '%d'.", len(screen.pointLightSources))
+		}
+		screen.CleanPointLightSources()
+		if len(screen.pointLightSources) != 0 {
+			t.Errorf("Invalid number if point. length. Instead of '0', it is '%d'.", len(screen.pointLightSources))
+		}
+	}()
+}
+func TestSetWindowSize(t *testing.T) {
+	var screen Screen
+	testData := []struct {
+		x float32
+		y float32
+	}{
+		{10.0, 10.0},
+		{100.0, 100.0},
+		{600.0, 600.0},
+	}
+	for _, tt := range testData {
+		screen.SetWindowSize(tt.x, tt.y)
+		if screen.windowWidth != tt.x {
+			t.Errorf("Invalid windowWidth. Instead of '%f', we have '%f'.", tt.x, screen.windowWidth)
+		}
+		if screen.windowHeight != tt.y {
+			t.Errorf("Invalid windowHeight. Instead of '%f', we have '%f'.", tt.y, screen.windowHeight)
+		}
+	}
+}
+func TestGetWindowSize(t *testing.T) {
+	var screen Screen
+	testData := []struct {
+		x float32
+		y float32
+	}{
+		{10.0, 10.0},
+		{100.0, 100.0},
+		{600.0, 600.0},
+	}
+	for _, tt := range testData {
+		screen.SetWindowSize(tt.x, tt.y)
+		x, y := screen.GetWindowSize()
+		if x != tt.x {
+			t.Errorf("Invalid windowWidth. Instead of '%f', we have '%f'.", tt.x, x)
+		}
+		if y != tt.y {
+			t.Errorf("Invalid windowHeight. Instead of '%f', we have '%f'.", tt.y, y)
+		}
+	}
+}
