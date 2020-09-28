@@ -191,6 +191,16 @@ func (m *MenuScreen) BuildScreen() {
 	m.charset.Clear()
 	m.background.Clear()
 	optionsToDisplay := m.getOptionsToDisplay()
+	// variables for aspect ratio.
+	aspWidth := float32(1.0)
+	aspHeight := float32(1.0)
+	windowWidth, windowHeight := m.GetWindowSize()
+	if windowWidth > windowHeight {
+		aspWidth = float32(windowHeight) / float32(windowWidth)
+	} else if windowWidth < windowHeight {
+		aspHeight = float32(windowWidth) / float32(windowHeight)
+	}
+
 	positionY := -0.8 * m.frameWidth / 2.0
 	topOfTheBottomForegroundArea := (-(m.frameWidth / 2.0) + m.frameLength + m.detailContentBoxHeight)
 	positionOfTheBottomMenuItem := -0.8 * m.frameWidth / 4.0
@@ -201,10 +211,10 @@ func (m *MenuScreen) BuildScreen() {
 	positionX := positionOfTheBottomMenuItem
 	surfaceToOption := make(map[interfaces.Mesh]Option)
 	for i := len(optionsToDisplay) - 1; i >= 0; i-- {
-		surface := m.menuSurface(mgl32.Vec3{0.0, positionY, ZBackground})
+		surface := m.menuSurface(mgl32.Vec3{0.0, positionY * aspHeight, ZBackground})
 		optionsToDisplay[i].SetSurface(surface)
 		surfaceToOption[surface] = optionsToDisplay[i]
-		m.charset.PrintTo(optionsToDisplay[i].label, positionX, -0.03, ZText, 3.0/m.windowWindth, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
+		m.charset.PrintTo(optionsToDisplay[i].label, positionX*aspWidth, -0.03*aspHeight, ZText, 3.0/windowWidth, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
 		positionY += m.frameWidth * 0.2
 	}
 	bottomOfTheTopForegroundArea := m.frameWidth/2.0 - m.frameLength
