@@ -32,6 +32,8 @@ func InitGlfw(windowWidth, windowHeight int, windowTitle string) *glfw.Window {
 }
 
 // InitGlfwFullSize returns a *glfw.Window instance.
+// The width and height of the window is based on the size of
+// the workarea.
 func InitGlfwFullSize(windowTitle string) *glfw.Window {
 	if err := glfw.Init(); err != nil {
 		panic(fmt.Errorf("could not initialize glfw: %v", err))
