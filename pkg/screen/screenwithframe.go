@@ -129,7 +129,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	}
 
 	// bottom frame. it supposed to be full width long.
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -framePosition * aspHeight, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -framePosition, ZFrame}))
 	// left, right
 	frameModel.AddMesh(b.frameRectangle(b.frameLength*aspWidth, (b.frameWidth-b.frameLength)*aspHeight, mgl32.Vec3{-framePosition, 0.0, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameLength*aspWidth, (b.frameWidth-b.frameLength)*aspHeight, mgl32.Vec3{framePosition, 0.0, ZFrame}))
