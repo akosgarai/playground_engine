@@ -128,7 +128,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
 	}
 
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth*aspWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -framePosition * aspHeight, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth*aspWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -framePosition * aspWidth, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameLength*aspWidth, (b.frameWidth-b.frameLength)*aspHeight, mgl32.Vec3{-framePosition * aspWidth, 0.0, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameLength*aspWidth, (b.frameWidth-b.frameLength)*aspHeight, mgl32.Vec3{framePosition * aspWidth, 0.0, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth*aspWidth, b.frameLength*aspHeight, mgl32.Vec3{(halfWidth - (b.frameTopLeftWidth / 2)) * aspWidth, framePosition * aspHeight, ZFrame}))
