@@ -116,21 +116,24 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	frameModel := model.New()
 	// calculate the positions of the frames:
 	halfWidth := b.frameWidth / 2
-	halfLength := b.frameLength / 2
-	framePosition := halfWidth - halfLength
+	framePosition := halfWidth - (b.frameLength / 2)
 	fullWithoutFrame := b.frameWidth - (2 * b.frameLength)
 	// variables for aspect ratio.
 	aspWidth := float32(1.0)
 	aspHeight := float32(1.0)
 	if b.windowWidth > b.windowHeight {
 		aspWidth = float32(b.windowHeight) / float32(b.windowWidth)
-	} else if b.windowWidth < b.windowHeight {
+	}
+	if b.windowWidth < b.windowHeight {
 		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
 	}
 
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth*aspWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -framePosition * aspHeight, ZFrame}))
+	// bottom frame. it supposed to be full width long.
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -framePosition * aspHeight, ZFrame}))
+	// left, right
 	frameModel.AddMesh(b.frameRectangle(b.frameLength*aspWidth, (b.frameWidth-b.frameLength)*aspHeight, mgl32.Vec3{-framePosition * aspWidth, 0.0, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle(b.frameLength*aspWidth, (b.frameWidth-b.frameLength)*aspHeight, mgl32.Vec3{framePosition * aspWidth, 0.0, ZFrame}))
+	// top
 	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth*aspWidth, b.frameLength*aspHeight, mgl32.Vec3{(halfWidth - (b.frameTopLeftWidth / 2)) * aspWidth, framePosition * aspHeight, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle((b.frameWidth-b.frameTopLeftWidth-b.labelWidth)*aspWidth, b.frameLength*aspHeight, mgl32.Vec3{((-b.frameTopLeftWidth - b.labelWidth) / 2) * aspWidth, framePosition * aspHeight, ZFrame}))
 	var detailContentBox interfaces.Mesh
