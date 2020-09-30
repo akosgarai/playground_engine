@@ -212,8 +212,18 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
+	// variables for aspect ratio.
+	aspWidth := float32(1.0)
+	aspHeight := float32(1.0)
+	if b.windowWidth > b.windowHeight {
+		aspWidth = float32(b.windowHeight) / float32(b.windowWidth)
+	}
+	if b.windowWidth < b.windowHeight {
+		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
+	}
+
 	if b.headerLabel != "" {
-		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, b.frameWidth/2 - 0.075, ZFrame}
+		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, b.frameWidth/2*aspWidth*aspHeight - 0.075, ZFrame}
 		textContainer := b.frameRectangle(textWidth, 0.15, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
