@@ -203,7 +203,7 @@ func (m *MenuScreen) BuildScreen() {
 
 	positionY := -0.8 * m.frameWidth * aspWidth / 2.0
 	topOfTheBottomForegroundArea := (-(m.frameWidth / 2.0) + m.frameLength + m.detailContentBoxHeight)
-	positionOfTheBottomMenuItem := -0.8 * m.frameWidth / 4.0
+	positionOfTheBottomMenuItem := -0.8 * m.frameWidth * aspWidth / 4.0
 	bottomOffset := positionOfTheBottomMenuItem - topOfTheBottomForegroundArea
 	if bottomOffset > 0 {
 		bottomOffset = 0
