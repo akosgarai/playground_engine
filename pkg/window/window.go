@@ -52,9 +52,9 @@ func InitGlfwFullSize(windowTitle string) *glfw.Window {
 	glfw.WindowHint(glfw.ScaleToMonitor, glfw.True)
 
 	monitor := glfw.GetPrimaryMonitor()
-	_, _, waw, wah := monitor.GetWorkarea()
+	vm := monitor.GetVideoMode()
 
-	window, err := glfw.CreateWindow(waw, wah, windowTitle, monitor, nil)
+	window, err := glfw.CreateWindow(vm.Width, vm.Height, windowTitle, monitor, nil)
 
 	if err != nil {
 		panic(fmt.Errorf("could not create opengl renderer: %v", err))
