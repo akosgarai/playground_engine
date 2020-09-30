@@ -41,10 +41,15 @@ func InitGlfwFullSize(windowTitle string) *glfw.Window {
 
 	glfw.WindowHint(glfw.ContextVersionMajor, glwrapper.GL_MAJOR_VERSION)
 	glfw.WindowHint(glfw.ContextVersionMinor, glwrapper.GL_MINOR_VERSION)
-	glfw.WindowHint(glfw.Resizable, glfw.True)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
+	// Specifies whether the window will be resizable by the user.
+	glfw.WindowHint(glfw.Resizable, glfw.True)
+	// Specifies whether the window will have window decorations such as a border, a close widget, etc.
 	glfw.WindowHint(glfw.Decorated, glfw.False)
+	// Specified whether the window content area should be resized based on the monitor content scale of any monitor it is placed on.
+	// This includes the initial placement when the window is created.
+	glfw.WindowHint(glfw.ScaleToMonitor, glfw.True)
 
 	monitor := glfw.GetPrimaryMonitor()
 	_, _, waw, wah := monitor.GetWorkarea()
