@@ -192,14 +192,8 @@ func (m *MenuScreen) BuildScreen() {
 	m.background.Clear()
 	optionsToDisplay := m.getOptionsToDisplay()
 	// variables for aspect ratio.
-	aspWidth := float32(1.0)
-	aspHeight := float32(1.0)
-	windowWidth, windowHeight := m.GetWindowSize()
-	if windowWidth > windowHeight {
-		aspWidth = float32(windowHeight) / float32(windowWidth)
-	} else if windowWidth < windowHeight {
-		aspHeight = float32(windowWidth) / float32(windowHeight)
-	}
+	aspWidth, aspHeight := m.GetAspect()
+	windowWidth, _ := m.GetWindowSize()
 
 	positionY := -0.8 * m.frameWidth * aspWidth / 2.0
 	topOfTheBottomForegroundArea := (-(m.frameWidth / 2.0) + m.frameLength + m.detailContentBoxHeight)
@@ -215,7 +209,7 @@ func (m *MenuScreen) BuildScreen() {
 		optionsToDisplay[i].SetSurface(surface)
 		surfaceToOption[surface] = optionsToDisplay[i]
 		m.charset.PrintTo(optionsToDisplay[i].label, positionX*aspWidth, -0.03*aspHeight, ZText, 3.0/windowWidth, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
-		positionY += m.frameWidth * 0.2
+		positionY += m.frameWidth * aspWidth * 0.2
 	}
 	bottomOfTheTopForegroundArea := m.frameWidth/2.0 - m.frameLength
 	topOffset := positionY - bottomOfTheTopForegroundArea
@@ -242,7 +236,8 @@ func (m *MenuScreen) getOptionsToDisplay() []Option {
 
 // menuSurface creates a rectangle for the menu option.
 func (m *MenuScreen) menuSurface(position mgl32.Vec3) interfaces.Mesh {
-	menuWidth := m.frameWidth / 2.0
+	aspWidth, _ := m.GetAspect()
+	menuWidth := m.frameWidth * aspWidth / 2.0
 	menuHeight := menuWidth / 5
 	rect := rectangle.NewExact(menuWidth, menuHeight)
 	v, i, bo := rect.MeshInput()

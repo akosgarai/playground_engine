@@ -605,6 +605,20 @@ func (s *ScreenBase) SetWindowSize(wW, wH float32) {
 	s.windowHeight = wH
 }
 
+// GetAspect function returns the horizontal, vertical multipliers.
+func (s *ScreenBase) GetAspect() (float32, float32) {
+	vertical := float32(1.0)
+	horizontal := float32(1.0)
+
+	if s.windowWidth > s.windowHeight {
+		vertical = float32(s.windowHeight) / float32(s.windowWidth)
+	}
+	if s.windowWidth < s.windowHeight {
+		horizontal = float32(s.windowWidth) / float32(s.windowHeight)
+	}
+	return vertical, horizontal
+}
+
 // SetWrapper updates the wrapper with the new one.
 func (s *ScreenBase) SetWrapper(w interfaces.GLWrapper) {
 	s.wrapper = w
