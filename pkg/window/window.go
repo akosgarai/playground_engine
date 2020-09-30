@@ -46,7 +46,7 @@ func InitGlfwFullSize(windowTitle string) *glfw.Window {
 	// Specifies whether the window will be resizable by the user.
 	glfw.WindowHint(glfw.Resizable, glfw.True)
 	// Specifies whether the window will have window decorations such as a border, a close widget, etc.
-	glfw.WindowHint(glfw.Decorated, glfw.False)
+	glfw.WindowHint(glfw.Decorated, glfw.True)
 	// Specified whether the window content area should be resized based on the monitor content scale of any monitor it is placed on.
 	// This includes the initial placement when the window is created.
 	glfw.WindowHint(glfw.ScaleToMonitor, glfw.True)
