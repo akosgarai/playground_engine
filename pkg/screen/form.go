@@ -645,9 +645,9 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				index := formModel.GetIndex(msh)
 				if index > -1 {
 					formModel.SetTarget(index - 1)
+					formModel.AddCursor()
+					f.underEdit = formModel
 				}
-				formModel.AddCursor()
-				f.underEdit = formModel
 				break
 			}
 		}
