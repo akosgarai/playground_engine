@@ -244,7 +244,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		clearColor:                b.clearColor,
 	}
 	s.Setup(formScreen.setupFormScreen)
-	b.offsetY = b.frameWidth/2 - 0.1
+	b.offsetY = (b.frameWidth/2 - 0.1) * aspWidth * aspHeight
 	for i := 0; i < len(b.configOrder); i++ {
 		key := b.configOrder[i]
 		if _, ok := b.config[key]; ok {
