@@ -44,6 +44,7 @@ func InitGlfwFullSize(windowTitle string) *glfw.Window {
 	glfw.WindowHint(glfw.Resizable, glfw.True)
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
+	glfw.WindowHint(glfw.Decorated, glfw.False)
 
 	monitor := glfw.GetPrimaryMonitor()
 	_, _, waw, wah := monitor.GetWorkarea()
