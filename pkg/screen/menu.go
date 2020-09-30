@@ -262,8 +262,8 @@ func (m *MenuScreen) setupMenu(glWrapper interfaces.GLWrapper) {
 // It also handles the camera movement and rotation, if the camera is set.
 func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	aspWidth, aspHeight := s.GetAspect()
-	cursorX := float32(-posX) * aspWidth * s.frameWidth / 2
-	cursorY := float32(posY) * aspHeight * s.frameWidth / 2
+	cursorX := float32(-posX) * aspHeight * s.frameWidth / 2
+	cursorY := float32(posY) * aspWidth * s.frameWidth / 2
 	direction := mgl32.Vec3{0, 0, 0}
 	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
 		direction = mgl32.Vec3{0, -1, 0}
