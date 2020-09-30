@@ -118,7 +118,6 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	frameModel := model.New()
 	// calculate the positions of the frames:
 	halfWidth := b.frameWidth / 2
-	framePositionVertical := halfWidth - (b.frameLength / 2)
 	framePositionHorizontal := halfWidth - (b.frameLength / 2)
 	fullWithoutFrame := b.frameWidth - (2 * b.frameLength)
 	// variables for aspect ratio.
@@ -130,7 +129,8 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	if b.windowWidth < b.windowHeight {
 		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
 	}
-	fmt.Printf("framePositionVertical: %f/%f\n", framePositionVertical, framePositionVertical*aspWidth)
+	framePositionVertical := halfWidth*aspWidth - (b.frameLength / 2)
+	fmt.Printf("framePositionVertical: %f\n", framePositionVertical)
 
 	// bottom frame. it supposed to be full width long.
 	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -0.52, ZFrame}))
