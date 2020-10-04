@@ -256,6 +256,7 @@ func (m *MenuScreen) setupMenu(glWrapper interfaces.GLWrapper) {
 	glWrapper.BlendFunc(glwrapper.SRC_APLHA, glwrapper.ONE_MINUS_SRC_ALPHA)
 	col := m.backgroundColor
 	glWrapper.ClearColor(col.X(), col.Y(), col.Z(), 1.0)
+	glWrapper.Viewport(0, 0, int32(m.windowWidth), int32(m.windowHeight))
 }
 
 // Update loops on the shaderMap, and calls Update function on every Model.
