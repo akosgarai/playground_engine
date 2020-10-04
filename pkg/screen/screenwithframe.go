@@ -143,7 +143,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	var detailContentBox interfaces.Mesh
 	if b.detailContentBoxHeight > 0.0 {
 		detailContainerPosition := mgl32.Vec3{0.0, (-halfWidth + b.frameLength + b.detailContentBoxHeight/2) * aspHeight, ZFrame}
-		detailContentBox = b.frameRectangleWithMaterial(fullWithoutFrame*aspWidth, b.detailContentBoxHeight*aspHeight, detailContainerPosition, b.detailContentBoxMaterial)
+		detailContentBox = b.frameRectangleWithMaterial(fullWithoutFrame, b.detailContentBoxHeight*aspHeight, detailContainerPosition, b.detailContentBoxMaterial)
 		detailContentBox.RotateX(-180)
 		detailContentBox.RotateY(180)
 		frameModel.AddMesh(detailContentBox)
