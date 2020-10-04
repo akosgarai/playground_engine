@@ -463,6 +463,7 @@ func (f *FormScreen) setupFormScreen(wrapper interfaces.GLWrapper) {
 	wrapper.DepthFunc(glwrapper.LESS)
 	wrapper.Enable(glwrapper.BLEND)
 	wrapper.BlendFunc(glwrapper.SRC_APLHA, glwrapper.ONE_MINUS_SRC_ALPHA)
+	wrapper.Viewport(0, 0, int32(f.windowWidth), int32(f.windowHeight))
 }
 
 // initMaterialForTheFormItems sets the material to the default of the form items.
