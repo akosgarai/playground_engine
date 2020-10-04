@@ -223,7 +223,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	}
 
 	if b.headerLabel != "" {
-		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth / 2) * aspWidth * aspHeight, ZFrame}
+		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2 - 0.075) * aspWidth * aspHeight, ZFrame}
 		textContainer := b.frameRectangle(textWidth, 0.15*aspWidth*aspHeight, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
