@@ -196,9 +196,20 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	if b.charset == nil {
 		b.defaultCharset()
 	}
+
+	// variables for aspect ratio.
+	aspWidth := float32(1.0)
+	aspHeight := float32(1.0)
+	if b.windowWidth > b.windowHeight {
+		aspWidth = float32(b.windowHeight) / float32(b.windowWidth)
+	}
+	if b.windowWidth < b.windowHeight {
+		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
+	}
+
 	var textWidth float32
 	if b.headerLabel != "" {
-		textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
+		textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth*aspWidth*aspHeight)
 		b.SetLabelWidth(textWidth)
 	} else {
 		textWidth = 0.0
@@ -211,16 +222,6 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	s.AddShader(fgShaderApplication)
 
 	s.AddModelToShader(b.charset, fgShaderApplication)
-
-	// variables for aspect ratio.
-	aspWidth := float32(1.0)
-	aspHeight := float32(1.0)
-	if b.windowWidth > b.windowHeight {
-		aspWidth = float32(b.windowHeight) / float32(b.windowWidth)
-	}
-	if b.windowWidth < b.windowHeight {
-		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
-	}
 
 	if b.headerLabel != "" {
 		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2 - 0.075) * aspWidth * aspHeight, ZFrame}
