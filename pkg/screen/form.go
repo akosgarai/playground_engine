@@ -227,7 +227,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		textContainer := b.frameRectangle(textWidth, textHeight, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
-		b.charset.PrintTo(b.headerLabel, -textWidth/2, -0.05, ZText, 3.0/b.windowWidth*aspWidth*aspHeight, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
+		b.charset.PrintTo(b.headerLabel, -textWidth/2, -textHeight/3, ZText, 3.0/b.windowWidth*aspWidth*aspHeight, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
 	}
 
 	formScreen := &FormScreen{
