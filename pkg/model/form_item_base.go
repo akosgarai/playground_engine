@@ -33,6 +33,8 @@ type FormItemBase struct {
 	size        float32
 	label       string
 	description string
+	// This value is used for scaling the items.
+	aspect float32
 }
 
 // NewFormItemBase returns a FormItemBase. Its input is the width of the screen,
@@ -48,6 +50,7 @@ func NewFormItemBase(w, size float32, label, description string, mat *material.M
 		size:        size,
 		label:       label,
 		description: description,
+		aspect:      1.0,
 	}
 	labelPrimitive := rectangle.NewExact(fi.GetFormItemWidth(), fi.GetFormItemHeight())
 	v, i, bo := labelPrimitive.MeshInput()
@@ -70,7 +73,7 @@ func (fi *FormItemBase) GetFormItemWidth() float32 {
 
 // It returns the height of the form item.
 func (fi *FormItemBase) GetFormItemHeight() float32 {
-	return fi.width * ITEM_HEIGHT_MULTIPLIER
+	return fi.width * ITEM_HEIGHT_MULTIPLIER * fi.aspect
 }
 
 // It returns the width of the label area. (55% of the halfwidth)
