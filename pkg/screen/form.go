@@ -223,7 +223,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
 	if b.headerLabel != "" {
-		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2*aspWidth*aspHeight - textHeight/2), ZFrame}
+		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2 - textHeight/2), ZFrame}
 		textContainer := b.frameRectangle(textWidth, textHeight, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
