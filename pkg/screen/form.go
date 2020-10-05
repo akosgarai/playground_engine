@@ -207,12 +207,11 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
 	}
 
-	var textWidth float32
+	textWidth := float32(0.0)
+	textHeight := float32(0.0)
 	if b.headerLabel != "" {
-		textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth*aspWidth*aspHeight)
+		textWidth, textHeight = b.charset.TextContainerSize(b.headerLabel, 3.0/b.windowWidth*aspWidth*aspHeight)
 		b.SetLabelWidth(textWidth)
-	} else {
-		textWidth = 0.0
 	}
 	s := b.ScreenWithFrameBuilder.Build()
 
@@ -224,8 +223,8 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
 	if b.headerLabel != "" {
-		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2*aspWidth*aspHeight - 0.075), ZFrame}
-		textContainer := b.frameRectangle(textWidth, 0.15, textContainerPosition)
+		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2*aspWidth*aspHeight - textHeight/2), ZFrame}
+		textContainer := b.frameRectangle(textWidth, textHeight, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
 		b.charset.PrintTo(b.headerLabel, -textWidth/2, -0.05, ZText, 3.0/b.windowWidth*aspWidth*aspHeight, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
