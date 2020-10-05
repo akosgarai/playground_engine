@@ -198,19 +198,18 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	}
 
 	// variables for aspect ratio.
-	aspWidth := float32(1.0)
-	aspHeight := float32(1.0)
+	aspect := float32(1.0)
 	if b.windowWidth > b.windowHeight {
-		aspWidth = float32(b.windowHeight) / float32(b.windowWidth)
+		aspect = float32(b.windowHeight) / float32(b.windowWidth)
 	}
 	if b.windowWidth < b.windowHeight {
-		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
+		aspect = float32(b.windowWidth) / float32(b.windowHeight)
 	}
 
 	textWidth := float32(0.0)
 	textHeight := float32(0.0)
 	if b.headerLabel != "" {
-		textWidth, textHeight = b.charset.TextContainerSize(b.headerLabel, 3.0/b.windowWidth*aspWidth*aspHeight)
+		textWidth, textHeight = b.charset.TextContainerSize(b.headerLabel, 3.0/b.windowWidth*aspect)
 		b.SetLabelWidth(textWidth)
 	}
 	s := b.ScreenWithFrameBuilder.Build()
@@ -223,11 +222,11 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
 	if b.headerLabel != "" {
-		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2*aspWidth*aspHeight - textHeight/2), ZFrame}
+		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2*aspect - textHeight/2), ZFrame}
 		textContainer := b.frameRectangle(textWidth, textHeight, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
-		b.charset.PrintTo(b.headerLabel, -textWidth/2, -textHeight/2, ZText, 3.0/b.windowWidth*aspWidth*aspHeight, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
+		b.charset.PrintTo(b.headerLabel, -textWidth/2, -textHeight/2, ZText, 3.0/b.windowWidth*aspect, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
 	}
 
 	formScreen := &FormScreen{
@@ -244,7 +243,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		clearColor:                b.clearColor,
 	}
 	s.Setup(formScreen.setupFormScreen)
-	b.offsetY = (b.frameWidth/2 - 0.1) * aspWidth * aspHeight
+	b.offsetY = (b.frameWidth/2 - 0.1) * aspect
 	for i := 0; i < len(b.configOrder); i++ {
 		key := b.configOrder[i]
 		if _, ok := b.config[key]; ok {
@@ -703,14 +702,16 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{
 
 // addFormItemFromConfigBool sets up a FormItemBool from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemBool(f.GetFullWidth(), model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	w, h := f.GetAspect()
+	fi := model.NewFormItemBool(f.GetFullWidth(), model.ITEM_WIDTH_SHORT, w*h, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	f.formItemToConf[fi] = configItem
 	f.addFormItem(fi, configItem.GetDefaultValue())
 }
 
 // addFormItemFromConfigInt sets up a FormItemInt from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	w, h := f.GetAspect()
+	fi := model.NewFormItemInt(f.GetFullWidth(), model.ITEM_WIDTH_HALF, w*h, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.IntValidator))
 	}
@@ -720,7 +721,8 @@ func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos
 
 // addFormItemFromConfigFloat sets up a FormItemFloat from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemFloat(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	w, h := f.GetAspect()
+	fi := model.NewFormItemFloat(f.GetFullWidth(), model.ITEM_WIDTH_HALF, w*h, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
@@ -730,7 +732,8 @@ func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigText sets up a FormItemText from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemText(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	w, h := f.GetAspect()
+	fi := model.NewFormItemText(f.GetFullWidth(), model.ITEM_WIDTH_FULL, w*h, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.StringValidator))
 	}
@@ -740,7 +743,8 @@ func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, po
 
 // addFormItemFromConfigInt64 sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt64(f.GetFullWidth(), model.ITEM_WIDTH_LONG, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	w, h := f.GetAspect()
+	fi := model.NewFormItemInt64(f.GetFullWidth(), model.ITEM_WIDTH_LONG, w*h, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.Int64Validator))
 	}
@@ -750,7 +754,8 @@ func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigVector sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemVector(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, f.formItemDefaultMaterial, pos, f.wrapper)
+	w, h := f.GetAspect()
+	fi := model.NewFormItemVector(f.GetFullWidth(), model.ITEM_WIDTH_FULL, w*h, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
