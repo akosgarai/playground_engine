@@ -42,7 +42,7 @@ type FormItemBase struct {
 // the label, the material of the surface and a gl wrapper.
 // In case of invalid input enum, it panics.
 // It creates the surface mesh.
-func NewFormItemBase(w, size float32, label, description string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
+func NewFormItemBase(w, size, aspect float32, label, description string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
 	m := New()
 	fi := &FormItemBase{
 		BaseModel:   m,
@@ -50,7 +50,7 @@ func NewFormItemBase(w, size float32, label, description string, mat *material.M
 		size:        size,
 		label:       label,
 		description: description,
-		aspect:      1.0,
+		aspect:      aspect,
 	}
 	labelPrimitive := rectangle.NewExact(fi.GetFormItemWidth(), fi.GetFormItemHeight())
 	v, i, bo := labelPrimitive.MeshInput()
