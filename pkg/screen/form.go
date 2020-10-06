@@ -243,22 +243,22 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		if _, ok := b.config[key]; ok {
 			switch b.config[key].GetValueType() {
 			case config.ValueTypeInt:
-				formScreen.addFormItemFromConfigInt(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigInt(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeInt64:
-				formScreen.addFormItemFromConfigInt64(b.config[key], b.itemPosition(model.ITEM_WIDTH_LONG, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigInt64(b.config[key], b.itemPosition(model.ITEM_WIDTH_LONG, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeFloat:
-				formScreen.addFormItemFromConfigFloat(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigFloat(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeText:
-				formScreen.addFormItemFromConfigText(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigText(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeBool:
-				formScreen.addFormItemFromConfigBool(b.config[key], b.itemPosition(model.ITEM_WIDTH_SHORT, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigBool(b.config[key], b.itemPosition(model.ITEM_WIDTH_SHORT, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeVector:
-				formScreen.addFormItemFromConfigVector(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigVector(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			}
 		}
