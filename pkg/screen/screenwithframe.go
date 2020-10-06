@@ -131,6 +131,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	}
 	aspRatio := float32(b.windowWidth) / float32(b.windowHeight)
 	framePositionVertical := (halfWidth - (b.frameLength / 2)) * aspRatio
+	fmt.Printf("framePositionVertical: %f\n", framePositionVertical)
 
 	// bottom frame. it supposed to be full width long.
 	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -framePositionVertical, ZFrame}))
