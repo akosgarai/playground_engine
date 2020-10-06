@@ -698,7 +698,7 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{
 
 // addFormItemFromConfigBool sets up a FormItemBool from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	asp := f.GetAspectRatio()
+	asp := 1.0 / f.GetAspectRatio()
 	fi := model.NewFormItemBool(f.GetFullWidth(), model.ITEM_WIDTH_SHORT, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	f.formItemToConf[fi] = configItem
 	f.addFormItem(fi, configItem.GetDefaultValue())
@@ -706,7 +706,7 @@ func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, po
 
 // addFormItemFromConfigInt sets up a FormItemInt from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	asp := f.GetAspectRatio()
+	asp := 1.0 / f.GetAspectRatio()
 	fi := model.NewFormItemInt(f.GetFullWidth(), model.ITEM_WIDTH_HALF, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.IntValidator))
@@ -717,7 +717,7 @@ func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos
 
 // addFormItemFromConfigFloat sets up a FormItemFloat from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	asp := f.GetAspectRatio()
+	asp := 1.0 / f.GetAspectRatio()
 	fi := model.NewFormItemFloat(f.GetFullWidth(), model.ITEM_WIDTH_HALF, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
@@ -728,7 +728,7 @@ func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigText sets up a FormItemText from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	asp := f.GetAspectRatio()
+	asp := 1.0 / f.GetAspectRatio()
 	fi := model.NewFormItemText(f.GetFullWidth(), model.ITEM_WIDTH_FULL, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.StringValidator))
@@ -739,7 +739,7 @@ func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, po
 
 // addFormItemFromConfigInt64 sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	asp := f.GetAspectRatio()
+	asp := 1.0 / f.GetAspectRatio()
 	fi := model.NewFormItemInt64(f.GetFullWidth(), model.ITEM_WIDTH_LONG, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.Int64Validator))
@@ -750,7 +750,7 @@ func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigVector sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	asp := f.GetAspectRatio()
+	asp := 1.0 / f.GetAspectRatio()
 	fi := model.NewFormItemVector(f.GetFullWidth(), model.ITEM_WIDTH_FULL, asp, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
