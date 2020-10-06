@@ -611,12 +611,17 @@ func (s *ScreenBase) GetAspect() (float32, float32) {
 	horizontal := float32(1.0)
 
 	if s.windowWidth > s.windowHeight {
-		vertical = float32(s.windowHeight) / float32(s.windowWidth)
+		vertical = 1.0 / s.GetAspectRatio()
 	}
 	if s.windowWidth < s.windowHeight {
-		horizontal = float32(s.windowWidth) / float32(s.windowHeight)
+		horizontal = s.GetAspectRatio()
 	}
 	return vertical, horizontal
+}
+
+// GetAspectRatio returns the windowWidth/windowHeight ratio
+func (s *ScreenBase) GetAspectRatio() float32 {
+	return float32(s.windowWidth) / float32(s.windowHeight)
 }
 
 // SetWrapper updates the wrapper with the new one.
