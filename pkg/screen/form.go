@@ -637,7 +637,12 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				formModel := f.closestModel.(*model.FormItemVector)
 				msh, _ := formModel.ClosestMeshTo(mgl32.Vec3{coords.X(), coords.Y(), coords.Z() - 0.01})
 				index := formModel.GetIndex(msh)
+				// I know that the input mesh indexes are 1,2,3. I will implement the following logic:
+				// If the index gt -1, a field has to be set, if the index is 0, it will use the first index.
 				if index > -1 {
+					if index == 0 {
+						index++
+					}
 					formModel.SetTarget(index - 1)
 					formModel.AddCursor()
 					f.underEdit = formModel
