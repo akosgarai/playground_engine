@@ -138,7 +138,7 @@ func (fi *FormItemBase) GetCursorHeight() float32 {
 
 // GetCursorWidth returns the width size of the cursor.
 func (fi *FormItemBase) GetCursorWidth() float32 {
-	return CURSOR_WIDTH * fi.widthMultiplier()
+	return CURSOR_WIDTH
 }
 
 // GetCursorInitialPosition returns the initial position vector of the cursor.
