@@ -134,10 +134,10 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	fmt.Printf("framePositionVertical: %f\n", framePositionVertical)
 
 	// bottom frame. it supposed to be full width long.
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength*aspHeight, mgl32.Vec3{0.0, -framePositionVertical, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength/aspRatio, mgl32.Vec3{0.0, -framePositionVertical, ZFrame}))
 	// left, right
-	frameModel.AddMesh(b.frameRectangle(b.frameLength, (b.frameWidth*aspWidth - b.frameLength*2), mgl32.Vec3{-framePositionHorizontal, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameLength, (b.frameWidth*aspWidth - b.frameLength*2), mgl32.Vec3{framePositionHorizontal, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameLength, (b.frameWidth-b.frameLength*2)/aspRatio, mgl32.Vec3{-framePositionHorizontal, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameLength, (b.frameWidth-b.frameLength*2)/aspRatio, mgl32.Vec3{framePositionHorizontal, 0.0, ZFrame}))
 	// top
 	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth, b.frameLength*aspHeight, mgl32.Vec3{(halfWidth - (b.frameTopLeftWidth / 2)), framePositionVertical * aspHeight, ZFrame}))
 	frameModel.AddMesh(b.frameRectangle((b.frameWidth - b.frameTopLeftWidth - b.labelWidth), b.frameLength*aspHeight, mgl32.Vec3{((-b.frameTopLeftWidth - b.labelWidth) / 2), framePositionVertical * aspHeight, ZFrame}))
