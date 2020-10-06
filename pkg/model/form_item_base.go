@@ -1,6 +1,8 @@
 package model
 
 import (
+	"math"
+
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
@@ -138,7 +140,7 @@ func (fi *FormItemBase) GetCursorHeight() float32 {
 
 // GetCursorWidth returns the width size of the cursor.
 func (fi *FormItemBase) GetCursorWidth() float32 {
-	return CURSOR_WIDTH
+	return CURSOR_WIDTH * float32(math.Min(1, float64(fi.aspect)))
 }
 
 // GetCursorInitialPosition returns the initial position vector of the cursor.
