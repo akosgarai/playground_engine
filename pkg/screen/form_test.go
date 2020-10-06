@@ -408,23 +408,6 @@ func TestFormScreenUpdate(t *testing.T) {
 			builder.AddConfigFloat("label float", longDescription, 0.44, nil),
 			builder.AddConfigText("label text", DefaultFormItemDescription, "sample", nil),
 			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
-			builder.AddConfigVector("label vector", DefaultFormItemDescription, mgl32.Vec3{0.01, 0.02, 0.03}, nil),
 		})
 		form := builder.Build()
 		ks := store.NewGlfwKeyStore()
@@ -467,11 +450,8 @@ func TestFormScreenUpdate(t *testing.T) {
 		ks.Set(KEY_UP, false)
 		ks.Set(KEY_DOWN, true)
 		form.Update(0.4, -0.4, 0.79, ks, ms)
-		form.Update(10000.0, -0.4, 0.79, ks, ms)
 		ks.Set(KEY_DOWN, false)
 		form.Update(0.4, -0.4, 0.79, ks, ms)
-		ks.Set(KEY_UP, true)
-		form.Update(10000.0, -0.4, 0.79, ks, ms)
 	}()
 }
 func newFormScreen() *FormScreen {
