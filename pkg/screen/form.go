@@ -576,8 +576,6 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 	newScrollOffset := f.currentScrollOffset + FormItemMoveSpeed*float32(dt)*direction.Y()
 	if newScrollOffset > float32(0.0) && newScrollOffset < f.maxScrollOffset {
 		f.currentScrollOffset = newScrollOffset
-	} else if newScrollOffset > float32(0.0) && newScrollOffset > f.maxScrollOffset {
-		f.currentScrollOffset = f.maxScrollOffset
 	} else {
 		direction = mgl32.Vec3{0, 0, 0}
 	}
