@@ -130,7 +130,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 		aspHeight = float32(b.windowWidth) / float32(b.windowHeight)
 	}
 	aspRatio := float32(b.windowWidth) / float32(b.windowHeight)
-	framePositionVertical := (halfWidth - (b.frameLength / 2)) * aspRatio
+	framePositionVertical := (halfWidth - (b.frameLength / 2)) / aspRatio
 	fmt.Printf("framePositionVertical: %f\n", framePositionVertical)
 
 	// bottom frame. it supposed to be full width long.
