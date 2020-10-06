@@ -198,18 +198,12 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	}
 
 	// variables for aspect ratio.
-	aspect := float32(1.0)
-	if b.windowWidth > b.windowHeight {
-		aspect = float32(b.windowHeight) / float32(b.windowWidth)
-	}
-	if b.windowWidth < b.windowHeight {
-		aspect = float32(b.windowWidth) / float32(b.windowHeight)
-	}
+	aspRatio := float32(b.windowWidth) / float32(b.windowHeight)
 
 	textWidth := float32(0.0)
 	textHeight := float32(0.0)
 	if b.headerLabel != "" {
-		textWidth, textHeight = b.charset.TextContainerSize(b.headerLabel, 3.0/b.windowWidth*aspect)
+		textWidth, textHeight = b.charset.TextContainerSize(b.headerLabel, 3.0/b.windowWidth*aspRatio)
 		b.SetLabelWidth(textWidth)
 	}
 	s := b.ScreenWithFrameBuilder.Build()
@@ -222,11 +216,11 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
 	if b.headerLabel != "" {
-		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2*aspect - textHeight/2), ZFrame}
+		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2/aspRatio - textHeight/2), ZFrame}
 		textContainer := b.frameRectangle(textWidth, textHeight, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
-		b.charset.PrintTo(b.headerLabel, -textWidth/2, -textHeight/2, ZText, 3.0/b.windowWidth*aspect, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
+		b.charset.PrintTo(b.headerLabel, -textWidth/2, -textHeight/2, ZText, 3.0/b.windowWidth*aspRatio, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
 	}
 
 	formScreen := &FormScreen{
@@ -243,7 +237,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		clearColor:                b.clearColor,
 	}
 	s.Setup(formScreen.setupFormScreen)
-	b.offsetY = (b.frameWidth/2 - 0.1) * aspect
+	b.offsetY = (b.frameWidth/2 - 0.1) / aspRatio
 	for i := 0; i < len(b.configOrder); i++ {
 		key := b.configOrder[i]
 		if _, ok := b.config[key]; ok {
@@ -270,7 +264,7 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		}
 	}
 	// bottom pos (-width/2) + length of the frame mesh + length of the detail content box + length of one form item - offsetY. if this value is negative, we could us 0 instead.
-	formScreen.maxScrollOffset = (-(b.frameWidth / 2.0) + b.frameLength + b.detailContentBoxHeight + (formScreen.GetFullWidth() * model.ITEM_HEIGHT_MULTIPLIER) - b.offsetY)
+	formScreen.maxScrollOffset = (-(b.frameWidth/2.0)+b.frameLength+b.detailContentBoxHeight+(formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))/aspRatio - b.offsetY
 	if formScreen.maxScrollOffset < 0 {
 		formScreen.maxScrollOffset = 0.0
 	}
