@@ -192,26 +192,26 @@ func (m *MenuScreen) BuildScreen() {
 	m.background.Clear()
 	optionsToDisplay := m.getOptionsToDisplay()
 	// variables for aspect ratio.
-	aspWidth, aspHeight := m.GetAspect()
+	aspRatio := m.GetAspectRatio()
 	windowWidth, _ := m.GetWindowSize()
 
-	positionY := -0.8 * m.frameWidth * aspWidth / 2.0
+	positionY := -0.8 * m.frameWidth / 2.0 / aspRatio
 	topOfTheBottomForegroundArea := (-(m.frameWidth / 2.0) + m.frameLength + m.detailContentBoxHeight)
-	positionOfTheBottomMenuItem := -0.8 * m.frameWidth * aspWidth / 4.0
-	bottomOffset := positionOfTheBottomMenuItem - topOfTheBottomForegroundArea
+	positionOfTheBottomMenuItem := -0.8 * m.frameWidth / 4.0
+	bottomOffset := (positionOfTheBottomMenuItem - topOfTheBottomForegroundArea) * aspRatio
 	if bottomOffset > 0 {
 		bottomOffset = 0
 	}
 	positionX := positionOfTheBottomMenuItem
 	surfaceToOption := make(map[interfaces.Mesh]Option)
 	for i := len(optionsToDisplay) - 1; i >= 0; i-- {
-		surface := m.menuSurface(mgl32.Vec3{0.0, positionY * aspHeight, ZBackground})
+		surface := m.menuSurface(mgl32.Vec3{0.0, positionY, ZBackground})
 		optionsToDisplay[i].SetSurface(surface)
 		surfaceToOption[surface] = optionsToDisplay[i]
-		m.charset.PrintTo(optionsToDisplay[i].label, positionX*aspWidth, -0.03*aspHeight, ZText, 3.0/windowWidth, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
-		positionY += m.frameWidth * aspWidth * 0.2
+		m.charset.PrintTo(optionsToDisplay[i].label, positionX, -0.03/aspRatio, ZText, 3.0/windowWidth*aspRatio, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
+		positionY += m.frameWidth * 0.2 / aspRatio
 	}
-	bottomOfTheTopForegroundArea := m.frameWidth/2.0 - m.frameLength
+	bottomOfTheTopForegroundArea := (m.frameWidth/2.0 - m.frameLength) / aspRatio
 	topOffset := positionY - bottomOfTheTopForegroundArea
 	if topOffset < 0 {
 		topOffset = 0
@@ -236,9 +236,9 @@ func (m *MenuScreen) getOptionsToDisplay() []Option {
 
 // menuSurface creates a rectangle for the menu option.
 func (m *MenuScreen) menuSurface(position mgl32.Vec3) interfaces.Mesh {
-	aspWidth, _ := m.GetAspect()
-	menuWidth := m.frameWidth * aspWidth / 2.0
-	menuHeight := menuWidth / 5
+	aspRatio := m.GetAspectRatio()
+	menuWidth := m.frameWidth / 2.0
+	menuHeight := menuWidth / 5 / aspRatio
 	rect := rectangle.NewExact(menuWidth, menuHeight)
 	v, i, bo := rect.MeshInput()
 	msh := mesh.NewTexturedMaterialMesh(v, i, m.surfaceTexture, m.defaultMaterial, m.wrapper)
