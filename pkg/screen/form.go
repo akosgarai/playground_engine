@@ -561,9 +561,9 @@ func (f *FormScreen) highlightFormAction() {
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	f.sinceLastClick = f.sinceLastClick + dt
 	f.sinceLastDelete = f.sinceLastDelete + dt
-	aspWidth, aspHeight := f.GetAspect()
-	cursorX := float32(-posX) * aspHeight * f.frameWidth / 2
-	cursorY := float32(posY) * aspWidth * f.frameWidth / 2
+	aspRatio := f.GetAspectRatio()
+	cursorX := float32(-posX) * f.frameWidth / 2
+	cursorY := float32(posY) / aspRatio * f.frameWidth / 2
 	direction := mgl32.Vec3{0, 0, 0}
 	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
 		direction = mgl32.Vec3{0, -1, 0}
@@ -690,7 +690,9 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{
 	fi.RotateY(180)
 	fi.SetSpeed(FormItemMoveSpeed)
 	f.AddModelToShader(fi, f.formItemShader)
-	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, ZText, LabelFontScale/f.windowWidth, f.wrapper, fi.GetSurface(), []mgl32.Vec3{f.formItemLabelColor})
+	aspRatio := f.GetAspectRatio()
+	_, h := f.charset.TextContainerSize(fi.GetLabel(), LabelFontScale/f.windowWidth*aspRatio)
+	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -h/2, ZText, LabelFontScale/f.windowWidth*aspRatio, f.wrapper, fi.GetSurface(), []mgl32.Vec3{f.formItemLabelColor})
 	f.SetFormItemValue(fi, defaultValue)
 }
 
