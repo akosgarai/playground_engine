@@ -552,8 +552,11 @@ func (f *FormScreen) highlightFormAction() {
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
 	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWidth, f.GetFullWidth())
 	aspRatio := f.GetAspectRatio()
+	// The text in the dcb starts at the frame. To handle this issue, i will add some padding to the beginning of the text.
+	// The width of the paddign will be the widht of the 'w' character.
+	wW, _ := f.charset.TextContainerSize("w", InputTextFontScale/f.windowWidth*aspRatio)
 	for i := 0; i < len(lines); i++ {
-		f.charset.PrintTo(lines[i], -f.GetFullWidth()/2, 0.12-float32(i)*0.075, ZText, InputTextFontScale/f.windowWidth*aspRatio, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
+		f.charset.PrintTo(lines[i], -f.GetFullWidth()/2+wW, 0.12-float32(i)*0.075, ZText, InputTextFontScale/f.windowWidth*aspRatio, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
 	}
 }
 
