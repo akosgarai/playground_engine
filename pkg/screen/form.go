@@ -556,7 +556,7 @@ func (f *FormScreen) highlightFormAction() {
 	// The width of the paddign will be the widht of the 'w' character.
 	wW, hW := f.charset.TextContainerSize("W", InputTextFontScale/f.windowWidth*aspRatio)
 	for i := 0; i < len(lines); i++ {
-		f.charset.PrintTo(lines[i], (-f.GetFullWidth()+wW)/2, (f.detailContentBoxHeight-hW)/2-float32(i)*1.5*hW, ZText, InputTextFontScale/f.windowWidth*aspRatio, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
+		f.charset.PrintTo(lines[i], (-f.GetFullWidth()+wW)/2, (f.detailContentBoxHeight/aspRatio-hW)/2-float32(i)*1.5*hW, ZText, InputTextFontScale/f.windowWidth*aspRatio, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
 	}
 }
 
