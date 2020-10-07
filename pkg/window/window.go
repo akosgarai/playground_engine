@@ -137,59 +137,25 @@ func (b *WindowBuilder) Build() *glfw.Window {
 
 // InitGlfw returns a *glfw.Windows instance.
 func InitGlfw(windowWidth, windowHeight int, windowTitle string) *glfw.Window {
-	if err := glfw.Init(); err != nil {
-		panic(fmt.Errorf("could not initialize glfw: %v", err))
-	}
-
-	glfw.WindowHint(glfw.ContextVersionMajor, glwrapper.GL_MAJOR_VERSION)
-	glfw.WindowHint(glfw.ContextVersionMinor, glwrapper.GL_MINOR_VERSION)
-	glfw.WindowHint(glfw.Resizable, glfw.False)
-	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
-	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
-
-	window, err := glfw.CreateWindow(windowWidth, windowHeight, windowTitle, nil, nil)
-
-	if err != nil {
-		panic(fmt.Errorf("could not create opengl renderer: %v", err))
-	}
-
-	window.MakeContextCurrent()
-
-	return window
+	builder := NewWindowBuilder()
+	builder.SetWindowSize(windowWidth, windowHeight)
+	builder.SetFullScreen(false)
+	builder.SetDecorated(true)
+	builder.SetTitle(windowTitle)
+	return builder.Build()
 }
 
 // InitGlfwFullSize returns a *glfw.Window instance.
 // The width and height of the window is based on the size of
 // the workarea.
 func InitGlfwFullSize(windowTitle string) *glfw.Window {
-	if err := glfw.Init(); err != nil {
-		panic(fmt.Errorf("could not initialize glfw: %v", err))
-	}
-
-	glfw.WindowHint(glfw.ContextVersionMajor, glwrapper.GL_MAJOR_VERSION)
-	glfw.WindowHint(glfw.ContextVersionMinor, glwrapper.GL_MINOR_VERSION)
-	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
-	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
-	// Specifies whether the window will be resizable by the user.
-	glfw.WindowHint(glfw.Resizable, glfw.True)
-	// Specifies whether the window will have window decorations such as a border, a close widget, etc.
-	glfw.WindowHint(glfw.Decorated, glfw.True)
-	// Specified whether the window content area should be resized based on the monitor content scale of any monitor it is placed on.
-	// This includes the initial placement when the window is created.
-	glfw.WindowHint(glfw.ScaleToMonitor, glfw.True)
-
-	monitor := glfw.GetPrimaryMonitor()
-	vm := monitor.GetVideoMode()
-
-	window, err := glfw.CreateWindow(vm.Width, vm.Height, windowTitle, monitor, nil)
-
-	if err != nil {
-		panic(fmt.Errorf("could not create opengl renderer: %v", err))
-	}
-
-	window.MakeContextCurrent()
-
-	return window
+	builder := NewWindowBuilder()
+	w, h := builder.GetCurrentMonitorResolution()
+	builder.SetWindowSize(w, h)
+	builder.SetFullScreen(true)
+	builder.SetDecorated(false)
+	builder.SetTitle(windowTitle)
+	return builder.Build()
 }
 
 // DummyKeyCallback is responsible for the keyboard event handling with log.
