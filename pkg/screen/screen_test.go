@@ -612,28 +612,24 @@ func TestGetWindowSize(t *testing.T) {
 		}
 	}
 }
-func TestGetAspect(t *testing.T) {
+func TestGetAspectRatio(t *testing.T) {
 	var screen Screen
 	testData := []struct {
-		x  float32
-		y  float32
-		aX float32
-		aY float32
+		x      float32
+		y      float32
+		aspect float32
 	}{
-		{10.0, 10.0, 1.0, 1.0},
-		{100.0, 100.0, 1.0, 1.0},
-		{600.0, 600.0, 1.0, 1.0},
-		{1000.0, 500.0, 0.5, 1.0},
-		{500.0, 1000.0, 1.0, 0.5},
+		{10.0, 10.0, 1.0},
+		{100.0, 100.0, 1.0},
+		{600.0, 600.0, 1.0},
+		{1000.0, 500.0, 2.0},
+		{500.0, 1000.0, 0.5},
 	}
 	for _, tt := range testData {
 		screen.SetWindowSize(tt.x, tt.y)
-		x, y := screen.GetAspect()
-		if x != tt.aX {
-			t.Errorf("Invalid aspectX. Instead of '%f', we have '%f'.", tt.aX, x)
-		}
-		if y != tt.aY {
-			t.Errorf("Invalid aspectY. Instead of '%f', we have '%f'.", tt.aY, y)
+		aspect := screen.GetAspectRatio()
+		if aspect != tt.aspect {
+			t.Errorf("Invalid aspect. Instead of '%f', we have '%f'.", tt.aspect, aspect)
 		}
 	}
 }

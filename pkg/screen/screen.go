@@ -605,20 +605,6 @@ func (s *ScreenBase) SetWindowSize(wW, wH float32) {
 	s.windowHeight = wH
 }
 
-// GetAspect function returns the horizontal, vertical multipliers.
-func (s *ScreenBase) GetAspect() (float32, float32) {
-	vertical := float32(1.0)
-	horizontal := float32(1.0)
-
-	if s.windowWidth > s.windowHeight {
-		vertical = 1.0 / s.GetAspectRatio()
-	}
-	if s.windowWidth < s.windowHeight {
-		horizontal = s.GetAspectRatio()
-	}
-	return vertical, horizontal
-}
-
 // GetAspectRatio returns the windowWidth/windowHeight ratio
 func (s *ScreenBase) GetAspectRatio() float32 {
 	return float32(s.windowWidth) / float32(s.windowHeight)
