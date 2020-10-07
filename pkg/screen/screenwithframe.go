@@ -116,19 +116,24 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	frameModel := model.New()
 	// calculate the positions of the frames:
 	halfWidth := b.frameWidth / 2
-	halfLength := b.frameLength / 2
-	framePosition := halfWidth - halfLength
+	framePositionHorizontal := halfWidth - (b.frameLength / 2)
 	fullWithoutFrame := b.frameWidth - (2 * b.frameLength)
+	// variables for aspect ratio.
+	aspRatio := float32(b.windowWidth) / float32(b.windowHeight)
+	framePositionVertical := (halfWidth - (b.frameLength / 2)) / aspRatio
 
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength, mgl32.Vec3{0.0, -framePosition, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{-framePosition, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameLength, b.frameWidth-b.frameLength, mgl32.Vec3{framePosition, 0.0, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth, b.frameLength, mgl32.Vec3{halfWidth - (b.frameTopLeftWidth / 2), framePosition, ZFrame}))
-	frameModel.AddMesh(b.frameRectangle(b.frameWidth-b.frameTopLeftWidth-b.labelWidth, b.frameLength, mgl32.Vec3{(-b.frameTopLeftWidth - b.labelWidth) / 2, framePosition, ZFrame}))
+	// bottom frame. it supposed to be full width long.
+	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength/aspRatio, mgl32.Vec3{0.0, -framePositionVertical, ZFrame}))
+	// left, right
+	frameModel.AddMesh(b.frameRectangle(b.frameLength, (b.frameWidth-b.frameLength*2)/aspRatio, mgl32.Vec3{-framePositionHorizontal, 0.0, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle(b.frameLength, (b.frameWidth-b.frameLength*2)/aspRatio, mgl32.Vec3{framePositionHorizontal, 0.0, ZFrame}))
+	// top
+	frameModel.AddMesh(b.frameRectangle(b.frameTopLeftWidth, b.frameLength/aspRatio, mgl32.Vec3{(halfWidth - (b.frameTopLeftWidth / 2)), framePositionVertical, ZFrame}))
+	frameModel.AddMesh(b.frameRectangle((b.frameWidth - b.frameTopLeftWidth - b.labelWidth), b.frameLength/aspRatio, mgl32.Vec3{((-b.frameTopLeftWidth - b.labelWidth) / 2), framePositionVertical, ZFrame}))
 	var detailContentBox interfaces.Mesh
 	if b.detailContentBoxHeight > 0.0 {
-		detailContainerPosition := mgl32.Vec3{0.0, -halfWidth + b.frameLength + b.detailContentBoxHeight/2, ZFrame}
-		detailContentBox = b.frameRectangleWithMaterial(fullWithoutFrame, b.detailContentBoxHeight, detailContainerPosition, b.detailContentBoxMaterial)
+		detailContainerPosition := mgl32.Vec3{0.0, -framePositionVertical + b.detailContentBoxHeight/2/aspRatio, ZFrame}
+		detailContentBox = b.frameRectangleWithMaterial(fullWithoutFrame, b.detailContentBoxHeight/aspRatio, detailContainerPosition, b.detailContentBoxMaterial)
 		detailContentBox.RotateX(-180)
 		detailContentBox.RotateY(180)
 		frameModel.AddMesh(detailContentBox)

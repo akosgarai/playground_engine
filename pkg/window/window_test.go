@@ -280,6 +280,21 @@ func TestInitGlfw(t *testing.T) {
 		defer glfw.Terminate()
 	}()
 }
+func TestInitGlfwFullSize(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping it in short mode")
+	}
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer glfw.Terminate()
+				t.Error("Init shouldn't be failed.")
+			}
+		}()
+		InitGlfwFullSize(WindowTitle)
+		defer glfw.Terminate()
+	}()
+}
 func TestDummyKeyCallback(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping it in short mode")

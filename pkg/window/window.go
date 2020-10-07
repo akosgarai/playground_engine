@@ -137,25 +137,25 @@ func (b *WindowBuilder) Build() *glfw.Window {
 
 // InitGlfw returns a *glfw.Windows instance.
 func InitGlfw(windowWidth, windowHeight int, windowTitle string) *glfw.Window {
-	if err := glfw.Init(); err != nil {
-		panic(fmt.Errorf("could not initialize glfw: %v", err))
-	}
+	builder := NewWindowBuilder()
+	builder.SetWindowSize(windowWidth, windowHeight)
+	builder.SetFullScreen(false)
+	builder.SetDecorated(true)
+	builder.SetTitle(windowTitle)
+	return builder.Build()
+}
 
-	glfw.WindowHint(glfw.ContextVersionMajor, glwrapper.GL_MAJOR_VERSION)
-	glfw.WindowHint(glfw.ContextVersionMinor, glwrapper.GL_MINOR_VERSION)
-	glfw.WindowHint(glfw.Resizable, glfw.False)
-	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
-	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
-
-	window, err := glfw.CreateWindow(windowWidth, windowHeight, windowTitle, nil, nil)
-
-	if err != nil {
-		panic(fmt.Errorf("could not create opengl renderer: %v", err))
-	}
-
-	window.MakeContextCurrent()
-
-	return window
+// InitGlfwFullSize returns a *glfw.Window instance.
+// The width and height of the window is based on the size of
+// the workarea.
+func InitGlfwFullSize(windowTitle string) *glfw.Window {
+	builder := NewWindowBuilder()
+	w, h := builder.GetCurrentMonitorResolution()
+	builder.SetWindowSize(w, h)
+	builder.SetFullScreen(true)
+	builder.SetDecorated(false)
+	builder.SetTitle(windowTitle)
+	return builder.Build()
 }
 
 // DummyKeyCallback is responsible for the keyboard event handling with log.

@@ -14,6 +14,11 @@ It holds:
 - `uniformFloat`, for storing the float uniforms that needs to be set for every shader.
 - `uniformVector`, for storing the vector uniforms that needs to be set for every shader.
 - `setupFunction`, for gl setup, like Enable stuff, setup clear color, etc.
+- `closestMesh`, the mesh that is closest to the mouse position.
+- `closestModel`, the model of the closestMesh.
+- `closestDistance` is the distance of the mouse position from the closestMesh.
+- `windowWidth` is the width of the current window.
+- `windowHeight` is the height of the current window.
 
 ## Functions
 
@@ -84,6 +89,38 @@ Update loops on the shaderMap, and calls Update function on every Model. It also
 **Export**
 
 Export creates a directory for the screen and calls Export function on the models.
+
+**Setup**
+
+Setup function sets the setupFunction to the given one.
+
+**CleanSpotLightSources**
+
+CleanSpotLightSources function makes the spotLightSources empty.
+
+**CleanPointLightSources**
+
+CleanPointLightSources function makes the pointLightSources empty.
+
+**GetWindowSize**
+
+GetWindowSize function returns the windowWidth, windowHeight variables.
+
+**SetWindowSize**
+
+SetWindowSize function sets the windowWidth, windowHeight variables.
+
+**GetAspectRatio**
+
+GetAspectRatio returns the windowWidth/windowHeight ratio
+
+**SetWrapper**
+
+SetWrapper updates the wrapper with the new one.
+
+**GetWrapper**
+
+GetWrapper returns the current wrapper of the application.
 
 ## Screens
 

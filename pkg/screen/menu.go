@@ -191,10 +191,14 @@ func (m *MenuScreen) BuildScreen() {
 	m.charset.Clear()
 	m.background.Clear()
 	optionsToDisplay := m.getOptionsToDisplay()
-	positionY := -0.8 * m.frameWidth / 2.0
+	// variables for aspect ratio.
+	aspRatio := m.GetAspectRatio()
+	windowWidth, _ := m.GetWindowSize()
+
+	positionY := -0.8 * m.frameWidth / 2.0 / aspRatio
 	topOfTheBottomForegroundArea := (-(m.frameWidth / 2.0) + m.frameLength + m.detailContentBoxHeight)
 	positionOfTheBottomMenuItem := -0.8 * m.frameWidth / 4.0
-	bottomOffset := positionOfTheBottomMenuItem - topOfTheBottomForegroundArea
+	bottomOffset := (positionOfTheBottomMenuItem - topOfTheBottomForegroundArea) * aspRatio
 	if bottomOffset > 0 {
 		bottomOffset = 0
 	}
@@ -204,10 +208,11 @@ func (m *MenuScreen) BuildScreen() {
 		surface := m.menuSurface(mgl32.Vec3{0.0, positionY, ZBackground})
 		optionsToDisplay[i].SetSurface(surface)
 		surfaceToOption[surface] = optionsToDisplay[i]
-		m.charset.PrintTo(optionsToDisplay[i].label, positionX, -0.03, ZText, 3.0/m.windowWindth, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
-		positionY += m.frameWidth * 0.2
+		_, textHeight := m.charset.TextContainerSize(optionsToDisplay[i].label, 3.0/windowWidth*aspRatio)
+		m.charset.PrintTo(optionsToDisplay[i].label, positionX, -textHeight/2.0, ZText, 3.0/windowWidth*aspRatio, m.wrapper, optionsToDisplay[i].surface, m.fontColor)
+		positionY += m.frameWidth * 0.2 / aspRatio
 	}
-	bottomOfTheTopForegroundArea := m.frameWidth/2.0 - m.frameLength
+	bottomOfTheTopForegroundArea := (m.frameWidth/2.0 - m.frameLength) / aspRatio
 	topOffset := positionY - bottomOfTheTopForegroundArea
 	if topOffset < 0 {
 		topOffset = 0
@@ -232,8 +237,9 @@ func (m *MenuScreen) getOptionsToDisplay() []Option {
 
 // menuSurface creates a rectangle for the menu option.
 func (m *MenuScreen) menuSurface(position mgl32.Vec3) interfaces.Mesh {
+	aspRatio := m.GetAspectRatio()
 	menuWidth := m.frameWidth / 2.0
-	menuHeight := menuWidth / 5
+	menuHeight := menuWidth / 5 / aspRatio
 	rect := rectangle.NewExact(menuWidth, menuHeight)
 	v, i, bo := rect.MeshInput()
 	msh := mesh.NewTexturedMaterialMesh(v, i, m.surfaceTexture, m.defaultMaterial, m.wrapper)
@@ -251,13 +257,15 @@ func (m *MenuScreen) setupMenu(glWrapper interfaces.GLWrapper) {
 	glWrapper.BlendFunc(glwrapper.SRC_APLHA, glwrapper.ONE_MINUS_SRC_ALPHA)
 	col := m.backgroundColor
 	glWrapper.ClearColor(col.X(), col.Y(), col.Z(), 1.0)
+	glWrapper.Viewport(0, 0, int32(m.windowWidth), int32(m.windowHeight))
 }
 
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
 func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+	aspRatio := s.GetAspectRatio()
 	cursorX := float32(-posX) * s.frameWidth / 2
-	cursorY := float32(posY) * s.frameWidth / 2
+	cursorY := float32(posY) / aspRatio * s.frameWidth / 2
 	direction := mgl32.Vec3{0, 0, 0}
 	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
 		direction = mgl32.Vec3{0, -1, 0}

@@ -28,8 +28,8 @@ func (fi *FormItemFloat) GetValue() float32 {
 }
 
 // NewFormItemFloat returns a form item that maintains a float32 value.
-func NewFormItemFloat(maxWidth, itemWidth float32, label, description string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemFloat {
-	base := NewFormItemCharBase(maxWidth, itemWidth, label, description, CHAR_NUM_FLOAT, mat, position, wrapper)
+func NewFormItemFloat(maxWidth, itemWidth, aspect float32, label, description string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemFloat {
+	base := NewFormItemCharBase(maxWidth, itemWidth, aspect, label, description, CHAR_NUM_FLOAT, mat, position, wrapper)
 	return &FormItemFloat{
 		FormItemCharBase: base,
 		typeState:        "P",

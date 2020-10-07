@@ -1,6 +1,8 @@
 package model
 
 import (
+	"math"
+
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
@@ -16,6 +18,7 @@ const (
 	ITEM_WIDTH_LONG        = float32(2.0 / 3.0)
 	ITEM_WIDTH_SHORT       = float32(1.0 / 3.0)
 	ITEM_HEIGHT_MULTIPLIER = float32(0.1 / 1.96)
+	CURSOR_WIDTH           = float32(0.015)
 	CHAR_NUM_INT           = 10
 	CHAR_NUM_FLOAT         = 10
 	CHAR_NUM_INT64         = 20
@@ -33,6 +36,8 @@ type FormItemBase struct {
 	size        float32
 	label       string
 	description string
+	// This value is used for scaling the items.
+	aspect float32
 }
 
 // NewFormItemBase returns a FormItemBase. Its input is the width of the screen,
@@ -40,7 +45,7 @@ type FormItemBase struct {
 // the label, the material of the surface and a gl wrapper.
 // In case of invalid input enum, it panics.
 // It creates the surface mesh.
-func NewFormItemBase(w, size float32, label, description string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
+func NewFormItemBase(w, size, aspect float32, label, description string, mat *material.Material, wrapper interfaces.GLWrapper) *FormItemBase {
 	m := New()
 	fi := &FormItemBase{
 		BaseModel:   m,
@@ -48,6 +53,7 @@ func NewFormItemBase(w, size float32, label, description string, mat *material.M
 		size:        size,
 		label:       label,
 		description: description,
+		aspect:      aspect,
 	}
 	labelPrimitive := rectangle.NewExact(fi.GetFormItemWidth(), fi.GetFormItemHeight())
 	v, i, bo := labelPrimitive.MeshInput()
@@ -70,7 +76,7 @@ func (fi *FormItemBase) GetFormItemWidth() float32 {
 
 // It returns the height of the form item.
 func (fi *FormItemBase) GetFormItemHeight() float32 {
-	return fi.width * ITEM_HEIGHT_MULTIPLIER
+	return fi.width * ITEM_HEIGHT_MULTIPLIER * fi.aspect
 }
 
 // It returns the width of the label area. (55% of the halfwidth)
@@ -134,7 +140,7 @@ func (fi *FormItemBase) GetCursorHeight() float32 {
 
 // GetCursorWidth returns the width size of the cursor.
 func (fi *FormItemBase) GetCursorWidth() float32 {
-	return fi.GetFormItemHeight() * 0.15
+	return CURSOR_WIDTH * float32(math.Min(1, float64(fi.aspect)))
 }
 
 // GetCursorInitialPosition returns the initial position vector of the cursor.

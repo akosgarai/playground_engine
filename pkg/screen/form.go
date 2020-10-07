@@ -196,12 +196,15 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	if b.charset == nil {
 		b.defaultCharset()
 	}
-	var textWidth float32
+
+	// variables for aspect ratio.
+	aspRatio := float32(b.windowWidth) / float32(b.windowHeight)
+
+	textWidth := float32(0.0)
+	textHeight := float32(0.0)
 	if b.headerLabel != "" {
-		textWidth := b.charset.TextWidth(b.headerLabel, 3.0/b.windowWidth)
+		textWidth, textHeight = b.charset.TextContainerSize(b.headerLabel, 3.0/b.windowWidth*aspRatio)
 		b.SetLabelWidth(textWidth)
-	} else {
-		textWidth = 0.0
 	}
 	s := b.ScreenWithFrameBuilder.Build()
 
@@ -213,11 +216,11 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 	s.AddModelToShader(b.charset, fgShaderApplication)
 
 	if b.headerLabel != "" {
-		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, b.frameWidth/2 - 0.075, ZFrame}
-		textContainer := b.frameRectangle(textWidth, 0.15, textContainerPosition)
+		textContainerPosition := mgl32.Vec3{b.frameWidth/2 - b.frameTopLeftWidth - textWidth/2, (b.frameWidth/2/aspRatio - textHeight/2), ZFrame}
+		textContainer := b.frameRectangle(textWidth, textHeight, textContainerPosition)
 		textContainer.RotateX(-180)
 		textContainer.RotateY(180)
-		b.charset.PrintTo(b.headerLabel, -textWidth/2, -0.05, ZText, 3.0/b.windowWidth, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
+		b.charset.PrintTo(b.headerLabel, -textWidth/2, -textHeight/2, ZText, 3.0/b.windowWidth*aspRatio, b.wrapper, textContainer, []mgl32.Vec3{b.headerLabelColor})
 	}
 
 	formScreen := &FormScreen{
@@ -234,34 +237,34 @@ func (b *FormScreenBuilder) Build() *FormScreen {
 		clearColor:                b.clearColor,
 	}
 	s.Setup(formScreen.setupFormScreen)
-	b.offsetY = b.frameWidth/2 - 0.1
+	b.offsetY = (b.frameWidth/2 - 0.1) / aspRatio
 	for i := 0; i < len(b.configOrder); i++ {
 		key := b.configOrder[i]
 		if _, ok := b.config[key]; ok {
 			switch b.config[key].GetValueType() {
 			case config.ValueTypeInt:
-				formScreen.addFormItemFromConfigInt(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigInt(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeInt64:
-				formScreen.addFormItemFromConfigInt64(b.config[key], b.itemPosition(model.ITEM_WIDTH_LONG, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigInt64(b.config[key], b.itemPosition(model.ITEM_WIDTH_LONG, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeFloat:
-				formScreen.addFormItemFromConfigFloat(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigFloat(b.config[key], b.itemPosition(model.ITEM_WIDTH_HALF, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeText:
-				formScreen.addFormItemFromConfigText(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigText(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeBool:
-				formScreen.addFormItemFromConfigBool(b.config[key], b.itemPosition(model.ITEM_WIDTH_SHORT, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigBool(b.config[key], b.itemPosition(model.ITEM_WIDTH_SHORT, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			case config.ValueTypeVector:
-				formScreen.addFormItemFromConfigVector(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))
+				formScreen.addFormItemFromConfigVector(b.config[key], b.itemPosition(model.ITEM_WIDTH_FULL, formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER/aspRatio))
 				break
 			}
 		}
 	}
 	// bottom pos (-width/2) + length of the frame mesh + length of the detail content box + length of one form item - offsetY. if this value is negative, we could us 0 instead.
-	formScreen.maxScrollOffset = (-(b.frameWidth / 2.0) + b.frameLength + b.detailContentBoxHeight + (formScreen.GetFullWidth() * model.ITEM_HEIGHT_MULTIPLIER) - b.offsetY)
+	formScreen.maxScrollOffset = (-(b.frameWidth/2.0)+b.frameLength+b.detailContentBoxHeight+(formScreen.GetFullWidth()*model.ITEM_HEIGHT_MULTIPLIER))/aspRatio - b.offsetY
 	if formScreen.maxScrollOffset < 0 {
 		formScreen.maxScrollOffset = 0.0
 	}
@@ -453,6 +456,7 @@ func (f *FormScreen) setupFormScreen(wrapper interfaces.GLWrapper) {
 	wrapper.DepthFunc(glwrapper.LESS)
 	wrapper.Enable(glwrapper.BLEND)
 	wrapper.BlendFunc(glwrapper.SRC_APLHA, glwrapper.ONE_MINUS_SRC_ALPHA)
+	wrapper.Viewport(0, 0, int32(f.windowWidth), int32(f.windowHeight))
 }
 
 // initMaterialForTheFormItems sets the material to the default of the form items.
@@ -546,9 +550,15 @@ func (f *FormScreen) highlightFormAction() {
 		return
 	}
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
-	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWindth, f.GetFullWidth())
+	aspRatio := f.GetAspectRatio()
+	textScale := InputTextFontScale / f.windowWidth * aspRatio
+	// Get the width and height of the 'W' character. The height of the full screen, will be decreased with the width.
+	// The height will be used for the vertical positioning.
+	wW, hW := f.charset.TextContainerSize("W", textScale)
+	lines := f.wrapTextToLines(desc, textScale, f.GetFullWidth()-2*wW)
 	for i := 0; i < len(lines); i++ {
-		f.charset.PrintTo(lines[i], -f.GetFullWidth()/2, 0.12-float32(i)*0.075, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
+		lineVerticalPosition := f.detailContentBoxHeight/aspRatio/2 - float32(i+1)*1.5*hW
+		f.charset.PrintTo(lines[i], (-f.GetFullWidth()+wW)/2, lineVerticalPosition, ZText, textScale, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
 	}
 }
 
@@ -557,8 +567,9 @@ func (f *FormScreen) highlightFormAction() {
 func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	f.sinceLastClick = f.sinceLastClick + dt
 	f.sinceLastDelete = f.sinceLastDelete + dt
+	aspRatio := f.GetAspectRatio()
 	cursorX := float32(-posX) * f.frameWidth / 2
-	cursorY := float32(posY) * f.frameWidth / 2
+	cursorY := float32(posY) / aspRatio * f.frameWidth / 2
 	direction := mgl32.Vec3{0, 0, 0}
 	if keyStore.Get(KEY_UP) && !keyStore.Get(KEY_DOWN) {
 		direction = mgl32.Vec3{0, -1, 0}
@@ -632,11 +643,16 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 				formModel := f.closestModel.(*model.FormItemVector)
 				msh, _ := formModel.ClosestMeshTo(mgl32.Vec3{coords.X(), coords.Y(), coords.Z() - 0.01})
 				index := formModel.GetIndex(msh)
+				// I know that the input mesh indexes are 1,2,3. I will implement the following logic:
+				// If the index gt -1, a field has to be set, if the index is 0, it will use the first index.
 				if index > -1 {
+					if index == 0 {
+						index++
+					}
 					formModel.SetTarget(index - 1)
+					formModel.AddCursor()
+					f.underEdit = formModel
 				}
-				formModel.AddCursor()
-				f.underEdit = formModel
 				break
 			}
 		}
@@ -649,12 +665,15 @@ func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeySto
 			f.underEdit.DeleteLastCharacter()
 			f.syncFormItemValuesToConfigValue()
 			f.charset.CleanSurface(f.underEdit.GetTarget())
+			aspRatio := f.GetAspectRatio()
+			textScale := InputTextFontScale / f.windowWidth * aspRatio
+			_, hW := f.charset.TextContainerSize("W", textScale)
 			switch f.underEdit.(type) {
 			case *model.FormItemVector:
-				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -hW/2, ZText, textScale, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 				break
 			default:
-				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
+				f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -hW/2, ZText, textScale, f.wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 				break
 			}
 		}
@@ -685,20 +704,25 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{
 	fi.RotateY(180)
 	fi.SetSpeed(FormItemMoveSpeed)
 	f.AddModelToShader(fi, f.formItemShader)
-	f.charset.PrintTo(fi.GetLabel(), -(fi.GetFormItemWidth()/2)*0.999, -0.03, ZText, LabelFontScale/f.windowWindth, f.wrapper, fi.GetSurface(), []mgl32.Vec3{f.formItemLabelColor})
+	aspRatio := f.GetAspectRatio()
+	textScale := LabelFontScale / f.windowWidth * aspRatio
+	wW, hW := f.charset.TextContainerSize("W", textScale)
+	f.charset.PrintTo(fi.GetLabel(), (-fi.GetFormItemWidth()+wW)/2, -hW/2, ZText, textScale, f.wrapper, fi.GetSurface(), []mgl32.Vec3{f.formItemLabelColor})
 	f.SetFormItemValue(fi, defaultValue)
 }
 
 // addFormItemFromConfigBool sets up a FormItemBool from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigBool(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemBool(f.GetFullWidth(), model.ITEM_WIDTH_SHORT, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	asp := 1.0 / f.GetAspectRatio()
+	fi := model.NewFormItemBool(f.GetFullWidth(), model.ITEM_WIDTH_SHORT, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	f.formItemToConf[fi] = configItem
 	f.addFormItem(fi, configItem.GetDefaultValue())
 }
 
 // addFormItemFromConfigInt sets up a FormItemInt from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	asp := 1.0 / f.GetAspectRatio()
+	fi := model.NewFormItemInt(f.GetFullWidth(), model.ITEM_WIDTH_HALF, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.IntValidator))
 	}
@@ -708,7 +732,8 @@ func (f *FormScreen) addFormItemFromConfigInt(configItem *config.ConfigItem, pos
 
 // addFormItemFromConfigFloat sets up a FormItemFloat from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemFloat(f.GetFullWidth(), model.ITEM_WIDTH_HALF, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	asp := 1.0 / f.GetAspectRatio()
+	fi := model.NewFormItemFloat(f.GetFullWidth(), model.ITEM_WIDTH_HALF, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
@@ -718,7 +743,8 @@ func (f *FormScreen) addFormItemFromConfigFloat(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigText sets up a FormItemText from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemText(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	asp := 1.0 / f.GetAspectRatio()
+	fi := model.NewFormItemText(f.GetFullWidth(), model.ITEM_WIDTH_FULL, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.StringValidator))
 	}
@@ -728,7 +754,8 @@ func (f *FormScreen) addFormItemFromConfigText(configItem *config.ConfigItem, po
 
 // addFormItemFromConfigInt64 sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemInt64(f.GetFullWidth(), model.ITEM_WIDTH_LONG, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
+	asp := 1.0 / f.GetAspectRatio()
+	fi := model.NewFormItemInt64(f.GetFullWidth(), model.ITEM_WIDTH_LONG, asp, configItem.GetLabel(), configItem.GetDescription(), f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.Int64Validator))
 	}
@@ -738,7 +765,8 @@ func (f *FormScreen) addFormItemFromConfigInt64(configItem *config.ConfigItem, p
 
 // addFormItemFromConfigVector sets up a FormItemInt64 from a ConfigItem structure.
 func (f *FormScreen) addFormItemFromConfigVector(configItem *config.ConfigItem, pos mgl32.Vec3) {
-	fi := model.NewFormItemVector(f.GetFullWidth(), model.ITEM_WIDTH_FULL, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, f.formItemDefaultMaterial, pos, f.wrapper)
+	asp := 1.0 / f.GetAspectRatio()
+	fi := model.NewFormItemVector(f.GetFullWidth(), model.ITEM_WIDTH_FULL, asp, configItem.GetLabel(), configItem.GetDescription(), model.CHAR_NUM_FLOAT, f.formItemDefaultMaterial, pos, f.wrapper)
 	if configItem.GetValidatorFunction() != nil {
 		fi.SetValidator(configItem.GetValidatorFunction().(model.FloatValidator))
 	}
@@ -756,16 +784,19 @@ func (f *FormScreen) setDefaultValueChar(input string) {
 // CharCallback is the character stream input handler
 func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 	if f.underEdit != nil {
-		offsetX := f.charset.TextWidth(string(char), InputTextFontScale/f.windowWindth)
+		aspRatio := f.GetAspectRatio()
+		textScale := InputTextFontScale / f.windowWidth * aspRatio
+		offsetX := f.charset.TextWidth(string(char), textScale)
 		f.underEdit.CharCallback(char, offsetX)
 		f.syncFormItemValuesToConfigValue()
 		f.charset.CleanSurface(f.underEdit.GetTarget())
+		_, hW := f.charset.TextContainerSize("W", textScale)
 		switch f.underEdit.(type) {
 		case *model.FormItemVector:
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -hW/2, ZText, textScale, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 			break
 		default:
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWindth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -hW/2, ZText, textScale, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 			break
 		}
 	}

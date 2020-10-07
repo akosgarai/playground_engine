@@ -20,8 +20,8 @@ func (fi *FormItemText) GetValue() string {
 }
 
 // NewFormItemText returns a form item that maintains a string value.
-func NewFormItemText(maxWidth, itemWidth float32, label, description string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemText {
-	base := NewFormItemCharBase(maxWidth, itemWidth, label, description, CHAR_NUM_TEXT, mat, position, wrapper)
+func NewFormItemText(maxWidth, itemWidth, aspect float32, label, description string, mat *material.Material, position mgl32.Vec3, wrapper interfaces.GLWrapper) *FormItemText {
+	base := NewFormItemCharBase(maxWidth, itemWidth, aspect, label, description, CHAR_NUM_TEXT, mat, position, wrapper)
 	return &FormItemText{
 		FormItemCharBase: base,
 		validator:        nil,
