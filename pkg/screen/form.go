@@ -551,8 +551,9 @@ func (f *FormScreen) highlightFormAction() {
 	}
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
 	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWidth, f.GetFullWidth())
+	aspRatio := f.GetAspectRatio()
 	for i := 0; i < len(lines); i++ {
-		f.charset.PrintTo(lines[i], -f.GetFullWidth()/2, 0.12-float32(i)*0.075, ZText, InputTextFontScale/f.windowWidth, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
+		f.charset.PrintTo(lines[i], -f.GetFullWidth()/2, 0.12-float32(i)*0.075, ZText, InputTextFontScale/f.windowWidth*aspRatio, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
 	}
 }
 
