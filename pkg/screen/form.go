@@ -784,12 +784,12 @@ func (f *FormScreen) setDefaultValueChar(input string) {
 // CharCallback is the character stream input handler
 func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 	if f.underEdit != nil {
-		offsetX := f.charset.TextWidth(string(char), InputTextFontScale/f.windowWidth)
+		aspRatio := f.GetAspectRatio()
+		textScale := InputTextFontScale / f.windowWidth * aspRatio
+		offsetX := f.charset.TextWidth(string(char), textScale)
 		f.underEdit.CharCallback(char, offsetX)
 		f.syncFormItemValuesToConfigValue()
 		f.charset.CleanSurface(f.underEdit.GetTarget())
-		aspRatio := f.GetAspectRatio()
-		textScale := InputTextFontScale / f.windowWidth * aspRatio
 		_, hW := f.charset.TextContainerSize("W", textScale)
 		switch f.underEdit.(type) {
 		case *model.FormItemVector:
