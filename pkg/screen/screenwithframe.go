@@ -1,8 +1,6 @@
 package screen
 
 import (
-	"fmt"
-
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/light"
@@ -123,7 +121,6 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	// variables for aspect ratio.
 	aspRatio := float32(b.windowWidth) / float32(b.windowHeight)
 	framePositionVertical := (halfWidth - (b.frameLength / 2)) / aspRatio
-	fmt.Printf("framePositionVertical: %f\n", framePositionVertical)
 
 	// bottom frame. it supposed to be full width long.
 	frameModel.AddMesh(b.frameRectangle(b.frameWidth, b.frameLength/aspRatio, mgl32.Vec3{0.0, -framePositionVertical, ZFrame}))
@@ -174,7 +171,6 @@ func (b *ScreenWithFrameBuilder) frameRectangle(width, length float32, position 
 	return b.frameRectangleWithMaterial(width, length, position, b.frameMaterial)
 }
 func (b *ScreenWithFrameBuilder) frameRectangleWithMaterial(width, length float32, position mgl32.Vec3, mat *material.Material) *mesh.TexturedMaterialMesh {
-	fmt.Printf("Frame mesh (%f * %f) to %v position.\n", width, length, position)
 	v, i, _ := rectangle.NewExact(width, length).MeshInput()
 	var tex texture.Textures
 	tex.TransparentTexture(1, 1, 128, "tex.diffuse", b.wrapper)
