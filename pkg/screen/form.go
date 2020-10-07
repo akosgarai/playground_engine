@@ -788,12 +788,15 @@ func (f *FormScreen) CharCallback(char rune, wrapper interfaces.GLWrapper) {
 		f.underEdit.CharCallback(char, offsetX)
 		f.syncFormItemValuesToConfigValue()
 		f.charset.CleanSurface(f.underEdit.GetTarget())
+		aspRatio := f.GetAspectRatio()
+		textScale := InputTextFontScale / f.windowWidth * aspRatio
+		_, hW := f.charset.TextContainerSize("W", textScale)
 		switch f.underEdit.(type) {
 		case *model.FormItemVector:
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWidth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.(*model.FormItemVector).GetVectorCursorInitialPosition().X(), -hW/2, ZText, textScale, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 			break
 		default:
-			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -0.015, ZText, InputTextFontScale/f.windowWidth, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
+			f.charset.PrintTo(f.underEdit.ValueToString(), -f.underEdit.GetCursorInitialPosition().X(), -hW/2, ZText, textScale, wrapper, f.underEdit.GetTarget(), []mgl32.Vec3{f.formItemInputColor})
 			break
 		}
 	}
