@@ -550,14 +550,15 @@ func (f *FormScreen) highlightFormAction() {
 		return
 	}
 	desc := f.closestModel.(interfaces.FormItem).GetDescription()
-	lines := f.wrapTextToLines(desc, InputTextFontScale/f.windowWidth, f.GetFullWidth())
 	aspRatio := f.GetAspectRatio()
-	// The text in the dcb starts at the frame. To handle this issue, i will add some padding to the beginning of the text.
-	// The width of the paddign will be the widht of the 'w' character.
-	wW, hW := f.charset.TextContainerSize("W", InputTextFontScale/f.windowWidth*aspRatio)
+	textScale := InputTextFontScale / f.windowWidth * aspRatio
+	// Get the width and height of the 'W' character. The height of the full screen, will be decreased with the width.
+	// The height will be used for the vertical positioning.
+	wW, hW := f.charset.TextContainerSize("W", textScale)
+	lines := f.wrapTextToLines(desc, textScale, f.GetFullWidth()-2*wW)
 	for i := 0; i < len(lines); i++ {
 		lineVerticalPosition := f.detailContentBoxHeight/aspRatio/2 - float32(i+1)*1.5*hW
-		f.charset.PrintTo(lines[i], (-f.GetFullWidth()+wW)/2, lineVerticalPosition, ZText, InputTextFontScale/f.windowWidth*aspRatio, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
+		f.charset.PrintTo(lines[i], (-f.GetFullWidth()+wW)/2, lineVerticalPosition, ZText, textScale, f.wrapper, f.detailContentBox, []mgl32.Vec3{f.formItemLabelColor})
 	}
 }
 
