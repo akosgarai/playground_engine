@@ -707,7 +707,7 @@ func (f *FormScreen) addFormItem(fi interfaces.FormItem, defaultValue interface{
 	aspRatio := f.GetAspectRatio()
 	textScale := LabelFontScale / f.windowWidth * aspRatio
 	wW, hW := f.charset.TextContainerSize("W", textScale)
-	f.charset.PrintTo(fi.GetLabel(), (-fi.GetFormItemWidth()+wW)/2, -hW/2, ZText, LabelFontScale/f.windowWidth*aspRatio, f.wrapper, fi.GetSurface(), []mgl32.Vec3{f.formItemLabelColor})
+	f.charset.PrintTo(fi.GetLabel(), (-fi.GetFormItemWidth()+wW)/2, -hW/2, ZText, textScale, f.wrapper, fi.GetSurface(), []mgl32.Vec3{f.formItemLabelColor})
 	f.SetFormItemValue(fi, defaultValue)
 }
 
