@@ -144,7 +144,8 @@ func (wm WindowMock) SetCharCallback(cb glfw.CharCallback) glfw.CharCallback { r
 func (wm WindowMock) SetMouseButtonCallback(cb glfw.MouseButtonCallback) glfw.MouseButtonCallback {
 	return cb
 }
-func (wm WindowMock) ShouldClose() bool   { return false }
-func (wm WindowMock) SwapBuffers()        {}
-func (wm WindowMock) GetSize() (int, int) { return 800, 800 }
-func (wm WindowMock) SetShouldClose(bool) {}
+func (wm WindowMock) ShouldClose() bool                { return false }
+func (wm WindowMock) SwapBuffers()                     {}
+func (wm WindowMock) GetSize() (int, int)              { return 800, 800 }
+func (wm WindowMock) SetShouldClose(bool)              {}
+func (wm WindowMock) SetInputMode(glfw.InputMode, int) {}

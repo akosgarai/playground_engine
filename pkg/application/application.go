@@ -48,6 +48,7 @@ type Window interface {
 	SwapBuffers()
 	GetSize() (int, int)
 	SetShouldClose(bool)
+	SetInputMode(glfw.InputMode, int)
 }
 
 type Application struct {
