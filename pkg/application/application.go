@@ -177,6 +177,8 @@ func (a *Application) KeyCallback(w *glfw.Window, key glfw.Key, scancode int, ac
 	switch key {
 	case ESCAPE:
 		if a.menuSet {
+			a.window.SetInputMode(glfw.CursorMode, glfw.CursorNormal)
+			a.window.SetInputMode(glfw.RawMouseMotion, 0)
 			a.ActivateScreen(a.menuScreen)
 		} else {
 			a.window.SetShouldClose(true)
