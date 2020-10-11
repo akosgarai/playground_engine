@@ -10,6 +10,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/model"
+	"github.com/akosgarai/playground_engine/pkg/pointer"
 	"github.com/akosgarai/playground_engine/pkg/primitives/boundingobject"
 	"github.com/akosgarai/playground_engine/pkg/store"
 	"github.com/akosgarai/playground_engine/pkg/testhelper"
@@ -384,20 +385,20 @@ func TestUpdate(t *testing.T) {
 		// wo everything
 		kst := store.NewGlfwKeyStore()
 		bst := store.NewGlfwMouseStore()
-		screen.Update(10, 0, 0, kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
 		// with camera
 		screen.SetCamera(cam)
-		screen.Update(10, 0, 0, kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
 		// with rotate on distance
 		screen.SetRotateOnEdgeDistance(0.1)
-		screen.Update(10, 0, 0, kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
 		// with shader & mesh
 		screen.AddShader(sm)
 		mod := model.New()
 		screen.AddModelToShader(mod, sm)
 		msh := mesh.NewPointMesh(wrapperMock)
 		mod.AddMesh(msh)
-		screen.Update(10, 0, 0, kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
 	}()
 }
 func TestCameraKeyboardMovement(t *testing.T) {
