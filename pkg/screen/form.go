@@ -564,7 +564,8 @@ func (f *FormScreen) highlightFormAction() {
 
 // Update function increases the time since the last events with dt. Handles the up / down scroll events.
 // Sets the form items to their initial state and then handles the mouse events and also the deletion events.
-func (f *FormScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+func (f *FormScreen) Update(dt float64, p interfaces.Pointer, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+	posX, posY := p.GetCurrent()
 	f.sinceLastClick = f.sinceLastClick + dt
 	f.sinceLastDelete = f.sinceLastDelete + dt
 	aspRatio := f.GetAspectRatio()

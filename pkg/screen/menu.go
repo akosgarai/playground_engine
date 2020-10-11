@@ -262,7 +262,8 @@ func (m *MenuScreen) setupMenu(glWrapper interfaces.GLWrapper) {
 
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
-func (s *MenuScreen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+func (s *MenuScreen) Update(dt float64, p interfaces.Pointer, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+	posX, posY := p.GetCurrent()
 	aspRatio := s.GetAspectRatio()
 	cursorX := float32(-posX) * s.frameWidth / 2
 	cursorY := float32(posY) / aspRatio * s.frameWidth / 2
