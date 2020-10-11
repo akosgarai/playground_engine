@@ -8,6 +8,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/model"
+	"github.com/akosgarai/playground_engine/pkg/pointer"
 	"github.com/akosgarai/playground_engine/pkg/store"
 	"github.com/akosgarai/playground_engine/pkg/testhelper"
 	"github.com/akosgarai/playground_engine/pkg/texture"
@@ -292,16 +293,16 @@ func TestMenuScreenUpdate(t *testing.T) {
 		menu.BuildScreen()
 		ks := store.NewGlfwKeyStore()
 		ms := store.NewGlfwMouseStore()
-		menu.Update(10, 0, -0.79, ks, ms)
+		menu.Update(10, pointer.New(0, -0.79, 0.0, 0.0), ks, ms)
 		ms.Set(LEFT_MOUSE_BUTTON, true)
-		menu.Update(10, 0, -0.79, ks, ms)
+		menu.Update(10, pointer.New(0, -0.79, 0.0, 0.0), ks, ms)
 		ms.Set(LEFT_MOUSE_BUTTON, false)
-		menu.Update(10, 0, -0.63, ks, ms)
+		menu.Update(10, pointer.New(0, -0.63, 0.0, 0.0), ks, ms)
 		ks.Set(KEY_UP, true)
-		menu.Update(10, 0, -0.74, ks, ms)
+		menu.Update(10, pointer.New(0, -0.74, 0.0, 0.0), ks, ms)
 		ks.Set(KEY_UP, false)
 		ks.Set(KEY_DOWN, true)
-		menu.Update(10, 0, -0.74, ks, ms)
+		menu.Update(10, pointer.New(0, -0.74, 0.0, 0.0), ks, ms)
 	}()
 }
 func TestMenuSetState(t *testing.T) {
