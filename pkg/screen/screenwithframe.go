@@ -23,7 +23,7 @@ type ScreenWithFrame struct {
 }
 
 // tmp function for testing
-func (f *ScreenWithFrame) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+func (f *ScreenWithFrame) Update(dt float64, p interfaces.Pointer, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 }
 
 // tmp function for testing

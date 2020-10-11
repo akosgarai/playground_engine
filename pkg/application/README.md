@@ -12,6 +12,7 @@ The common application related stuff goes here. It holds
 - `menuSet`, this flag is true if the menuScreen has been set.
 - `wrapper`, the interface for calling gl commands.
 - `ui`, the theme that we use for menu and form screens.
+- `mouseUpdatePositionX`, `mouseUpdatePositionY` - The coordinates of the mouse position. It is used for calculating the delta.
 
 ## New
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/akosgarai/playground_engine/pkg/config"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
+	"github.com/akosgarai/playground_engine/pkg/pointer"
 	"github.com/akosgarai/playground_engine/pkg/screen"
 	"github.com/akosgarai/playground_engine/pkg/store"
 	"github.com/akosgarai/playground_engine/pkg/texture"
@@ -70,6 +71,9 @@ type Application struct {
 	wrapper interfaces.GLWrapper
 	// Theme of the UI items.
 	ui theme.Theme
+	// Mouse position for the update loop.
+	mouseUpdatePositionX float64
+	mouseUpdatePositionY float64
 }
 
 // New returns an application instance
@@ -118,6 +122,10 @@ func (a *Application) GetWrapper() interfaces.GLWrapper {
 // SetWindow updates the window with the new one.
 func (a *Application) SetWindow(w Window) {
 	a.window = w
+	// Add default values to the mouse update positions.
+	MousePosX, MousePosY := a.window.GetCursorPos()
+	WindowWidth, WindowHeight := a.window.GetSize()
+	a.mouseUpdatePositionX, a.mouseUpdatePositionY = transformations.MouseCoordinates(MousePosX, MousePosY, float64(WindowWidth), float64(WindowHeight))
 }
 
 // GetWindow returns the current window of the application.
@@ -140,7 +148,11 @@ func (a *Application) Update(dt float64) {
 	MousePosX, MousePosY := a.window.GetCursorPos()
 	WindowWidth, WindowHeight := a.window.GetSize()
 	mX, mY := transformations.MouseCoordinates(MousePosX, MousePosY, float64(WindowWidth), float64(WindowHeight))
-	a.activeScreen.Update(dt, mX, mY, a.keyDowns, a.mouseDowns)
+	// Pointer
+	p := pointer.New(mX, mY, a.mouseUpdatePositionX-mX, a.mouseUpdatePositionY-mY)
+	a.mouseUpdatePositionX = mX
+	a.mouseUpdatePositionY = mY
+	a.activeScreen.Update(dt, p, a.keyDowns, a.mouseDowns)
 }
 
 // AddScreen appends the screen to screens.

@@ -9,6 +9,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/model"
+	"github.com/akosgarai/playground_engine/pkg/pointer"
 	"github.com/akosgarai/playground_engine/pkg/store"
 	"github.com/akosgarai/playground_engine/pkg/testhelper"
 
@@ -412,46 +413,46 @@ func TestFormScreenUpdate(t *testing.T) {
 		form := builder.Build()
 		ks := store.NewGlfwKeyStore()
 		ms := store.NewGlfwMouseStore()
-		form.Update(10, 0.5, 0.5, ks, ms)
-		form.Update(10, -0.4, 0.79, ks, ms)
+		form.Update(10, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+		form.Update(10, pointer.New(-0.4, 0.79, 0.0, 0.0), ks, ms)
 		ms.Set(LEFT_MOUSE_BUTTON, true)
 		form.sinceLastClick = 201
-		form.Update(10, -0.4, 0.79, ks, ms) // bool
+		form.Update(10, pointer.New(-0.4, 0.79, 0.0, 0.0), ks, ms) // bool
 		form.sinceLastClick = 201
-		form.Update(10, 0.4, 0.79, ks, ms) // int
+		form.Update(10, pointer.New(0.4, 0.79, 0.0, 0.0), ks, ms) // int
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
 		ks.Set(BACK_SPACE, true)
-		form.Update(10, 0.4, 0.79, ks, ms) // int
+		form.Update(10, pointer.New(0.4, 0.79, 0.0, 0.0), ks, ms) // int
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
-		form.Update(10, 0.4, 0.69, ks, ms) // int64
+		form.Update(10, pointer.New(0.4, 0.69, 0.0, 0.0), ks, ms) // int64
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
-		form.Update(10, -0.4, 0.69, ks, ms) // int64
+		form.Update(10, pointer.New(-0.4, 0.69, 0.0, 0.0), ks, ms) // int64
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
-		form.Update(10, -0.4, 0.59, ks, ms) // float
+		form.Update(10, pointer.New(-0.4, 0.59, 0.0, 0.0), ks, ms) // float
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
-		form.Update(10, -0.4, 0.69, ks, ms) // int64
+		form.Update(10, pointer.New(-0.4, 0.69, 0.0, 0.0), ks, ms) // int64
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
-		form.Update(10, -0.4, 0.59, ks, ms) // float
+		form.Update(10, pointer.New(-0.4, 0.59, 0.0, 0.0), ks, ms) // float
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
-		form.Update(10, -0.4, 0.49, ks, ms) // text
+		form.Update(10, pointer.New(-0.4, 0.49, 0.0, 0.0), ks, ms) // text
 		form.sinceLastClick = 201
 		form.sinceLastDelete = 201
-		form.Update(10, -0.4, 0.39, ks, ms) // vector
+		form.Update(10, pointer.New(-0.4, 0.39, 0.0, 0.0), ks, ms) // vector
 		ms.Set(LEFT_MOUSE_BUTTON, false)
 		ks.Set(KEY_UP, true)
-		form.Update(0.4, -0.4, 0.79, ks, ms)
+		form.Update(0.4, pointer.New(-0.4, 0.79, 0.0, 0.0), ks, ms)
 		ks.Set(KEY_UP, false)
 		ks.Set(KEY_DOWN, true)
-		form.Update(0.4, -0.4, 0.79, ks, ms)
+		form.Update(0.4, pointer.New(-0.4, 0.79, 0.0, 0.0), ks, ms)
 		ks.Set(KEY_DOWN, false)
-		form.Update(0.4, -0.4, 0.79, ks, ms)
+		form.Update(0.4, pointer.New(-0.4, 0.79, 0.0, 0.0), ks, ms)
 	}()
 }
 func newFormScreen() *FormScreen {

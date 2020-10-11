@@ -390,8 +390,9 @@ func (s *ScreenBase) Draw(wrapper interfaces.GLWrapper) {
 
 // Update loops on the shaderMap, and calls Update function on every Model.
 // It also handles the camera movement and rotation, if the camera is set.
-func (s *Screen) Update(dt, posX, posY float64, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
+func (s *Screen) Update(dt float64, p interfaces.Pointer, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	TransformationMatrix := mgl32.Ident4()
+	posX, posY := p.GetCurrent()
 	if s.cameraSet {
 		s.cameraKeyboardMovement("forward", "back", "Walk", dt, keyStore)
 		s.cameraKeyboardMovement("right", "left", "Strafe", dt, keyStore)
