@@ -181,10 +181,14 @@ type Camera interface {
 	BoundingObjectAfterStrafe(float32) *coldet.Sphere
 	BoundingObjectAfterLift(float32) *coldet.Sphere
 }
+type Pointer interface {
+	GetCurrent() (float64, float64)
+	GetDelta() (float64, float64)
+}
 type Screen interface {
 	Log() string
 	Draw(GLWrapper)
-	Update(float64, float64, float64, RoKeyStore, RoButtonStore)
+	Update(float64, Pointer, RoKeyStore, RoButtonStore)
 	Export(string)
 	GetCamera() Camera
 	GetClosestModelMeshDistance() (Model, Mesh, float32)
