@@ -568,6 +568,23 @@ func TestCameraMouseRotationWithoutDistance(t *testing.T) {
 		screen.cameraMouseRotationDefault(10, 10, 10)
 	}()
 }
+func TestCameraMouseRotationWithInvalidDistance(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic.")
+			}
+		}()
+		screen := New()
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "default",
+			"rotateOnEdgeDistance": float32(3.3),
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+		screen.cameraMouseRotationDefault(10, 30, 40)
+		screen.cameraMouseRotationDefault(10, -1, -1)
+	}()
+}
 func TestCameraMouseRotationWithDistance(t *testing.T) {
 	func() {
 		defer func() {
@@ -579,7 +596,7 @@ func TestCameraMouseRotationWithDistance(t *testing.T) {
 		screen := New()
 		optionsForDefaultCamera := map[string]interface{}{
 			"mode":                 "default",
-			"rotateOnEdgeDistance": float32(1.0),
+			"rotateOnEdgeDistance": float32(0.3),
 		}
 		screen.SetupCamera(cam, optionsForDefaultCamera)
 		screen.cameraMouseRotationDefault(10, 30, 40)
