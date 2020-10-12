@@ -450,6 +450,9 @@ func TestDraw(t *testing.T) {
 		setupFunc := func(w interfaces.GLWrapper) { w.Enable(glwrapper.DEPTH_TEST) }
 		screen.Setup(setupFunc)
 		screen.Draw(wrapperMock)
+		// with transparent model.
+		mod.SetTransparent(true)
+		screen.Draw(wrapperMock)
 	}()
 }
 func TestUpdate(t *testing.T) {
