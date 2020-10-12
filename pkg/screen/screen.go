@@ -17,7 +17,9 @@ import (
 )
 
 const (
-	LEFT_MOUSE_BUTTON = glfw.MouseButtonLeft
+	LEFT_MOUSE_BUTTON   = glfw.MouseButtonLeft
+	CAMERA_MODE_DEFAULT = "default"
+	CAMERA_MODE_FPS     = "fps"
 )
 
 func baseDirScreen() string {
@@ -28,21 +30,20 @@ func baseDirScreen() string {
 type SetupFunction func(wrapper interfaces.GLWrapper)
 
 type ScreenBase struct {
-	camera    interfaces.Camera
-	cameraSet bool
+	camera     interfaces.Camera
+	cameraMode string
+	// it holds the keyMaps for the camera movement, multiple keys allowed.
+	cameraKeyboardMovementMap map[string][]glfw.Key
+	// rotateOnEdgeDistance stores the variable
+	// that is checked for rotating the camera
+	// if the mouse is close to the window edge
+	rotateOnEdgeDistance float32
 
 	shaderMap map[interfaces.Shader][]interfaces.Model
 
 	directionalLightSources []DirectionalLightSource
 	pointLightSources       []PointLightSource
 	spotLightSources        []SpotLightSource
-
-	// it holds the keyMaps for the camera movement
-	cameraKeyboardMovementMap map[string]glfw.Key
-	// rotateOnEdgeDistance stores the variable
-	// that is checked for rotating the camera
-	// if the mouse is close to the window edge
-	rotateOnEdgeDistance float32
 
 	// uniforms, that needs to be set for every shader.
 	uniformFloat  map[string]float32    // map for float32
@@ -65,12 +66,12 @@ type ScreenBase struct {
 
 func newScreenBase() *ScreenBase {
 	return &ScreenBase{
-		cameraSet:                 false,
+		camera:                    nil,
 		shaderMap:                 make(map[interfaces.Shader][]interfaces.Model),
 		directionalLightSources:   []DirectionalLightSource{},
 		pointLightSources:         []PointLightSource{},
 		spotLightSources:          []SpotLightSource{},
-		cameraKeyboardMovementMap: make(map[string]glfw.Key),
+		cameraKeyboardMovementMap: make(map[string][]glfw.Key),
 		rotateOnEdgeDistance:      0.0,
 		uniformFloat:              make(map[string]float32),
 		uniformVector:             make(map[string]mgl32.Vec3),
@@ -96,7 +97,7 @@ func New() *Screen {
 // Log returns the string representation of this object.
 func (s *ScreenBase) Log() string {
 	logString := "Screen:\n"
-	if s.cameraSet {
+	if s.camera != nil {
 		logString += " - camera : " + s.camera.Log() + "\n"
 		logString += " - movement map:\n" + fmt.Sprintf("\t%#v\n", s.cameraKeyboardMovementMap)
 		logString += " - rotate distance:\n" + fmt.Sprintf("\t%#v\n", s.rotateOnEdgeDistance)
@@ -104,30 +105,42 @@ func (s *ScreenBase) Log() string {
 	return logString
 }
 
-// SetCameraMovementMap sets the cameraKeyboardMovementMap variable.
-// Currently the following values are supported: 'forward', 'back',
-// 'left', 'right', 'up', 'down', 'rotateLeft', 'rotateRight',
-// 'rotateUp', 'rotateDown'
-func (s *ScreenBase) SetCameraMovementMap(m map[string]glfw.Key) {
-	s.cameraKeyboardMovementMap = m
-}
-
-// SetRotateOnEdgeDistance updates the rotateOnEdgeDistance variable.
-// The value has to be in the [0-1] interval. If not, a message is printed to the
-// console and the variable update is skipped.
-func (s *ScreenBase) SetRotateOnEdgeDistance(value float32) {
-	// validate value. [0-1]
-	if value < 0 || value > 1 {
-		fmt.Printf("Skipping rotateOnEdgeDistance variable update, value '%f' invalid.\n", value)
-		return
+// SetupCamera gets a camera instance and a string - interface map as inputs.
+// The map should have a 'mode' key with default or fps string as value.
+// If this key is missing or invalid, it panics.
+// In case of default camera mode, the rotateOnEdgeDistance variable has to be also
+// present in the options. If not, or the value is invalid (it has to be in the [0-1] interval), it panics.
+func (s *ScreenBase) SetupCamera(c interfaces.Camera, opts map[string]interface{}) {
+	if _, ok := opts["mode"]; !ok {
+		panic("Missing camera mode config.")
 	}
-	s.rotateOnEdgeDistance = value
-}
-
-// SetCamera updates the camera with the new one.
-func (s *ScreenBase) SetCamera(c interfaces.Camera) {
-	s.cameraSet = true
+	mode := opts["mode"].(string)
+	if mode == CAMERA_MODE_DEFAULT {
+		if value, ok := opts["rotateOnEdgeDistance"]; ok {
+			floatValue := value.(float32)
+			if floatValue < 0 || floatValue > 1 {
+				panic("Invalid rotateOnEdgeDistance value.")
+			}
+			s.rotateOnEdgeDistance = floatValue
+		} else {
+			panic("Missing rotateOnEdgeDistance config.")
+		}
+		s.cameraMode = mode
+	} else if mode == CAMERA_MODE_FPS {
+		s.cameraMode = mode
+	} else {
+		msg := fmt.Sprintf("Invalid mode key value '%s'", mode)
+		panic(msg)
+	}
+	// set the camera.
 	s.camera = c
+	// keymap handling is optional.
+	movementKeys := []string{"forward", "back", "left", "right", "up", "down", "rotateLeft", "rotateRight", "rotateUp", "rotateDown"}
+	for i := 0; i < len(movementKeys); i++ {
+		if value, ok := opts[movementKeys[i]]; ok {
+			s.cameraKeyboardMovementMap[movementKeys[i]] = value.([]glfw.Key)
+		}
+	}
 }
 
 // GetCamera returns the current camera of the screen.
@@ -347,7 +360,7 @@ func (s *ScreenBase) Draw(wrapper interfaces.GLWrapper) {
 	// Draw the non transparent models first
 	for sh, _ := range s.shaderMap {
 		sh.Use()
-		if s.cameraSet {
+		if s.camera != nil {
 			sh.SetUniformMat4("view", s.camera.GetViewMatrix())
 			sh.SetUniformMat4("projection", s.camera.GetProjectionMatrix())
 			cameraPos := s.camera.GetPosition()
@@ -368,7 +381,7 @@ func (s *ScreenBase) Draw(wrapper interfaces.GLWrapper) {
 	// Draw transparent models
 	for sh, _ := range s.shaderMap {
 		sh.Use()
-		if s.cameraSet {
+		if s.camera != nil {
 			sh.SetUniformMat4("view", s.camera.GetViewMatrix())
 			sh.SetUniformMat4("projection", s.camera.GetProjectionMatrix())
 			cameraPos := s.camera.GetPosition()
@@ -393,13 +406,21 @@ func (s *ScreenBase) Draw(wrapper interfaces.GLWrapper) {
 func (s *Screen) Update(dt float64, p interfaces.Pointer, keyStore interfaces.RoKeyStore, buttonStore interfaces.RoButtonStore) {
 	TransformationMatrix := mgl32.Ident4()
 	posX, posY := p.GetCurrent()
-	if s.cameraSet {
+	if s.camera != nil {
 		s.cameraKeyboardMovement("forward", "back", "Walk", dt, keyStore)
 		s.cameraKeyboardMovement("right", "left", "Strafe", dt, keyStore)
 		s.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
 		s.cameraKeyboardRotation(dt, keyStore)
-		if s.rotateOnEdgeDistance > 0.0 {
-			s.cameraMouseRotation(dt, posX, posY)
+		switch s.cameraMode {
+		case CAMERA_MODE_DEFAULT:
+			if s.rotateOnEdgeDistance > 0.0 {
+				s.cameraMouseRotationDefault(dt, posX, posY)
+			}
+			break
+		case CAMERA_MODE_FPS:
+			dX, dY := p.GetDelta()
+			s.cameraMouseRotationFPS(dt, dX, dY)
+			break
 		}
 		TransformationMatrix = (s.camera.GetProjectionMatrix().Mul4(s.camera.GetViewMatrix())).Inv()
 	}
@@ -443,10 +464,18 @@ func (s *ScreenBase) cameraKeyboardMovement(directionKey, oppositeKey, handlerNa
 	keyStateDirection := false
 	keyStateOpposite := false
 	if val, ok := s.cameraKeyboardMovementMap[directionKey]; ok {
-		keyStateDirection = store.Get(val)
+		for i := 0; i < len(val); i++ {
+			if store.Get(val[i]) {
+				keyStateDirection = true
+			}
+		}
 	}
 	if val, ok := s.cameraKeyboardMovementMap[oppositeKey]; ok {
-		keyStateOpposite = store.Get(val)
+		for i := 0; i < len(val); i++ {
+			if store.Get(val[i]) {
+				keyStateOpposite = true
+			}
+		}
 	}
 	step := float32(0.0)
 	if keyStateDirection && !keyStateOpposite {
@@ -491,16 +520,32 @@ func (s *ScreenBase) cameraKeyboardRotation(delta float64, store interfaces.RoKe
 	rotateLeft := false
 	rotateRight := false
 	if val, ok := s.cameraKeyboardMovementMap["rotateUp"]; ok {
-		rotateUp = store.Get(val)
+		for i := 0; i < len(val); i++ {
+			if store.Get(val[i]) {
+				rotateUp = true
+			}
+		}
 	}
 	if val, ok := s.cameraKeyboardMovementMap["rotateDown"]; ok {
-		rotateDown = store.Get(val)
+		for i := 0; i < len(val); i++ {
+			if store.Get(val[i]) {
+				rotateDown = true
+			}
+		}
 	}
 	if val, ok := s.cameraKeyboardMovementMap["rotateLeft"]; ok {
-		rotateLeft = store.Get(val)
+		for i := 0; i < len(val); i++ {
+			if store.Get(val[i]) {
+				rotateLeft = true
+			}
+		}
 	}
 	if val, ok := s.cameraKeyboardMovementMap["rotateRight"]; ok {
-		rotateRight = store.Get(val)
+		for i := 0; i < len(val); i++ {
+			if store.Get(val[i]) {
+				rotateRight = true
+			}
+		}
 	}
 	s.applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotateDown, delta)
 }
@@ -525,9 +570,9 @@ func (s *ScreenBase) applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotat
 	}
 }
 
-// cameraMouseRotation function is responsible for the rotation generated by the mouse
+// cameraMouseRotationDefault function is responsible for the rotation generated by the mouse
 // position. If it is close to the edges, it triggers movement.
-func (s *ScreenBase) cameraMouseRotation(delta, posX, posY float64) {
+func (s *ScreenBase) cameraMouseRotationDefault(delta, posX, posY float64) {
 	rotateUp := false
 	rotateDown := false
 	rotateLeft := false
@@ -547,6 +592,25 @@ func (s *ScreenBase) cameraMouseRotation(delta, posX, posY float64) {
 		rotateRight = true
 	}
 
+	s.applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotateDown, delta)
+}
+func (s *ScreenBase) cameraMouseRotationFPS(delta, dX, dY float64) {
+	rotateUp := false
+	rotateDown := false
+	rotateLeft := false
+	rotateRight := false
+	if dY > 0 {
+		rotateUp = true
+	}
+	if dY < 0 {
+		rotateDown = true
+	}
+	if dX > 0 {
+		rotateRight = true
+	}
+	if dX < 0 {
+		rotateLeft = true
+	}
 	s.applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotateDown, delta)
 }
 

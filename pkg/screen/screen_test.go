@@ -1,7 +1,6 @@
 package screen
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/akosgarai/playground_engine/pkg/camera"
@@ -37,7 +36,7 @@ func TestNew(t *testing.T) {
 	if len(shader.shaderMap) != 0 {
 		t.Error("Invalid screen - shadermap should be empty")
 	}
-	if shader.cameraSet {
+	if shader.camera != nil {
 		t.Error("Camera shouldn't be set")
 	}
 }
@@ -48,53 +47,128 @@ func TestLog(t *testing.T) {
 	if log != emptylog {
 		t.Errorf("Invalid log for empty screen. Instead of '%s', we have '%s'.", emptylog, log)
 	}
-	screen.cameraSet = true
 	screen.camera = cam
 	log = screen.Log()
 	if log == emptylog {
 		t.Errorf("Invalid log for camera. We have the same as before '%s'.", emptylog)
 	}
 }
-func TestSetCameraMovementMap(t *testing.T) {
+func TestSetupCameraGoodOptionsWithoutMovement(t *testing.T) {
 	var screen Screen
-	cmMap := make(map[string]glfw.Key)
-	screen.SetCameraMovementMap(cmMap)
-
-	if !reflect.DeepEqual(screen.cameraKeyboardMovementMap, cmMap) {
-		t.Error("Invalid camera movement map has been set.")
+	goodOptionsForDefaultCamera := map[string]interface{}{
+		"mode":                 "default",
+		"rotateOnEdgeDistance": float32(0.5),
 	}
-}
-func TestSetRotateOnEdgeDistance(t *testing.T) {
-	var screen Screen
-	testData := []struct {
-		input    float32
-		expected float32
-	}{
-		{0.5, 0.5},
-		{0.0, 0.0},
-		{-0.1, 0.0},
-		{0.9, 0.9},
-		{1.1, 0.9},
-		{1.0, 1.0},
-	}
-	for _, tt := range testData {
-		screen.SetRotateOnEdgeDistance(tt.input)
-		if screen.rotateOnEdgeDistance != tt.expected {
-			t.Errorf("Invalid rotateOnEdgeDistance. Instead of '%f', we have '%f'.", tt.expected, screen.rotateOnEdgeDistance)
-		}
-	}
-}
-func TestSetCamera(t *testing.T) {
-	var screen Screen
-	screen.SetCamera(cam)
-
+	screen.SetupCamera(cam, goodOptionsForDefaultCamera)
 	if screen.camera != cam {
 		t.Error("Invalid camera setup.")
+	}
+	if screen.cameraMode != goodOptionsForDefaultCamera["mode"].(string) {
+		t.Error("Invalid camera mode.")
+	}
+	if screen.rotateOnEdgeDistance != goodOptionsForDefaultCamera["rotateOnEdgeDistance"].(float32) {
+		t.Error("Invalid rotateOnEdgeDistance.")
+	}
+	if len(screen.cameraKeyboardMovementMap) != 0 {
+		t.Error("Movement should not be set.")
+	}
+}
+func TestSetupCameraGoodOptionsWithMovement(t *testing.T) {
+	var screen Screen
+	screen.cameraKeyboardMovementMap = make(map[string][]glfw.Key)
+	goodOptionsForDefaultCamera := map[string]interface{}{
+		"mode":                 "default",
+		"rotateOnEdgeDistance": float32(0.5),
+		"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+	}
+	screen.SetupCamera(cam, goodOptionsForDefaultCamera)
+	if screen.camera != cam {
+		t.Error("Invalid camera setup.")
+	}
+	if screen.cameraMode != goodOptionsForDefaultCamera["mode"].(string) {
+		t.Error("Invalid camera mode.")
+	}
+	if screen.rotateOnEdgeDistance != goodOptionsForDefaultCamera["rotateOnEdgeDistance"].(float32) {
+		t.Error("Invalid rotateOnEdgeDistance.")
+	}
+	if len(screen.cameraKeyboardMovementMap) != 1 {
+		t.Error("Movement should not be set.")
+	}
+}
+func TestSetupCameraMissingMode(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing mode key in options.")
+			}
+		}()
+		var screen Screen
+		screen.cameraKeyboardMovementMap = make(map[string][]glfw.Key)
+		optionsForDefaultCamera := map[string]interface{}{
+			"rotateOnEdgeDistance": float32(0.5),
+			"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+	}()
+}
+func TestSetupCameraInvalidMode(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the invalid mode key in options.")
+			}
+		}()
+		var screen Screen
+		screen.cameraKeyboardMovementMap = make(map[string][]glfw.Key)
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "wrongValue",
+			"rotateOnEdgeDistance": float32(0.5),
+			"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+	}()
+}
+func TestSetupCameraDefaultModeMissingRotateValue(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic due to the missing rotateOnEdgeDistance key in options.")
+			}
+		}()
+		var screen Screen
+		screen.cameraKeyboardMovementMap = make(map[string][]glfw.Key)
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":    "default",
+			"forward": []glfw.Key{glfw.KeyW, glfw.KeyI},
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+	}()
+}
+func TestSetupCameraGoodFPSCamera(t *testing.T) {
+	var screen Screen
+	goodOptionsForDefaultCamera := map[string]interface{}{
+		"mode": "fps",
+	}
+	screen.SetupCamera(cam, goodOptionsForDefaultCamera)
+	if screen.camera != cam {
+		t.Error("Invalid camera setup.")
+	}
+	if screen.cameraMode != goodOptionsForDefaultCamera["mode"].(string) {
+		t.Error("Invalid camera mode.")
+	}
+	if len(screen.cameraKeyboardMovementMap) != 0 {
+		t.Error("Movement should not be set.")
 	}
 }
 func TestGetCamera(t *testing.T) {
 	var screen Screen
-	screen.SetCamera(cam)
+	screen.cameraKeyboardMovementMap = make(map[string][]glfw.Key)
+	optionsForDefaultCamera := map[string]interface{}{
+		"mode":                 "default",
+		"rotateOnEdgeDistance": float32(0.5),
+		"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+	}
+	screen.SetupCamera(cam, optionsForDefaultCamera)
 
 	if screen.GetCamera() != cam {
 		t.Error("Invalid camera setup.")
@@ -362,7 +436,12 @@ func TestDraw(t *testing.T) {
 		// wo camera
 		screen.Draw(wrapperMock)
 		// with camera
-		screen.SetCamera(cam)
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "default",
+			"rotateOnEdgeDistance": float32(0.5),
+			"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
 		screen.Draw(wrapperMock)
 		// with custom uniforms
 		screen.SetUniformFloat("testFloat", float32(42.0))
@@ -371,9 +450,12 @@ func TestDraw(t *testing.T) {
 		setupFunc := func(w interfaces.GLWrapper) { w.Enable(glwrapper.DEPTH_TEST) }
 		screen.Setup(setupFunc)
 		screen.Draw(wrapperMock)
+		// with transparent model.
+		mod.SetTransparent(true)
+		screen.Draw(wrapperMock)
 	}()
 }
-func TestUpdate(t *testing.T) {
+func TestUpdateDefaultCamera(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -387,10 +469,12 @@ func TestUpdate(t *testing.T) {
 		bst := store.NewGlfwMouseStore()
 		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
 		// with camera
-		screen.SetCamera(cam)
-		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
-		// with rotate on distance
-		screen.SetRotateOnEdgeDistance(0.1)
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "default",
+			"rotateOnEdgeDistance": float32(0.1),
+			"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
 		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
 		// with shader & mesh
 		screen.AddShader(sm)
@@ -401,13 +485,51 @@ func TestUpdate(t *testing.T) {
 		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
 	}()
 }
+func TestUpdateFPSCamera(t *testing.T) {
+	func() {
+		defer func() {
+			cam.SetRotationStep(0.0)
+			if r := recover(); r != nil {
+				t.Error("Shouldn't have panic.")
+				t.Log(r)
+			}
+		}()
+		screen := New()
+		// wo everything
+		kst := store.NewGlfwKeyStore()
+		bst := store.NewGlfwMouseStore()
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
+		// with camera
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":    "fps",
+			"forward": []glfw.Key{glfw.KeyW, glfw.KeyI},
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
+		// with shader & mesh
+		screen.AddShader(sm)
+		mod := model.New()
+		screen.AddModelToShader(mod, sm)
+		msh := mesh.NewPointMesh(wrapperMock)
+		mod.AddMesh(msh)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
+		// with rotations
+		cam.SetRotationStep(0.5)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.04, 0.0), kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, -0.04, 0.0), kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.05), kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, -0.05), kst, bst)
+	}()
+}
 func TestCameraKeyboardMovement(t *testing.T) {
 	screen := New()
-	screen.SetCamera(cam)
-	cmMap := make(map[string]glfw.Key)
-	cmMap["forward"] = glfw.KeyW
-	cmMap["back"] = glfw.KeyS
-	screen.SetCameraMovementMap(cmMap)
+	optionsForDefaultCamera := map[string]interface{}{
+		"mode":                 "default",
+		"rotateOnEdgeDistance": float32(0.1),
+		"forward":              []glfw.Key{glfw.KeyW},
+		"back":                 []glfw.Key{glfw.KeyS},
+	}
+	screen.SetupCamera(cam, optionsForDefaultCamera)
 	st := store.NewGlfwKeyStore()
 
 	// first dir
@@ -427,7 +549,7 @@ func TestCameraKeyboardMovement(t *testing.T) {
 	screen.cameraKeyboardMovement("forward", "back", "Wrong", 10, st)
 
 }
-func TestCameraKeyboardRotation(t *testing.T) {
+func TestCameraKeyboardRotationWithoutKeymap(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -435,23 +557,56 @@ func TestCameraKeyboardRotation(t *testing.T) {
 			}
 		}()
 		screen := New()
-		screen.SetCamera(cam)
-		keyMap := make(map[string]glfw.Key)
-		keyMap["rotateUp"] = glfw.KeyW
-		keyMap["rotateDown"] = glfw.KeyS
-		keyMap["rotateLeft"] = glfw.KeyA
-		keyMap["rotateRight"] = glfw.KeyD
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "default",
+			"rotateOnEdgeDistance": float32(0.1),
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
 		st := store.NewGlfwKeyStore()
 		st.Set(glfw.KeyW, false)
 		st.Set(glfw.KeyS, true)
-		// wo keymap
-		screen.cameraKeyboardRotation(10, st)
 		// with keymap
-		screen.SetCameraMovementMap(keyMap)
 		screen.cameraKeyboardRotation(10, st)
 	}()
 }
-func TestCameraMouseRotation(t *testing.T) {
+func TestCameraKeyboardRotationWithKeymap(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("Shouldn't have panic.")
+			}
+		}()
+		screen := New()
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "default",
+			"rotateOnEdgeDistance": float32(0.1),
+			"rotateUp":             []glfw.Key{glfw.KeyW},
+			"rotateDown":           []glfw.Key{glfw.KeyS},
+			"rotateLeft":           []glfw.Key{glfw.KeyA},
+			"rotateRight":          []glfw.Key{glfw.KeyD},
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+		st := store.NewGlfwKeyStore()
+		// down
+		st.Set(glfw.KeyW, false)
+		st.Set(glfw.KeyS, true)
+		screen.cameraKeyboardRotation(10, st)
+		// up
+		st.Set(glfw.KeyS, false)
+		st.Set(glfw.KeyW, true)
+		screen.cameraKeyboardRotation(10, st)
+		// left
+		st.Set(glfw.KeyW, false)
+		st.Set(glfw.KeyD, false)
+		st.Set(glfw.KeyA, true)
+		screen.cameraKeyboardRotation(10, st)
+		// right
+		st.Set(glfw.KeyD, true)
+		st.Set(glfw.KeyA, false)
+		screen.cameraKeyboardRotation(10, st)
+	}()
+}
+func TestCameraMouseRotationWithoutDistance(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -460,11 +615,47 @@ func TestCameraMouseRotation(t *testing.T) {
 			}
 		}()
 		screen := New()
-		screen.SetCamera(cam)
-		screen.cameraMouseRotation(10, 10, 10)
-		screen.SetRotateOnEdgeDistance(1.0)
-		screen.cameraMouseRotation(10, 30, 40)
-		screen.cameraMouseRotation(10, -1, -1)
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "default",
+			"rotateOnEdgeDistance": float32(0.0),
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+		screen.cameraMouseRotationDefault(10, 10, 10)
+	}()
+}
+func TestCameraMouseRotationWithInvalidDistance(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Error("Should have panic.")
+			}
+		}()
+		screen := New()
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "default",
+			"rotateOnEdgeDistance": float32(3.3),
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+		screen.cameraMouseRotationDefault(10, 30, 40)
+		screen.cameraMouseRotationDefault(10, -1, -1)
+	}()
+}
+func TestCameraMouseRotationWithDistance(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Log(r)
+				t.Error("Shouldn't have panic.")
+			}
+		}()
+		screen := New()
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":                 "default",
+			"rotateOnEdgeDistance": float32(0.3),
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+		screen.cameraMouseRotationDefault(10, 30, 40)
+		screen.cameraMouseRotationDefault(10, -1, -1)
 	}()
 }
 func TestCameraCollisionTest(t *testing.T) {

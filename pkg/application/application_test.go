@@ -48,7 +48,12 @@ func TestGetWindow(t *testing.T) {
 }
 func TestGetCamera(t *testing.T) {
 	s := screen.New()
-	s.SetCamera(cam)
+	optionsForDefaultCamera := map[string]interface{}{
+		"mode":                 "default",
+		"rotateOnEdgeDistance": float32(0.5),
+		"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+	}
+	s.SetupCamera(cam, optionsForDefaultCamera)
 	app := New(wrapperMock)
 	app.AddScreen(s)
 	app.ActivateScreen(s)
@@ -232,7 +237,12 @@ func TestGetClosestModelMeshDistanceWithActiveScreen(t *testing.T) {
 }
 func TestMenuScreen(t *testing.T) {
 	s := screen.New()
-	s.SetCamera(cam)
+	optionsForDefaultCamera := map[string]interface{}{
+		"mode":                 "default",
+		"rotateOnEdgeDistance": float32(0.5),
+		"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+	}
+	s.SetupCamera(cam, optionsForDefaultCamera)
 	app := New(wrapperMock)
 	app.AddScreen(s)
 	app.MenuScreen(s)
