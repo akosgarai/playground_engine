@@ -532,8 +532,22 @@ func TestCameraKeyboardRotationWithKeymap(t *testing.T) {
 		}
 		screen.SetupCamera(cam, optionsForDefaultCamera)
 		st := store.NewGlfwKeyStore()
+		// down
 		st.Set(glfw.KeyW, false)
 		st.Set(glfw.KeyS, true)
+		screen.cameraKeyboardRotation(10, st)
+		// up
+		st.Set(glfw.KeyS, false)
+		st.Set(glfw.KeyW, true)
+		screen.cameraKeyboardRotation(10, st)
+		// left
+		st.Set(glfw.KeyW, false)
+		st.Set(glfw.KeyD, false)
+		st.Set(glfw.KeyA, true)
+		screen.cameraKeyboardRotation(10, st)
+		// right
+		st.Set(glfw.KeyD, true)
+		st.Set(glfw.KeyA, false)
 		screen.cameraKeyboardRotation(10, st)
 	}()
 }
