@@ -17,7 +17,9 @@ import (
 )
 
 const (
-	LEFT_MOUSE_BUTTON = glfw.MouseButtonLeft
+	LEFT_MOUSE_BUTTON   = glfw.MouseButtonLeft
+	CAMERA_MODE_DEFAULT = "default"
+	CAMERA_MODE_FPS     = "fps"
 )
 
 func baseDirScreen() string {
@@ -113,7 +115,7 @@ func (s *ScreenBase) SetupCamera(c interfaces.Camera, opts map[string]interface{
 		panic("Missing camera mode config.")
 	}
 	mode := opts["mode"].(string)
-	if mode == "default" {
+	if mode == CAMERA_MODE_DEFAULT {
 		if value, ok := opts["rotateOnEdgeDistance"]; ok {
 			floatValue := value.(float32)
 			if floatValue < 0 || floatValue > 1 {
@@ -124,7 +126,7 @@ func (s *ScreenBase) SetupCamera(c interfaces.Camera, opts map[string]interface{
 			panic("Missing rotateOnEdgeDistance config.")
 		}
 		s.cameraMode = mode
-	} else if mode == "fps" {
+	} else if mode == CAMERA_MODE_FPS {
 		s.cameraMode = mode
 	} else {
 		msg := fmt.Sprintf("Invalid mode key value '%s'", mode)
@@ -409,8 +411,16 @@ func (s *Screen) Update(dt float64, p interfaces.Pointer, keyStore interfaces.Ro
 		s.cameraKeyboardMovement("right", "left", "Strafe", dt, keyStore)
 		s.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
 		s.cameraKeyboardRotation(dt, keyStore)
-		if s.rotateOnEdgeDistance > 0.0 {
-			s.cameraMouseRotationDefault(dt, posX, posY)
+		switch s.cameraMode {
+		case CAMERA_MODE_DEFAULT:
+			if s.rotateOnEdgeDistance > 0.0 {
+				s.cameraMouseRotationDefault(dt, posX, posY)
+			}
+			break
+		case CAMERA_MODE_FPS:
+			dX, dY := p.GetDelta()
+			s.cameraMouseRotationFPS(dt, dX, dY)
+			break
 		}
 		TransformationMatrix = (s.camera.GetProjectionMatrix().Mul4(s.camera.GetViewMatrix())).Inv()
 	}
@@ -582,6 +592,25 @@ func (s *ScreenBase) cameraMouseRotationDefault(delta, posX, posY float64) {
 		rotateRight = true
 	}
 
+	s.applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotateDown, delta)
+}
+func (s *ScreenBase) cameraMouseRotationFPS(delta, dX, dY float64) {
+	rotateUp := false
+	rotateDown := false
+	rotateLeft := false
+	rotateRight := false
+	if dY > 0 {
+		rotateUp = true
+	}
+	if dY < 0 {
+		rotateDown = true
+	}
+	if dX > 0 {
+		rotateRight = true
+	}
+	if dX < 0 {
+		rotateLeft = true
+	}
 	s.applyMouseRotation(rotateLeft, rotateRight, rotateUp, rotateDown, delta)
 }
 
