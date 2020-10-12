@@ -488,6 +488,7 @@ func TestUpdateDefaultCamera(t *testing.T) {
 func TestUpdateFPSCamera(t *testing.T) {
 	func() {
 		defer func() {
+			cam.SetRotationStep(0.0)
 			if r := recover(); r != nil {
 				t.Error("Shouldn't have panic.")
 				t.Log(r)
@@ -513,6 +514,7 @@ func TestUpdateFPSCamera(t *testing.T) {
 		mod.AddMesh(msh)
 		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
 		// with rotations
+		cam.SetRotationStep(0.5)
 		screen.Update(10, pointer.New(0.0, 0.0, 0.04, 0.0), kst, bst)
 		screen.Update(10, pointer.New(0.0, 0.0, -0.04, 0.0), kst, bst)
 		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.05), kst, bst)
