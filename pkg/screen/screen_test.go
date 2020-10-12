@@ -144,6 +144,22 @@ func TestSetupCameraDefaultModeMissingRotateValue(t *testing.T) {
 		screen.SetupCamera(cam, optionsForDefaultCamera)
 	}()
 }
+func TestSetupCameraGoodFPSCamera(t *testing.T) {
+	var screen Screen
+	goodOptionsForDefaultCamera := map[string]interface{}{
+		"mode": "fps",
+	}
+	screen.SetupCamera(cam, goodOptionsForDefaultCamera)
+	if screen.camera != cam {
+		t.Error("Invalid camera setup.")
+	}
+	if screen.cameraMode != goodOptionsForDefaultCamera["mode"].(string) {
+		t.Error("Invalid camera mode.")
+	}
+	if len(screen.cameraKeyboardMovementMap) != 0 {
+		t.Error("Movement should not be set.")
+	}
+}
 func TestGetCamera(t *testing.T) {
 	var screen Screen
 	screen.cameraKeyboardMovementMap = make(map[string][]glfw.Key)
