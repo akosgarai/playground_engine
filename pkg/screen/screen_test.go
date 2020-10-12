@@ -512,6 +512,11 @@ func TestUpdateFPSCamera(t *testing.T) {
 		msh := mesh.NewPointMesh(wrapperMock)
 		mod.AddMesh(msh)
 		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
+		// with rotations
+		screen.Update(10, pointer.New(0.0, 0.0, 0.04, 0.0), kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, -0.04, 0.0), kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.05), kst, bst)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, -0.05), kst, bst)
 	}()
 }
 func TestCameraKeyboardMovement(t *testing.T) {
