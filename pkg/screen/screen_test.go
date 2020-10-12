@@ -551,7 +551,7 @@ func TestCameraMouseRotationWithoutDistance(t *testing.T) {
 			"rotateOnEdgeDistance": float32(0.0),
 		}
 		screen.SetupCamera(cam, optionsForDefaultCamera)
-		screen.cameraMouseRotation(10, 10, 10)
+		screen.cameraMouseRotationDefault(10, 10, 10)
 	}()
 }
 func TestCameraMouseRotationWithDistance(t *testing.T) {
@@ -568,8 +568,8 @@ func TestCameraMouseRotationWithDistance(t *testing.T) {
 			"rotateOnEdgeDistance": float32(1.0),
 		}
 		screen.SetupCamera(cam, optionsForDefaultCamera)
-		screen.cameraMouseRotation(10, 30, 40)
-		screen.cameraMouseRotation(10, -1, -1)
+		screen.cameraMouseRotationDefault(10, 30, 40)
+		screen.cameraMouseRotationDefault(10, -1, -1)
 	}()
 }
 func TestCameraCollisionTest(t *testing.T) {
