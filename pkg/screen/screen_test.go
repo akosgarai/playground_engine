@@ -455,7 +455,7 @@ func TestDraw(t *testing.T) {
 		screen.Draw(wrapperMock)
 	}()
 }
-func TestUpdate(t *testing.T) {
+func TestUpdateDefaultCamera(t *testing.T) {
 	func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -473,6 +473,35 @@ func TestUpdate(t *testing.T) {
 			"mode":                 "default",
 			"rotateOnEdgeDistance": float32(0.1),
 			"forward":              []glfw.Key{glfw.KeyW, glfw.KeyI},
+		}
+		screen.SetupCamera(cam, optionsForDefaultCamera)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
+		// with shader & mesh
+		screen.AddShader(sm)
+		mod := model.New()
+		screen.AddModelToShader(mod, sm)
+		msh := mesh.NewPointMesh(wrapperMock)
+		mod.AddMesh(msh)
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
+	}()
+}
+func TestUpdateFPSCamera(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Error("Shouldn't have panic.")
+				t.Log(r)
+			}
+		}()
+		screen := New()
+		// wo everything
+		kst := store.NewGlfwKeyStore()
+		bst := store.NewGlfwMouseStore()
+		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
+		// with camera
+		optionsForDefaultCamera := map[string]interface{}{
+			"mode":    "fps",
+			"forward": []glfw.Key{glfw.KeyW, glfw.KeyI},
 		}
 		screen.SetupCamera(cam, optionsForDefaultCamera)
 		screen.Update(10, pointer.New(0.0, 0.0, 0.0, 0.0), kst, bst)
