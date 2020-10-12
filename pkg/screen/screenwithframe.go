@@ -107,7 +107,7 @@ func (b *ScreenWithFrameBuilder) Build() *ScreenWithFrame {
 	}
 	s := newScreenBase()
 	s.SetWrapper(b.wrapper)
-	s.SetCamera(b.defaultCamera())
+	s.SetupCamera(b.defaultCamera(), b.defaultOptions())
 	s.SetWindowSize(b.windowWidth, b.windowHeight)
 
 	frameShaderApplication := shader.NewMaterialShader(b.wrapper)
@@ -164,6 +164,14 @@ func (b *ScreenWithFrameBuilder) defaultCamera() *camera.DefaultCamera {
 	cam := camera.NewCamera(mgl32.Vec3{0, 0, -mat[0] * (b.frameWidth / 2)}, mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
 	cam.SetupProjection(b.fov, b.windowWidth/b.windowHeight, 0.001, 10.0)
 	return cam
+}
+
+// It creates the camera options.
+func (b *ScreenWithFrameBuilder) defaultOptions() map[string]interface{} {
+	return map[string]interface{}{
+		"mode":                 "default",
+		"rotateOnEdgeDistance": float32(0.0),
+	}
 }
 
 // It creates a rectangle for the screen frame.
