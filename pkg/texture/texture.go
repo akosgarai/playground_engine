@@ -111,6 +111,10 @@ func (t *Textures) AddTexture(filePath string, wrapR, wrapS, minificationFilter,
 	t.AddTextureRGBA(filePath, rgba, wrapR, wrapS, minificationFilter, magnificationFilter, uniformName, wrapper)
 }
 func (t *Textures) AddCubeMapTexture(directoryPath string, wrapR, wrapS, wrapT, minificationFilter, magnificationFilter int32, uniformName string, wrapper interfaces.GLWrapper) {
+	fileNames := [6]string{"skybox-right.png", "skybox-left.png", "skybox-top.png", "skybox-bottom.png", "skybox-front.png", "skybox-back.png"}
+	t.AddCubeMapTextureWithFilenames(directoryPath, fileNames, wrapR, wrapS, wrapT, minificationFilter, magnificationFilter, uniformName, wrapper)
+}
+func (t *Textures) AddCubeMapTextureWithFilenames(directoryPath string, files [6]string, wrapR, wrapS, wrapT, minificationFilter, magnificationFilter int32, uniformName string, wrapper interfaces.GLWrapper) {
 	tex := &Texture{
 		TextureName: genTextures(wrapper),
 		TargetId:    glwrapper.TEXTURE_CUBE_MAP,
@@ -120,9 +124,8 @@ func (t *Textures) AddCubeMapTexture(directoryPath string, wrapR, wrapS, wrapT, 
 	}
 	tex.Bind()
 	defer tex.UnBind()
-	fileNames := []string{"skybox-right.png", "skybox-left.png", "skybox-top.png", "skybox-bottom.png", "skybox-front.png", "skybox-back.png"}
 
-	for index, file := range fileNames {
+	for index, file := range files {
 		img, err := loadImageFromFile(directoryPath + "/" + file)
 		if err != nil {
 			panic(err)
