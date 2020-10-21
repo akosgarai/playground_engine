@@ -515,8 +515,12 @@ func (f *CubeFormScreen) cameraAnimation(dt float64) {
 func (f *CubeFormScreen) handleState() {
 	switch f.state {
 	case "initial":
-		f.state = "move-to-place"
-		f.controlPointIndex = 1
+		if len(f.controlPoints) > 1 {
+			f.state = "move-to-place"
+			f.controlPointIndex = 1
+		} else {
+			f.state = "form"
+		}
 		break
 	case "move-to-place":
 		if f.controlPointIndex == len(f.controlPoints) {
