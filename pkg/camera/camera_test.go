@@ -388,3 +388,11 @@ func TestGetRotationStep(t *testing.T) {
 		t.Errorf("Invalid rotationStep. Instead of '3', we have '%f'.\n", cam.GetRotationStep())
 	}
 }
+func TestSetPosition(t *testing.T) {
+	cam := NewCamera(DefaultCameraPosition, WorldUp, DefaultYaw, DefaultPitch)
+	newPosition := mgl32.Vec3{2, 1, 0}
+	cam.SetPosition(newPosition)
+	if cam.cameraPosition != newPosition {
+		t.Errorf("Invalid position. Instead of '%v', we have '%v'.\n", newPosition, cam.cameraPosition)
+	}
+}

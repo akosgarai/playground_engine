@@ -69,3 +69,7 @@ BoundingObjectAfterStrafe returns the bounding object of the new position. It is
 ## BoundingObjectAfterLift
 
 BoundingObjectAfterLift returns the bounding object of the new position. It is used for collision detection. The step is forbidden if it leads to collision.
+
+## SetPosition
+
+SetPosition method could be used to set the camera to an exact position.

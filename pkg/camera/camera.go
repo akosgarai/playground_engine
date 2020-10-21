@@ -245,6 +245,11 @@ func (c *Camera) GetPosition() mgl32.Vec3 {
 	return c.cameraPosition
 }
 
+// SetPosition updates the position of the camera.
+func (c *Camera) SetPosition(p mgl32.Vec3) {
+	c.cameraPosition = p
+}
+
 // GetBoundingObject returns the bounding object of the camera. It is defined as a sphere.
 func (c *Camera) GetBoundingObject() *coldet.Sphere {
 	return coldet.NewBoundingSphere(
