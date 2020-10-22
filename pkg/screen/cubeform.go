@@ -541,7 +541,7 @@ func (f *CubeFormScreen) cameraAnimation(dt float64) {
 		dY = -f.GetCamera().GetRotationStep() * float32(dt)
 		f.SumOfRotation = f.SumOfRotation + dY
 		if f.SumOfRotation < f.RotationToRightAngle {
-			dY = dY - (f.SumOfRotation + f.RotationToRightAngle)
+			dY = dY - (f.RotationToRightAngle + f.SumOfRotation)
 		}
 		break
 	case "rotate-right-from-left":
