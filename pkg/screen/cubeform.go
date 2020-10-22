@@ -442,7 +442,9 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 	}
 	posX, posY := p.GetCurrent()
 	aspRatio := f.GetAspectRatio()
-	coords := mgl32.Vec3{float32(-posX), float32(posY) / aspRatio, f.mouseZ}
+	TransformationMatrix := (f.camera.GetProjectionMatrix().Mul4(f.camera.GetViewMatrix())).Inv()
+	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(-posX), float32(posY) / aspRatio, f.mouseZ}, TransformationMatrix)
+	//coords := mgl32.Vec3{float32(-posX), float32(posY) / aspRatio, f.mouseZ}
 
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
