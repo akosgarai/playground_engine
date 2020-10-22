@@ -72,6 +72,8 @@ type CubeFormScreenBuilder struct {
 	camera interfaces.Camera
 	// control points for the initial camera movement animation
 	controlPoints []mgl32.Vec3
+	// clear color of the screen
+	clearColor mgl32.Vec3
 }
 
 // It returns a builder instance that holds the default values.
@@ -102,6 +104,7 @@ func NewCubeFormScreenBuilder() *CubeFormScreenBuilder {
 		wrapper:                   nil,
 		camera:                    nil,
 		controlPoints:             []mgl32.Vec3{mgl32.Vec3{0, 0, 0}},
+		clearColor:                mgl32.Vec3{0.0, 0.25, 0.5},
 	}
 }
 
@@ -195,6 +198,11 @@ func (b *CubeFormScreenBuilder) SetControlPoints(cp []mgl32.Vec3) {
 	b.controlPoints = cp
 }
 
+// SetClearColor sets the color of the background.
+func (b *CubeFormScreenBuilder) SetClearColor(c mgl32.Vec3) {
+	b.clearColor = c
+}
+
 // Build returns the CubeFormScreen. In case of missing wrapper, it panics.
 func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 	// check the wrapper
@@ -281,7 +289,7 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 	LeftMonitorGoRightButton.SetParent(leftMonitorScreen)
 	LeftMonitorGoRightButton.SetPosition(mgl32.Vec3{-0.02, -0.35, 0.0})
 	screens.AddMesh(LeftMonitorGoRightButton)
-	return &CubeFormScreen{
+	s := &CubeFormScreen{
 		ScreenBase:                 sb,
 		MiddleMonitorGoRightButton: MiddleMonitorGoRightButton,
 		MiddleMonitorGoLeftButton:  MiddleMonitorGoLeftButton,
@@ -293,7 +301,10 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 		mouseZ:                     b.middleMonitorPosition.Len(),
 		state:                      "initial",
 		controlPoints:              b.controlPoints,
+		clearColor:                 b.clearColor,
 	}
+	sb.Setup(s.setupCubeFormScreen)
+	return s
 }
 
 // getTexture has a filepath as input and returns the Textures that we can use for the meshes later.
@@ -378,6 +389,18 @@ type CubeFormScreen struct {
 	// the control points for the initial animation.
 	controlPoints     []mgl32.Vec3
 	controlPointIndex int
+	// clear color of the screen
+	clearColor mgl32.Vec3
+}
+
+func (f *CubeFormScreen) setupCubeFormScreen(wrapper interfaces.GLWrapper) {
+	col := f.clearColor
+	wrapper.ClearColor(col.X(), col.Y(), col.Z(), 1.0)
+	wrapper.Enable(glwrapper.DEPTH_TEST)
+	wrapper.DepthFunc(glwrapper.LESS)
+	wrapper.Enable(glwrapper.BLEND)
+	wrapper.BlendFunc(glwrapper.SRC_APLHA, glwrapper.ONE_MINUS_SRC_ALPHA)
+	wrapper.Viewport(0, 0, int32(f.windowWidth), int32(f.windowHeight))
 }
 
 // Update
