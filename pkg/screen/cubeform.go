@@ -308,7 +308,8 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 		RotationToLeftAngle:        b.leftMonitorRotationAngle,
 		RotationToRightAngle:       b.rightMonitorRotationAngle,
 		SumOfRotation:              float32(0.0),
-		mouseZ:                     b.middleMonitorPosition.Len(),
+		middleMonitorPosition:      b.middleMonitorPosition,
+		currentRotation:            float32(0.0),
 		state:                      "initial",
 		controlPoints:              b.controlPoints,
 		clearColor:                 b.clearColor,
@@ -399,8 +400,9 @@ type CubeFormScreen struct {
 	RotationToLeftAngle  float32
 	RotationToRightAngle float32
 	SumOfRotation        float32
-	// mouse z coordinate - it supposed to be on the monitor.
-	mouseZ float32
+	// for the click handling, i want to be able to detect the screen plane.
+	middleMonitorPosition mgl32.Vec3
+	currentRotation       float32
 	// The state of the screen. Possible values: 'initial', 'move-to-place',
 	// 'form', 'rotate-left', 'rotate-right'.
 	state string
@@ -443,12 +445,11 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 	posX, posY := p.GetCurrent()
 	aspRatio := f.GetAspectRatio()
 	TransformationMatrix := (f.camera.GetProjectionMatrix().Mul4(f.camera.GetViewMatrix())).Inv()
-	coords := mgl32.TransformCoordinate(mgl32.Vec3{f.mouseZ, float32(posX), float32(posY) / aspRatio}, TransformationMatrix)
-	middleMonitorPosition := mgl32.Vec3{2, 0, 0}
+	coords := mgl32.TransformCoordinate(mgl32.Vec3{2.0, float32(posX), float32(posY) / aspRatio}, TransformationMatrix)
 	//coords := mgl32.Vec3{float32(-posX), float32(posY) / aspRatio, f.mouseZ}
 	if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-		fmt.Printf("coords: '%#v',orig: '%#v' mouseZ: %f\n", coords, mgl32.Vec3{f.mouseZ, float32(posX), float32(posY) / aspRatio}, f.mouseZ)
-		fmt.Printf("Option 1: '%#v'\n", middleMonitorPosition.Add(mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)))
+		currentMonitorPosition := mgl32.TransformCoordinate(f.middleMonitorPosition, mgl32.HomogRotate3DZ(mgl32.DegToRad(f.currentRotation)))
+		fmt.Printf("Option 1: '%#v'\n", currentMonitorPosition.Add(mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)))
 	}
 
 	closestDistance := float32(math.MaxFloat32)
@@ -579,24 +580,28 @@ func (f *CubeFormScreen) handleState() {
 		if f.SumOfRotation < f.RotationToRightAngle {
 			f.state = "form"
 			f.SumOfRotation = 0
+			f.currentRotation = 0
 		}
 		break
 	case "rotate-left-from-middle":
 		if f.SumOfRotation > f.RotationToLeftAngle {
 			f.state = "form"
 			f.SumOfRotation = 0
+			f.currentRotation = f.RotationToLeftAngle
 		}
 		break
 	case "rotate-right-from-middle":
 		if f.SumOfRotation < f.RotationToRightAngle {
 			f.state = "form"
 			f.SumOfRotation = 0
+			f.currentRotation = f.RotationToRightAngle
 		}
 		break
 	case "rotate-right-from-left":
 		if f.SumOfRotation > f.RotationToLeftAngle {
 			f.state = "form"
 			f.SumOfRotation = 0
+			f.currentRotation = 0
 		}
 		break
 	case "form":
