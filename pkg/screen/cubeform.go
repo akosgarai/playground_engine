@@ -282,22 +282,22 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 	// Rotate right button
 	MiddleMonitorGoRightButton := b.createMaterialCubeWithBinding(material.Ruby, ButtonSize)
 	MiddleMonitorGoRightButton.SetParent(middleMonitorScreen)
-	MiddleMonitorGoRightButton.SetPosition(mgl32.Vec3{-0.02, 0.35, 0.0})
+	MiddleMonitorGoRightButton.SetPosition(mgl32.Vec3{-0.002, 0.35, 0.0})
 	screens.AddMesh(MiddleMonitorGoRightButton)
 	// Rotate left button
 	MiddleMonitorGoLeftButton := b.createMaterialCubeWithBinding(material.Ruby, ButtonSize)
 	MiddleMonitorGoLeftButton.SetParent(middleMonitorScreen)
-	MiddleMonitorGoLeftButton.SetPosition(mgl32.Vec3{-0.02, -0.35, 0.0})
+	MiddleMonitorGoLeftButton.SetPosition(mgl32.Vec3{-0.002, -0.35, 0.0})
 	screens.AddMesh(MiddleMonitorGoLeftButton)
 	// right go back button
 	RightMonitorGoLeftButton := b.createMaterialCubeWithBinding(material.Ruby, ButtonSize)
 	RightMonitorGoLeftButton.SetParent(rightMonitorScreen)
-	RightMonitorGoLeftButton.SetPosition(mgl32.Vec3{-0.02, 0.35, 0.0})
+	RightMonitorGoLeftButton.SetPosition(mgl32.Vec3{-0.002, 0.35, 0.0})
 	screens.AddMesh(RightMonitorGoLeftButton)
 	// left go back button
 	LeftMonitorGoRightButton := b.createMaterialCubeWithBinding(material.Ruby, ButtonSize)
 	LeftMonitorGoRightButton.SetParent(leftMonitorScreen)
-	LeftMonitorGoRightButton.SetPosition(mgl32.Vec3{-0.02, -0.35, 0.0})
+	LeftMonitorGoRightButton.SetPosition(mgl32.Vec3{-0.002, -0.35, 0.0})
 	screens.AddMesh(LeftMonitorGoRightButton)
 	s := &CubeFormScreen{
 		ScreenBase:                 sb,
