@@ -7,6 +7,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/camera"
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
+	"github.com/akosgarai/playground_engine/pkg/light"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/model"
@@ -74,6 +75,11 @@ type CubeFormScreenBuilder struct {
 	controlPoints []mgl32.Vec3
 	// clear color of the screen
 	clearColor mgl32.Vec3
+	// directional light source
+	lightDir      mgl32.Vec3
+	lightAmbient  mgl32.Vec3
+	lightDiffuse  mgl32.Vec3
+	lightSpecular mgl32.Vec3
 }
 
 // It returns a builder instance that holds the default values.
@@ -105,6 +111,10 @@ func NewCubeFormScreenBuilder() *CubeFormScreenBuilder {
 		camera:                    nil,
 		controlPoints:             []mgl32.Vec3{mgl32.Vec3{0, 0, 0}},
 		clearColor:                mgl32.Vec3{0.0, 0.25, 0.5},
+		lightDir:                  mgl32.Vec3{0.0, 0.0, -1.0},
+		lightAmbient:              mgl32.Vec3{1.0, 1.0, 1.0},
+		lightDiffuse:              mgl32.Vec3{1.0, 1.0, 1.0},
+		lightSpecular:             mgl32.Vec3{1.0, 1.0, 1.0},
 	}
 }
 
@@ -303,6 +313,14 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 		controlPoints:              b.controlPoints,
 		clearColor:                 b.clearColor,
 	}
+	DirectionalLightSource := light.NewDirectionalLight([4]mgl32.Vec3{
+		b.lightDir,
+		b.lightAmbient,
+		b.lightDiffuse,
+		b.lightSpecular,
+	})
+	// Add the lightources to the application
+	sb.AddDirectionalLightSource(DirectionalLightSource, [4]string{"dirLight[0].direction", "dirLight[0].ambient", "dirLight[0].diffuse", "dirLight[0].specular"})
 	sb.Setup(s.setupCubeFormScreen)
 	return s
 }
