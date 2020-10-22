@@ -446,7 +446,7 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 	coords := mgl32.TransformCoordinate(mgl32.Vec3{f.mouseZ, float32(posX), float32(posY) / aspRatio}, TransformationMatrix)
 	//coords := mgl32.Vec3{float32(-posX), float32(posY) / aspRatio, f.mouseZ}
 	if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-		fmt.Printf("coords: '%#v', mouseZ: %f\n", coords, f.mouseZ)
+		fmt.Printf("coords: '%#v',orig: '%#v' mouseZ: %f\n", coords, mgl32.Vec3{f.mouseZ, float32(posX), float32(posY) / aspRatio}, f.mouseZ)
 		fmt.Printf("trmatrix: '%#v'\n", TransformationMatrix)
 	}
 
