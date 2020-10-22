@@ -367,7 +367,7 @@ func (b *CubeFormScreenBuilder) createMaterialCubeWithBinding(m *material.Materi
 
 // It creates a new camera with the necessary setup
 func (b *CubeFormScreenBuilder) defaultCamera() *camera.DefaultCamera {
-	cam := camera.NewCamera(b.controlPoints[0], mgl32.Vec3{0, -1, 0}, 90.0, 0.0)
+	cam := camera.NewCamera(b.controlPoints[0], mgl32.Vec3{0, 0, -1}, 0.0, 0.0)
 	cam.SetupProjection(45, b.windowWidth/b.windowHeight, 0.001, 10.0)
 	cam.SetVelocity(float32(0.005))
 	cam.SetRotationStep(float32(0.125))
