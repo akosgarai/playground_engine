@@ -240,7 +240,7 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 	// left monitor
 	lm := b.createTexturedRectangle(b.getTexture(b.assetsDirectory+"/"+b.leftMonitorTexture), b.leftMonitorSize.X(), b.leftMonitorSize.Y())
 	lm.SetPosition(mgl32.TransformCoordinate(b.middleMonitorPosition, mgl32.HomogRotate3DZ(b.leftMonitorRotationAngle)))
-	lm.RotateZ(45)
+	lm.RotateZ(135)
 	monitors.AddMesh(lm)
 	// left screen
 	leftMonitorScreen := b.createMaterialCube(b.screenMaterial, b.leftScreenSize)
@@ -250,11 +250,11 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 	// right monitor
 	rm := b.createTexturedRectangle(b.getTexture(b.assetsDirectory+"/"+b.rightMonitorTexture), b.rightMonitorSize.X(), b.rightMonitorSize.Y())
 	rm.SetPosition(mgl32.TransformCoordinate(b.middleMonitorPosition, mgl32.HomogRotate3DZ(b.rightMonitorRotationAngle)))
-	rm.RotateZ(135)
+	rm.RotateZ(45)
 	monitors.AddMesh(rm)
 	// right screen
 	rightMonitorScreen := b.createMaterialCube(b.screenMaterial, b.rightScreenSize)
-	rightMonitorScreen.SetParent(lm)
+	rightMonitorScreen.SetParent(rm)
 	rightMonitorScreen.SetPosition(b.rightScreenPosition)
 	screens.AddMesh(rightMonitorScreen)
 	// table surface
