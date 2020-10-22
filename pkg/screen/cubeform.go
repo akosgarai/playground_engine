@@ -443,12 +443,10 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
 	}
 	posX, posY := p.GetCurrent()
-	aspRatio := f.GetAspectRatio()
 	TransformationMatrix := (f.camera.GetProjectionMatrix().Mul4(f.camera.GetViewMatrix())).Inv()
-	coords := mgl32.TransformCoordinate(mgl32.Vec3{2.0, float32(posX), float32(posY) / aspRatio}, TransformationMatrix)
-	//coords := mgl32.Vec3{float32(-posX), float32(posY) / aspRatio, f.mouseZ}
+	currentMonitorPosition := mgl32.TransformCoordinate(f.middleMonitorPosition, mgl32.HomogRotate3DZ(mgl32.DegToRad(f.currentRotation)))
+	coords := currentMonitorPosition.Add(mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix))
 	if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-		currentMonitorPosition := mgl32.TransformCoordinate(f.middleMonitorPosition, mgl32.HomogRotate3DZ(mgl32.DegToRad(f.currentRotation)))
 		fmt.Printf("Option 1: '%#v'\n", currentMonitorPosition.Add(mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)))
 	}
 
