@@ -446,9 +446,6 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 	TransformationMatrix := (f.camera.GetProjectionMatrix().Mul4(f.camera.GetViewMatrix())).Inv()
 	currentMonitorPosition := mgl32.TransformCoordinate(f.middleMonitorPosition, mgl32.HomogRotate3DZ(mgl32.DegToRad(f.currentRotation)))
 	coords := currentMonitorPosition.Add(mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix))
-	if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-		fmt.Printf("Option 1: '%#v'\n", currentMonitorPosition.Add(mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)))
-	}
 
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
