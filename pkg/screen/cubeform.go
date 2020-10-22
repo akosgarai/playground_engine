@@ -444,10 +444,11 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 	aspRatio := f.GetAspectRatio()
 	TransformationMatrix := (f.camera.GetProjectionMatrix().Mul4(f.camera.GetViewMatrix())).Inv()
 	coords := mgl32.TransformCoordinate(mgl32.Vec3{f.mouseZ, float32(posX), float32(posY) / aspRatio}, TransformationMatrix)
+	middleMonitorPosition := mgl32.Vec3{2, 0, 0}
 	//coords := mgl32.Vec3{float32(-posX), float32(posY) / aspRatio, f.mouseZ}
 	if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 		fmt.Printf("coords: '%#v',orig: '%#v' mouseZ: %f\n", coords, mgl32.Vec3{f.mouseZ, float32(posX), float32(posY) / aspRatio}, f.mouseZ)
-		fmt.Printf("Option 1: '%#v'\n", mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), f.mouseZ}, TransformationMatrix))
+		fmt.Printf("Option 1: '%#v'\n", middleMonitorPosition.Add(mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)))
 	}
 
 	closestDistance := float32(math.MaxFloat32)
