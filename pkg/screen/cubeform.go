@@ -109,7 +109,7 @@ func NewCubeFormScreenBuilder() *CubeFormScreenBuilder {
 		backgroundTexture:         "rusty_iron_1280.jpg",
 		wrapper:                   nil,
 		camera:                    nil,
-		controlPoints:             []mgl32.Vec3{mgl32.Vec3{0, 0, 0}},
+		controlPoints:             []mgl32.Vec3{mgl32.Vec3{-3.5, 0, 1.2}, mgl32.Vec3{0, 0, 1.2}, mgl32.Vec3{0, 0, 0}},
 		clearColor:                mgl32.Vec3{0.0, 0.25, 0.5},
 		lightDir:                  mgl32.Vec3{0.0, 0.0, -1.0},
 		lightAmbient:              mgl32.Vec3{1.0, 1.0, 1.0},
