@@ -103,7 +103,7 @@ func NewCubeFormScreenBuilder() *CubeFormScreenBuilder {
 		rightMonitorTexture:       "crt_monitor_1280.png",
 		screenMaterial:            material.Emerald,
 		tableMaterial:             material.Chrome,
-		tableSize:                 mgl32.Vec3{2, 6, 0.05},
+		tableSize:                 mgl32.Vec3{2.5, 6, 0.05},
 		tablePosition:             mgl32.Vec3{1.5, 0, -1},
 		backgroundSize:            mgl32.Vec3{8, 8, 8},
 		backgroundTexture:         "rusty_iron_1280.jpg",
