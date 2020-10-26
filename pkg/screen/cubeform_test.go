@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/akosgarai/playground_engine/pkg/material"
+
 	"github.com/go-gl/mathgl/mgl32"
 )
 
@@ -219,5 +221,128 @@ func TestCubeFormScreenBuilderSetMonitorTextureNames(t *testing.T) {
 		if builder.rightMonitorTexture != tt.right {
 			t.Errorf("Invalid rightMonitorTexture. Instead of '%s', it is '%s'.", tt.right, builder.rightMonitorTexture)
 		}
+	}
+}
+func TestCubeFormScreenBuilderSetScreenMaterial(t *testing.T) {
+	testData := []struct {
+		value *material.Material
+	}{
+		{material.Jade},
+		{material.Ruby},
+		{material.Gold},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetScreenMaterial(tt.value)
+		if builder.screenMaterial != tt.value {
+			t.Errorf("Invalid screenMaterial. Instead of '%#v', it is '%#v'.", tt.value, builder.screenMaterial)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetTableMaterial(t *testing.T) {
+	testData := []struct {
+		value *material.Material
+	}{
+		{material.Jade},
+		{material.Ruby},
+		{material.Gold},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetTableMaterial(tt.value)
+		if builder.tableMaterial != tt.value {
+			t.Errorf("Invalid tableMaterial. Instead of '%#v', it is '%#v'.", tt.value, builder.tableMaterial)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetTableSize(t *testing.T) {
+	testData := []struct {
+		value mgl32.Vec3
+	}{
+		{mgl32.Vec3{1.0, 0.0, 0.0}},
+		{mgl32.Vec3{2.0, 0.0, 0.0}},
+		{mgl32.Vec3{2.0, 0.0, 2.0}},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetTableSize(tt.value)
+		if builder.tableSize != tt.value {
+			t.Errorf("Invalid tableSize. Instead of '%#v', it is '%#v'.", tt.value, builder.tableSize)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetTablePosition(t *testing.T) {
+	testData := []struct {
+		value mgl32.Vec3
+	}{
+		{mgl32.Vec3{1.0, 0.0, 0.0}},
+		{mgl32.Vec3{2.0, 0.0, 0.0}},
+		{mgl32.Vec3{2.0, 0.0, 2.0}},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetTablePosition(tt.value)
+		if builder.tablePosition != tt.value {
+			t.Errorf("Invalid tablePosition. Instead of '%#v', it is '%#v'.", tt.value, builder.tablePosition)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetBackgroundSize(t *testing.T) {
+	testData := []struct {
+		value mgl32.Vec3
+	}{
+		{mgl32.Vec3{1.0, 0.0, 0.0}},
+		{mgl32.Vec3{2.0, 0.0, 0.0}},
+		{mgl32.Vec3{2.0, 0.0, 2.0}},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetBackgroundSize(tt.value)
+		if builder.backgroundSize != tt.value {
+			t.Errorf("Invalid backgroundSize. Instead of '%#v', it is '%#v'.", tt.value, builder.backgroundSize)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetBackgroundTextureName(t *testing.T) {
+	testData := []struct {
+		value string
+	}{
+		{"testData00.png"},
+		{"testData01.png"},
+		{"testData02.png"},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetBackgroundTextureName(tt.value)
+		if builder.backgroundTexture != tt.value {
+			t.Errorf("Invalid backgroundTexture. Instead of '%s', it is '%s'.", tt.value, builder.backgroundTexture)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetWindowSize(t *testing.T) {
+	testData := []struct {
+		w float32
+		h float32
+	}{
+		{10, 10},
+		{20, 20},
+		{60, 60},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetWindowSize(tt.w, tt.h)
+		if builder.windowWidth != tt.w {
+			t.Errorf("Invalid windowWidth. Instead of '%f', it is '%f'.", tt.w, builder.windowWidth)
+		}
+		if builder.windowHeight != tt.h {
+			t.Errorf("Invalid windowHeight. Instead of '%f', it is '%f'.", tt.h, builder.windowHeight)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetWrapper(t *testing.T) {
+	builder := NewCubeFormScreenBuilder()
+	builder.SetWrapper(wrapperMock)
+	if builder.wrapper != wrapperMock {
+		t.Error("Invalid wrapper")
 	}
 }
