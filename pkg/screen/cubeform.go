@@ -160,13 +160,6 @@ func (b *CubeFormScreenBuilder) SetScreenPositions(left, middle, right mgl32.Vec
 	b.rightScreenPosition = right
 }
 
-// SetMonitorSizes updates the size of the monitors.
-func (b *CubeFormScreenBuilder) SetMonitorSizes(left, middle, right mgl32.Vec3) {
-	b.middleScreenSize = middle
-	b.leftScreenSize = left
-	b.rightScreenSize = right
-}
-
 // SetScreenSizes updates the size of the screens.
 func (b *CubeFormScreenBuilder) SetScreenSizes(left, middle, right mgl32.Vec3) {
 	b.middleScreenSize = middle

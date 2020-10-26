@@ -346,3 +346,35 @@ func TestCubeFormScreenBuilderSetWrapper(t *testing.T) {
 		t.Error("Invalid wrapper")
 	}
 }
+func TestCubeFormScreenBuilderSetControlPoints(t *testing.T) {
+	testData := []struct {
+		value []mgl32.Vec3
+	}{
+		{[]mgl32.Vec3{mgl32.Vec3{1.0, 0.0, 0.0}, mgl32.Vec3{0, 0, 0}}},
+		{[]mgl32.Vec3{mgl32.Vec3{0.0, 1.0, 0.0}, mgl32.Vec3{0, 0, 0}}},
+		{[]mgl32.Vec3{mgl32.Vec3{0.0, 0.0, 1.0}, mgl32.Vec3{0, 0, 0}}},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetControlPoints(tt.value)
+		if !reflect.DeepEqual(builder.controlPoints, tt.value) {
+			t.Errorf("Invalid controlPoints. Instead of '%#v', it is '%#v'.", tt.value, builder.controlPoints)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetClearColor(t *testing.T) {
+	testData := []struct {
+		value mgl32.Vec3
+	}{
+		{mgl32.Vec3{1.0, 0.0, 0.0}},
+		{mgl32.Vec3{0.0, 1.0, 0.0}},
+		{mgl32.Vec3{0.0, 0.0, 1.0}},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetClearColor(tt.value)
+		if builder.clearColor != tt.value {
+			t.Errorf("Invalid clearColor. Instead of '%#v', it is '%#v'.", tt.value, builder.clearColor)
+		}
+	}
+}
