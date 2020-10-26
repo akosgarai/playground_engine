@@ -142,8 +142,8 @@ func NewCubeFormScreenBuilder() *CubeFormScreenBuilder {
 	}
 }
 
-// SetMiddleMonitorPosiiton updates the middleMonitorPosition with the new value.
-func (b *CubeFormScreenBuilder) SetMiddleMonitorPosiiton(p mgl32.Vec3) {
+// SetMiddleMonitorPosition updates the middleMonitorPosition with the new value.
+func (b *CubeFormScreenBuilder) SetMiddleMonitorPosition(p mgl32.Vec3) {
 	b.middleMonitorPosition = p
 }
 

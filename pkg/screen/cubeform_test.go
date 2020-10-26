@@ -3,6 +3,8 @@ package screen
 import (
 	"reflect"
 	"testing"
+
+	"github.com/go-gl/mathgl/mgl32"
 )
 
 func TestNewCubeFormScreenBuilder(t *testing.T) {
@@ -93,5 +95,129 @@ func TestNewCubeFormScreenBuilder(t *testing.T) {
 	}
 	if builder.lightSpecular != defaultLightSpecular {
 		t.Errorf("Invalid lightSpecular. Instead of '%#v', it is '%#v'.", defaultLightSpecular, builder.lightSpecular)
+	}
+}
+func TestCubeFormScreenBuilderSetMiddleMonitorPosition(t *testing.T) {
+	testData := []struct {
+		value mgl32.Vec3
+	}{
+		{mgl32.Vec3{1.0, 0.0, 0.0}},
+		{mgl32.Vec3{2.0, 0.0, 0.0}},
+		{mgl32.Vec3{2.0, 0.0, 2.0}},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetMiddleMonitorPosition(tt.value)
+		if builder.middleMonitorPosition != tt.value {
+			t.Errorf("Invalid middleMonitorPosition. Instead of '%#v', it is '%#v'.", tt.value, builder.middleMonitorPosition)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetMonitorRotationAngles(t *testing.T) {
+	testData := []struct {
+		left  float32
+		right float32
+	}{
+		{10, -10},
+		{20, -20},
+		{60, -60},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetMonitorRotationAngles(tt.left, tt.right)
+		if builder.leftMonitorRotationAngle != tt.left {
+			t.Errorf("Invalid leftMonitorRotationAngle. Instead of '%f', it is '%f'.", tt.left, builder.leftMonitorRotationAngle)
+		}
+		if builder.rightMonitorRotationAngle != tt.right {
+			t.Errorf("Invalid rightMonitorRotationAngle. Instead of '%f', it is '%f'.", tt.right, builder.rightMonitorRotationAngle)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetScreenPositions(t *testing.T) {
+	testData := []struct {
+		left   mgl32.Vec3
+		middle mgl32.Vec3
+		right  mgl32.Vec3
+	}{
+		{mgl32.Vec3{1.0, 0.0, 0.0}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{-1, 0, 0}},
+		{mgl32.Vec3{2.0, 0.0, 0.0}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{-2, 0, 0}},
+		{mgl32.Vec3{2.0, 0.0, 2.0}, mgl32.Vec3{0, 0, 2}, mgl32.Vec3{-2, 0, 2}},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetScreenPositions(tt.left, tt.middle, tt.right)
+		if builder.middleScreenPosition != tt.middle {
+			t.Errorf("Invalid middleScreenPosition. Instead of '%#v', it is '%#v'.", tt.middle, builder.middleScreenPosition)
+		}
+		if builder.leftScreenPosition != tt.left {
+			t.Errorf("Invalid leftScreenPosition. Instead of '%#v', it is '%#v'.", tt.left, builder.leftScreenPosition)
+		}
+		if builder.rightScreenPosition != tt.right {
+			t.Errorf("Invalid rightScreenPosition. Instead of '%#v', it is '%#v'.", tt.right, builder.rightScreenPosition)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetScreenSizes(t *testing.T) {
+	testData := []struct {
+		left   mgl32.Vec3
+		middle mgl32.Vec3
+		right  mgl32.Vec3
+	}{
+		{mgl32.Vec3{1.0, 0.0, 0.0}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{-1, 0, 0}},
+		{mgl32.Vec3{2.0, 0.0, 0.0}, mgl32.Vec3{0, 0, 0}, mgl32.Vec3{-2, 0, 0}},
+		{mgl32.Vec3{2.0, 0.0, 2.0}, mgl32.Vec3{0, 0, 2}, mgl32.Vec3{-2, 0, 2}},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetScreenSizes(tt.left, tt.middle, tt.right)
+		if builder.middleScreenSize != tt.middle {
+			t.Errorf("Invalid middleScreenSize. Instead of '%#v', it is '%#v'.", tt.middle, builder.middleScreenSize)
+		}
+		if builder.leftScreenSize != tt.left {
+			t.Errorf("Invalid leftScreenSize. Instead of '%#v', it is '%#v'.", tt.left, builder.leftScreenSize)
+		}
+		if builder.rightScreenSize != tt.right {
+			t.Errorf("Invalid rightScreenSize. Instead of '%#v', it is '%#v'.", tt.right, builder.rightScreenSize)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetAssetsDirectory(t *testing.T) {
+	testData := []struct {
+		value string
+	}{
+		{"testData/00"},
+		{"testData/01"},
+		{"testData/02"},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetAssetsDirectory(tt.value)
+		if builder.assetsDirectory != tt.value {
+			t.Errorf("Invalid assetsDirectory. Instead of '%s', it is '%s'.", tt.value, builder.assetsDirectory)
+		}
+	}
+}
+func TestCubeFormScreenBuilderSetMonitorTextureNames(t *testing.T) {
+	testData := []struct {
+		left   string
+		middle string
+		right  string
+	}{
+		{"testData.png", "testData02.png", "testData04.png"},
+		{"testData.png", "testData03.png", "testData06.png"},
+		{"testData.png", "testData05.png", "testData07.png"},
+	}
+	builder := NewCubeFormScreenBuilder()
+	for _, tt := range testData {
+		builder.SetMonitorTextureNames(tt.left, tt.middle, tt.right)
+		if builder.middleMonitorTexture != tt.middle {
+			t.Errorf("Invalid middleMonitorTexture. Instead of '%s', it is '%s'.", tt.middle, builder.middleMonitorTexture)
+		}
+		if builder.leftMonitorTexture != tt.left {
+			t.Errorf("Invalid leftMonitorTexture. Instead of '%s', it is '%s'.", tt.left, builder.leftMonitorTexture)
+		}
+		if builder.rightMonitorTexture != tt.right {
+			t.Errorf("Invalid rightMonitorTexture. Instead of '%s', it is '%s'.", tt.right, builder.rightMonitorTexture)
+		}
 	}
 }
