@@ -20,8 +20,32 @@ import (
 	"github.com/go-gl/mathgl/mgl32"
 )
 
+const (
+	defaultLeftMonitorRotationAngle  = float32(60)
+	defaultRightMonitorRotationAngle = float32(-60)
+	defaultMonitorTextureName        = "crt_monitor_1280.png"
+	defaultBackgroundTextureName     = "rusty_iron_1280.jpg"
+)
+
 var (
-	defaultAssetsDirectory string
+	defaultAssetsDirectory       string
+	defaultMiddleMonitorPosition = mgl32.Vec3{2.0, 0, 0}
+	defaultMonitorSize           = mgl32.Vec2{2.0, 2.0}
+	defaultMiddleScreenPosition  = mgl32.Vec3{-0.02, 0.0, 0.07} //relative from the middle monitor position.
+	defaultLeftScreenPosition    = mgl32.TransformCoordinate(defaultMiddleScreenPosition, mgl32.HomogRotate3DZ(mgl32.DegToRad(defaultLeftMonitorRotationAngle)))
+	defaultRightScreenPosition   = mgl32.TransformCoordinate(defaultMiddleScreenPosition, mgl32.HomogRotate3DZ(mgl32.DegToRad(defaultRightMonitorRotationAngle)))
+	defaultScreenSize            = mgl32.Vec3{1.5, 1.3, 0}
+	defaultScreenMaterial        = material.Emerald
+	defaultTableMaterial         = material.Chrome
+	defaultTableSize             = mgl32.Vec3{2.5, 6, 0.05}
+	defaultTablePosition         = mgl32.Vec3{1.5, 0, -1}
+	defaultBackgroundSize        = mgl32.Vec3{8, 8, 8}
+	defaultControlPoints         = []mgl32.Vec3{mgl32.Vec3{-3.5, 0, 1.2}, mgl32.Vec3{0, 0, 1.2}, mgl32.Vec3{0, 0, 0}}
+	defaultClearColor            = mgl32.Vec3{0.0, 0.25, 0.5}
+	defaultLightDir              = mgl32.Vec3{0.0, 0.0, -1.0}
+	defaultLightAmbient          = mgl32.Vec3{1.0, 1.0, 1.0}
+	defaultLightDiffuse          = mgl32.Vec3{1.0, 1.0, 1.0}
+	defaultLightSpecular         = mgl32.Vec3{1.0, 1.0, 1.0}
 )
 
 func init() {
@@ -85,36 +109,36 @@ type CubeFormScreenBuilder struct {
 // It returns a builder instance that holds the default values.
 func NewCubeFormScreenBuilder() *CubeFormScreenBuilder {
 	return &CubeFormScreenBuilder{
-		middleMonitorPosition:     mgl32.Vec3{2.0, 0, 0},
-		leftMonitorRotationAngle:  float32(60),
-		rightMonitorRotationAngle: float32(-60),
-		middleMonitorSize:         mgl32.Vec2{2, 2},
-		leftMonitorSize:           mgl32.Vec2{2, 2},
-		rightMonitorSize:          mgl32.Vec2{2, 2},
-		middleScreenPosition:      mgl32.Vec3{-0.02, 0.0, 0.07},
-		leftScreenPosition:        mgl32.TransformCoordinate(mgl32.Vec3{-0.02, 0.0, 0.07}, mgl32.HomogRotate3DZ(mgl32.DegToRad(60))),
-		rightScreenPosition:       mgl32.TransformCoordinate(mgl32.Vec3{-0.02, 0.0, 0.07}, mgl32.HomogRotate3DZ(mgl32.DegToRad(-60))),
-		middleScreenSize:          mgl32.Vec3{1.5, 1.3, 0},
-		leftScreenSize:            mgl32.Vec3{1.5, 1.3, 0},
-		rightScreenSize:           mgl32.Vec3{1.5, 1.3, 0},
+		middleMonitorPosition:     defaultMiddleMonitorPosition,
+		leftMonitorRotationAngle:  defaultLeftMonitorRotationAngle,
+		rightMonitorRotationAngle: defaultRightMonitorRotationAngle,
+		middleMonitorSize:         defaultMonitorSize,
+		leftMonitorSize:           defaultMonitorSize,
+		rightMonitorSize:          defaultMonitorSize,
+		middleScreenPosition:      defaultMiddleScreenPosition,
+		leftScreenPosition:        defaultLeftScreenPosition,
+		rightScreenPosition:       defaultRightScreenPosition,
+		middleScreenSize:          defaultScreenSize,
+		leftScreenSize:            defaultScreenSize,
+		rightScreenSize:           defaultScreenSize,
 		assetsDirectory:           defaultAssetsDirectory,
-		middleMonitorTexture:      "crt_monitor_1280.png",
-		leftMonitorTexture:        "crt_monitor_1280.png",
-		rightMonitorTexture:       "crt_monitor_1280.png",
-		screenMaterial:            material.Emerald,
-		tableMaterial:             material.Chrome,
-		tableSize:                 mgl32.Vec3{2.5, 6, 0.05},
-		tablePosition:             mgl32.Vec3{1.5, 0, -1},
-		backgroundSize:            mgl32.Vec3{8, 8, 8},
-		backgroundTexture:         "rusty_iron_1280.jpg",
+		middleMonitorTexture:      defaultMonitorTextureName,
+		leftMonitorTexture:        defaultMonitorTextureName,
+		rightMonitorTexture:       defaultMonitorTextureName,
+		screenMaterial:            defaultScreenMaterial,
+		tableMaterial:             defaultTableMaterial,
+		tableSize:                 defaultTableSize,
+		tablePosition:             defaultTablePosition,
+		backgroundSize:            defaultBackgroundSize,
+		backgroundTexture:         defaultBackgroundTextureName,
 		wrapper:                   nil,
 		camera:                    nil,
-		controlPoints:             []mgl32.Vec3{mgl32.Vec3{-3.5, 0, 1.2}, mgl32.Vec3{0, 0, 1.2}, mgl32.Vec3{0, 0, 0}},
-		clearColor:                mgl32.Vec3{0.0, 0.25, 0.5},
-		lightDir:                  mgl32.Vec3{0.0, 0.0, -1.0},
-		lightAmbient:              mgl32.Vec3{1.0, 1.0, 1.0},
-		lightDiffuse:              mgl32.Vec3{1.0, 1.0, 1.0},
-		lightSpecular:             mgl32.Vec3{1.0, 1.0, 1.0},
+		controlPoints:             defaultControlPoints,
+		clearColor:                defaultClearColor,
+		lightDir:                  defaultLightDir,
+		lightAmbient:              defaultLightAmbient,
+		lightDiffuse:              defaultLightDiffuse,
+		lightSpecular:             defaultLightSpecular,
 	}
 }
 
