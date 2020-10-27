@@ -414,3 +414,36 @@ func TestCubeFormScreenBuilderBuildWithWrapper(t *testing.T) {
 		builder.Build()
 	}()
 }
+func TestCubeFormScreen(t *testing.T) {
+	runtime.LockOSThread()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+	defer testhelper.GlfwTerminate()
+	wrapperReal.InitOpenGL()
+	builder := NewCubeFormScreenBuilder()
+	builder.SetWrapper(wrapperReal)
+	s := builder.Build()
+	if s.RotationToLeftAngle != defaultLeftMonitorRotationAngle {
+		t.Errorf("Invalid RotationToLeftAngle. Instead of '%f', it is '%f'.", defaultLeftMonitorRotationAngle, s.RotationToLeftAngle)
+	}
+	if s.RotationToRightAngle != defaultRightMonitorRotationAngle {
+		t.Errorf("Invalid RotationToRightAngle. Instead of '%f', it is '%f'.", defaultRightMonitorRotationAngle, s.RotationToRightAngle)
+	}
+	if s.SumOfRotation != float32(0.0) {
+		t.Errorf("Invalid SumOfRotation. Instead of '0.0', it is '%f'.", s.SumOfRotation)
+	}
+	if s.middleMonitorPosition != defaultMiddleMonitorPosition {
+		t.Errorf("Invalid middleMonitorPosition. Instead of '%#v', it is '%#v'.", defaultMiddleMonitorPosition, s.middleMonitorPosition)
+	}
+	if s.currentRotation != float32(0.0) {
+		t.Errorf("Invalid currentRotation. Instead of '0.0', it is '%f'.", s.currentRotation)
+	}
+	if s.state != "initial" {
+		t.Errorf("Invalid state. Instead of 'initial', it is '%s'.", s.state)
+	}
+	if !reflect.DeepEqual(s.controlPoints, defaultControlPoints) {
+		t.Errorf("Invalid controlPoints. Instead of '%#v', it is '%#v'.", defaultControlPoints, s.controlPoints)
+	}
+	if s.clearColor != defaultClearColor {
+		t.Errorf("Invalid clearColor. Instead of '%#v', it is '%#v'.", defaultClearColor, s.clearColor)
+	}
+}
