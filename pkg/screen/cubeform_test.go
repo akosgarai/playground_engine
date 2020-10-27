@@ -2,9 +2,12 @@ package screen
 
 import (
 	"reflect"
+	"runtime"
 	"testing"
 
+	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/material"
+	"github.com/akosgarai/playground_engine/pkg/testhelper"
 
 	"github.com/go-gl/mathgl/mgl32"
 )
@@ -377,4 +380,37 @@ func TestCubeFormScreenBuilderSetClearColor(t *testing.T) {
 			t.Errorf("Invalid clearColor. Instead of '%#v', it is '%#v'.", tt.value, builder.clearColor)
 		}
 	}
+}
+func TestCubeFormScreenBuilderBuildWithoutWrapper(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r == nil {
+				defer testhelper.GlfwTerminate()
+				t.Error("Build should panic without wrapper.")
+			}
+		}()
+		runtime.LockOSThread()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+		defer testhelper.GlfwTerminate()
+		wrapperReal.InitOpenGL()
+		builder := NewCubeFormScreenBuilder()
+		builder.Build()
+	}()
+}
+func TestCubeFormScreenBuilderBuildWithWrapper(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("Build should be fine with wrapper. '%#v'.", r)
+			}
+		}()
+		runtime.LockOSThread()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+		defer testhelper.GlfwTerminate()
+		wrapperReal.InitOpenGL()
+		builder := NewCubeFormScreenBuilder()
+		builder.SetWrapper(wrapperReal)
+		builder.Build()
+	}()
 }
