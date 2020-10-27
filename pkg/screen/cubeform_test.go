@@ -7,6 +7,8 @@ import (
 
 	"github.com/akosgarai/playground_engine/pkg/glwrapper"
 	"github.com/akosgarai/playground_engine/pkg/material"
+	"github.com/akosgarai/playground_engine/pkg/pointer"
+	"github.com/akosgarai/playground_engine/pkg/store"
 	"github.com/akosgarai/playground_engine/pkg/testhelper"
 
 	"github.com/go-gl/mathgl/mgl32"
@@ -446,4 +448,149 @@ func TestCubeFormScreen(t *testing.T) {
 	if s.clearColor != defaultClearColor {
 		t.Errorf("Invalid clearColor. Instead of '%#v', it is '%#v'.", defaultClearColor, s.clearColor)
 	}
+}
+func TestCubeFormScreenSetupCubeFormScreen(t *testing.T) {
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				defer testhelper.GlfwTerminate()
+				t.Errorf("setupCubeFormScreen should be fine with wrapper. '%#v'.", r)
+			}
+		}()
+		runtime.LockOSThread()
+		testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+		defer testhelper.GlfwTerminate()
+		wrapperReal.InitOpenGL()
+		builder := NewCubeFormScreenBuilder()
+		builder.SetWrapper(wrapperReal)
+		builder.SetWindowSize(800, 800)
+		s := builder.Build()
+		s.setupCubeFormScreen(wrapperReal)
+	}()
+}
+func TestCubeFormScreenUpdateWithDefaultControlPoints(t *testing.T) {
+	runtime.LockOSThread()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+	defer testhelper.GlfwTerminate()
+	wrapperReal.InitOpenGL()
+	builder := NewCubeFormScreenBuilder()
+	builder.SetWrapper(wrapperReal)
+	s := builder.Build()
+	ks := store.NewGlfwKeyStore()
+	ms := store.NewGlfwMouseStore()
+	s.Update(10, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(10, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(10, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(100, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(100, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(100, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(200, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(200, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(500, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(500, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(500, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(500, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+	s.Update(500, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+}
+
+func TestCubeFormScreenUpdateWithOneControlPoint(t *testing.T) {
+	runtime.LockOSThread()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+	defer testhelper.GlfwTerminate()
+	wrapperReal.InitOpenGL()
+	builder := NewCubeFormScreenBuilder()
+	builder.SetWrapper(wrapperReal)
+	builder.SetControlPoints([]mgl32.Vec3{mgl32.Vec3{0, 0, 0}})
+	s := builder.Build()
+	ks := store.NewGlfwKeyStore()
+	ms := store.NewGlfwMouseStore()
+	s.Update(10, pointer.New(0.5, 0.5, 0.0, 0.0), ks, ms)
+}
+func TestCubeFormScreenUpdateRotateLeftFromTheMiddle(t *testing.T) {
+	runtime.LockOSThread()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+	defer testhelper.GlfwTerminate()
+	wrapperReal.InitOpenGL()
+	builder := NewCubeFormScreenBuilder()
+	builder.SetWrapper(wrapperReal)
+	builder.SetWindowSize(800, 800)
+	builder.SetControlPoints([]mgl32.Vec3{mgl32.Vec3{0, 0, 0}})
+	s := builder.Build()
+	ks := store.NewGlfwKeyStore()
+	ms := store.NewGlfwMouseStore()
+	ms.Set(LEFT_MOUSE_BUTTON, true)
+	s.Update(10, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	ms.Set(LEFT_MOUSE_BUTTON, false)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+}
+func TestCubeFormScreenUpdateRotateRightFromTheMiddle(t *testing.T) {
+	runtime.LockOSThread()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+	defer testhelper.GlfwTerminate()
+	wrapperReal.InitOpenGL()
+	builder := NewCubeFormScreenBuilder()
+	builder.SetWrapper(wrapperReal)
+	builder.SetWindowSize(800, 800)
+	builder.SetControlPoints([]mgl32.Vec3{mgl32.Vec3{0, 0, 0}})
+	s := builder.Build()
+	ks := store.NewGlfwKeyStore()
+	ms := store.NewGlfwMouseStore()
+	ms.Set(LEFT_MOUSE_BUTTON, true)
+	s.Update(10, pointer.New(-0.2, 0.2, 0.0, 0.0), ks, ms)
+	ms.Set(LEFT_MOUSE_BUTTON, false)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+}
+func TestCubeFormScreenUpdateRotateLeftFromTheRight(t *testing.T) {
+	runtime.LockOSThread()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+	defer testhelper.GlfwTerminate()
+	wrapperReal.InitOpenGL()
+	builder := NewCubeFormScreenBuilder()
+	builder.SetWrapper(wrapperReal)
+	builder.SetWindowSize(800, 800)
+	builder.SetControlPoints([]mgl32.Vec3{mgl32.Vec3{0, 0, 0}})
+	s := builder.Build()
+	ks := store.NewGlfwKeyStore()
+	ms := store.NewGlfwMouseStore()
+	ms.Set(LEFT_MOUSE_BUTTON, true)
+	s.Update(10, pointer.New(-0.2, 0.2, 0.0, 0.0), ks, ms)
+	ms.Set(LEFT_MOUSE_BUTTON, false)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	ms.Set(LEFT_MOUSE_BUTTON, true)
+	s.Update(10, pointer.New(-0.2, 0.2, 0.0, 0.0), ks, ms)
+	ms.Set(LEFT_MOUSE_BUTTON, false)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+}
+func TestCubeFormScreenUpdateRotateRightFromTheLeft(t *testing.T) {
+	runtime.LockOSThread()
+	testhelper.GlfwInit(glwrapper.GL_MAJOR_VERSION, glwrapper.GL_MINOR_VERSION)
+	defer testhelper.GlfwTerminate()
+	wrapperReal.InitOpenGL()
+	builder := NewCubeFormScreenBuilder()
+	builder.SetWrapper(wrapperReal)
+	builder.SetWindowSize(800, 800)
+	builder.SetControlPoints([]mgl32.Vec3{mgl32.Vec3{0, 0, 0}})
+	s := builder.Build()
+	ks := store.NewGlfwKeyStore()
+	ms := store.NewGlfwMouseStore()
+	ms.Set(LEFT_MOUSE_BUTTON, true)
+	s.Update(10, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	ms.Set(LEFT_MOUSE_BUTTON, false)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	ms.Set(LEFT_MOUSE_BUTTON, true)
+	s.Update(10, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	ms.Set(LEFT_MOUSE_BUTTON, false)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
+	s.Update(300, pointer.New(0.2, 0.2, 0.0, 0.0), ks, ms)
 }
