@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"path"
@@ -11,6 +12,10 @@ import (
 
 	"github.com/akosgarai/coldet"
 	"github.com/go-gl/mathgl/mgl32"
+)
+
+var (
+	emptyMeshesError = errors.New("EMPTY_MESHES")
 )
 
 func baseDirModel() string {
@@ -100,6 +105,22 @@ func New() *BaseModel {
 // AddMesh function adds a mesh to the meshes.
 func (m *Model) AddMesh(msh interfaces.Mesh) {
 	m.meshes = append(m.meshes, msh)
+}
+
+// GetMeshByIndex function returns the mesh with the given index and nil.
+// If the index is greater than the mesh size, or less than 0, it returns error.
+// If the meshes is empty, it returns error.
+func (m *Model) GetMeshByIndex(index int) (interfaces.Mesh, error) {
+	if len(m.meshes) == 0 {
+		return nil, emptyMeshesError
+	}
+	if index < 0 {
+		return nil, errors.New("INVALID_INDEX")
+	}
+	if index+1 > len(m.meshes) {
+		return nil, errors.New("INVALID_INDEX")
+	}
+	return m.meshes[index], nil
 }
 
 // Draw function loops over each of the meshes and calls their Draw function.

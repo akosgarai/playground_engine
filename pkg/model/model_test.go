@@ -46,6 +46,33 @@ func TestAddMesh(t *testing.T) {
 		}
 	}
 }
+func TestGetMeshByIndex(t *testing.T) {
+	model := New()
+	_, err := model.GetMeshByIndex(2)
+	if err != emptyMeshesError {
+		t.Errorf("Invalid error for empty meshes. Instead of '%#v', it is '%#v'.", emptyMeshesError, err)
+	}
+	maxIndex := 10
+	for i := 0; i < maxIndex; i++ {
+		msh := mesh.NewPointMesh(wrapperMock)
+		model.AddMesh(msh)
+		m, err := model.GetMeshByIndex(i)
+		if err != nil {
+			t.Errorf("Should be fine, but we have the following error: '%#v'.", err)
+		}
+		if m != msh {
+			t.Error("Invalid mesh.")
+		}
+	}
+	_, err = model.GetMeshByIndex(-1)
+	if err == nil {
+		t.Error("Negative index should fail.")
+	}
+	_, err = model.GetMeshByIndex(maxIndex)
+	if err == nil {
+		t.Error("Big index should fail.")
+	}
+}
 func TestSetTransparent(t *testing.T) {
 	model := New()
 	if model.transparent != false {
