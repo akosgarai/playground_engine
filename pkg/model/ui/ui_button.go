@@ -4,7 +4,6 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/interfaces"
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
-	"github.com/akosgarai/playground_engine/pkg/model"
 	"github.com/akosgarai/playground_engine/pkg/primitives/rectangle"
 	"github.com/akosgarai/playground_engine/pkg/texture"
 
@@ -113,12 +112,13 @@ func (b *UIButtonBuilder) Build() *UIButton {
 	frame := b.frameMesh()
 	// label surface mesh: tex. (transp.) mat. (defaultMaterial) rectangle (buttonWidth - 2*frameWidth) * (buttonHeight - 2*frameWidth)
 	surface := b.surfaceMesh()
+	surface.SetParent(frame)
 	// base model
-	m := model.New()
+	m := New()
 	m.AddMesh(frame)
 	m.AddMesh(surface)
 	return &UIButton{
-		Model:           m,
+		UIModel:         m,
 		labelText:       b.labelText,
 		labelColor:      b.labelColor,
 		labelPosition:   b.labelPosition,
@@ -130,7 +130,7 @@ func (b *UIButtonBuilder) Build() *UIButton {
 }
 
 type UIButton struct {
-	Model         *model.BaseModel
+	*UIModel
 	labelText     string     // This value is printed to the surface mesh
 	labelColor    mgl32.Vec3 // The value will be printed with this color.
 	labelPosition mgl32.Vec3 // The position of the text (relative from the surface).
