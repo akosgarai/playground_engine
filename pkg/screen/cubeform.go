@@ -301,32 +301,28 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 	bb := ui.NewUIButtonBuilder(b.wrapper)
 	bb.SetupSize(0.5, 1.0, 0.05)
 	bb.SetupMaterials(material.Chrome, material.Ruby, material.Emerald)
+	// Rotate right button
 	button1 := bb.Build()
 	button1.AttachToScreen(middleMonitorScreen, mgl32.Vec3{-0.002, 0.35, 0.0})
 	sb.AddModelToShader(button1, shaderAppButtons)
-	// Rotate right button
-	MiddleMonitorGoRightButton, _ := button1.GetMeshByIndex(0)
 	// Rotate left button
 	button2 := bb.Build()
 	button2.AttachToScreen(middleMonitorScreen, mgl32.Vec3{-0.002, -0.35, 0.0})
 	sb.AddModelToShader(button2, shaderAppButtons)
-	MiddleMonitorGoLeftButton, _ := button2.GetMeshByIndex(0)
 	// right go back button
 	button3 := bb.Build()
 	button3.AttachToScreen(rightMonitorScreen, mgl32.Vec3{-0.002, 0.35, 0.0})
 	sb.AddModelToShader(button3, shaderAppButtons)
-	RightMonitorGoLeftButton, _ := button3.GetMeshByIndex(0)
 	// left go back button
 	button4 := bb.Build()
 	button4.AttachToScreen(leftMonitorScreen, mgl32.Vec3{-0.002, -0.35, 0.0})
 	sb.AddModelToShader(button4, shaderAppButtons)
-	LeftMonitorGoRightButton, _ := button4.GetMeshByIndex(0)
 	s := &CubeFormScreen{
 		ScreenBase:                 sb,
-		MiddleMonitorGoRightButton: MiddleMonitorGoRightButton.(*mesh.TexturedMaterialMesh),
-		MiddleMonitorGoLeftButton:  MiddleMonitorGoLeftButton.(*mesh.TexturedMaterialMesh),
-		RightMonitorGoLeftButton:   RightMonitorGoLeftButton.(*mesh.TexturedMaterialMesh),
-		LeftMonitorGoRightButton:   LeftMonitorGoRightButton.(*mesh.TexturedMaterialMesh),
+		MiddleMonitorGoRightButton: button1,
+		MiddleMonitorGoLeftButton:  button2,
+		RightMonitorGoLeftButton:   button3,
+		LeftMonitorGoRightButton:   button4,
 		RotationToLeftAngle:        b.leftMonitorRotationAngle,
 		RotationToRightAngle:       b.rightMonitorRotationAngle,
 		SumOfRotation:              float32(0.0),
@@ -404,10 +400,10 @@ func (b *CubeFormScreenBuilder) defaultCameraOptions() map[string]interface{} {
 
 type CubeFormScreen struct {
 	*ScreenBase
-	MiddleMonitorGoRightButton *mesh.TexturedMaterialMesh
-	MiddleMonitorGoLeftButton  *mesh.TexturedMaterialMesh
-	RightMonitorGoLeftButton   *mesh.TexturedMaterialMesh
-	LeftMonitorGoRightButton   *mesh.TexturedMaterialMesh
+	MiddleMonitorGoRightButton *ui.UIButton
+	MiddleMonitorGoLeftButton  *ui.UIButton
+	RightMonitorGoLeftButton   *ui.UIButton
+	LeftMonitorGoRightButton   *ui.UIButton
 	// Rotation to the monitors
 	RotationToLeftAngle  float32
 	RotationToRightAngle float32
@@ -478,6 +474,8 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 	f.closestModel = closestModel
 	// movement handler. It will be unnecessary. Only for testing purposes in form.
 	if f.state == "form" {
+		// make the buttons to their default state.
+		f.buttonsToDefaultState()
 		f.cameraKeyboardMovement("forward", "back", "Walk", dt, keyStore)
 		f.cameraKeyboardMovement("right", "left", "Strafe", dt, keyStore)
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
@@ -487,26 +485,16 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 			btn := f.closestModel.(*ui.UIButton)
 			btn.Hover()
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-				btn.OnState()
-			} else {
-				btn.OnState()
-			}
-			break
-		}
-		switch f.closestMesh.(type) {
-		case *mesh.TexturedMaterialMesh:
-			mMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
-			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
-				if mMesh == f.MiddleMonitorGoRightButton {
+				if btn == f.MiddleMonitorGoRightButton {
 					fmt.Println("MiddleMonitorGoRightButton button has been pressed.")
 					f.state = "rotate-right-from-middle"
-				} else if mMesh == f.MiddleMonitorGoLeftButton {
+				} else if btn == f.MiddleMonitorGoLeftButton {
 					fmt.Println("MiddleMonitorGoLeftButton button has been pressed.")
 					f.state = "rotate-left-from-middle"
-				} else if mMesh == f.RightMonitorGoLeftButton {
+				} else if btn == f.RightMonitorGoLeftButton {
 					fmt.Println("RightMonitorGoLeftButton button has been pressed.")
 					f.state = "rotate-left-from-right"
-				} else if mMesh == f.LeftMonitorGoRightButton {
+				} else if btn == f.LeftMonitorGoRightButton {
 					fmt.Println("LeftMonitorGoRightButton button has been pressed.")
 					f.state = "rotate-right-from-left"
 				}
@@ -514,6 +502,12 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 			break
 		}
 	}
+}
+func (f *CubeFormScreen) buttonsToDefaultState() {
+	f.MiddleMonitorGoRightButton.Clear()
+	f.MiddleMonitorGoLeftButton.Clear()
+	f.RightMonitorGoLeftButton.Clear()
+	f.LeftMonitorGoRightButton.Clear()
 }
 
 // CharCallback
