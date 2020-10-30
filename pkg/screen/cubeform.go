@@ -482,6 +482,17 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 		f.cameraKeyboardMovement("right", "left", "Strafe", dt, keyStore)
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
 		// check the buttons also.
+		switch f.closestModel.(type) {
+		case *ui.UIButton:
+			btn := f.closestModel.(*ui.UIButton)
+			btn.Hover()
+			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
+				btn.OnState()
+			} else {
+				btn.OnState()
+			}
+			break
+		}
 		switch f.closestMesh.(type) {
 		case *mesh.TexturedMaterialMesh:
 			mMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
