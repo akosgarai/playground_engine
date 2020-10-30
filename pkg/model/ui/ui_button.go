@@ -113,6 +113,7 @@ func (b *UIButtonBuilder) Build() *UIButton {
 	// label surface mesh: tex. (transp.) mat. (defaultMaterial) rectangle (buttonWidth - 2*frameWidth) * (buttonHeight - 2*frameWidth)
 	surface := b.surfaceMesh()
 	surface.SetParent(frame)
+	surface.SetPosition(mgl32.Vec3{0, 0.001, 0})
 	// base model
 	m := newModel()
 	m.AddMesh(frame)
