@@ -114,7 +114,7 @@ func (b *UIButtonBuilder) Build() *UIButton {
 	surface := b.surfaceMesh()
 	surface.SetParent(frame)
 	// base model
-	m := New()
+	m := newModel()
 	m.AddMesh(frame)
 	m.AddMesh(surface)
 	return &UIButton{
@@ -146,7 +146,7 @@ type UIButton struct {
 // meshes[0] - background mesh - the frame of the button
 // meshes[1] - the surface mesh. Its material is updatable.
 func (m *UIButton) LabelSurface() interfaces.Mesh {
-	msh, _ := m.Model.GetMeshByIndex(1)
+	msh, _ := m.GetMeshByIndex(1)
 	return msh
 }
 
