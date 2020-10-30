@@ -11,6 +11,7 @@ import (
 	"github.com/akosgarai/playground_engine/pkg/material"
 	"github.com/akosgarai/playground_engine/pkg/mesh"
 	"github.com/akosgarai/playground_engine/pkg/model"
+	"github.com/akosgarai/playground_engine/pkg/model/ui"
 	"github.com/akosgarai/playground_engine/pkg/primitives/cuboid"
 	"github.com/akosgarai/playground_engine/pkg/primitives/rectangle"
 	"github.com/akosgarai/playground_engine/pkg/shader"
@@ -289,39 +290,43 @@ func (b *CubeFormScreenBuilder) Build() *CubeFormScreen {
 	sb.AddShader(shaderAppMaterial)
 	shaderAppTexture := shader.NewTextureShader(b.wrapper)
 	sb.AddShader(shaderAppTexture)
+	shaderAppButtons := shader.NewTextureMatShaderBlending(b.wrapper)
+	sb.AddShader(shaderAppButtons)
 	// Attach the models to the shaders
 	sb.AddModelToShader(monitors, shaderAppMonitors)
 	sb.AddModelToShader(desk, shaderAppMaterial)
 	sb.AddModelToShader(screens, shaderAppMaterial)
 	sb.AddModelToShader(rustySurface, shaderAppTexture)
 	// The buttons below are only for testing purposes. The final layout will be designed later.
-	ButtonSize := mgl32.Vec3{0.5, 1.0, 0.0}
+	bb := ui.NewUIButtonBuilder(b.wrapper)
+	bb.SetupSize(0.5, 1.0, 0.05)
+	bb.SetupMaterials(material.Chrome, material.Ruby, material.Emerald)
+	button1 := bb.Build()
+	button1.AttachToScreen(middleMonitorScreen, mgl32.Vec3{-0.002, 0.35, 0.0})
+	sb.AddModelToShader(button1, shaderAppButtons)
 	// Rotate right button
-	MiddleMonitorGoRightButton := b.createMaterialCubeWithBinding(material.Ruby, ButtonSize)
-	MiddleMonitorGoRightButton.SetParent(middleMonitorScreen)
-	MiddleMonitorGoRightButton.SetPosition(mgl32.Vec3{-0.002, 0.35, 0.0})
-	screens.AddMesh(MiddleMonitorGoRightButton)
+	MiddleMonitorGoRightButton, _ := button1.GetMeshByIndex(0)
 	// Rotate left button
-	MiddleMonitorGoLeftButton := b.createMaterialCubeWithBinding(material.Ruby, ButtonSize)
-	MiddleMonitorGoLeftButton.SetParent(middleMonitorScreen)
-	MiddleMonitorGoLeftButton.SetPosition(mgl32.Vec3{-0.002, -0.35, 0.0})
-	screens.AddMesh(MiddleMonitorGoLeftButton)
+	button2 := bb.Build()
+	button2.AttachToScreen(middleMonitorScreen, mgl32.Vec3{-0.002, -0.35, 0.0})
+	sb.AddModelToShader(button2, shaderAppButtons)
+	MiddleMonitorGoLeftButton, _ := button2.GetMeshByIndex(0)
 	// right go back button
-	RightMonitorGoLeftButton := b.createMaterialCubeWithBinding(material.Ruby, ButtonSize)
-	RightMonitorGoLeftButton.SetParent(rightMonitorScreen)
-	RightMonitorGoLeftButton.SetPosition(mgl32.Vec3{-0.002, 0.35, 0.0})
-	screens.AddMesh(RightMonitorGoLeftButton)
+	button3 := bb.Build()
+	button3.AttachToScreen(rightMonitorScreen, mgl32.Vec3{-0.002, 0.35, 0.0})
+	sb.AddModelToShader(button3, shaderAppButtons)
+	RightMonitorGoLeftButton, _ := button3.GetMeshByIndex(0)
 	// left go back button
-	LeftMonitorGoRightButton := b.createMaterialCubeWithBinding(material.Ruby, ButtonSize)
-	LeftMonitorGoRightButton.SetParent(leftMonitorScreen)
-	LeftMonitorGoRightButton.SetPosition(mgl32.Vec3{-0.002, -0.35, 0.0})
-	screens.AddMesh(LeftMonitorGoRightButton)
+	button4 := bb.Build()
+	button4.AttachToScreen(leftMonitorScreen, mgl32.Vec3{-0.002, -0.35, 0.0})
+	sb.AddModelToShader(button4, shaderAppButtons)
+	LeftMonitorGoRightButton, _ := button4.GetMeshByIndex(0)
 	s := &CubeFormScreen{
 		ScreenBase:                 sb,
-		MiddleMonitorGoRightButton: MiddleMonitorGoRightButton,
-		MiddleMonitorGoLeftButton:  MiddleMonitorGoLeftButton,
-		RightMonitorGoLeftButton:   RightMonitorGoLeftButton,
-		LeftMonitorGoRightButton:   LeftMonitorGoRightButton,
+		MiddleMonitorGoRightButton: MiddleMonitorGoRightButton.(*mesh.TexturedMaterialMesh),
+		MiddleMonitorGoLeftButton:  MiddleMonitorGoLeftButton.(*mesh.TexturedMaterialMesh),
+		RightMonitorGoLeftButton:   RightMonitorGoLeftButton.(*mesh.TexturedMaterialMesh),
+		LeftMonitorGoRightButton:   LeftMonitorGoRightButton.(*mesh.TexturedMaterialMesh),
 		RotationToLeftAngle:        b.leftMonitorRotationAngle,
 		RotationToRightAngle:       b.rightMonitorRotationAngle,
 		SumOfRotation:              float32(0.0),
@@ -373,16 +378,6 @@ func (b *CubeFormScreenBuilder) createTexturedCube(t texture.Textures, size mgl3
 	return mesh.NewTexturedMesh(V, I, t, b.wrapper)
 }
 
-// Create material cube, that represents the button on the screens.
-// TODO: It should look better.
-func (b *CubeFormScreenBuilder) createMaterialCubeWithBinding(m *material.Material, size mgl32.Vec3) *mesh.MaterialMesh {
-	r := cuboid.New(size.X(), size.Y(), size.Z())
-	V, I, BO := r.MaterialMeshInput()
-	rect := mesh.NewMaterialMesh(V, I, m, b.wrapper)
-	rect.SetBoundingObject(BO)
-	return rect
-}
-
 // It creates a new camera with the necessary setup
 func (b *CubeFormScreenBuilder) defaultCamera() *camera.DefaultCamera {
 	cam := camera.NewCamera(b.controlPoints[0], mgl32.Vec3{0, 0, -1}, 0.0, 0.0)
@@ -409,10 +404,10 @@ func (b *CubeFormScreenBuilder) defaultCameraOptions() map[string]interface{} {
 
 type CubeFormScreen struct {
 	*ScreenBase
-	MiddleMonitorGoRightButton *mesh.MaterialMesh
-	MiddleMonitorGoLeftButton  *mesh.MaterialMesh
-	RightMonitorGoLeftButton   *mesh.MaterialMesh
-	LeftMonitorGoRightButton   *mesh.MaterialMesh
+	MiddleMonitorGoRightButton *mesh.TexturedMaterialMesh
+	MiddleMonitorGoLeftButton  *mesh.TexturedMaterialMesh
+	RightMonitorGoLeftButton   *mesh.TexturedMaterialMesh
+	LeftMonitorGoRightButton   *mesh.TexturedMaterialMesh
 	// Rotation to the monitors
 	RotationToLeftAngle  float32
 	RotationToRightAngle float32
@@ -488,8 +483,8 @@ func (f *CubeFormScreen) Update(dt float64, p interfaces.Pointer, keyStore inter
 		f.cameraKeyboardMovement("up", "down", "Lift", dt, keyStore)
 		// check the buttons also.
 		switch f.closestMesh.(type) {
-		case *mesh.MaterialMesh:
-			mMesh := f.closestMesh.(*mesh.MaterialMesh)
+		case *mesh.TexturedMaterialMesh:
+			mMesh := f.closestMesh.(*mesh.TexturedMaterialMesh)
 			if buttonStore.Get(LEFT_MOUSE_BUTTON) {
 				if mMesh == f.MiddleMonitorGoRightButton {
 					fmt.Println("MiddleMonitorGoRightButton button has been pressed.")
