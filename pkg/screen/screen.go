@@ -158,6 +158,16 @@ func (s *ScreenBase) AddModelToShader(m interfaces.Model, sh interfaces.Shader) 
 	s.shaderMap[sh] = append(s.shaderMap[sh], m)
 }
 
+// RemoveModelFromShader detaches the model from the shader.
+func (s *ScreenBase) RemoveModelFromShader(m interfaces.Model, sh interfaces.Shader) {
+	for index, val := range s.shaderMap[sh] {
+		if val == m {
+			copy(s.shaderMap[sh][index:], s.shaderMap[sh][index+1:])
+			s.shaderMap[sh] = s.shaderMap[sh][:len(s.shaderMap[sh])-1]
+		}
+	}
+}
+
 // GetClosestModelMeshDistance returns the closest model, mesh and its distance
 // from the mouse position.
 func (s *ScreenBase) GetClosestModelMeshDistance() (interfaces.Model, interfaces.Mesh, float32) {
