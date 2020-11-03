@@ -196,6 +196,22 @@ func TestAddModelToShader(t *testing.T) {
 		t.Errorf("Invalid model length. Instead of '1', it is '%d'.\n", len(screen.shaderMap[sm]))
 	}
 }
+func TestRemoveModelFromShader(t *testing.T) {
+	screen := New()
+	screen.AddShader(sm)
+	if len(screen.shaderMap[sm]) != 0 {
+		t.Errorf("Invalid model length. Instead of '0', it is '%d'.\n", len(screen.shaderMap[sm]))
+	}
+	mod := model.New()
+	screen.AddModelToShader(mod, sm)
+	if len(screen.shaderMap[sm]) != 1 {
+		t.Errorf("Invalid model length. Instead of '1', it is '%d'.\n", len(screen.shaderMap[sm]))
+	}
+	screen.RemoveModelFromShader(mod, sm)
+	if len(screen.shaderMap[sm]) != 0 {
+		t.Errorf("Invalid model length. Instead of '0', it is '%d'.\n", len(screen.shaderMap[sm]))
+	}
+}
 func TestGetClosestModelMeshDistance(t *testing.T) {
 	screen := New()
 	mod := model.New()
