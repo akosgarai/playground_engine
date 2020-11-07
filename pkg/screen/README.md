@@ -54,6 +54,10 @@ AddShader method inserts the new shader to the shaderMap
 
 AddModelToShader attaches the model to a shader.
 
+**RemoveModelFromShader**
+
+RemoveModelFromShader detaches the model from the shader.
+
 **GetClosestModelMeshDistance**
 
 GetClosestModelMeshDistance returns the closest model, mesh and its distance from the mouse position.
