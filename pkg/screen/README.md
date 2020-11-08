@@ -88,7 +88,11 @@ Draw calls Draw function in every drawable item. It calls the setupFunction, the
 
 **Update**
 
-Update loops on the shaderMap, and calls Update function on every Model. It also handles the camera movement and rotation, if the camera is set.
+It handles the camera movement and rotation, if the camera is set. It calls UpdateWithDistance after the necessary input is calculated.
+
+**UpdateWithDistance**
+
+UpdateWithDistance loops on the shaderMap, and calls Update function on every Model.
 
 **Export**
 

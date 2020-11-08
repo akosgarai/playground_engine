@@ -434,19 +434,17 @@ func (s *Screen) Update(dt float64, p interfaces.Pointer, keyStore interfaces.Ro
 		}
 		TransformationMatrix = (s.camera.GetProjectionMatrix().Mul4(s.camera.GetViewMatrix())).Inv()
 	}
-	coords := mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix)
+	s.UpdateWithDistance(dt, mgl32.TransformCoordinate(mgl32.Vec3{float32(posX), float32(posY), 0.0}, TransformationMatrix))
+}
+
+// UpdateWithDistance gets the coordinates as input and loops over the shaders, updates them and does the collision detection.
+func (s *Screen) UpdateWithDistance(dt float64, coords mgl32.Vec3) {
 	closestDistance := float32(math.MaxFloat32)
 	var closestMesh interfaces.Mesh
 	var closestModel interfaces.Model
 
 	for sh, _ := range s.shaderMap {
 		for index, _ := range s.shaderMap[sh] {
-			// The collision detection between the moving meshes supposed to be implemented somewhere here.
-			// It could be the same as the collision detection between the camera and the other objects.
-			// If a mesh is a moving object (in this case, the moving means movement on the direction),
-			// then it needs to be tested against other objects. If collision is not found, the update
-			// could be applied, otherwise it needs to be skipped. In the future, the collusion effect
-			// also could be handled here.
 			s.shaderMap[sh][index].Update(dt)
 			msh, dist := s.shaderMap[sh][index].ClosestMeshTo(coords)
 			if dist < closestDistance {
