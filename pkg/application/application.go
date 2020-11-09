@@ -45,6 +45,7 @@ type Window interface {
 	SetKeyCallback(glfw.KeyCallback) glfw.KeyCallback
 	SetMouseButtonCallback(glfw.MouseButtonCallback) glfw.MouseButtonCallback
 	SetCharCallback(glfw.CharCallback) glfw.CharCallback
+	SetSizeCallback(glfw.SizeCallback) glfw.SizeCallback
 	ShouldClose() bool
 	SwapBuffers()
 	GetSize() (int, int)
