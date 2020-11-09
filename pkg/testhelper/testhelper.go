@@ -141,6 +141,7 @@ func (wm WindowMock) GetCursorPos() (float64, float64) {
 }
 func (wm WindowMock) SetKeyCallback(cb glfw.KeyCallback) glfw.KeyCallback    { return cb }
 func (wm WindowMock) SetCharCallback(cb glfw.CharCallback) glfw.CharCallback { return cb }
+func (wm WindowMock) SetSizeCallback(cb glfw.SizeCallback) glfw.SizeCallback { return cb }
 func (wm WindowMock) SetMouseButtonCallback(cb glfw.MouseButtonCallback) glfw.MouseButtonCallback {
 	return cb
 }
