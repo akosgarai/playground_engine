@@ -175,6 +175,7 @@ type Camera interface {
 	Lift(float32)
 	UpdateDirection(float32, float32)
 	GetPosition() mgl32.Vec3
+	SetPosition(mgl32.Vec3)
 	GetVelocity() float32
 	GetRotationStep() float32
 	BoundingObjectAfterWalk(float32) *coldet.Sphere
